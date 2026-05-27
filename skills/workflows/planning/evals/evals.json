@@ -1,0 +1,99 @@
+{
+  "skill_name": "planning",
+  "evals": [
+    {
+      "id": 1,
+      "name": "define-from-active-spec",
+      "mode_under_test": "define",
+      "prompt": "Vamos a empezar a implementar la spec de itinerarios colaborativos. Arranquemos por el modelo de datos del colaborador y la integración con django-guardian.",
+      "context": {
+        "session_state": "empty",
+        "active_spec": ".ai/specs/itinerarios-colaborativos/",
+        "spec_files": ["PRD.md", "user-stories.md"],
+        "constitution_tdd_mode": "enabled",
+        "reference_index_has": ["django-guardian"]
+      },
+      "expected_output": [
+        ".ai/session/plan.md created from plan-template.md",
+        ".ai/session/tasks.md created with phases declaring depends-on and reversibility",
+        ".ai/session/walkthrough.md created as a stub",
+        "Tasks are TDD-ordered (failing test before implementation within each phase)",
+        "Plan cites both the spec and the reference-index entry for django-guardian",
+        "Agent paused for approval before any execution; no source files modified",
+        "If any ambiguity existed (e.g. role storage), it was resolved via a questionnaire — no [NEEDS CLARIFICATION] block in the artifact"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "define-independent-plan",
+      "mode_under_test": "define",
+      "prompt": "Estamos viendo problemas de N+1 en el listado de itinerarios. Hay que optimizar las queries de la vista de lista.",
+      "context": {
+        "session_state": "empty",
+        "active_spec": null,
+        "constitution_tdd_mode": "enabled"
+      },
+      "expected_output": [
+        "plan.md created with spec field empty in frontmatter",
+        "Technical approach section explains the use of select_related / prefetch_related",
+        "tasks.md has at least one phase covering profiling (confirm the N+1) and one for the fix",
+        "TDD posture: a perf or query-count assertion exists as a test task before the optimization task",
+        "Sources consulted includes the constitution and (if relevant) the reference-index for django-debug-toolbar",
+        "Agent paused for approval"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "execute-with-mid-phase-discrepancy",
+      "mode_under_test": "execute",
+      "prompt": "continúa",
+      "context": {
+        "session_state": "active",
+        "session_files": {
+          "plan.md": "approved, slug=itinerarios-colaborativos-modelo-base",
+          "tasks.md": "Phase 1 has 2 of 4 tasks checked",
+          "walkthrough.md": "Phase 0 onboarding block only"
+        },
+        "git_status": "clean",
+        "simulated_obstacle": "Next task references an Itinerary.owner field; the model actually uses Itinerary.created_by",
+        "constitution_tdd_mode": "enabled"
+      },
+      "expected_output": [
+        "Agent verified git status before doing anything",
+        "Agent surfaced the field name discrepancy (owner vs created_by) and stopped to ask, instead of guessing",
+        "If the developer approves the rename in tasks.md, the agent also amended plan.md (Plan amendments section) and noted the deviation in walkthrough.md",
+        "No further phase was started in the same turn; the agent paused at the phase boundary",
+        "A chore(wip) commit message was suggested but not executed"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "summarize-with-adr-proposal",
+      "mode_under_test": "summarize",
+      "prompt": "Listo, cerremos este plan.",
+      "context": {
+        "session_state": "active",
+        "session_files": {
+          "plan.md": "approved",
+          "tasks.md": "all checked",
+          "walkthrough.md": "3 phase blocks, one with a structural decision: roles as CharField choices"
+        },
+        "active_spec": ".ai/specs/itinerarios-colaborativos/",
+        "quality_gate": "passing"
+      },
+      "expected_output": [
+        ".ai/session/<slug>-summary.md created using plan-summary-template.md",
+        "Summary is short (target one screen, no walkthrough-style narration)",
+        "Spec coverage section marks the user stories closed by this plan",
+        "An ADR proposal is included (CharField vs roles table), status: Proposed, with context/decision/alternatives/consequences",
+        "A conventional-commit message is suggested (feat:...) and explicitly noted as a squash target option",
+        "Agent did NOT run cleanup; explicitly handed off the next step to the developer",
+        "Agent did NOT write directly to .ai/memory/adr-log.md"
+      ],
+      "files": []
+    }
+  ]
+}
