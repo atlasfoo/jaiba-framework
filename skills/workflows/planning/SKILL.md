@@ -1,6 +1,15 @@
 ---
 name: planning
 description: Tactical planning workflow inside the JAIBA framework. Use this skill whenever the developer wants to plan a concrete piece of work, advance an existing plan, wrap up a completed plan, or archive its session artifacts. Trigger on any of: explicit calls like "planning define / summarize / cleanup", phrases like "vamos a planear", "armemos un plan", "siguiente tarea", "continúa con el plan", "cierra este plan", "archiva el plan". Also trigger implicitly whenever `.ai/session/plan.md` exists in the repository and the developer's message reads as a continuation cue (e.g. "sigue", "avanza", "next", "go", "okay continúa"). Covers writing plan.md and tasks.md, executing tasks phase by phase with walkthrough logging, summarizing a finished plan with optional ADR proposal, and cleaning up `.ai/session/` after archival.
+version: 1.0.0
+author: atlasfoo<iscomejia15@outlook.com>
+requires:
+  - git
+tags:
+  - jaiba
+  - workflows
+  - jaiba-workflows
+  - plan-mode
 ---
 
 # Planning Skill

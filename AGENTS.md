@@ -76,6 +76,7 @@ graph TD
     end
 ```
 
+
 ### File hierarchy
 
 The final output of this framework are skills, template artifacts will be packaged within this skills
@@ -106,3 +107,12 @@ The final output of this framework are skills, template artifacts will be packag
 ```
 
 > Since scaffold script is not already done, memory artifacts templates live in `templates` temporary folder.
+
+
+## 5. Project status
+
+Read project status and tasks at `.ai/session/state.md` when requested with a full plan.
+
+## 6. Behavior
+
+To save tokens, use `caveman` skill for communication
