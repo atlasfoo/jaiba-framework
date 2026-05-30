@@ -79,6 +79,9 @@ session.
    chat.
 4. **Tools serve discovery and verification**, not bulk content
    delivery.
+5. **Language preferences.** Respect the language the user uses in
+   their chat requests, only changing it if the user explicitly
+   requests a different language. For writing framework artifacts, use english exclusively for long term brain `.ai/memory`, and for workflow brain artifacts (`.ai/session`, `.ai/specs`), use the same language as the user when generating them.
 
 ## 4. Security
 

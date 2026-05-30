@@ -233,13 +233,13 @@ The knowledge maintenance workflow. Updates the `memory/` files based on project
 
 ### ⚡ `skill: fast`
 
-Direct execution without formal planning. For small, well-defined, low-risk tasks where the overhead of creating a plan is not justified.
+Direct execution without formal planning. For small, well-defined, low-risk tasks where the overhead of creating a plan is not justified. It can run free-standing (e.g. *"bump requests to 2.32"*) or as an unplanned adjustment to an active plan (e.g. *"add a validation to the endpoint that wasn't in the plan"*).
 
-- The agent acts directly on the human's request
-- Records a minimal summary in `walkthrough.md`
-- Does not generate `plan.md` or `tasks.md`
+- **Triages before acting.** The agent first estimates the change's blast radius. If the work is too large for `fast` (many files, contract changes, migrations, cascading breaking changes), it refuses and routes the developer to `planning` instead of half-applying it.
+- **Free-standing:** the agent acts directly and writes nothing to `.ai/session/`; git history plus a one-line recap is the record. Does not generate `plan.md` or `tasks.md`.
+- **Plan adjustment:** the agent executes the change, then — only after the developer confirms it is correct — records it into the active session artifacts (`tasks.md`, `plan.md` amendments, `walkthrough.md`), so the plan never drifts ahead of reality.
 
-> Use it judiciously. If the task has more than 2-3 steps or touches multiple files, consider using **planning** instead.
+> Use it judiciously. If the task has more than 2-3 steps, touches multiple files, or changes shared contracts, `fast` itself will hand it back to **planning**.
 
 ---
 

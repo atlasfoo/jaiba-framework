@@ -1,0 +1,89 @@
+{
+  "skill_name": "fast",
+  "evals": [
+    {
+      "id": 1,
+      "name": "free-standing-accepted",
+      "context_under_test": "free-standing",
+      "prompt": "/fast sube requests de 2.31 a 2.32 en el manifiesto",
+      "context": {
+        "session_state": "empty",
+        "constitution_quality_gate": "present",
+        "reference_index_has": ["requests"]
+      },
+      "expected_output": [
+        "Agent triaged scope first (confirmed the bump touches only the manifest, no breaking changes reaching call sites)",
+        "Change applied to the dependency manifest only",
+        "Quality Gate run after the change",
+        "Nothing written to .ai/session/ (no plan active, no orphan walkthrough.md created)",
+        "A conventional-commit message suggested (chore(deps): ...), not executed",
+        "One-line recap given in chat"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "too-complex-refused",
+      "context_under_test": "triage-refusal",
+      "prompt": "/fast actualiza el paquete requests a la versión 5",
+      "context": {
+        "session_state": "empty",
+        "simulated_blast_radius": "23 call sites across 9 modules, a custom requests.Session subclass whose signature changes, adapter/retry config moves to a new API",
+        "constitution_quality_gate": "present"
+      },
+      "expected_output": [
+        "Agent investigated blast radius before editing (counted call sites, detected contract + migration impact)",
+        "Agent refused to execute the change as fast work",
+        "No partial change applied; worktree left untouched",
+        "Refusal was concrete (named file/call-site count and the changed contract), not just 'too complex'",
+        "Agent routed the developer to planning define with a one-line sketch of what the plan must cover"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "plan-adjustment-with-confirmation",
+      "context_under_test": "plan-adjustment",
+      "prompt": "agrega una validación de formato de email al endpoint de invitación, no estaba en el plan",
+      "context": {
+        "session_state": "active",
+        "session_files": {
+          "plan.md": "approved, executing, slug=itinerarios-colaborativos-modelo-base",
+          "tasks.md": "Phase 2 (invitation service) in progress",
+          "walkthrough.md": "Phase 1 block present"
+        },
+        "git_status": "dirty-from-current-phase",
+        "constitution_tdd_mode": "enabled"
+      },
+      "expected_output": [
+        "Agent triaged the change as fast-eligible (one serializer + one test, contained)",
+        "Agent recognized the change as a plan adjustment (in scope of the active plan)",
+        "Dirty worktree treated as expected mid-phase, not as a blocking surprise",
+        "Behavioral change with TDD enabled: a test was added/adjusted and passes",
+        "Quality Gate run green",
+        "Agent executed the change THEN asked the developer to confirm correctness BEFORE writing session artifacts",
+        "On confirmation: tasks.md got the new checked task tagged (fast, <date>), plan.md got a Plan amendments bullet, walkthrough.md got an out-of-band note",
+        "Agent did not advance the plan itself; suggested a commit without running it"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "borderline-asks-developer",
+      "context_under_test": "triage-borderline",
+      "prompt": "/fast extrae la lógica de cálculo de precios a su propio módulo y actualiza los imports",
+      "context": {
+        "session_state": "empty",
+        "simulated_blast_radius": "ambiguous — could be 2 files or could ripple through ~8 importers",
+        "constitution_quality_gate": "present"
+      },
+      "expected_output": [
+        "Agent investigated before deciding (located the pricing logic and counted importers)",
+        "Agent surfaced its blast-radius estimate to the developer rather than deciding silently",
+        "Agent offered the choice: proceed as fast vs. route to planning, and waited for the decision",
+        "No code changed before the developer chose"
+      ],
+      "files": []
+    }
+  ]
+}
