@@ -245,13 +245,15 @@ Direct execution without formal planning. For small, well-defined, low-risk task
 
 ### 💬 `skill: ask`
 
-Pure query mode. The agent answers questions, explains code, analyzes architecture, or evaluates options **without modifying anything**.
+Pure query mode. The agent answers questions, explains code, analyzes architecture, or evaluates options **without modifying anything**. It is strictly read-only: it reads, searches, and explains, but never edits code, writes to `.ai/`, or runs the Quality Gate.
 
-- The agent does not write or edit code
-- Can consult project files to give contextualized answers
-- Ideal for conceptual pair-programming, reviews, and decision-making
+- **Strictly read-only.** The agent does not write or edit code or brain artifacts — safe to invoke reflexively before any action.
+- **Answers cold.** It orients itself from the repository, so questions about the active plan (`session/`) or the active spec (`specs/`) work on the first message of a session, with no prior context.
+- **Three domains.** Code (with `git log`/`blame` for the *why-historical*), the active plan, and the active spec — plus past decisions via `adr-log.md`.
+- **Hands off to action.** When the developer stops asking and asks to *act*, `ask` routes to the owning skill — `planning:execute` for a continuation cue, `planning` for a new plan, `fast` for a contained change — carrying everything it already read into that skill within the same session.
+- Triggers explicitly (`/ask`) and **implicitly** on interrogative/exploratory messages, deliberately yielding to the action skills on imperative or continuation cues.
 
-> Separating query mode from execution mode prevents accidental changes and keeps the human's intent clear.
+> Separating query mode from execution mode prevents accidental changes and keeps the human's intent clear. Asking first is not overhead: the context gathered while answering carries straight into whichever skill executes the change.
 
 ---
 

@@ -6,7 +6,7 @@
 - [x] Short term brain workflows and artifacts
   - [x] `planning` skill and artifacts
   - [x] `fast` skill
-  - [ ] `ask` skill
+  - [x] `ask` skill
 - [ ] Mid term brain workflows and artifacts
   - [ ] `specifiy` skills and artifacts
 - [ ] Long term brain workflows
