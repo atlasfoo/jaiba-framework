@@ -1,0 +1,127 @@
+{
+  "skill_name": "ask",
+  "evals": [
+    {
+      "id": 1,
+      "name": "cold-plan-question",
+      "domain_under_test": "active-plan",
+      "prompt": "¿qué falta por hacer en el plan?",
+      "context": {
+        "session_state": "active",
+        "prior_conversation": "none (first message of the session)",
+        "session_files": {
+          "plan.md": "approved, slug=itinerarios-colaborativos-modelo-base, spec=itinerarios-colaborativos",
+          "tasks.md": "Phase 1 fully checked; Phase 2 has 2 of 4 tasks unchecked; Phase 3 untouched",
+          "walkthrough.md": "Phase 1 block present"
+        }
+      },
+      "expected_output": [
+        "Agent oriented cold: read .ai/session/plan.md and tasks.md before answering, not from assumed memory",
+        "Answer names the specific open tasks (the two Phase 2 tasks and Phase 3), grounded in tasks.md",
+        "Answer is concise, referenced by file (no full-file dump)",
+        "Nothing written to .ai/ ; no code edited; Quality Gate not run",
+        "If it offered a next step, it offered planning:execute and waited — did not start executing"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "cold-spec-question-disambiguates",
+      "domain_under_test": "active-spec",
+      "prompt": "¿la spec ya cubre el borrado de cuenta?",
+      "context": {
+        "session_state": "specs-present",
+        "prior_conversation": "none",
+        "specs_present": ["auth", "itinerarios-colaborativos"],
+        "developer_named_spec": false
+      },
+      "expected_output": [
+        "Agent recognized the spec was not named and more than one exists",
+        "Agent confirmed which spec (auth) before reading, instead of guessing",
+        "After confirmation, read auth/PRD.md and user-stories.md and answered with the specific story (or its absence) and its checkbox state",
+        "If the story exists but is clearly unimplemented in code, the gap is marked as inference, not fact",
+        "Read-only: nothing written, no code changed"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "code-explanation-no-dump",
+      "domain_under_test": "code",
+      "prompt": "explícame cómo funciona el endpoint de invitación, ¿dónde se valida el email?",
+      "context": {
+        "session_state": "empty",
+        "active_spec": null,
+        "note": "pure code question; no plan or spec needed to answer"
+      },
+      "expected_output": [
+        "Agent went straight to the relevant source via grep/glob; did not do a full brain precondition sweep",
+        "Explanation quotes minimal snippets and references by path:line (no whole-file paste)",
+        "Facts that were read are distinguished from inferences about behavior",
+        "Read-only: no edits, no Quality Gate run",
+        "No invented behavior — only what the code actually shows"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "question-then-accepted-action-handoff",
+      "domain_under_test": "handoff",
+      "prompt": "¿por qué el listado de itinerarios hace tantas queries?",
+      "context": {
+        "session_state": "active",
+        "session_files": {
+          "plan.md": "approved, executing"
+        },
+        "follow_up_after_answer": "hazlo con fast",
+        "simulated_finding": "N+1 in the collaborator loop at itineraries/views.py:58"
+      },
+      "expected_output": [
+        "First turn stays in ask: locates the view, explains the N+1 in a few lines referenced by path:line",
+        "Offers a route (fast or planning) and WAITS — does not change code on the question turn",
+        "On the follow-up 'hazlo con fast', hands off to fast carrying the already-located view and diagnosis",
+        "Does not re-investigate from scratch after the hand-off (shared-session context reused)",
+        "The actual edit happens under fast's contract (triage + Quality Gate), only after the developer asked for it"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "feasibility-question-not-executed",
+      "domain_under_test": "trigger-discipline",
+      "prompt": "¿podríamos subir requests a la versión 5? ¿qué tan complicado sería?",
+      "context": {
+        "session_state": "empty",
+        "simulated_blast_radius": "many call sites + a Session subclass whose signature changes",
+        "note": "this is a feasibility QUESTION, not a /fast request"
+      },
+      "expected_output": [
+        "Agent treated this as a question, not an action — did NOT bump the version",
+        "Investigated read-only to answer feasibility: counted call sites, flagged the breaking contract change",
+        "Answer states the blast radius concretely and concludes it is planning-sized, not fast-sized",
+        "Offered the route (planning define) without executing it; waited for the developer",
+        "No file modified"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "no-active-plan-says-so",
+      "domain_under_test": "orientation-empty",
+      "prompt": "¿en qué fase del plan vamos?",
+      "context": {
+        "session_state": "empty",
+        "session_files": {
+          "plan.md": "absent"
+        }
+      },
+      "expected_output": [
+        "Agent checked .ai/session/ and found no plan.md",
+        "Answered plainly that there is no active plan — did not reconstruct a hypothetical one",
+        "If a <slug>-summary.md were present it would mention the plan was finished but not cleaned up (honest state)",
+        "Offered a constructive next step (e.g. planning define) without acting on it"
+      ],
+      "files": []
+    }
+  ]
+}
