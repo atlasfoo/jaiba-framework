@@ -31,3 +31,17 @@
 
 **Quality gate.** Pass | Fail-then-fixed | <details>
 -->
+
+<!--
+Out-of-band change block (written by the `fast` skill when it makes an
+unplanned adjustment to this plan). Use this instead of a phase block:
+
+## Out-of-band change (fast)     <YYYY-MM-DD>
+
+**Change.** <1–2 lines on what was adjusted and why it wasn't in the
+plan.>
+
+**Scope touched.** <files / tasks affected; the phase it relates to>
+
+**Quality gate.** Pass | Fail-then-fixed | <details>
+-->
