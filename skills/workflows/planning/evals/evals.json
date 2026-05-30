@@ -5,10 +5,10 @@
       "id": 1,
       "name": "define-from-active-spec",
       "mode_under_test": "define",
-      "prompt": "Vamos a empezar a implementar la spec de itinerarios colaborativos. Arranquemos por el modelo de datos del colaborador y la integración con django-guardian.",
+      "prompt": "Let's start implementing the collaborative itineraries spec. Let's begin with the collaborator data model and the django-guardian integration.",
       "context": {
         "session_state": "empty",
-        "active_spec": ".ai/specs/itinerarios-colaborativos/",
+        "active_spec": ".ai/specs/collaborative-itineraries/",
         "spec_files": ["PRD.md", "user-stories.md"],
         "constitution_tdd_mode": "enabled",
         "reference_index_has": ["django-guardian"]
@@ -28,7 +28,7 @@
       "id": 2,
       "name": "define-independent-plan",
       "mode_under_test": "define",
-      "prompt": "Estamos viendo problemas de N+1 en el listado de itinerarios. Hay que optimizar las queries de la vista de lista.",
+      "prompt": "We are seeing N+1 problems in the itinerary listing. We need to optimize the queries in the list view.",
       "context": {
         "session_state": "empty",
         "active_spec": null,
@@ -48,11 +48,11 @@
       "id": 3,
       "name": "execute-with-mid-phase-discrepancy",
       "mode_under_test": "execute",
-      "prompt": "continúa",
+      "prompt": "continue",
       "context": {
         "session_state": "active",
         "session_files": {
-          "plan.md": "approved, slug=itinerarios-colaborativos-modelo-base",
+          "plan.md": "approved, slug=collaborative-itineraries-base-model",
           "tasks.md": "Phase 1 has 2 of 4 tasks checked",
           "walkthrough.md": "Phase 0 onboarding block only"
         },
@@ -73,7 +73,7 @@
       "id": 4,
       "name": "summarize-with-adr-proposal",
       "mode_under_test": "summarize",
-      "prompt": "Listo, cerremos este plan.",
+      "prompt": "Done, let's close this plan.",
       "context": {
         "session_state": "active",
         "session_files": {
@@ -81,7 +81,7 @@
           "tasks.md": "all checked",
           "walkthrough.md": "3 phase blocks, one with a structural decision: roles as CharField choices"
         },
-        "active_spec": ".ai/specs/itinerarios-colaborativos/",
+        "active_spec": ".ai/specs/collaborative-itineraries/",
         "quality_gate": "passing"
       },
       "expected_output": [

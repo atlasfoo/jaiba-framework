@@ -5,12 +5,12 @@
       "id": 1,
       "name": "cold-plan-question",
       "domain_under_test": "active-plan",
-      "prompt": "¿qué falta por hacer en el plan?",
+      "prompt": "what's left to do in the plan?",
       "context": {
         "session_state": "active",
         "prior_conversation": "none (first message of the session)",
         "session_files": {
-          "plan.md": "approved, slug=itinerarios-colaborativos-modelo-base, spec=itinerarios-colaborativos",
+          "plan.md": "approved, slug=collaborative-itineraries-base-model, spec=collaborative-itineraries",
           "tasks.md": "Phase 1 fully checked; Phase 2 has 2 of 4 tasks unchecked; Phase 3 untouched",
           "walkthrough.md": "Phase 1 block present"
         }
@@ -28,11 +28,11 @@
       "id": 2,
       "name": "cold-spec-question-disambiguates",
       "domain_under_test": "active-spec",
-      "prompt": "¿la spec ya cubre el borrado de cuenta?",
+      "prompt": "does the spec already cover account deletion?",
       "context": {
         "session_state": "specs-present",
         "prior_conversation": "none",
-        "specs_present": ["auth", "itinerarios-colaborativos"],
+        "specs_present": ["auth", "collaborative-itineraries"],
         "developer_named_spec": false
       },
       "expected_output": [
@@ -48,7 +48,7 @@
       "id": 3,
       "name": "code-explanation-no-dump",
       "domain_under_test": "code",
-      "prompt": "explícame cómo funciona el endpoint de invitación, ¿dónde se valida el email?",
+      "prompt": "explain how the invitation endpoint works, where is the email validated?",
       "context": {
         "session_state": "empty",
         "active_spec": null,
@@ -67,19 +67,19 @@
       "id": 4,
       "name": "question-then-accepted-action-handoff",
       "domain_under_test": "handoff",
-      "prompt": "¿por qué el listado de itinerarios hace tantas queries?",
+      "prompt": "why does the itinerary listing make so many queries?",
       "context": {
         "session_state": "active",
         "session_files": {
           "plan.md": "approved, executing"
         },
-        "follow_up_after_answer": "hazlo con fast",
+        "follow_up_after_answer": "do it with fast",
         "simulated_finding": "N+1 in the collaborator loop at itineraries/views.py:58"
       },
       "expected_output": [
         "First turn stays in ask: locates the view, explains the N+1 in a few lines referenced by path:line",
         "Offers a route (fast or planning) and WAITS — does not change code on the question turn",
-        "On the follow-up 'hazlo con fast', hands off to fast carrying the already-located view and diagnosis",
+        "On the follow-up 'do it with fast', hands off to fast carrying the already-located view and diagnosis",
         "Does not re-investigate from scratch after the hand-off (shared-session context reused)",
         "The actual edit happens under fast's contract (triage + Quality Gate), only after the developer asked for it"
       ],
@@ -89,7 +89,7 @@
       "id": 5,
       "name": "feasibility-question-not-executed",
       "domain_under_test": "trigger-discipline",
-      "prompt": "¿podríamos subir requests a la versión 5? ¿qué tan complicado sería?",
+      "prompt": "could we upgrade requests to version 5? how complex would that be?",
       "context": {
         "session_state": "empty",
         "simulated_blast_radius": "many call sites + a Session subclass whose signature changes",
@@ -108,7 +108,7 @@
       "id": 6,
       "name": "no-active-plan-says-so",
       "domain_under_test": "orientation-empty",
-      "prompt": "¿en qué fase del plan vamos?",
+      "prompt": "what phase of the plan are we on?",
       "context": {
         "session_state": "empty",
         "session_files": {

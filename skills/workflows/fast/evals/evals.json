@@ -5,7 +5,7 @@
       "id": 1,
       "name": "free-standing-accepted",
       "context_under_test": "free-standing",
-      "prompt": "/fast sube requests de 2.31 a 2.32 en el manifiesto",
+      "prompt": "/fast bump requests from 2.31 to 2.32 in the manifest",
       "context": {
         "session_state": "empty",
         "constitution_quality_gate": "present",
@@ -25,7 +25,7 @@
       "id": 2,
       "name": "too-complex-refused",
       "context_under_test": "triage-refusal",
-      "prompt": "/fast actualiza el paquete requests a la versión 5",
+      "prompt": "/fast update the requests package to version 5",
       "context": {
         "session_state": "empty",
         "simulated_blast_radius": "23 call sites across 9 modules, a custom requests.Session subclass whose signature changes, adapter/retry config moves to a new API",
@@ -44,11 +44,11 @@
       "id": 3,
       "name": "plan-adjustment-with-confirmation",
       "context_under_test": "plan-adjustment",
-      "prompt": "agrega una validación de formato de email al endpoint de invitación, no estaba en el plan",
+      "prompt": "add an email format validation to the invitation endpoint, it was not in the plan",
       "context": {
         "session_state": "active",
         "session_files": {
-          "plan.md": "approved, executing, slug=itinerarios-colaborativos-modelo-base",
+          "plan.md": "approved, executing, slug=collaborative-itineraries-base-model",
           "tasks.md": "Phase 2 (invitation service) in progress",
           "walkthrough.md": "Phase 1 block present"
         },
@@ -71,7 +71,7 @@
       "id": 4,
       "name": "borderline-asks-developer",
       "context_under_test": "triage-borderline",
-      "prompt": "/fast extrae la lógica de cálculo de precios a su propio módulo y actualiza los imports",
+      "prompt": "/fast extract the pricing calculation logic to its own module and update the imports",
       "context": {
         "session_state": "empty",
         "simulated_blast_radius": "ambiguous — could be 2 files or could ripple through ~8 importers",

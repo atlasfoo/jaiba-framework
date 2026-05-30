@@ -1,6 +1,6 @@
 # Walkthrough: <plan slug>
 
-> Bitácora narrativa de la ejecución del plan. Append one block per
+> Narrative log of the plan's execution. Append one block per
 > completed phase. Don't log task-by-task — aggregate at the phase
 > boundary.
 >

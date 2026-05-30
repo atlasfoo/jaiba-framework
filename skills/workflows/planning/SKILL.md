@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Tactical planning workflow inside the JAIBA framework. Use this skill whenever the developer wants to plan a concrete piece of work, advance an existing plan, wrap up a completed plan, or archive its session artifacts. Trigger on any of: explicit calls like "planning define / summarize / cleanup", phrases like "vamos a planear", "armemos un plan", "siguiente tarea", "continúa con el plan", "cierra este plan", "archiva el plan". Also trigger implicitly whenever `.ai/session/plan.md` exists in the repository and the developer's message reads as a continuation cue (e.g. "sigue", "avanza", "next", "go", "okay continúa"). Covers writing plan.md and tasks.md, executing tasks phase by phase with walkthrough logging, summarizing a finished plan with optional ADR proposal, and cleaning up `.ai/session/` after archival.
+description: Tactical planning workflow inside the JAIBA framework. Use this skill whenever the developer wants to plan a concrete piece of work, advance an existing plan, wrap up a completed plan, or archive its session artifacts. Trigger on any of: explicit calls like "planning define / summarize / cleanup", phrases like "let's plan", "let's build a plan", "next task", "continue the plan", "close this plan", "archive the plan". Also trigger implicitly whenever `.ai/session/plan.md` exists in the repository and the developer's message reads as a continuation cue (e.g. "next", "go", "advance", "keep going", "okay continue"). Covers writing plan.md and tasks.md, executing tasks phase by phase with walkthrough logging, summarizing a finished plan with optional ADR proposal, and cleaning up `.ai/session/` after archival.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -31,7 +31,7 @@ ambiguous, ask the developer instead of guessing.
 | Situation | Mode | Read |
 |---|---|---|
 | Developer asks for a new plan / says "planning define" / there is no `.ai/session/plan.md` and they describe work to do | `define` | `references/define-mode.md` |
-| `.ai/session/plan.md` exists, `tasks.md` has unchecked tasks, and the developer's message is a continuation cue (`continúa`, `sigue`, `avanza`, `siguiente`, `next`, `go`, a reply to a pending question) | `execute` *(implicit)* | `references/execute-mode.md` |
+| `.ai/session/plan.md` exists, `tasks.md` has unchecked tasks, and the developer's message is a continuation cue (`continue`, `next`, `go`, `advance`, `keep going`, a reply to a pending question) | `execute` *(implicit)* | `references/execute-mode.md` |
 | `.ai/session/plan.md` exists, all tasks in `tasks.md` are checked, developer asks to close / wrap up / "planning summarize" | `summarize` | `references/summarize-mode.md` |
 | `.ai/session/<slug>-summary.md` exists, developer asks to clean up / archive / "planning cleanup" | `cleanup` | `references/cleanup-mode.md` |
 | Anything else, including `.ai/session/plan.md` exists but the message is unrelated to the plan | **Ask.** Don't enter any mode silently. | — |

@@ -18,7 +18,7 @@ doesn't re-investigate; it inherits.
 
 So the hand-off is not "start over in another skill". It's "carry this
 understanding into execution". Make that explicit when you route:
-*"Ya tengo el contexto del plan y de la spec; esto lo seguimos con
+*"I already have the plan and spec context; we continue this with
 `planning:execute`."*
 
 ## Reading the shift: question vs. action
@@ -27,24 +27,23 @@ The signal is **intent**, not vocabulary. The same words can be either,
 depending on what the developer wants to happen next.
 
 **Still a question (stay in `ask`):**
-- Interrogatives: "¿por qué…?", "¿qué…?", "¿cómo…?", "¿esto está
-  cubierto?", "what's left…?".
-- Exploratory framing: "explícame", "walk me through", "compara las
-  opciones".
-- Hypotheticals: "si cambiáramos X, ¿qué se rompe?" — analysis, not a
+- Interrogatives: "why…?", "what…?", "how…?", "is this
+  covered?", "what's left…?".
+- Exploratory framing: "explain", "walk me through", "compare the
+  options".
+- Hypotheticals: "if we changed X, what would break?" — analysis, not a
   request to change X.
 
 **Now an action (hand off):**
-- Imperatives that mutate state: "haz…", "agrega…", "cambia…",
-  "renombra…", "sube la versión".
-- Continuation cues against an approved plan: "continúa", "sigue",
-  "avanza", "siguiente", "dale", "next", "go", "proceed".
-- Explicit skill calls: "armemos un plan", "/fast …", "planning
+- Imperatives that mutate state: "do…", "add…", "change…",
+  "rename…", "bump the version".
+- Continuation cues against an approved plan: "continue", "next",
+  "advance", "go", "proceed".
+- Explicit skill calls: "let's build a plan", "/fast …", "planning
   define".
-- A direct "sí, hazlo" / "ok, dale" answering an offer you just made.
+- A direct "yes, do it" / "ok, go" answering an offer you just made.
 
-When a single message carries both — *"¿por qué valida así? y de paso
-arréglalo"* — answer the question as `ask`, **then** route the action.
+When a single message carries both — *"why does it validate like that? and also fix it"* — answer the question as `ask`, **then** route the action.
 Never fold the change silently into the answer; the developer asked for
 an explanation *and* a fix, and they're owed both, in that order.
 
@@ -56,15 +55,15 @@ an explanation *and* a fix, and they're owed both, in that order.
 | Build a new plan | `planning:define` | "armemos un plan", or work too big for `fast`. |
 | Small, contained change now | `fast` | `fast` will triage; if it's bigger than it looks, `fast` itself routes to `planning`. Don't pre-judge size in `ask` beyond a rough offer. |
 | Reconcile / update the brain | `update-brain` | For drift you surfaced while answering. Propose it; don't edit memory from `ask`. |
-| Formalize a requirement | `specification` | "hagamos una spec de esto". |
+| Formalize a requirement | `specification` | "let's make a spec for this". |
 
 ## How to hand off
 
 1. **Confirm the shift is real.** If you're inferring action from an
    ambiguous message, don't — default to `ask` and ask (`AGENTS.md`
    §2.6). Cheap question vs. unwanted edit.
-2. **Name the receiving skill and why.** *"Esto es un cambio chico y
-   contenido → `fast`."* The developer should know which mode they're
+2. **Name the receiving skill and why.** *"This is a small, contained
+   change → `fast`."* The developer should know which mode they're
    entering and can veto it.
 3. **State what carries over.** The plan/spec/code you already read.
    This is the value of having asked first — make it visible.
@@ -78,12 +77,12 @@ an explanation *and* a fix, and they're owed both, in that order.
 ## Don't over- or under-trigger
 
 - **Over-trigger (acting on a question):** the most damaging failure.
-  "¿podríamos subir requests a la v5?" is a *question about
-  feasibility*, not "/fast súbelo". Answer the feasibility (blast
+  "could we upgrade requests to v5?" is a *question about
+  feasibility*, not "/fast bump it". Answer the feasibility (blast
   radius, breaking changes), then offer the route. Don't bump the
   version.
 - **Under-trigger (re-asking on a clear action):** the developer says
-  "dale, continúa" with an approved plan active — that's
+  "go ahead, continue" with an approved plan active — that's
   `planning:execute`, not an invitation to re-explain the plan. Hand
   off and let `execute` run.
 - **The offer is not the action.** Ending an answer with *"si quieres
@@ -92,12 +91,12 @@ an explanation *and* a fix, and they're owed both, in that order.
 
 ## Worked example — question, then accepted action
 
-1. 👤 *"¿por qué el listado de itinerarios hace tantas queries?"*
+1. 👤 *"why does the itinerary listing make so many queries?"*
 2. `ask`: locate the view, read it, identify the N+1 in the
    collaborator loop (`itineraries/views.py:58`). Explain in 3 lines.
-   Offer: *"Se arregla con `select_related`; ¿lo hacemos con `fast` o
-   lo metemos al plan?"* — then wait. (Still `ask`.)
-3. 👤 *"hazlo con fast"* → that's the shift. Hand off to `fast`,
+   Offer: *"Fixable with `select_related`; do we do it with `fast` or
+   add it to the plan?"* — then wait. (Still `ask`.)
+3. 👤 *"do it with fast"* → that's the shift. Hand off to `fast`,
    carrying the located view and the diagnosis. `fast` triages
    (one file, contained), applies the change, runs the Quality Gate.
 
