@@ -75,7 +75,7 @@ Never silently summarize an incomplete plan.
 
 ## Worked example (TripNest)
 
-The plan `itinerarios-colaborativos-modelo-base` covered three
+The plan `collaborative-itineraries-base-model` covered three
 phases (domain model, invitation service, API endpoints) and is
 fully checked. Walkthrough shows one structural decision
 (`CharField` + choices for roles, with the explicit deferral of a
@@ -85,7 +85,7 @@ Steps:
 
 1. Read all session files, plus the active spec.
 2. Mark the four `user-stories.md` items this plan covered.
-3. Write `itinerarios-colaborativos-modelo-base-summary.md`:
+3. Write `collaborative-itineraries-base-model-summary.md`:
    - Outcome: invitation flow operational with role-based perms.
    - Deviations: none vs plan; minor — used `prefetch_related` in
      the collaborator list endpoint for performance, recorded in

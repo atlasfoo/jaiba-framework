@@ -1,6 +1,6 @@
 ---
 name: ask
-description: Read-only question-and-answer mode of the JAIBA framework. Use this skill whenever the developer asks a question instead of requesting a change — about the codebase, about the active plan (`.ai/session/plan.md`, `tasks.md`, `walkthrough.md`), or about the active spec (`.ai/specs/<name>/`) — and answer it cold, without relying on prior session context. Trigger on explicit calls like "ask" / "/ask", and IMPLICITLY on interrogative or exploratory messages even when the developer doesn't name the skill: "¿por qué el plan hace X antes que Y?", "¿qué tareas faltan?", "¿qué cubre la spec de autenticación?", "¿esto ya está contemplado en el plan?", "¿qué hace este endpoint?", "explícame este módulo", "¿por qué decidimos usar Z?", "what's left in the plan?", "why did we go with this approach?", "is this covered by the spec?", "walk me through this". This skill is strictly read-only: it reads, searches, and explains, but never edits code, writes session/brain artifacts, or runs the Quality Gate to change state. It deliberately yields to the action skills — when the developer stops asking and asks to *act*, route there instead: a continuation cue ("continúa", "sigue", "next", "dale") belongs to `planning:execute`; "armemos un plan" / "planning define" to `planning`; "cambio rápido", "sube la versión de X", "quick fix" to `fast`. Because `ask` and the action skills share one session, the context gathered while answering carries straight into whichever skill executes the change.
+description: Read-only question-and-answer mode of the JAIBA framework. Use this skill whenever the developer asks a question instead of requesting a change — about the codebase, about the active plan (`.ai/session/plan.md`, `tasks.md`, `walkthrough.md`), or about the active spec (`.ai/specs/<name>/`) — and answer it cold, without relying on prior session context. Trigger on explicit calls like "ask" / "/ask", and IMPLICITLY on interrogative or exploratory messages even when the developer doesn't name the skill: "why does the plan do X before Y?", "what tasks are left?", "what does the auth spec cover?", "is this already in the plan?", "what does this endpoint do?", "explain this module", "why did we decide to use Z?", "what's left in the plan?", "why did we go with this approach?", "is this covered by the spec?", "walk me through this". This skill is strictly read-only: it reads, searches, and explains, but never edits code, writes session/brain artifacts, or runs the Quality Gate to change state. It deliberately yields to the action skills — when the developer stops asking and asks to *act*, route there instead: a continuation cue ("continue", "next", "go") belongs to `planning:execute`; "let's build a plan" / "planning define" to `planning`; "quick change", "bump the version of X", "quick fix" to `fast`. Because `ask` and the action skills share one session, the context gathered while answering carries straight into whichever skill executes the change.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -28,7 +28,7 @@ Two properties define it:
    accidental edit. (`AGENTS.md` sample: *"When in doubt, use `skill:
    ask` before executing."*)
 2. **It orients cold.** `ask` is meant to be usable with no prior
-   conversation. A bare "¿qué falta en el plan?" must work on the
+   conversation. A bare "what's left in the plan?" must work on the
    first message of a session. So `ask` orients itself from the
    repository — it does not assume it already knows what the active
    plan or spec is.
@@ -45,19 +45,19 @@ prior session or pre-training (`AGENTS.md` §2.1):
 
 | Domain | Typical questions | Primary sources |
 |---|---|---|
-| **Code** | "¿qué hace este endpoint?", "explícame este módulo", "where is X handled?", "why does this break?" | The source files, their tests, `git log`/`git blame` for the *why-historical*. |
-| **Active plan** | "¿qué tareas faltan?", "¿por qué el plan hace X primero?", "¿esto ya está en el plan?" | `.ai/session/plan.md`, `tasks.md`, `walkthrough.md`. |
-| **Active spec** | "¿qué cubre la spec de auth?", "¿esta historia ya está cerrada?", "what's out of scope?" | `.ai/specs/<name>/PRD.md`, `user-stories.md`. |
-| **Decisions** | "¿por qué decidimos usar Z?", "what alternatives did we reject?" | `.ai/memory/adr-log.md`, then `walkthrough.md` for tactical calls. |
+| **Code** | "what does this endpoint do?", "explain this module", "where is X handled?", "why does this break?" | The source files, their tests, `git log`/`git blame` for the *why-historical*. |
+| **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | `.ai/session/plan.md`, `tasks.md`, `walkthrough.md`. |
+| **Active spec** | "what does the auth spec cover?", "is this story already closed?", "what's out of scope?" | `.ai/specs/<name>/PRD.md`, `user-stories.md`. |
+| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?" | `.ai/memory/adr-log.md`, then `walkthrough.md` for tactical calls. |
 
-A question can span domains ("¿el plan cubre la historia de invitación
-de la spec?") — read what the question needs from each, no more.
+A question can span domains ("does the plan cover the invitation story
+from the spec?") — read what the question needs from each, no more.
 
 ## Read what the question needs — and no more
 
 `ask` is the lightweight skill. Unlike `planning` and `fast`, it has
 **no fixed precondition reads**. Reading the whole brain to answer
-"¿qué hace este endpoint?" would be wasteful (`AGENTS.md` §3.2). Let
+"what does this endpoint do?" would be wasteful (`AGENTS.md` §3.2). Let
 the question drive the reads:
 
 - **Pure code question** → go straight to the relevant source; you may
@@ -90,8 +90,8 @@ which spec, whether either exists — read
   here (`auth/views.py:42`)" is a fact you read. "This probably fails
   when the token is expired" is an inference — mark it as one.
 - **Offer the next step, don't take it.** A good answer often ends with
-  a pointer: *"si quieres lo arreglamos con `fast`"* or *"esto da para
-  un plan"*. Offer — then wait. Suggesting is read-only; executing is
+  a pointer: *"if you want, we can fix it with `fast`"* or *"this
+  could use a plan"*. Offer — then wait. Suggesting is read-only; executing is
   not.
 
 ## When the question becomes an action
@@ -106,11 +106,11 @@ Quick routing:
 
 | The developer now wants… | Route to |
 |---|---|
-| Advance an approved, active plan (cue: "continúa", "sigue", "next", "dale") | `planning:execute` |
-| Build a new plan ("armemos un plan", "planning define") | `planning:define` |
-| A small, contained change now ("cambio rápido", "sube la versión", "quick fix") | `fast` |
-| Reconcile the brain with reality ("actualiza el constitution", "registra esta decisión") | `update-brain` |
-| Formalize a requirement into a spec ("hagamos una spec de esto") | `specification` |
+| Advance an approved, active plan (cue: "continue", "next", "go") | `planning:execute` |
+| Build a new plan ("let's build a plan", "planning define") | `planning:define` |
+| A small, contained change now ("quick change", "bump the version", "quick fix") | `fast` |
+| Reconcile the brain with reality ("update the constitution", "record this decision") | `update-brain` |
+| Formalize a requirement into a spec ("let's make a spec for this") | `specification` |
 
 For the nuances — how to tell a question from an action cue, what to
 carry across the hand-off, and how to avoid both over- and
@@ -122,15 +122,15 @@ under-triggering against `planning:execute` and `fast` — read
 `ask` shares its trigger surface with the action skills, so the
 distinction is **intent**, not keywords:
 
-- **Interrogative / exploratory → `ask`.** "¿por qué…?", "¿qué…?",
-  "¿cómo funciona…?", "explícame…", "¿esto está cubierto?",
+- **Interrogative / exploratory → `ask`.** "why…?", "what…?",
+  "how does … work?", "explain…", "is this covered?",
   "what's left…?". The developer wants understanding.
-- **Imperative / continuation → action skill.** "continúa", "haz…",
-  "agrega…", "sube la versión", "armemos un plan". The developer wants
+- **Imperative / continuation → action skill.** "continue", "do…",
+  "add…", "bump the version", "let's build a plan". The developer wants
   a change.
 
-When a message mixes both ("¿por qué el plan hace X primero? y de paso
-súbelo de versión"), answer the question first as `ask`, then route the
+When a message mixes both ("why does the plan do X first? and also
+bump the version"), answer the question first as `ask`, then route the
 action — don't silently do the change while answering.
 
 When genuinely ambiguous, default to `ask` and ask the developer what
@@ -152,13 +152,13 @@ applies here.
   this session, you don't know what's in it. Read, then answer.
 - **Reading the whole brain for a one-file question.** `ask` is the
   cheap skill — keep it cheap. Let the question scope the reads.
-- **Sliding into execution.** The developer asks "¿por qué falla
-  esto?" and you *fix* it. That's `fast`, not `ask`. Explain the
+- **Sliding into execution.** The developer asks "why does this fail?"
+  and you *fix* it. That's `fast`, not `ask`. Explain the
   cause, then offer to fix it — and wait.
 - **Patching drift you spotted.** Noticing the brain is stale is an
   `ask` outcome; rewriting it is not. Propose `update-brain`.
-- **Dumping files.** "Explícame este módulo" is not an invitation to
+- **Dumping files.** "Explain this module" is not an invitation to
   paste 300 lines. Summarize, quote the load-bearing parts, link by
   line.
-- **Inventing what isn't there.** No active plan? Say "no hay plan
-  activo". Don't reconstruct a hypothetical one to be helpful.
+- **Inventing what isn't there.** No active plan? Say "there is no
+  active plan". Don't reconstruct a hypothetical one to be helpful.

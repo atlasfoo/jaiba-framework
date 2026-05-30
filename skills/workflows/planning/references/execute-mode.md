@@ -11,9 +11,7 @@ slash command. Activation conditions:
 1. `.ai/session/plan.md` exists and has been explicitly approved.
 2. `.ai/session/tasks.md` has at least one unchecked task.
 3. The developer's message is a continuation cue:
-   - Spanish: `continúa`, `sigue`, `avanza`, `siguiente`, `dale`,
-     `ya`, `procede`.
-   - English: `continue`, `next`, `go`, `proceed`, `keep going`.
+   - `continue`, `next`, `go`, `proceed`, `keep going`.
    - A direct answer to a pending question you asked at the end of
      the previous phase.
 
@@ -98,7 +96,7 @@ Tasks remaining:
 - [ ] Wire object-level permissions with django-guardian
 ```
 
-Developer says: *"continúa"*.
+Developer says: *"continue"*.
 
 Steps:
 

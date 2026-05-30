@@ -1,7 +1,7 @@
 # `ask`: cold-start orientation
 
 `ask` is meant to answer on the **first message of a session**, with no
-prior conversation to lean on. "¿qué falta en el plan?" has to work even
+prior conversation to lean on. "what's left in the plan?" has to work even
 when you don't yet know whether a plan exists, what its slug is, or
 which spec — if any — is active. Orientation is how you find out, cheaply,
 before you answer.
@@ -34,8 +34,8 @@ The active plan lives in `.ai/session/`. Check, in order:
    there is only ever one. Read its frontmatter for the slug and the
    spec it descends from (if any). Read `tasks.md` for progress and
    `walkthrough.md` for what already happened.
-2. **No `plan.md`?** There is no active plan. Say so: *"No hay un plan
-   activo en `.ai/session/`."* Don't reconstruct one from a summary or
+2. **No `plan.md`?** There is no active plan. Say so: *"There is no
+   active plan in `.ai/session/`."* Don't reconstruct one from a summary or
    from git. If a `<slug>-summary.md` is present, the plan was finished
    but not yet cleaned up — mention that, it's the honest answer.
 
@@ -44,7 +44,7 @@ The active plan lives in `.ai/session/`. Check, in order:
 Specs live in `.ai/specs/<name>/`. Unlike the plan, there can be more
 than one.
 
-1. **Did the developer name the spec?** ("la spec de auth") → read
+1. **Did the developer name the spec?** ("the auth spec") → read
    `.ai/specs/<that-name>/PRD.md` and `user-stories.md`.
 2. **They said "the spec" but didn't name it?**
    - Exactly one spec directory exists → that's the one. Read it.
@@ -70,29 +70,29 @@ if reconciliation is warranted.
   question needs.
 - **Not a license to assume.** "Active plan" means *the file exists and
   you read it*, not "there's probably a plan". If `plan.md` is absent,
-  the answer is "no hay plan activo", full stop.
+  the answer is "there is no active plan", full stop.
 
-## Worked example — cold "¿qué falta en el plan?"
+## Worked example — cold "what's left in the plan?"
 
 First message of the session. No context.
 
 1. Classify: it's a **plan** question.
 2. Locate: `.ai/session/plan.md` exists → slug
-   `itinerarios-colaborativos-modelo-base`, descends from spec
-   `itinerarios-colaborativos`. Read `tasks.md`.
+   `collaborative-itineraries-base-model`, descends from spec
+   `collaborative-itineraries`. Read `tasks.md`.
 3. `tasks.md` shows Phase 1 fully checked, Phase 2 has 2 of 4 tasks
    left (invitation email integration, its test), Phase 3 untouched.
 4. Answer: name the two open Phase-2 tasks and the pending Phase 3, in
-   2–4 lines, referencing `tasks.md`. Offer: *"si quieres seguimos con
-   `planning:execute`"* — then wait. Offering is read-only; advancing
+   2–4 lines, referencing `tasks.md`. Offer: *"if you want, we can
+   continue with `planning:execute`"* — then wait. Offering is read-only; advancing
    the plan is `execute`, not `ask`.
 
-## Worked example — cold "¿la spec ya cubre el borrado de cuenta?"
+## Worked example — cold "does the spec already cover account deletion?"
 
 1. Classify: **spec** question.
 2. Locate: developer didn't name it. Two specs under `.ai/specs/`:
-   `auth` and `itinerarios-colaborativos`. "Borrado de cuenta" points
-   at `auth`, but two exist → confirm: *"¿La spec `auth`?"* before
+   `auth` and `collaborative-itineraries`. "Account deletion" points
+   at `auth`, but two exist → confirm: *"The `auth` spec?"* before
    reading, rather than guessing.
 3. On confirmation, read `auth/PRD.md` and `user-stories.md`, find
    whether an account-deletion story exists and its checkbox state.

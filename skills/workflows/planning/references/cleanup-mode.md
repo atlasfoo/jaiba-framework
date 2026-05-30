@@ -19,8 +19,8 @@ Stop if any of these is not true:
 1. **Read the summary.** Confirm it exists and the slug matches
    `plan.md`'s frontmatter.
 2. **Confirm intent.** Ask the developer for explicit confirmation,
-   e.g. *"Voy a archivar el summary y vaciar `.ai/session/`.
-   ¿Procedo?"*. A bare "yes" is enough; ambiguity is not.
+   e.g. *"I am going to archive the summary and empty `.ai/session/`.
+   Shall I proceed?"*. A bare "yes" is enough; ambiguity is not.
 3. **Run the cleanup script.** Use `scripts/cleanup.sh`. It is the
    one source of truth for the archive layout:
    ```bash
@@ -60,17 +60,17 @@ Achieve the contract by whatever means the repo allows.
 
 ## Worked example (TripNest)
 
-The summary `itinerarios-colaborativos-modelo-base-summary.md`
-exists. The developer says: *"adelante, limpia"*.
+The summary `collaborative-itineraries-base-model-summary.md`
+exists. The developer says: *"go ahead, clean it up"*.
 
 Steps:
 
 1. Confirm the file exists.
-2. Confirm intent (the developer just said "adelante" — that's
+2. Confirm intent (the developer just said "go ahead" — that's
    confirmation).
-3. Run `bash scripts/cleanup.sh itinerarios-colaborativos-modelo-base`.
+3. Run `bash scripts/cleanup.sh collaborative-itineraries-base-model`.
 4. Report: archived to
-   `.ai/memory/archive/plans/2026-05-26-itinerarios-colaborativos-modelo-base.md`,
+   `.ai/memory/archive/plans/2026-05-26-collaborative-itineraries-base-model.md`,
    session emptied.
 
 ## Common failure modes

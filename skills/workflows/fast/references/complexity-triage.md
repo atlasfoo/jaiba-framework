@@ -68,7 +68,7 @@ migration. Then recommend `planning define`.
 
 ## Worked example — `requests` v5 (a refusal)
 
-> 👤 *"/fast actualiza el paquete requests a la versión 5"*
+> 👤 *"/fast update the requests package to version 5"*
 
 Triage steps:
 
@@ -86,14 +86,14 @@ Triage steps:
 Conclusion: **refuse**. Reply with the concrete blast radius and route
 to planning:
 
-> `requests` v5 toca 9 módulos (23 usos), rompe la firma de tu
-> subclase `Session` y mueve la config de adapters/retries a otra
-> API. Eso necesita fases y verificación por partes — es trabajo de
-> `planning`, no de `fast`. ¿Lo armamos con `planning define`?
+> `requests` v5 touches 9 modules (23 usages), breaks the signature of
+> your `Session` subclass, and moves the adapters/retries config to a
+> new API. That requires phases and staged verification — this is
+> `planning` work, not `fast`. Shall we build a plan with `planning define`?
 
 ## Worked example — `requests` patch bump (accepted)
 
-> 👤 *"/fast sube requests de 2.31 a 2.32"*
+> 👤 *"/fast bump requests from 2.31 to 2.32"*
 
 Triage: changelog shows no breaking changes affecting your call sites;
 only the manifest pin changes. Footprint: one file
@@ -102,8 +102,8 @@ run the Quality Gate, suggest `chore(deps): bump requests to 2.32`.
 
 ## Worked example — unplanned validation (accepted, plan adjustment)
 
-> 👤 (mid-plan) *"agrega una validación de email al endpoint de
-> invitación, no estaba en el plan"*
+> 👤 (mid-plan) *"add an email validation to the invitation endpoint,
+> it was not in the plan"*
 
 Triage: one serializer/handler, one new test. Contained. →
 **`fast`-eligible**, and a **plan adjustment** because it lands inside

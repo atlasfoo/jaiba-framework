@@ -1,6 +1,6 @@
 ---
 name: fast
-description: Direct-execution workflow inside the JAIBA framework for small, well-scoped, low-risk changes that don't justify a full plan. Use this skill whenever the developer wants a quick, concrete change made now rather than planned. Trigger on explicit calls like "fast" / "/fast", and on phrases like "cambio rápido", "haz un ajuste rápido", "actualiza el paquete X", "sube la versión de Y", "pequeño fix", "renombra esto", "quick fix", "just bump", "small change", "tweak this". Also trigger when the developer asks for an adjustment NOT contemplated by an active plan (e.g. "agrega una validación al endpoint que no estaba en el plan", "add a quick check here"). This skill competes with `planning`: prefer `fast` for atomic, low-blast-radius edits, and defer to `planning` for anything that touches many files, changes public contracts, needs a migration, or warrants phase decomposition — `fast` itself will refuse over-large work and hand it to `planning`.
+description: Direct-execution workflow inside the JAIBA framework for small, well-scoped, low-risk changes that don't justify a full plan. Use this skill whenever the developer wants a quick, concrete change made now rather than planned. Trigger on explicit calls like "fast" / "/fast", and on phrases like "quick change", "make a quick adjustment", "update package X", "bump the version of Y", "small fix", "rename this", "quick fix", "just bump", "small change", "tweak this". Also trigger when the developer asks for an adjustment NOT contemplated by an active plan (e.g. "add a validation to the endpoint that was not in the plan", "add a quick check here"). This skill competes with `planning`: prefer `fast` for atomic, low-blast-radius edits, and defer to `planning` for anything that touches many files, changes public contracts, needs a migration, or warrants phase decomposition — `fast` itself will refuse over-large work and hand it to `planning`.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -80,12 +80,12 @@ free-standing or adjusting a live plan. Detect which one applies:
 
 - **Free-standing** — no `.ai/session/plan.md` exists, **or** one
   exists but the requested change is unrelated to its scope. Example:
-  `/fast actualiza requests a la 2.32`. The change stands on its own.
+  `/fast update requests to 2.32`. The change stands on its own.
 
 - **Plan adjustment** — `.ai/session/plan.md` exists, is approved/
   executing, **and** the requested change falls inside or adjacent to
   the plan's scope but wasn't contemplated by it. Example, mid-plan:
-  *"agrega una validación al endpoint que no estaba en el plan"*.
+  *"add a validation to the endpoint that was not in the plan"*.
 
 If a plan is active and you're unsure whether the change belongs to
 it, ask — the recording behavior differs and you don't want to either
@@ -143,9 +143,9 @@ When triage says the work is too big:
    touches 14 call sites and changes the `Client.request` signature".
 3. **Route to `planning`.** Recommend `planning define`, and offer a
    one-line sketch of what the plan would need to cover. Example:
-   > Este cambio rompe la firma de `Client.request` en 14 lugares y
-   > necesita una migración de config. Es trabajo de `planning`, no de
-   > `fast`. ¿Armamos un plan con `planning define`?
+   > This change breaks the `Client.request` signature in 14 places and
+   > requires a config migration. This is `planning` work, not `fast`.
+   > Shall we build a plan with `planning define`?
 
 ## Asking the human
 

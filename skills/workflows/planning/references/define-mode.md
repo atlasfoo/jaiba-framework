@@ -62,8 +62,8 @@ plan — never silently overwrite.
    - `assets/walkthrough-template.md` → `.ai/session/walkthrough.md`
      (stub only; gets populated during `execute`)
 8. **Stop and ask for approval.** The plan is not active until the
-   developer says so explicitly (`"approved"`, `"adelante"`,
-   `"aprobado"`, etc.). Do not transition into `execute`. Do not
+   developer says so explicitly (`"approved"`, `"go ahead"`,
+   `"confirmed"`, etc.). Do not transition into `execute`. Do not
    write any source code.
 
 ## What goes in `plan.md`
@@ -100,8 +100,8 @@ The template (`assets/tasks-template.md`) is authoritative. Key rules:
 
 ## Worked example (TripNest)
 
-The developer says: *"Implementemos la invitación por email de
-colaboradores a un itinerario."* A spec `itinerarios-colaborativos`
+The developer says: *"Let's implement the email invitation for
+itinerary collaborators."* A spec `collaborative-itineraries`
 is active. The codebase already has `Itinerary` and `User` models;
 `django-guardian` is configured per `reference-index.md`; there is no
 `ItineraryCollaborator` model yet.
@@ -110,11 +110,11 @@ Steps in this mode:
 
 1. Read `PRD.md`, `user-stories.md`, the `Itinerary` model and its
    views, `reference-index.md` (django-guardian entry).
-2. Detect discrepancies: the spec mentions roles `propietario /
-   editor / lector`, but the codebase has no permission scheme yet.
+2. Detect discrepancies: the spec mentions roles `owner /
+   editor / reader`, but the codebase has no permission scheme yet.
    Not a contradiction, a gap. List it.
-3. Ask, via questionnaire: "Para los roles, ¿usamos `CharField` con
-   choices o una tabla separada?" → developer picks `CharField`.
+3. Ask, via questionnaire: "For roles, should we use `CharField` with
+   choices or a separate table?" → developer picks `CharField`.
 4. Read constitution: TDD `enabled`.
 5. Decompose into phases:
    - Phase 1 — Domain model (model + permissions + tests).

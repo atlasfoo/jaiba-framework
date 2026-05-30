@@ -28,10 +28,10 @@ expanding — the human stays in the loop on every scope change
 
 2. **Ask the developer to confirm.** Show what changed (a minimal
    diff or a one-line description) and ask whether it's correct before
-   you record it. A bare "sí" / "correcto" / "yes" is enough; silence
+   you record it. A bare "yes" / "correct" / "confirmed" is enough; silence
    or ambiguity is not. Example:
-   > Agregué la validación de email en `InvitationSerializer` y su test
-   > pasa. ¿Lo confirmo en el plan (tasks + amendment + walkthrough)?
+   > I added the email validation to `InvitationSerializer` and its
+   > test passes. Shall I confirm it in the plan (tasks + amendment + walkthrough)?
 
 3. **On confirmation, update the three artifacts.** Keep edits
    surgical — you're annotating, not rewriting.
