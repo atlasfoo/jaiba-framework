@@ -27,9 +27,20 @@ Never silently summarize an incomplete plan.
 
 1. **Read everything.** `plan.md`, `tasks.md`, `walkthrough.md`,
    plus the active spec (`PRD.md` and `user-stories.md`) if any.
-2. **Identify spec stories closed by this plan.** If a spec is
-   active, mark each story this plan satisfied as `[x]` in
-   `user-stories.md`. Don't touch stories the plan didn't address.
+2. **Reconcile the spec.** If a spec is active (the plan's `spec:` /
+   `stories:` frontmatter, or an active folder under `.ai/specs/`):
+   - Mark each story this plan satisfied as `[x]` in
+     `user-stories.md`. Don't touch stories the plan didn't address.
+   - **Capture out-of-spec work that the PRD needed.** If, during
+     execution, the plan did something the spec hadn't foreseen but
+     that was necessary for the PRD to hold (typically a bug fix —
+     check `walkthrough.md` for out-of-band changes and structural
+     drift), that work should exist as a **retroactive corrective
+     story** in `user-stories.md`. If it isn't there yet, route to
+     `specification:define` to add it (as a corrective `<PREFIX>-NNN`),
+     then mark it `[x]`. This keeps the spec the single source of
+     truth for everything it took to satisfy the PRD, instead of
+     burying necessary fixes in a walkthrough.
 3. **Draft the summary** using `assets/plan-summary-template.md`.
    Hard rules:
    - **Be concise.** The summary lives forever in the brain; bloat
@@ -63,6 +74,11 @@ Never silently summarize an incomplete plan.
 6. **Hand off.** Tell the developer the summary is ready and that
    the next step, when they're ready, is `planning:cleanup`. Do not
    trigger cleanup automatically.
+   - **If this plan closed the last open story in an active spec**
+     (every story in `user-stories.md` is now `[x]`), also point the
+     developer at `specification:archive` — the spec is fully
+     delivered and ready to be closed into long-term memory. Mention
+     it; don't trigger it.
 
 ## Naming and location
 

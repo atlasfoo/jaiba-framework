@@ -17,8 +17,9 @@
         ".ai/session/plan.md created from plan-template.md",
         ".ai/session/tasks.md created with phases declaring depends-on and reversibility",
         ".ai/session/walkthrough.md created as a stub",
-        "Tasks are TDD-ordered (failing test before implementation within each phase)",
-        "Plan cites both the spec and the reference-index entry for django-guardian",
+        "Tasks are TDD-ordered (failing test before implementation within each phase), with tests derived from the stories' happy/sad acceptance criteria",
+        "Plan frontmatter fills spec: and stories: and a Covered stories section traces plan -> spec",
+        "Plan cites both the spec (PRD + stories) and the reference-index entry for django-guardian",
         "Agent paused for approval before any execution; no source files modified",
         "If any ambiguity existed (e.g. role storage), it was resolved via a questionnaire — no [NEEDS CLARIFICATION] block in the artifact"
       ],

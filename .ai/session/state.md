@@ -7,16 +7,16 @@
   - [x] `planning` skill and artifacts
   - [x] `fast` skill
   - [x] `ask` skill
-- [ ] Mid term brain workflows and artifacts
-  - [ ] `specifiy` skills and artifacts
+- [x] Mid term brain workflows and artifacts
+  - [x] `specification` skill and artifacts (brainstorm / define / archive + planning integration)
 - [ ] Long term brain workflows
   - [ ] `update-brain` skill and artifacts
-    - external index accesibility and tool testing
+- [ ] Quality gate sectioning (after phases and after plan).
 - [ ] Meta Skills
   - [ ] `scaffold` skill
-  - [ ] `create-workflow` skill
+  - [ ] `doctor` skill, external index accesibility and tool testing
   - [ ] `create-knowledge` skill
-- [ ] Quality gate sectioning (after phases and after plan).
+  - [ ] `create-workflow` skill
 
 # Global instructions
 - Keep `README.md` always up to date

@@ -47,7 +47,7 @@ graph TD
         AB --> AH([reference_index.md])
 
         AC --> AI([PRD.md])
-        AC --> AJ([user_stories.md])
+        AC --> AJ([user-stories.md])
 
         AJ -."each one generates one".-> AK
 
@@ -85,25 +85,31 @@ The final output of this framework are skills, template artifacts will be packag
 └── skills
     ├── workflows
     │   ├── planning
-    │   │   └── assets
-    │   │       ├── plan.template.md
-    │   │       ├── tasks.template.md
-    │   │       ├── walkthrough.template.md
-    │   │       └── plan-summary.template.md
+    │   │   ├── assets
+    │   │   │   ├── plan-template.md
+    │   │   │   ├── tasks-template.md
+    │   │   │   ├── walkthrough-template.md
+    │   │   │   └── plan-summary-template.md
+    │   │   ├── references     (one per mode: define, execute, summarize, cleanup)
+    │   │   └── scripts
+    │   │       └── cleanup.sh
     │   ├── specification
-    │   │   └── assets
-    │   │       ├── prd.template.md
-    │   │       ├── user-stories.template.md
-    │   │       └── spec-summary.template.md
+    │   │   ├── assets
+    │   │   │   ├── prd-template.md
+    │   │   │   ├── user-stories-template.md
+    │   │   │   └── spec-archive-template.md
+    │   │   ├── references     (one per mode: brainstorm, define, archive)
+    │   │   └── scripts
+    │   │       └── archive.sh
     │   ├── ask
     │   ├── fast
     │   └── update-brain
     └── meta
         └── scaffold
             └── assets
-                ├── constitution.template.md
-                ├── adr-log.template.md
-                └── reference-index.template.md
+                ├── constitution-template.md
+                ├── adr-log-template.md
+                └── reference-index-template.md
 ```
 
 > Since scaffold script is not already done, memory artifacts templates live in `templates` temporary folder.

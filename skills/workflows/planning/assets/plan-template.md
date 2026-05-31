@@ -2,6 +2,7 @@
 slug: <kebab-case-identifier>          # e.g. itinerarios-colaborativos-modelo-base
 created: <YYYY-MM-DD>
 spec: <spec-name-or-empty>             # path under .ai/specs/, or leave empty
+stories: []                            # story IDs this plan covers, e.g. [ITIN-001, ITIN-002]. Empty if no active spec.
 status: draft                          # draft | approved | executing | summarized | archived
 ---
 
@@ -11,6 +12,15 @@ status: draft                          # draft | approved | executing | summariz
 
 <2–4 sentences. What this plan delivers and why it matters. Tie it
 to a business or technical outcome — never just "do X".>
+
+## Covered stories
+
+<Only if a spec is active. List each story this plan implements, by ID
+and one-line title, so a reviewer can trace plan → spec. The story's
+acceptance criteria (happy/sad paths) are the source for this plan's
+tests. If no spec is active, write "None — standalone plan.">
+
+- `<PREFIX>-NNN` — <one-line story title>
 
 ## Scope
 
