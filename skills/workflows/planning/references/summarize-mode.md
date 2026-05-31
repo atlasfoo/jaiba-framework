@@ -12,8 +12,17 @@ Stop and ask if any of these is not true:
 
 1. `.ai/session/plan.md` exists and is approved.
 2. Every task in `.ai/session/tasks.md` is checked.
-3. The Quality Gate passes (run the commands from constitution §6 if
-   the last run was not in the current session).
+3. **Run the Plan Gate** using the Plan Gate commands from
+   `tasks.md § Gate Commands`. This is the heavyweight tier: full test
+   suite, coverage, build, security scan. It runs **once**, here, not
+   after each phase.
+
+**If the Plan Gate fails:** list every failing check with a concise
+explanation, then ask the developer what corrective action to take.
+Do **not** proceed to write the summary until all Plan Gate checks pass.
+The developer may choose to fix the issues (routing back to `execute`
+for additional tasks) or explicitly waive a check with a documented
+reason. Waived checks must be noted in the summary.
 
 If some tasks are unchecked but the developer wants to summarize
 anyway, surface the gap. Options to offer:

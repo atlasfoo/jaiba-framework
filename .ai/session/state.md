@@ -15,9 +15,10 @@
       reference-index) under its `assets/`; `initialize` mode detects
       whether the files already exist in the target `.ai/memory/` and
       creates them from the templates only when absent.
-- [ ] Quality gate sectioning (after phases and after plan).
-- [ ] Token economy
+- [x] Quality gate sectioning (after phases and after plan).
+- [x] Token economy
 - [ ] Meta Skills
+  - [ ] `create-knowledge` skill (plugin behavior)
   - [ ] `scaffold` skill
     - Does **not** manage the artifact templates — that is
       `update-brain`'s responsibility. `scaffold` only lays down the
@@ -26,7 +27,6 @@
       cross-skill runtime reference to `update-brain/assets/` (skills
       package independently); the boundary is a hand-off, not a path.
   - [ ] `doctor` skill, external index accesibility and tool testing
-  - [ ] `create-knowledge` skill (plugin behavior)
   - [ ] `create-workflow` skill
 
 # Global instructions

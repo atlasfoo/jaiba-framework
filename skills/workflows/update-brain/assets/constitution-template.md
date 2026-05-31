@@ -68,25 +68,31 @@ What belongs inside this project, and what does not.
 
 ## 6. Quality Gate
 
-A task is **not done** until all of these pass. If any fails, stop and fix.
+The Quality Gate is split into two tiers run at different points in the
+workflow. Both tiers read their commands from the repository's scriptfile
+(`justfile`, `Makefile`, `package.json` scripts, `pyproject.toml [tool.*]`,
+etc.) or `README.md`. If neither documents the commands, **stop and ask
+the maintainer to add them** — do not invent commands from memory.
 
-- **Tests:** [e.g., All affected tests pass; new logic is covered.]
-- **Coverage:** [e.g., ≥ 85% on new business logic.]
+### Phase Gate (runs after each phase — must be fast)
+
+A phase is **not done** until all of these pass. If any fails, fix it
+atomically before moving on.
+
+- **Tests (affected):** [e.g., Run only the tests for changed modules.]
 - **Linting:** [Zero errors, zero warnings.]
 - **Type checking:** [Zero errors from the project's type checker.]
 - **Formatting:** [Code conforms to the project's formatter; no diffs.]
-- **Build:** [Production build succeeds.]
 
-> **Where the commands live.** Verification commands (`test`, `lint`,
-> `typecheck`, `build`, etc.) belong in the repository's scriptfile
-> (`justfile`, `Makefile`, `package.json` scripts, `pyproject.toml`
-> `[tool.*]`, etc.). If no scriptfile exists, they belong in the
-> repo's `README.md` Getting Started section. The agent reads them
-> from there.
->
-> If neither the scriptfile nor the repo `README.md` documents how to
-> run the Quality Gate, **stop and ask the maintainer to add them**
-> before continuing. Do not invent commands from memory.
+### Plan Gate (runs once at `planning:summarize` — may be slow)
+
+A plan is **not done** until all of these pass. Failures block the summary
+and require corrective action before closing.
+
+- **Full test suite:** [All tests pass, including integration and e2e.]
+- **Coverage:** [e.g., ≥ 85% on new business logic.]
+- **Build:** [Production build succeeds.]
+- **Security scan:** [e.g., Zero critical issues from SonarQube. Omit if not configured.]
 
 ## 7. Planning Conventions
 

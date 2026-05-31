@@ -23,13 +23,14 @@ new requirement), **don't enter execute**. Either route to `ask` /
 
 Run these in order. Stop and ask on any failure.
 
-1. **Read the plan and tasks.** Confirm the plan is approved and the
-   tasks reflect the same scope. If they diverged (e.g., the
-   developer hand-edited the plan), treat the manual edits as final
-   and re-align tasks accordingly before doing anything else.
+1. **Read `plan.md` and `tasks.md`.** Confirm the plan is approved and the
+   tasks reflect the same scope. If they diverged (e.g., the developer
+   hand-edited the plan), treat the manual edits as final and re-align
+   tasks accordingly before doing anything else. Note the Phase Gate
+   commands in `tasks.md § Gate Commands` — you will use them after each
+   phase.
 2. **Read the walkthrough.** It tells you what already happened in
-   prior phases of this same plan, including decisions and
-   deviations.
+   prior phases of this same plan, including decisions and deviations.
 3. **Check `git status`.** A dirty worktree means uncommitted work
    from another session or manual edits. **Stop and report it.**
    Suggest the developer either commit, stash, or discard before
@@ -38,6 +39,9 @@ Run these in order. Stop and ask on any failure.
 4. **Identify the next phase.** The next phase is the first one with
    any unchecked task. If a phase depends on prior phases that are
    not fully checked, surface that and ask.
+
+> `constitution.md` and `reference-index.md` are not re-read here.
+> Everything needed for execution is in the session files.
 
 ## Executing a phase
 
@@ -48,11 +52,9 @@ turn unless the developer explicitly asks.
    it atomically. If you can't complete it as written (missing API,
    surprising state), stop and surface the obstacle — don't
    improvise.
-2. **Honor the Quality Gate after each meaningful change.** Use the
-   verification commands from the project scriptfile or
-   `README.md` (constitution §6 tells you where to find them). If a
-   gate command fails, fix it as part of the current task — don't
-   accumulate red.
+2. **Run the Phase Gate after each meaningful change.** Use the Phase Gate
+   commands from `tasks.md § Gate Commands`. If a gate command fails,
+   fix it as part of the current task — don't accumulate red.
 3. **Update `tasks.md` as you go.** Flip checkboxes only on truly
    complete tasks. Half-done is unchecked.
 4. **Append to `walkthrough.md` at the end of the phase**, not after
@@ -106,7 +108,7 @@ Steps:
    confirm it fails for the right reason.
 4. Pick next: "Implement...". Make the test pass.
 5. Pick next: "Wire object-level permissions...". Implement.
-6. Run Quality Gate (tests, lint, typecheck). Green.
+6. Run Phase Gate (affected tests, lint, typecheck, format). Green.
 7. Check the three tasks in `tasks.md`.
 8. Append to `walkthrough.md` the Phase 1 block, noting the choice
    of `CharField` over a separate roles table (matches the plan,

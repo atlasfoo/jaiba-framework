@@ -36,25 +36,35 @@ ambiguous, ask the developer instead of guessing.
 | `.ai/session/<slug>-summary.md` exists, developer asks to clean up / archive / "planning cleanup" | `cleanup` | `references/cleanup-mode.md` |
 | Anything else, including `.ai/session/plan.md` exists but the message is unrelated to the plan | **Ask.** Don't enter any mode silently. | — |
 
-## Universal Preconditions
+## Context Loading
 
-Before entering any mode, do these reads. Stop and surface the gap if
-any file is missing or contradicts the request.
+Context is loaded per mode — not universally — to minimize token usage.
+Read only what your mode requires.
 
-1. **`AGENTS.md`** — your behavioral contract. Always.
-2. **`.ai/memory/constitution.md`** — authoritative on project facts.
-   In particular look for:
-   - The Quality Gate section.
-   - The Planning Conventions section — especially the **TDD mode**
-     line (`enabled` / `disabled`). Default is `enabled` if absent.
-3. **`.ai/memory/reference-index.md`** — read sections relevant to the
-   integrations the plan will touch. Do not invent integrations.
-4. **Active spec, if any** — if the developer references a spec or one
-   is implied, read `.ai/specs/<name>/PRD.md` and `user-stories.md`.
-   Identify which story IDs the plan covers (recorded in the plan's
-   `stories:` field); their happy/sad acceptance criteria are the
-   source for the plan's tests, and `summarize` will mark them `[x]`
-   when the plan closes.
+### `define` (full context)
+1. **`AGENTS.md`** — behavioral contract.
+2. **`.ai/memory/constitution.md`** — Quality Gate (§6), TDD mode (§7), stack and conventions.
+3. **`.ai/memory/reference-index.md`** — sections relevant to integrations the plan will touch.
+4. **Active spec, if any** — `.ai/specs/<name>/PRD.md` and `user-stories.md`. Identify story IDs
+   this plan covers; their acceptance criteria are the source for tests, and `summarize` will
+   mark them `[x]` when the plan closes.
+
+### `execute` (session only)
+1. **`AGENTS.md`** — behavioral contract.
+2. **`.ai/session/plan.md`**, **`tasks.md`**, **`walkthrough.md`** — complete plan context,
+   including Phase Gate commands embedded in `tasks.md § Gate Commands`.
+
+> `constitution.md` and `reference-index.md` are **not** re-read during execute.
+> Gate commands and TDD posture were copied into `tasks.md` at define time.
+
+### `summarize` (session only)
+1. **`AGENTS.md`** — behavioral contract.
+2. **`.ai/session/plan.md`**, **`tasks.md`**, **`walkthrough.md`** — plan outcomes and gate commands.
+
+### `cleanup` (no reads required)
+Verify the summary file exists, then run the cleanup script.
+
+---
 
 If any of these reads reveals a conflict between the developer's
 request and recorded project facts, **flag it before producing

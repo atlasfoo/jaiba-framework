@@ -58,20 +58,27 @@ how to estimate blast radius cheaply, read
 
 ## Universal preconditions
 
-Once you've judged the change plausibly `fast`-eligible, do these
-reads before executing (skip nothing — a "trivial" change against the
-wrong assumptions isn't trivial):
+Context loaded depends on execution context — detect which applies (see
+"Two contexts" below) before reading.
 
-1. **`AGENTS.md`** — your behavioral contract. Always.
-2. **`.ai/memory/constitution.md`** — the **Quality Gate** (§6) and
-   the **TDD mode** flag (§7). You still honor the gate for a one-line
-   change.
+**Free-standing** (no active plan or change unrelated to it):
+1. **`AGENTS.md`** — behavioral contract.
+2. **`.ai/memory/constitution.md` §6 only** — Phase Gate commands and
+   TDD mode flag. Read this section only; skip the rest of the file.
 3. **`.ai/memory/reference-index.md`** — only the entries the change
-   touches (e.g. the dependency you're bumping). Don't invent
-   integrations; if the change needs one that isn't indexed, surface
-   the gap (`AGENTS.md` §5.3).
-4. **`.ai/session/`** — check whether a plan is active. This decides
-   the execution context (next section).
+   touches. Skip entirely if the change touches no indexed integrations.
+
+**Plan adjustment** (`.ai/session/plan.md` exists and the change falls
+within its scope):
+1. **`AGENTS.md`** — behavioral contract.
+2. **`.ai/session/plan.md`** and **`tasks.md`** — plan context and
+   Phase Gate commands (already embedded in `tasks.md § Gate Commands`).
+
+> For plan adjustments, `constitution.md` is not re-read. Gate commands
+> and TDD posture are available in the session files.
+
+Skip nothing within your applicable context — a "trivial" change
+against the wrong assumptions isn't trivial.
 
 ## Two contexts
 
@@ -95,9 +102,11 @@ pollute an unrelated plan or silently expand its approved scope.
 
 1. **Triage.** (See above / `references/complexity-triage.md`.) If not
    `fast`-eligible, refuse and route to `planning`. Stop here.
-2. **Read preconditions.** Quality Gate, TDD mode, relevant
-   reference-index entries, session state.
-3. **Determine context.** Free-standing vs. plan adjustment.
+2. **Determine context.** Free-standing vs. plan adjustment (check
+   whether `.ai/session/plan.md` exists and the change is in scope).
+3. **Read preconditions** per context (see "Universal preconditions"
+   above). Gate commands come from `tasks.md § Gate Commands` for plan
+   adjustments, and from `constitution.md §6` for free-standing changes.
 4. **For a plan adjustment, check the worktree.** A dirty worktree is
    *expected* if you're mid-phase — read `tasks.md` / `walkthrough.md`
    to confirm the dirt is the in-progress phase, not a surprise from
@@ -112,9 +121,10 @@ pollute an unrelated plan or silently expand its approved scope.
      rename, comment, formatting) don't need a new test. If the change
      would require building substantial new test scaffolding, that's a
      signal it wasn't `fast` work — reconsider triage.
-6. **Run the Quality Gate.** Use the commands from the project
-   scriptfile or `README.md` (constitution §6). If it fails and the
-   fix isn't itself atomic, stop and surface it.
+6. **Run the Phase Gate.** For plan adjustments use the commands from
+   `tasks.md § Gate Commands`; for free-standing changes use the Phase
+   Gate commands from `constitution.md §6`. If it fails and the fix
+   isn't itself atomic, stop and surface it.
 7. **Record, per context:**
    - **Free-standing:** write nothing to `.ai/session/`. The change
      plus git history is the record; give the developer a one-line
