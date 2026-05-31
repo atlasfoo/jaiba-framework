@@ -1,0 +1,112 @@
+{
+  "skill_name": "specification",
+  "evals": [
+    {
+      "id": 1,
+      "name": "brainstorm-fuzzy-requirement",
+      "mode_under_test": "brainstorm",
+      "prompt": "I want users to be able to share their trips somehow and maybe edit them together? Not totally sure what that should look like.",
+      "context": {
+        "specs_state": "empty",
+        "constitution_summary": "TripNest — Django travel planner",
+        "reference_index_has": ["django-guardian"],
+        "code_facts": ["Itinerary model exists, uses created_by", "no collaborator model", "no invitation flow"]
+      },
+      "expected_output": [
+        "Agent read preconditions (constitution, reference-index, relevant code, history) before shaping",
+        "Mirrored the PROBLEM back (no in-app co-planning today) rather than jumping to a solution",
+        "Asked clarifying questions one topic at a time (real-time vs async, roles, conflict handling)",
+        "Offered concrete shapes grounded in existing integrations (reuse django-guardian) instead of inventing dependencies",
+        "Wrote NOTHING to disk — no PRD.md, no user-stories.md, no scratch file",
+        "Converged on a landed requirement and offered to continue into define in the same conversation"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "define-new-spec",
+      "mode_under_test": "define",
+      "prompt": "Ok the requirement is clear: invitation-based async collaboration on itineraries, roles owner/editor/reader, last-write-wins, reusing django-guardian. Let's write the spec.",
+      "context": {
+        "specs_state": "empty",
+        "reference_index_has": ["django-guardian"],
+        "code_facts": ["Itinerary uses created_by, not owner"],
+        "language": "english"
+      },
+      "expected_output": [
+        ".ai/specs/<slug>/PRD.md created from prd-template.md, one-to-two screens, no implementation detail",
+        "A short uppercase story prefix was proposed and confirmed, recorded in PRD frontmatter (prefix:)",
+        ".ai/specs/<slug>/user-stories.md created with <PREFIX>-NNN IDs, each a deliverable increment",
+        "Each story has Given/When/Then acceptance criteria split into Happy path and Sad paths",
+        "The created_by-vs-owner mismatch was surfaced and resolved via a question, not guessed",
+        "PRD Open questions section is empty; no [NEEDS CLARIFICATION] blocks anywhere",
+        "Agent paused for explicit approval; no source code written; status stays draft until approved"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "define-amend-corrective-story",
+      "mode_under_test": "define",
+      "prompt": "While building ITIN-005 we found sessions expire mid-edit and silently log people out — we need to fix it for the spec to hold. Add it to the spec.",
+      "context": {
+        "specs_state": "active",
+        "active_spec": ".ai/specs/collaborative-itineraries/",
+        "existing_stories": "ITIN-001 through ITIN-007, highest ID is ITIN-007",
+        "language": "english"
+      },
+      "expected_output": [
+        "Agent recognized this is an amendment to an active spec, not a new spec",
+        "Read existing user-stories.md first; did NOT renumber existing IDs",
+        "Appended a new corrective story continuing the count (ITIN-008)",
+        "Story is framed as corrective and references the story it surfaced during",
+        "Story has Happy and Sad path Given/When/Then criteria",
+        "Reused the spec's existing prefix; did not invent a new one",
+        "Did not write source code (the fix itself is planning's job)"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "archive-completed-spec",
+      "mode_under_test": "archive",
+      "prompt": "All the collaboration stories are done. Let's archive this spec.",
+      "context": {
+        "specs_state": "active",
+        "active_spec": ".ai/specs/collaborative-itineraries/",
+        "stories_status": "all checked [x]",
+        "plan_archives": ["2026-05-26-collaborative-itineraries-base-model.md"],
+        "quality_gate": "passing",
+        "spec_language": "english"
+      },
+      "expected_output": [
+        "Verified every story is checked before proceeding",
+        "Drafted .ai/specs/<slug>/archive.md from spec-archive-template.md, concise, IN ENGLISH",
+        "Archive lists stories delivered and the plan summaries that built them",
+        "Proposed ADRs / brain updates (or explicitly stated none) WITHOUT writing to adr-log.md",
+        "Asked for explicit confirmation before the destructive step",
+        "On confirmation, used scripts/archive.sh: moved doc to .ai/memory/archive/specs/<date>-<slug>.md and removed the spec folder",
+        "Handed off to update-brain for any proposed ADRs"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "archive-blocked-open-stories",
+      "mode_under_test": "archive",
+      "prompt": "Let's close and archive the collaboration spec.",
+      "context": {
+        "specs_state": "active",
+        "active_spec": ".ai/specs/collaborative-itineraries/",
+        "stories_status": "ITIN-009 still unchecked [ ]"
+      },
+      "expected_output": [
+        "Agent detected at least one open story and STOPPED — did not archive",
+        "Surfaced the specific open story (ITIN-009)",
+        "Offered the three options: finish it via planning, drop it (record in Deviations), or split into a follow-up spec",
+        "Did not run archive.sh and did not delete the spec folder"
+      ],
+      "files": []
+    }
+  ]
+}

@@ -51,6 +51,10 @@ any file is missing or contradicts the request.
    integrations the plan will touch. Do not invent integrations.
 4. **Active spec, if any** — if the developer references a spec or one
    is implied, read `.ai/specs/<name>/PRD.md` and `user-stories.md`.
+   Identify which story IDs the plan covers (recorded in the plan's
+   `stories:` field); their happy/sad acceptance criteria are the
+   source for the plan's tests, and `summarize` will mark them `[x]`
+   when the plan closes.
 
 If any of these reads reveals a conflict between the developer's
 request and recorded project facts, **flag it before producing

@@ -42,9 +42,11 @@ project/
 │   │   ├── constitution.md             ← Project executive summary
 │   │   ├── adr-log.md                  ← Architectural decision history
 │   │   ├── reference-index.md          ← Index of dependencies and external APIs
-│   │   └── archive/                    ← Archived summaries of closed plans
-│   │       └── plans/
-│   │           └── YYYY-MM-DD-slug.md
+│   │   └── archive/                    ← Archived summaries of closed work
+│   │       ├── plans/                   ← Closed plan summaries (planning:cleanup)
+│   │       │   └── YYYY-MM-DD-slug.md
+│   │       └── specs/                   ← Delivered spec archives (specification:archive)
+│   │           └── YYYY-MM-DD-spec-slug.md
 │   ├── specs/                          ← Mid-term memory
 │   │   └── [spec-name]/
 │   │       ├── PRD.md                  ← Formalized business requirement
@@ -152,9 +154,9 @@ specs/
 Defines the **what and why** of the requirement: the business problem, acceptance criteria, assumptions, and constraints.
 
 #### `user-stories.md`
-Breaks the PRD down into **concrete user stories** with clear acceptance criteria. Functions as a progress checklist during implementation.
+Breaks the PRD down into **concrete user stories**, each a deliverable increment (a screen, an endpoint, an improvement, a fix). Every story is numbered `<PREFIX>-NNN` (a short uppercase prefix unique to the spec) and carries acceptance criteria split into **happy path** and **sad paths** as Given/When/Then — the direct input to business design and integration tests. Functions as a progress checklist during implementation: `planning:summarize` flips each story to `[x]` as plans deliver it.
 
-> A spec can span multiple work sessions. It remains active until archived or completed.
+> A spec can span multiple work sessions. It remains active until all its stories are delivered and `specification:archive` closes it.
 
 ---
 
@@ -204,14 +206,15 @@ The tactical work workflow. Designed for concrete tasks that do not require a fu
 
 ### 📐 `skill: specification`
 
-The specification-driven development workflow. For requirements of greater complexity or scope that need to be formalized before implementation.
+The specification-driven development workflow. For requirements of greater complexity or scope that need to be formalized before implementation. It owns the *what* and the *why* — it **never writes source code**; implementation belongs to `planning`.
 
 | Mode | Description |
 |---|---|
-| **`brainstorm`** | Open-ended exploration of the requirement. The agent asks questions, identifies ambiguities, and helps clarify the business problem. |
-| **`define`** | Formalization of the spec: the agent drafts `PRD.md` and `user-stories.md` based on the human-validated brainstorm. |
-| **`resolve`** | Query mode within an active spec: the human can ask questions about scope, and the agent responds without modifying any code. |
-| **`archive`** | Formal closure of the spec: it is marked as completed, its folder is archived, and relevant knowledge is promoted to `memory/`. |
+| **`brainstorm`** | Open-ended, **conversational** exploration of a fuzzy requirement. The agent loads full context, asks questions, identifies ambiguities, and helps land the business problem. Writes nothing to disk — its output flows into `define` within the same conversation. |
+| **`define`** | Formalization of the spec: the agent drafts `PRD.md` and `user-stories.md` (each story numbered `<PREFIX>-NNN`, with happy/sad acceptance criteria). Open doubts are resolved via a questionnaire *before* writing — never punted into the artifact. Ends at explicit human approval. Also handles amending an active spec (e.g. adding a retroactive corrective story). |
+| **`archive`** | Formal closure of a fully-delivered spec (all stories `[x]`): the agent drafts an English archive document, proposes ADRs/brain updates, and — after explicit confirmation — moves it to `.ai/memory/archive/specs/` and removes the active spec folder. A single mode with a confirmation gate. |
+
+> Querying an active spec read-only ("what does this spec cover?") is the job of `skill: ask`, not a mode here.
 
 > A well-defined spec is the best investment before writing a single line of code.
 
@@ -353,12 +356,14 @@ And the resulting `user-stories.md` includes stories such as:
 - `[ ]` As a reader, I want to view the itinerary in read-only mode without being able to modify it
 - `[ ]` As an owner, I want to see the change history of my itinerary
 
-**Resolve:**
-During development a question arises: should the permissions system integrate with the existing authentication system or be handled independently?
+> The stories then get implemented through `skill: planning`, one or more per plan. Each plan declares the stories it covers, derives its tests from their happy/sad criteria, and marks them `[x]` on close. (Read-only questions that arise mid-development — *"should roles reuse `django-guardian`?"* — are answered by `skill: ask`, not by this workflow.)
 
-> 👤 *"Should collaborator roles use the permissions system we already have with `django-guardian`?"*
+**Archive:**
+Once every story in the spec is `[x]`, the team closes it.
 
-The agent consults `.ai/memory/reference-index.md`, confirms that `django-guardian` is already integrated for object permissions, and responds with a well-founded recommendation **without touching any code**.
+> 👤 *"All the collaboration stories are done — archive the spec."*
+
+The agent verifies completeness, drafts an English archive document summarizing the delivered requirement and the plans that built it, proposes an ADR (object permissions via `django-guardian`), and — after explicit confirmation — moves it to `.ai/memory/archive/specs/2026-05-30-collaborative-itineraries.md` and removes the active spec folder.
 
 ---
 

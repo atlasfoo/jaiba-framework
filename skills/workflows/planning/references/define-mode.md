@@ -14,7 +14,10 @@ plan — never silently overwrite.
 - The developer's prompt describing the work.
 - An optional active spec — when the developer references one, or
   when a single spec lives under `.ai/specs/` and the prompt fits it,
-  treat its `user-stories.md` as the primary source of scope.
+  read **both** its `PRD.md` (for the *why* and the constraints) and
+  its `user-stories.md` (the primary source of scope). Identify the
+  specific story IDs this plan will implement; their acceptance
+  criteria (happy/sad paths) are the source for this plan's tests.
 - The codebase itself — the plan must be grounded in what exists,
   not in what the prompt assumes exists.
 - The constitution — for stack, Quality Gate, and the TDD mode flag.
@@ -46,9 +49,14 @@ plan — never silently overwrite.
    constitution's Planning Conventions section.
    - `enabled` (default) ⇒ structure phases as red → green →
      refactor. Each implementation task is preceded by a failing-test
-     task **in the same phase**.
+     task **in the same phase**. When a spec is active, derive those
+     failing tests directly from the story's acceptance criteria —
+     each happy path and each sad path is a test the plan must make
+     pass. This is the payoff of the spec: the tests are already
+     written, in prose, in `user-stories.md`.
    - `disabled` ⇒ tests are scheduled at the team's discretion;
-     typically a dedicated phase.
+     typically a dedicated phase. The acceptance criteria still define
+     "done" for each story.
 6. **Decompose into phases.** Group tasks by **architectural
    cohesion**, not by chronology. Each phase must:
    - Have a single, nameable theme (e.g., "Domain model", "API
@@ -57,7 +65,10 @@ plan — never silently overwrite.
      state when complete (so a `chore(wip)` commit is safe).
    - Declare its dependencies on prior phases in its header.
 7. **Write the artifacts.** Use the templates verbatim:
-   - `assets/plan-template.md` → `.ai/session/plan.md`
+   - `assets/plan-template.md` → `.ai/session/plan.md`. When a spec is
+     active, fill the `spec:` and `stories:` frontmatter fields and
+     the "Covered stories" section, so the plan → spec link is
+     explicit and a reviewer can trace it.
    - `assets/tasks-template.md` → `.ai/session/tasks.md`
    - `assets/walkthrough-template.md` → `.ai/session/walkthrough.md`
      (stub only; gets populated during `execute`)
