@@ -95,9 +95,10 @@ session.
 4. **Redact** any secret-like tokens that appear in command output
    or logs before processing or summarizing them.
 
-## 5. Memory Drift
+## 5. Memory Drift & Gaps
 
-The brain can fall behind the repository. When you detect drift:
+The brain can fall behind the repository, or be incomplete from the
+start. Keep it honest:
 
 1. **Notify briefly.** Point out the specific contradiction (file
    vs reality).
@@ -106,3 +107,15 @@ The brain can fall behind the repository. When you detect drift:
 3. **Stub missing references.** If a task needs an external
    integration not listed in `reference-index.md`, surface the gap
    and propose adding a stub before proceeding.
+4. **Never let a memory gap pass silently.** Long-term memory
+   (`.ai/memory`) marks what it cannot yet state as fact with the
+   canonical annotations — `[MISSING]` for an absent fact,
+   `[NEEDS CLARIFICATION]` for an ambiguous one — and unfilled template
+   placeholders (`[bracket]`) count the same. Whenever you read or
+   write a `.ai/memory` file and any such annotation remains, **warn the
+   human explicitly**: name the file and what is outstanding, before you
+   rely on that file or end your turn. This holds for every skill, not
+   just `update-brain` — an incomplete brain the human doesn't know
+   about is worse than a visible gap, because it gets trusted as if it
+   were complete. Resolving these is `update-brain`'s job; surfacing
+   them is everyone's.
