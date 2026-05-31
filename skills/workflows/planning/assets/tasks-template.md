@@ -1,5 +1,23 @@
 # Tasks: <plan slug>
 
+## Gate Commands
+
+<!-- Populated by planning:define from constitution.md §6. Do not edit manually. -->
+
+**Phase gate** (run after each phase):
+- `<affected tests command>`
+- `<lint command>`
+- `<typecheck command>`
+- `<format check command>`
+
+**Plan gate** (run once in `planning:summarize`):
+- `<full test suite command>`
+- `<coverage command>`
+- `<build command>`
+- `<security scan command>` *(omit if not configured)*
+
+---
+
 > Phase rules:
 > - Phases have **architectural cohesion**, not chronological grouping.
 > - Each phase leaves the codebase **reversible and buildable** — a

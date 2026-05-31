@@ -69,7 +69,12 @@ plan — never silently overwrite.
      active, fill the `spec:` and `stories:` frontmatter fields and
      the "Covered stories" section, so the plan → spec link is
      explicit and a reviewer can trace it.
-   - `assets/tasks-template.md` → `.ai/session/tasks.md`
+   - `assets/tasks-template.md` → `.ai/session/tasks.md`. **Populate
+     the `## Gate Commands` section** at the top: copy the Phase Gate
+     commands and Plan Gate commands verbatim from `constitution.md §6`
+     (the actual CLI commands from the project's scriptfile, not the
+     descriptions). This is the last time `constitution.md` is needed —
+     `execute` and `summarize` will read gate commands from `tasks.md`.
    - `assets/walkthrough-template.md` → `.ai/session/walkthrough.md`
      (stub only; gets populated during `execute`)
 8. **Stop and ask for approval.** The plan is not active until the
