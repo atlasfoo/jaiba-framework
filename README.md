@@ -51,11 +51,14 @@ project/
 │   │   └── [spec-name]/
 │   │       ├── PRD.md                  ← Formalized business requirement
 │   │       └── user-stories.md         ← User story checklist
-│   └── session/                        ← Short-term memory
-│       ├── plan.md                     ← Active plan
-│       ├── tasks.md                    ← Task checklist
-│       ├── walkthrough.md              ← Session log
-│       └── <slug>-summary.md           ← Plan summary, until cleanup archives it
+│   ├── session/                        ← Short-term memory
+│   │   ├── plan.md                     ← Active plan
+│   │   ├── tasks.md                    ← Task checklist
+│   │   ├── walkthrough.md              ← Session log
+│   │   └── <slug>-summary.md           ← Plan summary, until cleanup archives it
+│   └── vendored/                       ← Local copies of external references
+│       ├── stripe-openapi.yaml          ← e.g. a vendored API contract
+│       └── internal-sdk.txt             ← e.g. a Repomix bundle of a dependency
 └── src/ ...                            ← Your project
 ```
 
@@ -131,6 +134,8 @@ The project's **architectural decision history** (Architecture Decision Records)
 The **index of external dependencies**: integrated APIs, key packages, third-party services, and important libraries. For each entry it documents its purpose, where it is configured, and how it is used within the project.
 
 > Prevents the agent from "reinventing" integrations that already exist or using incorrect versions.
+>
+> When a reference is stored locally rather than fetched live, the entry points at its copy under `.ai/vendored/` (see below).
 
 #### `archive/plans/`
 **Archived summaries** of already-closed plans. Each file is the output of the `planning:summarize` skill, archived by the `cleanup` mode in the format `YYYY-MM-DD-<slug>.md`. They function as the project's historical log: a developer (human or agent) can browse this directory to understand what was done, when, and why, without having to reconstruct it from commits.
@@ -177,6 +182,21 @@ The narrative record of the session: decisions made, problems encountered, and t
 The plan summary, produced by `planning:summarize` when all tasks are complete. It lives temporarily in `session/` so the developer can review it alongside the rest of the session material, and is then moved to `.ai/memory/archive/plans/` by the `cleanup` mode.
 
 > Files in `session/` are **ephemeral**: when `planning:cleanup` runs, the summary is archived in `memory/` and the other files are deleted, leaving the space ready for the next plan.
+
+---
+
+### `vendored/` — Local copies of external references
+
+Not a memory horizon, but a **store** that backs `reference-index.md`. When an external reference can't (or shouldn't) be fetched live every time it's needed, a local copy is kept here and the index entry points at it.
+
+Typical contents:
+
+- **Vendored API contracts** — a physical copy of a third-party or internal API's OpenAPI/GraphQL spec or docs, so the agent reads the contract from disk instead of guessing at it.
+- **Repomix (or similar) bundles** — a compressed, single-file snapshot of a dependency's source or documentation, useful for libraries with non-obvious usage or internal forks.
+
+The reference-index's *"Vendored at `<path>`"* consultation method always resolves to a path under `.ai/vendored/`. Keeping these copies in-repo means the agent's understanding of an external surface is **versioned alongside the code** — it doesn't drift when the upstream changes, and it works offline.
+
+> Populated and curated by `update-brain`, which records the pointer in `reference-index.md`. The future `doctor` skill checks that each vendored path the index references actually exists.
 
 ---
 

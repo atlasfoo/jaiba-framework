@@ -104,15 +104,22 @@ The final output of this framework are skills, template artifacts will be packag
     │   ├── ask
     │   ├── fast
     │   └── update-brain
+    │       ├── assets
+    │       │   ├── constitution-template.md
+    │       │   ├── adr-log-template.md
+    │       │   ├── reference-index-template.md
+    │       │   └── readme-skeleton.md
+    │       └── references     (one per mode: initialize, update)
     └── meta
-        └── scaffold
-            └── assets
-                ├── constitution-template.md
-                ├── adr-log-template.md
-                └── reference-index-template.md
+        └── scaffold           (lays the .ai/ skeleton, then invokes
+                                update-brain:initialize — owns no templates)
 ```
 
-> Since scaffold script is not already done, memory artifacts templates live in `templates` temporary folder.
+> The memory artifact templates are owned by `update-brain` (the only
+> skill that writes `.ai/memory/`). `scaffold` does not carry its own
+> copies: it creates the `.ai/` skeleton and hands off to
+> `update-brain:initialize`, which materializes the brain from those
+> templates.
 
 
 ## 5. Project status

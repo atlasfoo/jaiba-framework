@@ -9,13 +9,24 @@
   - [x] `ask` skill
 - [x] Mid term brain workflows and artifacts
   - [x] `specification` skill and artifacts (brainstorm / define / archive + planning integration)
-- [ ] Long term brain workflows
-  - [ ] `update-brain` skill and artifacts
+- [x] Long term brain workflows
+  - [x] `update-brain` skill and artifacts (in progress)
+    - Owns the memory artifact templates (constitution / adr-log /
+      reference-index) under its `assets/`; `initialize` mode detects
+      whether the files already exist in the target `.ai/memory/` and
+      creates them from the templates only when absent.
 - [ ] Quality gate sectioning (after phases and after plan).
+- [ ] Token economy
 - [ ] Meta Skills
   - [ ] `scaffold` skill
+    - Does **not** manage the artifact templates — that is
+      `update-brain`'s responsibility. `scaffold` only lays down the
+      `.ai/` skeleton + `AGENTS.md`, then immediately invokes
+      `update-brain:initialize` to populate the brain content. No
+      cross-skill runtime reference to `update-brain/assets/` (skills
+      package independently); the boundary is a hand-off, not a path.
   - [ ] `doctor` skill, external index accesibility and tool testing
-  - [ ] `create-knowledge` skill
+  - [ ] `create-knowledge` skill (plugin behavior)
   - [ ] `create-workflow` skill
 
 # Global instructions

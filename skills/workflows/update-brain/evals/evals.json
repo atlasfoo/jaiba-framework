@@ -1,0 +1,150 @@
+{
+  "skill_name": "update-brain",
+  "evals": [
+    {
+      "id": 1,
+      "name": "initialize-brownfield-dotnet",
+      "mode_under_test": "initialize",
+      "prompt": "Set up jaiba on this repo and build the brain. It's an existing .NET service we've been running for a while.",
+      "context": {
+        "memory_state": "empty (.ai/memory/ has no *.md, or bare templates)",
+        "code_facts": [
+          "ASP.NET Core 8 Web API, layered (Api/Application/Domain/Infrastructure)",
+          "Orders.csproj references EFCore.Npgsql, MediatR, Serilog",
+          "calls an external Payments API via a typed HttpClient; OpenAPI vendored at docs/openapi/payments-v2.yaml",
+          "Dockerfile + .github/workflows/ci.yml run `dotnet test` and a `snyk test` step"
+        ],
+        "readme_state": "non-empty but only a title and a one-line description",
+        "scriptfile": "none; CI yml is the only place commands live",
+        "unknowable_from_code": ["business objective", "downstream consumers"]
+      },
+      "expected_output": [
+        "Did the evidence sweep (code, .csproj, README, CI) before writing anything",
+        "Created/filled constitution.md, adr-log.md, reference-index.md from assets templates",
+        "constitution Quality Gate commands sourced from CI (dotnet test, snyk); did NOT invent commands",
+        "Asked the human for business objective and downstream consumers; marked [MISSING] for any deferred",
+        "adr-log kept only ADR-001 (dated today); did NOT back-fill pre-adoption architecture decisions",
+        "reference-index Payments API points at the vendored OpenAPI path, NOT the internal contracts assembly",
+        "snyk recorded under the secondary Workflow & Verification Tooling tier",
+        "README judged incomplete (missing requirements + how-to) → advised what to add, did NOT overwrite it",
+        "Wrote the brain in English; ended with an explicit list of remaining [MISSING]/[bracket] gaps per file"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "initialize-empty-readme-fill",
+      "mode_under_test": "initialize",
+      "prompt": "Build the brain. Also our README.md is basically blank.",
+      "context": {
+        "memory_state": "empty",
+        "code_facts": ["Python 3.12, FastAPI, uv-managed", "justfile has test/lint/fmt/typecheck recipes"],
+        "readme_state": "completely empty file",
+        "language": "spanish"
+      },
+      "expected_output": [
+        "README.md completely empty → filled from assets/readme-skeleton.md",
+        "Skeleton brackets filled from real evidence (commands from the justfile, stack from pyproject)",
+        "README allowed to be in the project/developer language (spanish), NOT forced to english",
+        ".ai/memory artifacts written in English regardless of session language",
+        "Quality Gate commands taken from the justfile, not invented",
+        "Closed with a gap report"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "update-apply-proposed-adr",
+      "mode_under_test": "update",
+      "prompt": "Apply the ADR that the spec archive proposed for the itinerary permissions.",
+      "context": {
+        "memory_state": "populated",
+        "proposal_source": ".ai/memory/archive/specs/2026-05-30-collaborative-itineraries.md proposed 'Object permissions via django-guardian'",
+        "adr_log_state": "last entry is ADR-003"
+      },
+      "expected_output": [
+        "Located the proposal in the spec archive",
+        "Showed the change in prose and asked for confirmation BEFORE writing (propose -> confirm -> enact)",
+        "Appended ADR-004 from the adr-log template, status flipped Proposed -> Accepted, dated today",
+        "Added ADR-004 to the Decision Index table",
+        "Did NOT edit or delete any prior ADR",
+        "Reported provenance (the spec archive it came from)"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "update-fix-drift-new-integration",
+      "mode_under_test": "update",
+      "prompt": "The reference index doesn't mention the new payments integration we added last sprint — reconcile it.",
+      "context": {
+        "memory_state": "populated, reference-index has no payments entry",
+        "code_facts": ["new StripeClient wired in Infrastructure", "STRIPE_API_KEY referenced in .env.example", "no vendored Stripe spec, docs only at stripe.com/docs"]
+      },
+      "expected_output": [
+        "Scoped the drift to reference-index.md specifically (not a full brain re-derivation)",
+        "Added Stripe under External APIs (code-scope tier)",
+        "Consumption point grounded in real evidence (docs URL + STRIPE_API_KEY in .env.example), not invented",
+        "Did not read or echo the actual secret; pointed at .env.example",
+        "Proposed -> confirm -> enact; minimal change, untouched sections left alone",
+        "If any consumption detail was unfindable, marked [MISSING] rather than guessing"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "update-rejects-non-identity-change",
+      "mode_under_test": "update",
+      "prompt": "We just bumped Serilog from 3.1 to 3.2 and refactored the order validator. Update the constitution.",
+      "context": {
+        "memory_state": "populated",
+        "change_nature": "version bump + behavior-preserving refactor, no scope/consumer/gate/upstream change"
+      },
+      "expected_output": [
+        "Recognized this is NOT a constitution event (no identity/scope/consumer/Quality Gate change)",
+        "Declined to edit constitution.md and explained why",
+        "Did not propose an ADR (no structural decision)",
+        "Pointed the developer at where such tactical changes are recorded instead (walkthrough/git), not memory"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "mode-disambiguation-half-filled",
+      "mode_under_test": "selection",
+      "prompt": "update the brain",
+      "context": {
+        "memory_state": "ambiguous: constitution.md has real content but reference-index.md is still a bare template"
+      },
+      "expected_output": [
+        "Did not silently pick a mode",
+        "Surfaced the mixed state (some real content, some bare template) and asked whether to initialize the missing parts or update existing ones",
+        "Did not overwrite the populated constitution"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "initialize-prunes-inapplicable-sections",
+      "mode_under_test": "initialize",
+      "prompt": "Build the brain for this repo.",
+      "context": {
+        "memory_state": "empty",
+        "code_facts": [
+          "small standalone CLI tool, Go, single module",
+          "no external APIs, no datastore, no infra dependencies",
+          "no product/business documentation anywhere in the repo",
+          "no CI scanners or verification tooling beyond `go test`"
+        ]
+      },
+      "expected_output": [
+        "reference-index.md kept only the sections that apply (packages, if any)",
+        "Removed the External APIs, Infrastructure, Business Documentation and Workflow Tooling sections entirely — did NOT leave them as headings full of bracket rows",
+        "Remaining sections renumbered contiguously",
+        "Did NOT use [MISSING] for these — they are inapplicable categories, not unfound facts",
+        "Distinguished this from genuinely-unknown facts (e.g. business objective), which were asked or marked [MISSING]"
+      ],
+      "files": []
+    }
+  ]
+}
