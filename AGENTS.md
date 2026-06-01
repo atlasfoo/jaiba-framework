@@ -83,36 +83,36 @@ The final output of this framework are skills, template artifacts will be packag
 
 ```
 └── skills
-    ├── workflows
-    │   ├── planning
-    │   │   ├── assets
-    │   │   │   ├── plan-template.md
-    │   │   │   ├── tasks-template.md
-    │   │   │   ├── walkthrough-template.md
-    │   │   │   └── plan-summary-template.md
-    │   │   ├── references     (one per mode: define, execute, summarize, cleanup)
-    │   │   └── scripts
-    │   │       └── cleanup.sh
-    │   ├── specification
-    │   │   ├── assets
-    │   │   │   ├── prd-template.md
-    │   │   │   ├── user-stories-template.md
-    │   │   │   └── spec-archive-template.md
-    │   │   ├── references     (one per mode: brainstorm, define, archive)
-    │   │   └── scripts
-    │   │       └── archive.sh
-    │   ├── ask
-    │   ├── fast
-    │   └── update-brain
-    │       ├── assets
-    │       │   ├── constitution-template.md
-    │       │   ├── adr-log-template.md
-    │       │   ├── reference-index-template.md
-    │       │   └── readme-skeleton.md
-    │       └── references     (one per mode: initialize, update)
-    └── meta
-        └── scaffold           (lays the .ai/ skeleton, then invokes
-                                update-brain:initialize — owns no templates)
+    ├── planning
+    │   ├── assets
+    │   │   ├── plan-template.md
+    │   │   ├── tasks-template.md
+    │   │   ├── walkthrough-template.md
+    │   │   └── plan-summary-template.md
+    │   ├── references     (one per mode: define, execute, summarize, cleanup)
+    │   └── scripts
+    │       └── cleanup.sh
+    ├── specification
+    │   ├── assets
+    │   │   ├── prd-template.md
+    │   │   ├── user-stories-template.md
+    │   │   └── spec-archive-template.md
+    │   ├── references     (one per mode: brainstorm, define, archive)
+    │   └── scripts
+    │       └── archive.sh
+    ├── ask
+    ├── fast
+    ├── update-brain
+    │   ├── assets
+    │   │   ├── constitution-template.md
+    │   │   ├── adr-log-template.md
+    │   │   ├── reference-index-template.md
+    │   │   └── readme-skeleton.md
+    │   └── references     (one per mode: initialize, update)
+    ├── scaffold           (lays the .ai/ skeleton, then invokes
+    │                       update-brain:initialize — owns no templates)
+    ├── create-knowledge
+    └── doctor
 ```
 
 > The memory artifact templates are owned by `update-brain` (the only

@@ -1,0 +1,27 @@
+# JAIBA project-scoped skill set installed by jaiba-scaffold.
+#
+# Two entry formats:
+#
+#   bare name       → skill from atlasfoo/jaiba-framework
+#                     e.g.  planning
+#
+#   owner/repo      → all skills from an external GitHub repo
+#   owner/repo#skill → specific skill from an external GitHub repo
+#                     e.g.  juliusbrussee/caveman
+#                           anthropics/skills#skill-creator
+#
+# Lines starting with '#' are comments. Keep this list current as the
+# framework grows or external dependencies are added/removed.
+
+# ── JAIBA skills ──────────────────────────────────────────────────────
+planning
+specification
+ask
+fast
+update-brain
+create-knowledge
+doctor
+
+# ── External community skills ─────────────────────────────────────────
+# Add external skills below, e.g.:
+juliusbrussee/caveman
