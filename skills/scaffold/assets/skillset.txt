@@ -20,8 +20,8 @@ ask
 fast
 update-brain
 create-knowledge
-doctor
+jaiba-doctor
 
 # ── External community skills ─────────────────────────────────────────
 # Add external skills below, e.g.:
-juliusbrussee/caveman
+juliusbrussee/caveman#caveman
