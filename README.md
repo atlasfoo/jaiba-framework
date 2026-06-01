@@ -13,6 +13,71 @@
 
 ---
 
+- [🦀 JAIBA](#-jaiba)
+  - [🚀 Getting Started](#-getting-started)
+    - [1. Install the Scaffold Skill globally](#1-install-the-scaffold-skill-globally)
+    - [2. Initialize JAIBA in your repository](#2-initialize-jaiba-in-your-repository)
+  - [What is JAIBA?](#what-is-jaiba)
+    - [Core principles](#core-principles)
+  - [System architecture](#system-architecture)
+  - [🧠 Memory structure: the agent's brain](#-memory-structure-the-agents-brain)
+    - [`AGENTS.md` — Behavior guidelines](#agentsmd--behavior-guidelines)
+    - [`memory/` — Long-term memory](#memory--long-term-memory)
+      - [`constitution.md`](#constitutionmd)
+      - [`adr-log.md`](#adr-logmd)
+      - [`reference-index.md`](#reference-indexmd)
+      - [`archive/plans/`](#archiveplans)
+    - [`specs/` — Mid-term memory](#specs--mid-term-memory)
+      - [`PRD.md` (Product Requirements Document)](#prdmd-product-requirements-document)
+      - [`user-stories.md`](#user-storiesmd)
+    - [`session/` — Short-term memory](#session--short-term-memory)
+      - [`plan.md`](#planmd)
+      - [`tasks.md`](#tasksmd)
+      - [`walkthrough.md`](#walkthroughmd)
+      - [`<slug>-summary.md`](#slug-summarymd)
+    - [`vendored/` — Local copies of external references](#vendored--local-copies-of-external-references)
+  - [⚙️ Skills: the workflows](#️-skills-the-workflows)
+    - [📋 `skill: planning`](#-skill-planning)
+    - [📐 `skill: specification`](#-skill-specification)
+    - [🔄 `skill: update-brain`](#-skill-update-brain)
+    - [⚡ `skill: fast`](#-skill-fast)
+    - [💬 `skill: ask`](#-skill-ask)
+    - [🩺 `skill: doctor`](#-skill-doctor)
+  - [Typical workflow](#typical-workflow)
+  - [Design philosophy](#design-philosophy)
+    - [The agent as co-pilot, not pilot](#the-agent-as-co-pilot-not-pilot)
+    - [Memory as a first-class citizen](#memory-as-a-first-class-citizen)
+    - [Workflows as contracts](#workflows-as-contracts)
+  - [Usage examples](#usage-examples)
+    - [Example 1 — `skill: specification` · New requirement](#example-1--skill-specification--new-requirement)
+    - [Example 2 — `skill: planning` within an active spec](#example-2--skill-planning-within-an-active-spec)
+    - [Example 3 — `skill: planning` standalone (outside a spec)](#example-3--skill-planning-standalone-outside-a-spec)
+  - [Glossary](#glossary)
+
+
+## 🚀 Getting Started
+
+To adopt JAIBA in your project, follow these two steps:
+
+### 1. Install the Scaffold Skill globally
+First, install the meta-skill that handles the JAIBA bootstrap process.
+
+```bash
+npx skills add -y atlasfoo/jaiba-framework --skill jaiba-scaffold
+```
+
+### 2. Initialize JAIBA in your repository
+Navigate to the root of your project and ask the agent to set up the framework. This will create the brain skeleton, install the project-scoped skills, and probe your local toolchain.
+
+```text
+/jaiba-scaffold
+```
+*Or simply: "set up jaiba in this project"*
+
+Once the scaffold is complete, it will hand over to `update-brain:initialize` to analyze your repository and populate the long-term memory.
+
+---
+
 ## What is JAIBA?
 
 JAIBA is an agile development framework designed for teams that work with AI agents as co-pilots in building software. It is not a tool, an AI model, or a collection of loose prompts: it is a **behavioral architecture** that defines how to organize context, how to orchestrate workflows, and how to keep the human as the central decision-maker at every significant stage of development.
