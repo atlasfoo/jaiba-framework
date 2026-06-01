@@ -1,0 +1,23 @@
+{
+  "skill_name": "jaiba-scaffold",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to start using JAIBA on this repo. It's a fresh Python service, nothing set up yet. Can you scaffold it?",
+      "expected_output": "Detects no vendor agent dir -> uses .agents/skills as install target. Creates .ai/ skeleton (memory/ specs/ session/ vendored/) plus .ai/.gitignore ignoring session/ and tools-state.md. Installs AGENTS.md at root. Installs the project-scoped skill set. Runs the tool check writing .ai/tools-state.md. Hands off to update-brain:initialize. Ends with a closing report.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "set up jaiba here please",
+      "expected_output": "Repo already has its own AGENTS.md at root. Skill must NOT overwrite it -- it stops and offers the two non-destructive options (back up + replace, or install as AGENTS.jaiba.md to coexist) before continuing the rest of the bootstrap.",
+      "files": ["AGENTS.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "can you scaffold jaiba into this project? I think someone may have started already",
+      "expected_output": "Repo already has a populated .ai/memory/constitution.md (real content, not bare template). Skill recognizes the project is already JAIBA-instrumented, refuses to re-scaffold/clobber, and routes the developer to update-brain (and/or planning/ask) instead.",
+      "files": [".ai/memory/constitution.md"]
+    }
+  ]
+}

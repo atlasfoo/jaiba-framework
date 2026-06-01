@@ -1,0 +1,17 @@
+# JAIBA project-scoped skill set installed by jaiba-scaffold.
+# Source paths within the canonical repo (atlasfoo/jaiba-framework),
+# one per line. Lines starting with '#' are comments.
+#
+# These are the skills a *project* needs locally. Global meta skills
+# (jaiba-scaffold itself, and future agent-level tools) are NOT here —
+# they live in the agent, not the repo.
+#
+# Keep this list current as the framework grows (e.g. add
+# meta/create-workflow once it ships).
+workflows/planning
+workflows/specification
+workflows/ask
+workflows/fast
+workflows/update-brain
+meta/create-knowledge
+meta/doctor
