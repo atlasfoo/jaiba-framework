@@ -117,33 +117,43 @@ Never silently clobber an existing `AGENTS.md`.
 ### 4. Install the project-scoped JAIBA skills
 
 Install the skills a *project* needs into the agent folder from step 1,
-fetching them from the canonical source — **the same package manager
+fetching them from their canonical sources — **the same package manager
 that installed scaffold itself.** Do not copy from scaffold's own
 directory: skills package independently, and scaffold carries no copies
 of its siblings.
 
-- **Source:** `atlasfoo/jaiba-framework` (the canonical repo).
-- **What to install:** the skill set listed in `assets/skillset.txt`
-  (workflows + `create-knowledge`). Read that file — it's the
-  maintained manifest, so the list stays correct as the framework grows.
+- **What to install:** every entry in `assets/skillset.txt`.
+  Read that file — it is the maintained manifest, so the list stays
+  correct as the framework evolves or community skills are added.
 - **Destination:** the `skills/` subdir chosen in step 1.
 
-Canonical form (adapt to the actual `skills` CLI available — the one
-that installed scaffold):
+`skillset.txt` uses two entry formats:
+
+| Line format | Meaning | Install command |
+|---|---|---|
+| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `skills add atlasfoo/jaiba-framework --skill planning` |
+| `owner/repo` | all skills from an external GitHub repo | `skills add owner/repo` |
+| `owner/repo#skill` | one skill from an external GitHub repo | `skills add owner/repo --skill skill` |
+
+Process the file top to bottom: skip blank lines and lines starting with
+`#`, then for each remaining entry run the appropriate command. Batch
+all bare-name JAIBA entries into a single call to avoid redundant fetches:
 
 ```bash
-skills install atlasfoo/jaiba-framework \
-  --skills workflows/planning workflows/specification workflows/ask \
-           workflows/fast workflows/update-brain meta/create-knowledge \
-  --dir <agent-folder>/skills
+# All JAIBA-local entries in one call
+skills add atlasfoo/jaiba-framework \
+  --skill planning specification ask fast update-brain create-knowledge doctor
+
+# External entries — one call per repo
+skills add juliusbrussee/caveman
 ```
 
 If no skills package manager is available, say so and fall back to
-cloning the source and copying those skill folders into the target —
+cloning each source and copying the skill folders into the target —
 but prefer the package manager so versions/locks stay honest.
 
 > Scaffold installs the **project-scoped** set only. It does **not**
-> install itself (it's global) or unbuilt skills (`create-workflow`).
+> install itself (it's global) or unbuilt skills.
 > Keep that list in `assets/skillset.txt`, not hardcoded in prose.
 
 ### 5. Probe the local toolchain
