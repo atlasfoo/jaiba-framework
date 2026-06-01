@@ -1,0 +1,29 @@
+{
+  "skill_name": "jaiba-doctor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Before I start planning the next feature, can you run a jaiba health check on this repo and tell me if anything's off?",
+      "expected_output": "Runs all three diagnostics in order. Memory coherence: reads the three .ai/memory files (here mostly complete) and reports them coherent. Tool state: runs the bundled check-tools.sh, refreshes .ai/tools-state.md, reports tools present/missing with provenance. Reference health: walks reference-index.md, tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before planning.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Something feels stale about jaiba here. Can you check it?",
+      "expected_output": "Finds drift: the constitution claims one stack but the manifest shows another (or names a service with no reference-index entry), and/or the brain still has unfilled [brackets]/[MISSING]. Reports these as evidenced findings and routes the fix to update-brain (update mode for drift, initialize if a file is a bare template) — it does NOT rewrite .ai/memory/ itself. If the tool probe finds a missing CLI, flags it with its 'Needed by' provenance and prescribes an install. Report leads with the most severe (Broken) findings.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "are all my external references still reachable? I haven't touched this project in a while",
+      "expected_output": "Focuses on reference health (still runs the full checkup). For each reference-index entry: checks the named channel (MCP server installed/enabled, CLI on PATH, URL reachable if web tools exist, spec/vendored file on disk). Runs `git log -1 --format=%cs` on each vendored file and flags any older than 1 month as Degraded/stale, suggesting a re-vendor recorded via update-brain. Marks anything it cannot test (no web tools, no MCP introspection) as [UNVERIFIED] rather than passing it. Routes each fix to its owner.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "run jaiba doctor on this project",
+      "expected_output": "Detects there is no .ai/ brain to diagnose (repo was never instrumented). Refuses to invent findings and routes the developer to `scaffold` to bootstrap JAIBA first, explaining doctor is a maintenance/health-check skill that presumes an existing brain.",
+      "files": []
+    }
+  ]
+}

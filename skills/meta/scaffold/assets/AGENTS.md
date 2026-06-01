@@ -20,6 +20,7 @@ JAIBA stores persistent context in `.ai/`. Read these before you act.
 | `.ai/memory/reference-index.md` | long-term | Map of external dependencies, APIs, services, packages. |
 | `.ai/specs/<spec-name>/` | mid-term | Active product specifications: `PRD.md`, `user-stories.md`. |
 | `.ai/session/` | short-term | Active workspace: `plan.md`, `tasks.md`, `walkthrough.md`. |
+| `.ai/tools-state.md` | environment | Local CLI toolchain probe written by `jaiba-scaffold` (gitignored — machine state, not project memory). Which tools the installed skills need are present or missing here. |
 
 If any of these files is missing or empty, say so before acting on
 assumptions about its contents.
@@ -119,3 +120,30 @@ start. Keep it honest:
    about is worse than a visible gap, because it gets trusted as if it
    were complete. Resolving these is `update-brain`'s job; surfacing
    them is everyone's.
+
+## 6. Toolchain Awareness
+
+JAIBA skills run real commands — bundled scripts, git, search, fetch.
+Each skill declares the CLI tools it needs (`requires:` in its
+frontmatter), and `jaiba-scaffold` probes the local machine once and
+records the result in `.ai/tools-state.md`. That file is **environment
+state, not project memory**: it is gitignored, because what is
+installed on one developer's machine says nothing about the project
+itself. A tool listed there as **missing** is a latent failure — a
+skill that depends on it will break mid-run, often with a cryptic
+error, unless the human is warned first. So treat toolchain gaps with
+the same discipline as brain gaps (§5):
+
+1. **Check at session start.** If `.ai/tools-state.md` exists, read it.
+   Note any tool marked missing and which skill(s) declared it.
+2. **Warn before you rely on it.** Before invoking a skill whose
+   required tool is missing, name the tool and the skill explicitly and
+   surface it to the human — exactly as you would a `[MISSING]` brain
+   fact (§5.4). Do not discover the gap by letting the command fail.
+3. **The probe can go stale.** `tools-state.md` reflects the machine at
+   scaffold time. If a tool it lists as present turns out to be absent
+   (a `command not found`), say so and suggest re-running the
+   `jaiba-scaffold` tool check rather than trusting the stale file.
+4. **No probe at all.** If `.ai/tools-state.md` is missing entirely, the
+   environment was never probed. Note it and suggest running
+   `jaiba-scaffold`; don't silently assume the toolchain is complete.

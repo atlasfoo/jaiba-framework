@@ -1,0 +1,9 @@
+# JAIBA — local-only brain state. Do not commit.
+#
+# Copied to `.ai/.gitignore` by jaiba-scaffold.
+#   session/        short-term workspace: plan.md, tasks.md, walkthrough.md.
+#                   Per-developer, per-task scratch — never shared.
+#   tools-state.md  this machine's CLI toolchain probe — environment state,
+#                   not project fact.
+session/
+tools-state.md

@@ -196,7 +196,7 @@ Typical contents:
 
 The reference-index's *"Vendored at `<path>`"* consultation method always resolves to a path under `.ai/vendored/`. Keeping these copies in-repo means the agent's understanding of an external surface is **versioned alongside the code** — it doesn't drift when the upstream changes, and it works offline.
 
-> Populated and curated by `update-brain`, which records the pointer in `reference-index.md`. The future `doctor` skill checks that each vendored path the index references actually exists.
+> Populated and curated by `update-brain`, which records the pointer in `reference-index.md`. The `doctor` skill checks that each vendored path the index references actually exists, and warns when a vendored copy is more than a month old (using git to read its last-commit date) so a stale snapshot gets re-vendored.
 
 ---
 
@@ -277,6 +277,22 @@ Pure query mode. The agent answers questions, explains code, analyzes architectu
 - Triggers explicitly (`/ask`) and **implicitly** on interrogative/exploratory messages, deliberately yielding to the action skills on imperative or continuation cues.
 
 > Separating query mode from execution mode prevents accidental changes and keeps the human's intent clear. Asking first is not overhead: the context gathered while answering carries straight into whichever skill executes the change.
+
+---
+
+### 🩺 `skill: doctor`
+
+The framework health check. A maintenance meta-skill the developer runs manually — ideally as a **pre-flight right before `specification` or `planning`** — to confirm JAIBA is still sound before drift or a missing dependency derails the work. It **diagnoses and routes**; it does not repair (the framework's *propose, don't patch* rule). The one file it writes is `.ai/tools-state.md` — machine state, not project memory.
+
+It runs three diagnostics and emits a single severity-ordered report of suggested fixes:
+
+| Diagnostic | What it checks | Where the fix routes |
+|---|---|---|
+| **Memory coherence** | Are `constitution.md` / `adr-log.md` / `reference-index.md` complete (no unfilled `[brackets]`/`[MISSING]`), consistent with each other, and not drifting from the repo? | `update-brain` |
+| **Tool state** | Are the CLI tools the installed skills, subagents, and hooks declare actually present? Refreshes `.ai/tools-state.md` with a *"Needed by"* provenance column. | install the tool |
+| **External-reference health** | Is every `reference-index.md` entry reachable — its MCP/CLI installed, its remote spec/URL live, its vendored copy present and **fresh** (git last-commit date, flagged if older than a month)? | install the MCP/CLI · fix the endpoint · re-vendor via `update-brain` |
+
+> doctor presumes a brain to inspect: on a repo with no `.ai/` it routes to `scaffold` rather than inventing findings. Anything it can't verify in the current session (no web tools, no MCP introspection) is reported as `[UNVERIFIED]`, never silently passed.
 
 ---
 
