@@ -18,7 +18,7 @@ tags:
 
 The **kickoff** skill. `jaiba-scaffold` is a *global* meta-skill —
 installed once into your agent (e.g.
-`skills install atlasfoo/jaiba-framework --skills meta/scaffold`), not
+`npx skills add -y atlasfoo/jaiba-framework --skill jaiba-scaffold`), not
 per-project — and run from inside a target repo to adopt JAIBA there.
 
 It does the one-time install and nothing else. It lays the brain
@@ -132,21 +132,19 @@ of its siblings.
 
 | Line format | Meaning | Install command |
 |---|---|---|
-| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `skills add atlasfoo/jaiba-framework --skill planning` |
-| `owner/repo` | all skills from an external GitHub repo | `skills add owner/repo` |
-| `owner/repo#skill` | one skill from an external GitHub repo | `skills add owner/repo --skill skill` |
+| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill planning` |
+| `owner/repo` | all skills from an external GitHub repo | `npx skills add -y owner/repo` |
+| `owner/repo#skill` | one skill from an external GitHub repo | `npx skills add -y owner/repo --skill skill` |
 
 Process the file top to bottom: skip blank lines and lines starting with
-`#`, then for each remaining entry run the appropriate command. Batch
-all bare-name JAIBA entries into a single call to avoid redundant fetches:
+`#`, then for each remaining entry run the appropriate command. Install
+skills **one by one** to ensure each is correctly registered:
 
 ```bash
-# All JAIBA-local entries in one call
-skills add atlasfoo/jaiba-framework \
-  --skill planning specification ask fast update-brain create-knowledge doctor
-
-# External entries — one call per repo
-skills add juliusbrussee/caveman
+# Example individual calls
+npx skills add -y atlasfoo/jaiba-framework --skill planning
+npx skills add -y atlasfoo/jaiba-framework --skill specification
+npx skills add -y juliusbrussee/caveman --skill caveman
 ```
 
 If no skills package manager is available, say so and fall back to
