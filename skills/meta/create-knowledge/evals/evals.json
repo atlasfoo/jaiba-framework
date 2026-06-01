@@ -1,0 +1,26 @@
+{
+  "skill_name": "create-knowledge",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "We use Linear on this team. I've got a skill at ./linear-tickets that knows how to pull issues via the Linear MCP. Adapt it so that when I start a spec and drop a Linear ticket id in the prompt, it feeds the ticket into the specification workflow automatically. Don't touch what it already knows about Linear.",
+      "expected_output": "linear-tickets/SKILL.md rewritten: description now binds to specification:define and names the Linear-id trigger signal (pushy); a '## JAIBA Integration' section with Hook=specification:define, Modifier type=input, a concrete Trigger signal, and Behavior describing fetch->hand-off-as-requirement with fail-soft fallback; tags gain jaiba/jaiba-knowledge/jaiba-input. The body knowledge sections (Fetching/Summarizing/Notes) are byte-for-byte unchanged. No framework file touched.",
+      "files": ["fixtures/linear-tickets/SKILL.md"],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "prompt": "Here's our ASP.NET best-practices skill (./aspnet-practices). I want it to take an active role when planning ASP.NET features — its rules, like the per-endpoint markdown doc and the layering, should show up as tasks in the plan without me pasting them every time. Make it a JAIBA plugin.",
+      "expected_output": "aspnet-practices/SKILL.md rewritten as an output modifier: description binds to planning:define and names the ASP.NET-work trigger signal; '## JAIBA Integration' with Hook including planning:define, Modifier type=output, Behavior listing concrete contributed tasks/artifacts (per-endpoint doc task, layering + xUnit into technical approach) and an instruction to cite the skill under 'Sources consulted'. Tags gain jaiba/jaiba-knowledge/jaiba-output. The Architecture/Testing/Documentation/Error-contract knowledge is unchanged. No framework file touched.",
+      "files": ["fixtures/aspnet-practices/SKILL.md"],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "prompt": "Take ./rest-api and wire it into JAIBA. It's both things really: when we spec a feature it should force us to declare the endpoints, and when we plan it, it should require an openapi.yaml and a contract test per endpoint. Set it up properly.",
+      "expected_output": "rest-api/SKILL.md adapted as a 'both' modifier: description binds to BOTH specification:define and planning:define with the REST/endpoint trigger signal; '## JAIBA Integration' with Hook=both modes, Modifier type=both, Behavior separating the spec-time obligation (declare endpoints) from the plan-time output (openapi.yaml artifact + contract-test task per endpoint, cite in Sources consulted). Tags gain jaiba/jaiba-knowledge/jaiba-input/jaiba-output. The Design-first/OpenAPI-first/Contract-testing/Conventions knowledge is unchanged. No framework file touched.",
+      "files": ["fixtures/rest-api/SKILL.md"],
+      "assertions": []
+    }
+  ]
+}
