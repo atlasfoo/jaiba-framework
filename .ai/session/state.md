@@ -17,8 +17,8 @@
       creates them from the templates only when absent.
 - [x] Quality gate sectioning (after phases and after plan).
 - [x] Token economy
-- [ ] Meta Skills
-  - [ ] `create-knowledge` skill (plugin behavior)
+- [~] Meta Skills
+  - [x] `create-knowledge` skill (plugin behavior)
   - [ ] `scaffold` skill
     - Does **not** manage the artifact templates — that is
       `update-brain`'s responsibility. `scaffold` only lays down the
