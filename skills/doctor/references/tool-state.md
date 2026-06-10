@@ -12,27 +12,30 @@ maintenance check and widened to cover subagents and hooks.
 
 ## Procedure
 
-1. **Run the bundled probe** against the skills directory you located in
-   the preconditions:
+1. **Run the bundled probe** against every skills directory you located in
+   the preconditions — project-local, global, or both, joined with `:`:
 
    ```bash
-   bash <this-skill>/scripts/check-tools.sh <agent-folder>/skills <project-root>
+   bash <this-skill>/scripts/check-tools.sh "<local-skills-dir>:<global-skills-dir>" <project-root>
    ```
 
-   The script derives required tools from three sources, unions a small
-   framework baseline (`git bash rg curl`), checks each against the
-   machine, records **which skill/subagent/hook needs each tool**
-   (provenance), and rewrites `.ai/tools-state.md`. It always exits 0 —
-   the missing count comes back on stdout and in the file.
+   Pass just one path (no `:`) if only one of the two exists. The script
+   derives required tools from three sources, unions a small framework
+   baseline (`git bash rg curl`), checks each against the machine,
+   records **which skill/subagent/hook needs each tool** (provenance),
+   and rewrites `.ai/tools-state.md`. It always exits 0 — the missing
+   count comes back on stdout and in the file.
 
-   What it scans:
+   What it scans, across **each** skills directory given and its parent
+   agent folder:
    - **Skills** — every `<skills-dir>/**/SKILL.md` `requires:` block.
    - **Subagents** — every `<agent-folder>/agents/*.md` that carries a
      `requires:` block.
    - **Hooks** — the leading executable of each hook `command` in
      `<agent-folder>/settings.json` / `settings.local.json` (best-effort,
      `jq`-gated; hooks can run arbitrary shell, so only the invoked
-     program is claimed).
+     program is claimed). A global agent folder rarely has hooks/subagents
+     of its own, but the probe checks anyway — cheap and avoids assuming.
 
 2. **Read the result back.** Open the refreshed `.ai/tools-state.md` and
    turn its rows into findings:

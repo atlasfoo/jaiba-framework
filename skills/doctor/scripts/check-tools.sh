@@ -15,13 +15,18 @@
 # is machine state, gitignored, not project memory.
 #
 # Usage:
-#   check-tools.sh <installed-skills-dir> [<project-root>]
+#   check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [<project-root>]
 #
-#   <installed-skills-dir>  where the JAIBA skills are installed
-#                           (e.g. .claude/skills or .agents/skills).
-#                           Its parent is treated as the agent folder,
-#                           so subagents (agents/*.md) and hook configs
-#                           (settings*.json) next to it are scanned too.
+#   <installed-skills-dir>  where JAIBA skills are installed (e.g.
+#                           .claude/skills, .agents/skills, or a global
+#                           dir like ~/.claude/skills). Pass several,
+#                           separated by ':', if the project's skillset
+#                           is split across project-local and global
+#                           locations (per jaiba-scaffold step 4). Each
+#                           directory's parent is treated as an agent
+#                           folder, so subagents (agents/*.md) and hook
+#                           configs (settings*.json) next to each are
+#                           scanned too.
 #   <project-root>          defaults to the current directory.
 #
 # Exit code is always 0 (the missing count is reported in the output
@@ -29,10 +34,22 @@
 
 set -uo pipefail
 
-SKILLS_DIR="${1:?usage: check-tools.sh <installed-skills-dir> [project-root]}"
+SKILLS_DIRS_RAW="${1:?usage: check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [project-root]}"
 ROOT="${2:-$PWD}"
 OUT="$ROOT/.ai/tools-state.md"
-AGENT_DIR="$(dirname "$SKILLS_DIR")"
+IFS=':' read -r -a SKILLS_DIRS <<< "$SKILLS_DIRS_RAW"
+
+# Each skills dir's parent is an agent folder (subagents/hooks live
+# alongside it). De-duplicate in case two skill dirs share a parent.
+declare -A SEEN_AGENT_DIR
+AGENT_DIRS=()
+for d in "${SKILLS_DIRS[@]}"; do
+  ad="$(dirname "$d")"
+  if [ -z "${SEEN_AGENT_DIR[$ad]:-}" ]; then
+    SEEN_AGENT_DIR[$ad]=1
+    AGENT_DIRS+=("$ad")
+  fi
+done
 
 # Framework baseline — tools the JAIBA skills assume regardless of any
 # one declaration. Same set scaffold uses, so the two probes agree.
@@ -64,36 +81,43 @@ requires_of() {
 }
 
 # 1. Skills: <skills-dir>/**/SKILL.md  ->  labelled by skill folder name.
-if [ -d "$SKILLS_DIR" ]; then
+for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
+  [ -d "$SKILLS_DIR" ] || continue
   while IFS= read -r -d '' f; do
     label="skill:$(basename "$(dirname "$f")")"
     while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
   done < <(find "$SKILLS_DIR" -name SKILL.md -print0 2>/dev/null)
-fi
+done
 
-# 2. Subagents: <agent>/agents/*.md with a `requires:` block.
-if [ -d "$AGENT_DIR/agents" ]; then
-  while IFS= read -r -d '' f; do
-    label="subagent:$(basename "$f" .md)"
-    while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-  done < <(find "$AGENT_DIR/agents" -name '*.md' -print0 2>/dev/null)
-fi
+# 2. Subagents: <agent>/agents/*.md with a `requires:` block, for every
+#    agent folder in play (project-local and/or global).
+for AGENT_DIR in "${AGENT_DIRS[@]}"; do
+  if [ -d "$AGENT_DIR/agents" ]; then
+    while IFS= read -r -d '' f; do
+      label="subagent:$(basename "$f" .md)"
+      while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
+    done < <(find "$AGENT_DIR/agents" -name '*.md' -print0 2>/dev/null)
+  fi
+done
 
-# 3. Hooks: leading executable of every hook command in settings*.json.
+# 3. Hooks: leading executable of every hook command in settings*.json,
+#    for every agent folder in play.
 #    Best-effort and jq-gated — hooks can run arbitrary shell, so we only
 #    claim the command's first token (the program it invokes).
 if command -v jq >/dev/null 2>&1; then
-  for cfg in "$AGENT_DIR"/settings.json "$AGENT_DIR"/settings.local.json; do
-    [ -f "$cfg" ] || continue
-    while IFS= read -r cmd; do
-      [ -z "$cmd" ] && continue
-      exe="$(printf '%s\n' "$cmd" | awk '{print $1}')"
-      exe="$(basename "$exe")"
-      # Skip empties and bare shell wrappers (`bash -c "…"`): the wrapper
-      # isn't the dependency, and bash is already in the baseline.
-      case "$exe" in ""|sh|bash|zsh|env) continue ;; esac
-      note "$exe" "hook"
-    done < <(jq -r '.hooks // {} | .. | .command? // empty' "$cfg" 2>/dev/null)
+  for AGENT_DIR in "${AGENT_DIRS[@]}"; do
+    for cfg in "$AGENT_DIR"/settings.json "$AGENT_DIR"/settings.local.json; do
+      [ -f "$cfg" ] || continue
+      while IFS= read -r cmd; do
+        [ -z "$cmd" ] && continue
+        exe="$(printf '%s\n' "$cmd" | awk '{print $1}')"
+        exe="$(basename "$exe")"
+        # Skip empties and bare shell wrappers (`bash -c "…"`): the wrapper
+        # isn't the dependency, and bash is already in the baseline.
+        case "$exe" in ""|sh|bash|zsh|env) continue ;; esac
+        note "$exe" "hook"
+      done < <(jq -r '.hooks // {} | .. | .command? // empty' "$cfg" 2>/dev/null)
+    done
   done
 fi
 
@@ -127,8 +151,8 @@ mkdir -p "$ROOT/.ai"
   echo "> tool check)."
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "- **Skills scanned:** \`$SKILLS_DIR\`"
-  echo "- **Agent folder:** \`$AGENT_DIR\`"
+  echo "- **Skills scanned:** $(printf '\`%s\` ' "${SKILLS_DIRS[@]}")"
+  echo "- **Agent folder(s):** $(printf '\`%s\` ' "${AGENT_DIRS[@]}")"
   echo "- **Missing:** $missing of $total"
   echo
   echo "| Tool | State | Path | Needed by |"

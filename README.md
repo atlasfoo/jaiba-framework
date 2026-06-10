@@ -15,8 +15,12 @@
 
 - [🦀 JAIBA](#-jaiba)
   - [🚀 Getting Started](#-getting-started)
-    - [1. Install the Scaffold Skill globally](#1-install-the-scaffold-skill-globally)
+    - [1. Install JAIBA skills globally (Recommended)](#1-install-jaiba-skills-globally-recommended)
     - [2. Initialize JAIBA in your repository](#2-initialize-jaiba-in-your-repository)
+    - [Alternative: Project-scoped installation](#alternative-project-scoped-installation)
+  - [Installation modes](#installation-modes)
+    - [Global installation (Recommended ✅)](#global-installation-recommended-)
+    - [Project-scoped installation (Legacy)](#project-scoped-installation-legacy)
   - [What is JAIBA?](#what-is-jaiba)
     - [Core principles](#core-principles)
   - [System architecture](#system-architecture)
@@ -57,24 +61,92 @@
 
 ## 🚀 Getting Started
 
-To adopt JAIBA in your project, follow these two steps:
+To adopt JAIBA in your project, follow these steps:
 
-### 1. Install the Scaffold Skill globally
-First, install the meta-skill that handles the JAIBA bootstrap process.
+### 1. Install JAIBA skills globally (Recommended)
+
+Install all JAIBA skills globally so they are available across all your projects:
 
 ```bash
-npx skills add -y atlasfoo/jaiba-framework --skill jaiba-scaffold
+npx skills add atlasfoo/jaiba-framework --skill jaiba-scaffold -g
+npx skills add atlasfoo/jaiba-framework --skill planning -g
+npx skills add atlasfoo/jaiba-framework --skill specification -g
+npx skills add atlasfoo/jaiba-framework --skill update-brain -g
+npx skills add atlasfoo/jaiba-framework --skill fast -g
+npx skills add atlasfoo/jaiba-framework --skill ask -g
+npx skills add atlasfoo/jaiba-framework --skill doctor -g
 ```
 
+Or install them all at once:
+
+```bash
+npx skills add -y atlasfoo/jaiba-framework -g
+```
+
+**Benefits of global installation:**
+- Skills are available instantly in any project without per-project setup
+- Consistent behavior across all your projects
+- Automatic updates apply to all projects
+- Reduced repository clutter (no `.agents/` folder needed per project)
+
 ### 2. Initialize JAIBA in your repository
-Navigate to the root of your project and ask the agent to set up the framework. This will create the brain skeleton, install the project-scoped skills, and probe your local toolchain.
+
+Navigate to the root of your project and invoke the scaffold skill to set up the framework:
 
 ```text
 /jaiba-scaffold
 ```
-*Or simply: "set up jaiba in this project"*
+
+*Or simply: "set up jaiba in this project" or "bootstrap jaiba"*
+
+The scaffold will:
+- Create the `.ai/` brain skeleton and its structure
+- Generate the `AGENTS.md` behavioral guidelines
+- Set up `.gitignore` for the brain folder
+- Probe your local toolchain and record available tools
 
 Once the scaffold is complete, it will hand over to `update-brain:initialize` to analyze your repository and populate the long-term memory.
+
+### Alternative: Project-scoped installation
+
+If you prefer to keep JAIBA skills scoped to individual projects (not recommended), the `jaiba-scaffold` skill will install them locally during initialization. In this case, you only need to install the scaffold skill globally in step 1.
+
+---
+
+## Installation modes
+
+### Global installation (Recommended ✅)
+
+Skills are installed globally using `npx skills add` and are available across all your projects:
+
+| Aspect | Global |
+|--------|--------|
+| **Command** | `npx skills add -y atlasfoo/jaiba-framework --skill <skill-name>` |
+| **Location** | `~/.agents/skills/` (user home directory) |
+| **Availability** | All projects automatically have access |
+| **Setup per project** | Only initialize `.ai/` brain with `/jaiba-scaffold` |
+| **Disk footprint** | Minimal — skills are stored once |
+| **Updates** | `npx skills update` applies to all projects |
+| **Recommended for** | Teams, multi-project workflows, clean repositories |
+
+**How it works:**
+1. Install skills once globally
+2. In each project, run `/jaiba-scaffold` to initialize only the brain (`.ai/`)
+3. All skills automatically activate in every project you work on
+
+### Project-scoped installation (Legacy)
+
+Skills are installed locally in each project under `.agents/` or `.claude/skills/`:
+
+| Aspect | Project-scoped |
+|--------|-----------------|
+| **Command** | Skills auto-install during scaffold if not global |
+| **Location** | `.agents/` or project skill folder |
+| **Availability** | Only in that specific project |
+| **Setup per project** | Full scaffold including skill installation |
+| **Disk footprint** | Each project has its own copy of skills |
+| **Updates** | Must re-scaffold or manually update per project |
+| **Recommended for** | Legacy setups, isolated environments |
 
 ---
 

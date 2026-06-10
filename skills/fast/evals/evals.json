@@ -84,6 +84,28 @@
         "No code changed before the developer chose"
       ],
       "files": []
+    },
+    {
+      "id": 5,
+      "name": "uninstrumented-project-still-executes",
+      "context_under_test": "brain-discovery-uninstrumented",
+      "prompt": "/fast bump lodash from 4.17.20 to 4.17.21 in package.json",
+      "context": {
+        "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
+        "repo_state": "no AGENTS.md (or one unrelated to JAIBA), no .ai/ directory",
+        "session_state": "empty",
+        "ci_facts": "package.json has a `test` script; CI workflow runs `npm test`"
+      },
+      "expected_output": [
+        "Agent ran the brain check, found no JAIBA AGENTS.md / constitution, but did NOT block the change",
+        "Triaged scope normally (single dependency bump, contained)",
+        "Treated the change as free-standing — did not look for an active plan",
+        "Quality Gate fallback used the repo's own package.json `test` script / CI command, not constitution.md §6 (which doesn't exist)",
+        "Change applied to package.json (and lockfile if present)",
+        "Closing recap mentioned jaiba-scaffold once as an opportunity, without making it a precondition for the change",
+        "Nothing written to .ai/session/"
+      ],
+      "files": []
     }
   ]
 }

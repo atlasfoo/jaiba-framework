@@ -10,10 +10,14 @@
 # surface it every session.
 #
 # Usage:
-#   check-tools.sh <installed-skills-dir> [<project-root>]
+#   check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [<project-root>]
 #
-#   <installed-skills-dir>  where scaffold installed the JAIBA skills
-#                           (e.g. .claude/skills or .agents/skills).
+#   <installed-skills-dir>  where the JAIBA skills live (e.g.
+#                           .claude/skills, .agents/skills, or a global
+#                           dir like ~/.claude/skills). Pass multiple
+#                           directories separated by ':' if the project's
+#                           skills are split across project-local and
+#                           global locations.
 #   <project-root>          defaults to the current directory.
 #
 # Exit code is always 0 (the count of missing tools is reported in the
@@ -21,9 +25,10 @@
 
 set -uo pipefail
 
-SKILLS_DIR="${1:?usage: check-tools.sh <installed-skills-dir> [project-root]}"
+SKILLS_DIRS_RAW="${1:?usage: check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [project-root]}"
 ROOT="${2:-$PWD}"
 OUT="$ROOT/.ai/tools-state.md"
+IFS=':' read -r -a SKILLS_DIRS <<< "$SKILLS_DIRS_RAW"
 
 # Framework baseline — tools the JAIBA skills assume regardless of any
 # one skill's declaration. `bash` runs the bundled *.sh scripts, `git`
@@ -32,22 +37,25 @@ OUT="$ROOT/.ai/tools-state.md"
 # so the probe only flags tools the project's skills actually need.
 BASELINE="git bash rg curl"
 
-# Pull every item out of each SKILL.md `requires:` YAML list.
+# Pull every item out of each SKILL.md `requires:` YAML list, across all
+# given skills directories.
 derive_requires() {
-  [ -d "$SKILLS_DIR" ] || return 0
-  find "$SKILLS_DIR" -name SKILL.md -print0 2>/dev/null \
-  | while IFS= read -r -d '' f; do
-      awk '
-        /^requires:[[:space:]]*$/ { inblk=1; next }
-        inblk && /^[[:space:]]*-[[:space:]]+/ {
-          sub(/^[[:space:]]*-[[:space:]]+/, "")
-          sub(/[[:space:]]+$/, "")
-          print
-          next
-        }
-        inblk && /^[^[:space:]]/ { inblk=0 }
-      ' "$f"
-    done
+  for dir in "${SKILLS_DIRS[@]}"; do
+    [ -d "$dir" ] || continue
+    find "$dir" -name SKILL.md -print0 2>/dev/null \
+    | while IFS= read -r -d '' f; do
+        awk '
+          /^requires:[[:space:]]*$/ { inblk=1; next }
+          inblk && /^[[:space:]]*-[[:space:]]+/ {
+            sub(/^[[:space:]]*-[[:space:]]+/, "")
+            sub(/[[:space:]]+$/, "")
+            print
+            next
+          }
+          inblk && /^[^[:space:]]/ { inblk=0 }
+        ' "$f"
+      done
+  done
 }
 
 # A declared dependency name may differ from the command that probes it.
@@ -81,7 +89,7 @@ mkdir -p "$ROOT/.ai"
   echo "> fact. Regenerate by re-running the scaffold tool check."
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "- **Skills scanned:** \`$SKILLS_DIR\`"
+  echo "- **Skills scanned:** $(printf '\`%s\` ' "${SKILLS_DIRS[@]}")"
   echo "- **Missing:** $missing"
   echo
   echo "| Tool | State | Path |"

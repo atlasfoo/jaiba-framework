@@ -107,6 +107,45 @@
         "Did not run archive.sh and did not delete the spec folder"
       ],
       "files": []
+    },
+    {
+      "id": 6,
+      "name": "no-brain-stops-and-routes-to-scaffold",
+      "mode_under_test": "brain-discovery",
+      "prompt": "We need a feature that lets users export their itinerary as a PDF. Let's spec this.",
+      "context": {
+        "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
+        "repo_state": "no .ai/ directory at all, no AGENTS.md at the project root",
+        "specs_state": "n/a"
+      },
+      "expected_output": [
+        "Agent ran the Brain Discovery checks before any mode selection",
+        "Detected .ai/ is absent and AGENTS.md is absent — did not proceed into brainstorm or define",
+        "Did NOT create .ai/specs/<slug>/ or any draft PRD/user-stories file",
+        "Told the developer plainly that the project isn't JAIBA-instrumented",
+        "Recommended jaiba-scaffold as the next step and stopped there",
+        "Resolved .ai/ and AGENTS.md against the current project root, not the skill's own (global) install path"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "bare-template-brain-routes-to-update-brain",
+      "mode_under_test": "brain-discovery",
+      "prompt": "specification define — let's write the PRD for the export feature we just discussed.",
+      "context": {
+        "skill_install": "global (~/.claude/skills/)",
+        "repo_state": ".ai/ skeleton exists, AGENTS.md present and is the JAIBA behavioral contract, but .ai/memory/constitution.md, adr-log.md and reference-index.md are still the bare [bracket] templates from scaffold",
+        "specs_state": "empty"
+      },
+      "expected_output": [
+        "Agent ran the Brain Discovery checks before any mode selection",
+        "Detected AGENTS.md is the JAIBA contract but .ai/memory/ is still bare templates — treated this as a failed validation, not a pass",
+        "Did NOT create .ai/specs/<slug>/PRD.md or user-stories.md",
+        "Explained that the long-term brain hasn't been built yet, so the spec would have nothing to ground its scope/integrations against",
+        "Recommended update-brain in initialize mode and stopped there"
+      ],
+      "files": []
     }
   ]
 }
