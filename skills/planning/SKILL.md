@@ -24,6 +24,37 @@ This skill has **four modes**, each documented in its own reference
 file. Read the relevant reference *before* taking action — the
 selection table below tells you which one.
 
+## Brain Discovery and Validation
+
+This skill can be installed per-project (`.claude/skills/`,
+`.agents/skills/`) or **globally** (e.g. `~/.claude/skills/`), shared
+across every repository you work in. Either way, "the brain" means
+`.ai/` and `AGENTS.md` at the root of the **project you're currently
+in** — where `.git/` lives — never a path relative to this skill's own
+installation location.
+
+Before selecting a mode, confirm the project is JAIBA-instrumented:
+
+1. **`AGENTS.md` exists at the project root, is non-empty, and is the
+   JAIBA behavioral contract** — it describes the `.ai/` Brain Map and
+   the numbered Behavioral Rules. An `AGENTS.md` that exists but is
+   unrelated (some other agent-instructions file) doesn't count.
+2. **`.ai/memory/constitution.md`, `adr-log.md`, and
+   `reference-index.md` exist and hold real content** — not the bare
+   `[bracket]` templates.
+
+If either check fails, **stop here** — do not enter any mode or write
+to `.ai/session/`. An orphaned plan with no constitution to ground it
+helps no one. Tell the developer plainly what's missing and route
+them:
+
+- No `.ai/` at all → `jaiba-scaffold` (installs the skeleton, the
+  behavioral `AGENTS.md`, and the rest of the skillset).
+- `.ai/` exists but `.ai/memory/` is bare templates → `update-brain`
+  in `initialize` mode.
+- `AGENTS.md` is missing or isn't the JAIBA contract → `jaiba-scaffold`
+  (it handles the existing-`AGENTS.md` coexist/replace decision).
+
 ## Mode Selection
 
 Decide the mode **before** reading anything else. If the message is

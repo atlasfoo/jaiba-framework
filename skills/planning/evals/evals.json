@@ -95,6 +95,45 @@
         "Agent did NOT write directly to .ai/memory/adr-log.md"
       ],
       "files": []
+    },
+    {
+      "id": 5,
+      "name": "no-brain-stops-and-routes-to-scaffold",
+      "mode_under_test": "brain-discovery",
+      "prompt": "Let's build a plan to add Stripe payments to the checkout flow.",
+      "context": {
+        "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
+        "repo_state": "no .ai/ directory at all, no AGENTS.md at the project root",
+        "session_state": "empty"
+      },
+      "expected_output": [
+        "Agent ran the Brain Discovery checks before any mode selection",
+        "Detected .ai/ is absent and AGENTS.md is absent — did not proceed into define",
+        "Did NOT create .ai/session/plan.md, tasks.md, or walkthrough.md",
+        "Told the developer plainly that the project isn't JAIBA-instrumented",
+        "Recommended jaiba-scaffold as the next step and stopped there",
+        "Resolved .ai/ and AGENTS.md against the current project root, not the skill's own (global) install path"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "bare-template-brain-routes-to-update-brain",
+      "mode_under_test": "brain-discovery",
+      "prompt": "next",
+      "context": {
+        "skill_install": "global (~/.claude/skills/)",
+        "repo_state": ".ai/ skeleton exists, AGENTS.md present and is the JAIBA behavioral contract, but .ai/memory/constitution.md, adr-log.md and reference-index.md are still the bare [bracket] templates from scaffold",
+        "session_state": "empty (no .ai/session/plan.md)"
+      },
+      "expected_output": [
+        "Agent ran the Brain Discovery checks before any mode selection",
+        "Detected AGENTS.md is the JAIBA contract but .ai/memory/ is still bare templates — treated this as a failed validation, not a pass",
+        "Did NOT create .ai/session/plan.md or any other session artifact",
+        "Explained that the long-term brain hasn't been built yet",
+        "Recommended update-brain in initialize mode and stopped there"
+      ],
+      "files": []
     }
   ]
 }

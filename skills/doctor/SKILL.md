@@ -64,12 +64,25 @@ reflect the repository, not the prompt's assumptions.
    §6 (toolchain awareness): doctor operationalizes both as checks.
 2. **`.ai/` exists and has a brain.** Confirm `.ai/memory/` holds the
    three artifacts. If not, see "When NOT to run doctor".
-3. **Locate the agent folder.** doctor needs to know where the installed
-   skills, subagents, and hooks live (the tool-state and reference
-   checks scan them). Detect it the same way `scaffold` does: a single
-   vendor dir (`.claude/`, `.cursor/`, `.gemini/`, …) if exactly one
-   exists; otherwise the neutral `.agents/`. Hold the `skills/` subdir
-   path — the tool probe takes it as an argument.
+3. **Locate every skills directory in play.** JAIBA skills can be
+   installed project-locally, globally (e.g. `~/.claude/skills/`,
+   `~/.agents/skills/`), or split across both — `jaiba-scaffold` step 4
+   now offers that choice, and skills already global before scaffold ran
+   are left there. doctor's tool-state and reference checks need to scan
+   *all* of them, not just the project's:
+
+   - **Project-local:** detect the agent folder the same way `scaffold`
+     does — a single vendor dir (`.claude/`, `.cursor/`, `.gemini/`, …)
+     if exactly one exists at the project root; otherwise the neutral
+     `.agents/`. Its `skills/` subdir is the project-local skills dir, if
+     it exists.
+   - **Global:** the same vendor folder name, rooted at the user's home
+     directory (e.g. `~/.claude/skills`), if it exists. `npx skills list
+     -g` confirms whether any JAIBA skills are installed there.
+
+   Hold both paths (either may be absent — that's fine, a project that
+   only used local or only used global is a normal configuration). The
+   tool probe (diagnostic 2) takes them as a colon-separated list.
 
 ## The three diagnostics
 

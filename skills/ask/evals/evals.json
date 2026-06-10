@@ -122,6 +122,43 @@
         "Offered a constructive next step (e.g. planning define) without acting on it"
       ],
       "files": []
+    },
+    {
+      "id": 7,
+      "name": "no-brain-still-answers-code-question",
+      "domain_under_test": "brain-discovery-empty",
+      "prompt": "what does the auth module do, and is there a spec for it?",
+      "context": {
+        "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
+        "repo_state": "no .ai/ directory at all, no AGENTS.md at the project root",
+        "code_facts": ["auth/views.py implements login/logout/password-reset endpoints"]
+      },
+      "expected_output": [
+        "Agent checked for .ai/ and AGENTS.md as part of orienting cold",
+        "Still answered the code-question half from the source (auth/views.py) — did not refuse entirely",
+        "For the spec half, said plainly there is no spec because this project has no JAIBA brain yet — did not invent one",
+        "Offered jaiba-scaffold as a next step and waited — did not install or write anything",
+        "Read-only throughout: nothing written, no code changed"
+      ],
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "bare-template-decision-question",
+      "domain_under_test": "brain-discovery-partial",
+      "prompt": "why did we decide to use django-guardian for permissions?",
+      "context": {
+        "skill_install": "global (~/.claude/skills/)",
+        "repo_state": ".ai/ skeleton exists, AGENTS.md present and is the JAIBA behavioral contract, but .ai/memory/adr-log.md is still the bare [bracket] template"
+      },
+      "expected_output": [
+        "Agent opened .ai/memory/adr-log.md and recognized it as a bare template, not an empty-but-real log",
+        "Answered plainly that the ADR log hasn't been initialized yet, so this decision (if made) isn't recorded",
+        "Did not invent a plausible-sounding rationale to fill the gap",
+        "Fell back to git log/blame on the relevant code as a read-only secondary source, if useful, and labeled it as inference vs. recorded fact",
+        "Offered update-brain initialize as a next step and waited"
+      ],
+      "files": []
     }
   ]
 }

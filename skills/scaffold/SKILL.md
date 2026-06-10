@@ -53,9 +53,16 @@ When still ambiguous, **ask the developer** rather than risk overwriting.
 
 ## The bootstrap sequence
 
-Run these in order. Steps 2–6 each have a precondition or an edge case;
-don't barrel through them. Surface what you did at the end (see
-**Closing**).
+Before anything else, run the greeting banner so the developer sees
+scaffold has kicked off:
+
+```bash
+bash <this-skill>/scripts/greeting.sh
+```
+
+Then run the steps below in order. Steps 2–6 each have a precondition or
+an edge case; don't barrel through them. Surface what you did at the end
+(see **Closing**).
 
 ### 0. Confirm you're at the project root
 
@@ -115,33 +122,79 @@ non-destructive choices:
 
 Never silently clobber an existing `AGENTS.md`.
 
-### 4. Install the project-scoped JAIBA skills
+### 4. Check what's already installed globally, then install what's missing
 
-Install the skills a *project* needs into the agent folder from step 1,
-fetching them from their canonical sources — **the same package manager
-that installed scaffold itself.** Do not copy from scaffold's own
-directory: skills package independently, and scaffold carries no copies
-of its siblings.
+The project-scoped skills (`assets/skillset.txt`) can live **globally**
+(`~/.claude/skills/`, `~/.agents/skills/`, …) shared across every repo on
+this machine, or **locally** in this project's agent folder. Before
+fetching anything, find out which is already true — reinstalling
+per-project something a developer already has globally would duplicate
+it and fragment versions across repos.
 
-- **What to install:** every entry in `assets/skillset.txt`.
-  Read that file — it is the maintained manifest, so the list stays
-  correct as the framework evolves or community skills are added.
-- **Destination:** the `skills/` subdir chosen in step 1.
+1. **List global skills for this agent:**
+   ```bash
+   npx skills list -g
+   ```
+   This prints the skills installed at the user level, e.g.:
+   ```
+   Global Skills
+
+   jaiba-scaffold   ~/.agents/skills/jaiba-scaffold   Agents: ...
+   planning         ~/.agents/skills/planning         Agents: ...
+   ```
+
+2. **Resolve the name to look for, per `assets/skillset.txt` entry:**
+
+   | Entry format | Name to check against the global list |
+   |---|---|
+   | `planning` (bare name) | `planning` |
+   | `owner/repo#skill` | the part after `#`, e.g. `caveman` |
+   | `owner/repo` (no `#`, installs everything from that repo) | can't be resolved to one name from the listing — treat as **missing** below; `npx skills add` is idempotent, so a redundant run for this format is harmless |
+
+3. **Split** the skillset into *already global* and *missing*.
+
+**Case A — everything is already global.** Install **nothing** — not
+globally, not into this project. Tell the developer their global
+skillset already covers this project, and point them at
+`npx skills update -g` (or `npx skills update <skill> -g` for one at a
+time) to keep it current. Then go to step 5, pointing the toolchain probe
+at the **global** skills directory instead of the project's (nothing was
+installed there).
+
+**Case B — one or more entries are missing globally.** Before installing
+anything, ask the developer **once** how the missing skills should be
+set up:
+
+- **Global** — `npx skills add -y <source> --skill <skill> -g`. Available
+  in every project on this machine from now on. Recommended for the JAIBA
+  workflow skills, since most developers work across several repos.
+- **Project-local** — the same command without `-g`, landing in the
+  `skills/` subdir of the agent folder chosen in step 1. Use this if the
+  developer wants this project's skill versions pinned independently.
+
+A single structured question with these two options is enough — offer
+"decide per skill" only if the developer asks for it. Apply the choice to
+the **missing** entries only. Skills already global stay exactly where
+they are: don't reinstall them, and don't also copy them into the
+project.
 
 `skillset.txt` uses two entry formats:
 
 | Line format | Meaning | Install command |
 |---|---|---|
-| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill planning` |
-| `owner/repo` | all skills from an external GitHub repo | `npx skills add -y owner/repo` |
-| `owner/repo#skill` | one skill from an external GitHub repo | `npx skills add -y owner/repo --skill skill` |
+| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill planning [-g]` |
+| `owner/repo` | all skills from an external GitHub repo | `npx skills add -y owner/repo [-g]` |
+| `owner/repo#skill` | one skill from an external GitHub repo | `npx skills add -y owner/repo --skill skill [-g]` |
 
-Process the file top to bottom: skip blank lines and lines starting with
-`#`, then for each remaining entry run the appropriate command. Install
-skills **one by one** to ensure each is correctly registered:
+`[-g]` means: append `-g` if the developer chose global, omit it for
+project-local. Process `skillset.txt` top to bottom: skip blank lines,
+lines starting with `#`, and entries already confirmed global in step 2.
+For each remaining (missing) entry, run the appropriate command with the
+chosen scope flag. Install skills **one by one** to ensure each is
+correctly registered:
 
 ```bash
-# Example individual calls
+# Example individual calls (project-local; add -g for global)
 npx skills add -y atlasfoo/jaiba-framework --skill planning
 npx skills add -y atlasfoo/jaiba-framework --skill specification
 npx skills add -y juliusbrussee/caveman --skill caveman
@@ -151,16 +204,26 @@ If no skills package manager is available, say so and fall back to
 cloning each source and copying the skill folders into the target —
 but prefer the package manager so versions/locks stay honest.
 
-> Scaffold installs the **project-scoped** set only. It does **not**
-> install itself (it's global) or unbuilt skills.
-> Keep that list in `assets/skillset.txt`, not hardcoded in prose.
+> Scaffold never installs *itself* (it's global) or unbuilt skills, and
+> only installs entries from `assets/skillset.txt` — keep that list
+> current, not hardcoded in prose.
 
 ### 5. Probe the local toolchain
 
-Run the bundled script against the folder you just installed into:
+Run the bundled script against the directory (or directories) that
+actually hold this project's JAIBA skills now, which depends on how step
+4 went:
+
+- **Case A (everything stayed global):** point the probe at the global
+  skills directory — `~/<agent-folder>/skills`, e.g. `~/.claude/skills`
+  or `~/.agents/skills` (same vendor folder name as step 1, rooted at the
+  user's home directory).
+- **Everything installed locally:** `<agent-folder>/skills` as before.
+- **Mixed** (some stayed global, some were installed locally): pass both
+  — `check-tools.sh` accepts a colon-separated list of directories.
 
 ```bash
-bash <this-skill>/scripts/check-tools.sh <agent-folder>/skills <project-root>
+bash <this-skill>/scripts/check-tools.sh "<skills-dir-1>[:<skills-dir-2>]" <project-root>
 ```
 
 It derives the required tools from each installed skill's `requires:`
@@ -192,7 +255,11 @@ End with a short, honest report:
 1. **Where things landed** — the agent folder used and *why* (zero/one/
    many vendor dirs detected), the `.ai/` tree created, where `AGENTS.md`
    went (and how any existing one was handled).
-2. **Skills installed** — the list, and the source.
+2. **Skills installed** — for each `skillset.txt` entry, whether it was
+   already global (untouched), newly installed globally, or newly
+   installed project-locally, and the source. If Case A applied
+   (everything was already global), say so plainly and repeat the
+   `npx skills update -g` reminder here.
 3. **Toolchain** — green if all present; otherwise list each **missing**
    tool and the skill(s) that need it (this is the §6 warning's first
    airing).
@@ -215,6 +282,9 @@ End with a short, honest report:
 - **Install from source, not siblings.** Fetch the skill set from the
   canonical repo via the package manager. No runtime path into another
   skill's folder.
+- **Don't duplicate global skills.** If `npx skills list -g` already
+  covers a `skillset.txt` entry, leave it there — don't reinstall it
+  globally and don't also copy it into the project.
 
 ## Common failure modes
 
@@ -232,3 +302,10 @@ End with a short, honest report:
   memory.
 - **Finishing silently.** The developer needs the closing report —
   especially missing tools and whatever `update-brain` still needs.
+- **Skipping the global-skills check.** Installing the full
+  `skillset.txt` locally without first running `npx skills list -g`
+  duplicates skills the developer already has globally and fragments
+  versions across repos.
+- **Reinstalling an already-global skill "just in case."** If it's in
+  `npx skills list -g`, leave it — point the developer at
+  `npx skills update -g` instead of adding a project-local copy.
