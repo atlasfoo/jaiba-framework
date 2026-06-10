@@ -51,21 +51,6 @@ ground truth before writing a word.
 1. **`AGENTS.md`** — your behavioral contract. Always. Note especially
    §2.9 (memory is read-mostly; propose, don't patch) and §5 (drift
    handling) — they *are* this skill's mandate.
-
-   This skill, like the rest of the framework, can be installed
-   per-project or **globally** (e.g. `~/.claude/skills/`), shared
-   across every repository. `.ai/` and `AGENTS.md` always mean the
-   *current project's* root — where `.git/` lives — never a path
-   relative to this skill's own installation location.
-
-   If `AGENTS.md` is missing entirely, or exists but isn't the JAIBA
-   contract (no `.ai/` Brain Map, no numbered Behavioral Rules), this
-   project was never scaffolded. `update-brain` can still populate
-   `.ai/memory/` if a `.ai/` skeleton exists, but flag this clearly —
-   the developer is missing the behavioral contract and the rest of
-   the skillset that `jaiba-scaffold` installs. Recommend it, then
-   continue with `initialize` if the developer wants `.ai/memory/`
-   built anyway.
 2. **The current state of `.ai/memory/`** — do the three files exist?
    Are they real content or untouched templates (full of `[brackets]`)?
    This is what disambiguates `initialize` from `update`.

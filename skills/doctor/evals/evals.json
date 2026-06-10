@@ -24,18 +24,6 @@
       "prompt": "run jaiba doctor on this project",
       "expected_output": "Detects there is no .ai/ brain to diagnose (repo was never instrumented). Refuses to invent findings and routes the developer to `scaffold` to bootstrap JAIBA first, explaining doctor is a maintenance/health-check skill that presumes an existing brain.",
       "files": []
-    },
-    {
-      "id": 5,
-      "name": "tool-state-covers-global-skills",
-      "prompt": "Run a jaiba health check before I start planning.",
-      "context": {
-        "skill_install": "split — planning, specification, ask, fast, and update-brain are installed GLOBALLY (~/.claude/skills/), while create-knowledge and jaiba-doctor are project-local (.claude/skills/)",
-        "repo_state": ".ai/memory/ fully populated and coherent",
-        "tooling": "one of the globally-installed skills declares `requires: [jq]`, and `jq` is not on PATH"
-      },
-      "expected_output": "In preconditions, located BOTH the project-local skills dir (.claude/skills) AND the global skills dir (~/.claude/skills) -- did not scan only the project-local one. Ran check-tools.sh with both paths joined by ':'. Tool-state diagnostic reports `jq` as missing with provenance pointing at the global skill that declares it (e.g. 'skill:planning'), not just project-local skills. .ai/tools-state.md refreshed and lists tools/skills from both locations. Final report leads with the missing jq finding (Broken) and prescribes an install, not a reinstall of the skill.",
-      "files": []
     }
   ]
 }

@@ -145,26 +145,6 @@
         "Distinguished this from genuinely-unknown facts (e.g. business objective), which were asked or marked [MISSING]"
       ],
       "files": []
-    },
-    {
-      "id": 8,
-      "name": "missing-agents-md-flags-scaffold-but-can-proceed",
-      "mode_under_test": "brain-discovery",
-      "prompt": "Build the brain for this repo.",
-      "context": {
-        "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists (empty .ai/memory/, .ai/specs/, .ai/session/) but AGENTS.md is absent at the project root — likely a partial/manual setup, not a full jaiba-scaffold run",
-        "code_facts": ["Node.js Express API, package.json has test/lint scripts"]
-      },
-      "expected_output": [
-        "Agent noticed AGENTS.md is missing entirely as part of its preconditions",
-        "Flagged that this project is missing the JAIBA behavioral contract and the rest of the skillset jaiba-scaffold installs",
-        "Recommended jaiba-scaffold, but did not refuse outright",
-        "Asked the developer whether to continue with initialize anyway (populate .ai/memory/ from the existing skeleton) or stop and run jaiba-scaffold first",
-        "If the developer chose to continue, proceeded with the normal initialize evidence sweep (constitution, adr-log, reference-index from templates)",
-        "Did not write or copy AGENTS.md itself — that remains jaiba-scaffold's responsibility"
-      ],
-      "files": []
     }
   ]
 }

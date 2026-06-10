@@ -39,33 +39,6 @@ And one transition defines its boundary: when the developer shifts from
 doing the work itself. The context it already gathered carries over —
 that's the payoff of asking first.
 
-## Brain Discovery
-
-`ask` can be installed per-project (`.claude/skills/`,
-`.agents/skills/`) or **globally** (e.g. `~/.claude/skills/`), shared
-across every repository you work in. Either way, "the brain" means
-`.ai/` and `AGENTS.md` at the root of the **current project** — where
-`.git/` lives — never a path relative to this skill's own installation
-location.
-
-Orienting cold (see `references/orientation.md`) includes checking
-whether this project is JAIBA-instrumented at all — `AGENTS.md` exists,
-is non-empty, and is the JAIBA behavioral contract (the `.ai/` Brain Map
-and numbered Behavioral Rules), and `.ai/memory/` holds real content,
-not bare `[bracket]` templates. Two outcomes:
-
-- **Not instrumented at all** (no `.ai/`, or `AGENTS.md` missing/empty/
-  not the JAIBA contract) — say so plainly. Code questions still work
-  from the repository directly; plan/spec/decision questions get "there
-  is no active plan/spec — this project has no JAIBA brain yet." Offer
-  `jaiba-scaffold` as the next step, then wait — `ask` doesn't install
-  anything.
-- **Partially instrumented** (`.ai/` exists but `.ai/memory/` is bare
-  templates) — plan/spec questions still work (session and spec files
-  don't depend on the long-term brain); decision questions ("why did we
-  choose X?") get "the ADR log hasn't been initialized yet." Offer
-  `update-brain` initialize.
-
 ## What `ask` answers
 
 Three domains, each grounded in the repository — never in memory from a

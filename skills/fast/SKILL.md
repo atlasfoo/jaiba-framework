@@ -59,23 +59,6 @@ how to estimate blast radius cheaply, read
 
 ## Universal preconditions
 
-> **Brain check first.** `fast` can be installed per-project or
-> **globally** (e.g. `~/.claude/skills/`), shared across every
-> repository. Either way, "the brain" means `.ai/` and `AGENTS.md` at
-> the root of *this* project — where `.git/` lives — never a path
-> relative to this skill's own installation location.
->
-> If `AGENTS.md` is missing/empty/not the JAIBA contract, or
-> `.ai/memory/constitution.md` is still a bare `[bracket]` template,
-> this project isn't (fully) JAIBA-instrumented. `fast` doesn't block on
-> this — small, atomic changes are still in scope — but: fall back to
-> whatever verification commands the repo itself defines for the Phase
-> Gate (constitution §6 isn't available) — README, CI config, or failing
-> those, the package manager's own scripts (`package.json`, `Makefile`,
-> `justfile`, …). Treat the change as free-standing (skip "plan
-> adjustment" entirely), and mention `jaiba-scaffold` once, in the
-> closing recap, as an opportunity rather than a blocker.
-
 Context loaded depends on execution context — detect which applies (see
 "Two contexts" below) before reading.
 
