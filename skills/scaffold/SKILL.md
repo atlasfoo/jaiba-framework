@@ -1,7 +1,7 @@
 ---
 name: jaiba-scaffold
 description: >-
-  First-run bootstrap of the JAIBA framework into a project — the meta-skill that turns an un-instrumented repo into a JAIBA-instrumented one. Use this whenever JAIBA is not yet present and the developer wants to adopt it: "scaffold jaiba", "set up jaiba in this project", "initialize the jaiba framework here", "bootstrap jaiba", "install jaiba", "add jaiba to this repo", or the explicit /jaiba-scaffold call. It lays the `.ai/` brain skeleton and its internal `.gitignore`, installs the JAIBA behavioral `AGENTS.md`, installs the JAIBA workflow + meta skills into the project's agent folder (`.agents/`, or a detected vendor folder like `.claude/`), probes the local machine for the CLI tools those skills need and records them in `.ai/tools-state.md`, then hands off to `update-brain:initialize` to populate the long-term brain. Run it on greenfield and legacy repos alike, as the very first JAIBA action in a project. Do NOT use it when `.ai/` already exists or the project is already JAIBA-instrumented — building or reconciling the brain is `update-brain`, planning work is `planning`, asking what the brain says is `ask`; scaffold only does the one-time install, then steps aside.
+  First-run bootstrap of the JAIBA framework into a project — the meta-skill that turns an un-instrumented repo into a JAIBA-instrumented one. Use this whenever JAIBA is not yet present and the developer wants to adopt it: "scaffold jaiba", "set up jaiba in this project", "initialize the jaiba framework here", "bootstrap jaiba", "install jaiba", "add jaiba to this repo", or the explicit /jaiba-scaffold call. It lays the `.ai/` brain skeleton and its internal `.gitignore`, installs the JAIBA behavioral `AGENTS.md`, installs the JAIBA workflow + meta skills into the project's agent folder (`.agents/`, or a detected vendor folder like `.claude/`), and then hands off to `update-brain:initialize` to populate the long-term brain, followed by `jaiba-doctor` to run the first health check and probe the local machine toolchain. Run it on greenfield and legacy repos alike, as the very first JAIBA action in a project. Do NOT use it when `.ai/` already exists or the project is already JAIBA-instrumented — building or reconciling the brain is `update-brain`, planning work is `planning`, asking what the brain says is `ask`; scaffold only does the one-time install, then steps aside.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -44,7 +44,7 @@ you'd be clobbering real work — stop and route instead.
 | The repo already has… | Meaning | Route to |
 |---|---|---|
 | `.ai/memory/*.md` with **real content** | Fully instrumented | `update-brain` (drift/update), `planning`, or `ask` |
-| `.ai/` skeleton but **empty/bare** `memory/` | Half-scaffolded (a prior run stopped before the brain was built) | Resume: skip to **step 6** (hand off to `update-brain:initialize`) |
+| `.ai/` skeleton but **empty/bare** `memory/` | Half-scaffolded (a prior run stopped before the brain was built) | Resume: skip to **step 5** (hand off to `update-brain:initialize`) |
 | Nothing JAIBA under `.ai/` | Greenfield or legacy, not yet adopted | Continue here |
 
 If you're unsure which case you're in, read `.ai/memory/constitution.md`
@@ -84,7 +84,7 @@ counting vendor-specific agent config directories at the root:
 
 The install **target** is the `skills/` subdirectory of the chosen
 folder — e.g. `.claude/skills/` or `.agents/skills/`. Create it if
-absent. Hold onto this path; the tool-check step (5) scans it.
+absent. Hold onto this path; the doctor step (6) will scan it.
 
 > `.agents/` itself is the *neutral default*, not a vendor — its presence
 > does not count as "an agent is configured."
@@ -103,9 +103,14 @@ filling it; `update-brain` does that in step 6):
 ```
 
 Then write `.ai/.gitignore` from `assets/ai.gitignore` — it ignores
-`session/` (per-developer scratch) and `tools-state.md` (machine state).
+`session/` (per-developer scratch).
 Add a `.gitkeep` to `specs/` and `vendored/` so the empty tracked dirs
 survive a commit (`session/` is gitignored, so it needs none).
+
+Also, create the `.atl/` directory at the project root and write its
+`.gitignore` (from `assets/atl.gitignore`) containing `*` so that the
+entire directory is ignored from source control, keeping machine-local
+state out of the repository.
 
 ### 3. Install the behavioral `AGENTS.md`
 
@@ -208,35 +213,7 @@ but prefer the package manager so versions/locks stay honest.
 > only installs entries from `assets/skillset.txt` — keep that list
 > current, not hardcoded in prose.
 
-### 5. Probe the local toolchain
-
-Run the bundled script against the directory (or directories) that
-actually hold this project's JAIBA skills now, which depends on how step
-4 went:
-
-- **Case A (everything stayed global):** point the probe at the global
-  skills directory — `~/<agent-folder>/skills`, e.g. `~/.claude/skills`
-  or `~/.agents/skills` (same vendor folder name as step 1, rooted at the
-  user's home directory).
-- **Everything installed locally:** `<agent-folder>/skills` as before.
-- **Mixed** (some stayed global, some were installed locally): pass both
-  — `check-tools.sh` accepts a colon-separated list of directories.
-
-```bash
-bash <this-skill>/scripts/check-tools.sh "<skills-dir-1>[:<skills-dir-2>]" <project-root>
-```
-
-It derives the required tools from each installed skill's `requires:`
-frontmatter, unions a small framework baseline (`git bash rg curl`),
-checks each against the machine, and writes `.ai/tools-state.md`.
-
-**Warn and continue — never block.** If anything is missing, name the
-tool(s) and the skill(s) that need them in your closing report, but
-proceed to step 6. The persistent warning lives in `AGENTS.md` §6, which
-re-surfaces missing tools every session until they're resolved — so a
-gap here is recorded, not lost.
-
-### 6. Hand off to `update-brain:initialize`
+### 5. Hand off to `update-brain:initialize`
 
 The house is built; now fill the brain. Invoke `update-brain` in
 **initialize** mode — it sweeps the repository and populates
@@ -247,6 +224,15 @@ does not write `.ai/memory/` itself.
 If `update-brain` isn't installed for some reason (step 4 was skipped or
 failed), say so and point the developer at it — don't try to build the
 brain yourself.
+
+### 6. Hand off to `jaiba-doctor`
+
+Once the brain has been initialized, hand control off to `jaiba-doctor`
+to perform the first complete project checkup. This includes probing the
+local machine toolchain for the installed skills (writing the local
+`.atl/tool-layout.md`), checking memory coherence, and verifying external
+references. By deferring the tool probe to `doctor`, we prevent duplication
+and ensure the environment is fully verified with the newly populated memory.
 
 ## Closing
 
@@ -260,11 +246,7 @@ End with a short, honest report:
    installed project-locally, and the source. If Case A applied
    (everything was already global), say so plainly and repeat the
    `npx skills update -g` reminder here.
-3. **Toolchain** — green if all present; otherwise list each **missing**
-   tool and the skill(s) that need it (this is the §6 warning's first
-   airing).
-4. **Hand-off** — that control now passes to `update-brain:initialize`,
-   and whatever it still needs from the developer (its own gaps report).
+3. **Hand-off** — that control now passes to `update-brain:initialize`, which will initialize the long-term memory, followed by `jaiba-doctor` to run the first checkup, probe the local machine toolchain, and write the local `.atl/tool-layout.md` file.
 
 ## Boundaries
 
