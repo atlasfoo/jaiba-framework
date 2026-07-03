@@ -1,7 +1,6 @@
 ---
 name: jaiba-scaffold
-description: >-
-  First-run bootstrap of the JAIBA framework into a project — the meta-skill that turns an un-instrumented repo into a JAIBA-instrumented one. Use this whenever JAIBA is not yet present and the developer wants to adopt it: "scaffold jaiba", "set up jaiba in this project", "initialize the jaiba framework here", "bootstrap jaiba", "install jaiba", "add jaiba to this repo", or the explicit /jaiba-scaffold call. It lays the `.ai/` brain skeleton and its internal `.gitignore`, installs the JAIBA behavioral `AGENTS.md`, installs the JAIBA workflow + meta skills into the project's agent folder (`.agents/`, or a detected vendor folder like `.claude/`), and then hands off to `update-brain:initialize` to populate the long-term brain, followed by `jaiba-doctor` to run the first health check and probe the local machine toolchain. Run it on greenfield and legacy repos alike, as the very first JAIBA action in a project. Do NOT use it when `.ai/` already exists or the project is already JAIBA-instrumented — building or reconciling the brain is `update-brain`, planning work is `planning`, asking what the brain says is `ask`; scaffold only does the one-time install, then steps aside.
+description: First-run bootstrap of JAIBA into a project. Lays brain skeleton, installs AGENTS.md, installs workflow/meta skills, probes toolchain, then hands to update-brain. One-time install only — don't use if .ai/ exists already.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
