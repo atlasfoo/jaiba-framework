@@ -4,7 +4,7 @@
 hooks declare actually present on *this* machine?
 
 This is the one diagnostic that **writes**: it refreshes
-`.ai/tools-state.md`. That file is machine state (gitignored, `AGENTS.md`
+`.atl/tool-layout.md`. That file is machine state (gitignored, `AGENTS.md`
 §6), not project memory, so rewriting it is squarely doctor's job — it
 does not violate the "propose, don't patch" rule that governs the brain.
 It is the same probe `scaffold` runs once at install time, re-run as a
@@ -23,7 +23,7 @@ maintenance check and widened to cover subagents and hooks.
    derives required tools from three sources, unions a small framework
    baseline (`git bash rg curl`), checks each against the machine,
    records **which skill/subagent/hook needs each tool** (provenance),
-   and rewrites `.ai/tools-state.md`. It always exits 0 — the missing
+   and rewrites `.atl/tool-layout.md`. It always exits 0 — the missing
    count comes back on stdout and in the file.
 
    What it scans, across **each** skills directory given and its parent
@@ -37,14 +37,22 @@ maintenance check and widened to cover subagents and hooks.
      program is claimed). A global agent folder rarely has hooks/subagents
      of its own, but the probe checks anyway — cheap and avoids assuming.
 
-2. **Read the result back.** Open the refreshed `.ai/tools-state.md` and
+   **Windows Shell Host Detection:**
+   Under Windows, the probe introspects the shell environment to detect and label the flavor (e.g. `git-bash` via `$MSYSTEM` or `wsl` via `/proc/version` / `$WSL_DISTRO_NAME`). It annotates the `bash` baseline row accordingly so Git Bash and WSL are never conflated (they use different execution and path styles). On Linux/macOS, it reports `native`.
+
+2. **Read the result back.** Open the refreshed `.atl/tool-layout.md` and
    turn its rows into findings:
    - A tool marked **❌ missing** → a **Broken** finding. Name the tool
      *and* its "Needed by" provenance — a missing tool whose only
      consumer is a hook you never trigger is less urgent than one a core
      workflow skill needs, and the developer can only judge that if you
      tell them who needs it.
-   - All present → ✅ healthy for this diagnostic.
+   - A skill or source marked **❌ broken** in the **Skill-Specific Health Rollup**
+     → a **Broken** finding naming the specific skill and its missing tool(s).
+     This rollup ensures that skill-specific dependencies (such as `python`
+     or `just`) surface prominently as an unhealthy *skill* instead of
+     getting lost in a flat tool list.
+   - All present and all sources satisfied → ✅ healthy for this diagnostic.
 
 3. **Compare against the previous probe if it matters.** If a tool that a
    running workflow assumed present is now missing, that's the §6.3
@@ -59,7 +67,7 @@ maintenance check and widened to cover subagents and hooks.
 - The **fix** for a missing tool is an install, not another skill: say so
   plainly (e.g. "install `jq` — `brew install jq` / `apt install jq`").
   doctor doesn't install it for them.
-- Mention that `.ai/tools-state.md` was refreshed, so the developer knows
+- Mention that `.atl/tool-layout.md` was refreshed, so the developer knows
   the §6 session warning now reflects reality.
 
 ## Boundary

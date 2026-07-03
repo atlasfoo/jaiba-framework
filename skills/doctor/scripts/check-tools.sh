@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 #
-# JAIBA doctor — local toolchain probe (maintenance re-check).
+# JAIBA doctor — local toolchain probe (maintenance check).
 #
-# The diagnostic sibling of scaffold's check-tools.sh. Where scaffold
-# probes once at install time from the installed skills' `requires:`,
-# doctor RE-probes during a health check and widens the net: it derives
+# The diagnostic toolchain probe. Where scaffold used to probe once at
+# install time, doctor RE-probes during a health check and widens the net: it derives
 # the required CLI tools from installed skills, from subagent
 # definitions, AND from hook command lines, tracks WHICH of them needs
 # each tool (provenance), checks every tool against this machine, and
-# rewrites `.ai/tools-state.md`. Warn-and-record by design — a missing
+# rewrites `.atl/tool-layout.md`. Warn-and-record by design — a missing
 # tool is reported, never fatal (AGENTS.md §6 keeps surfacing it).
 #
-# Refreshing tools-state.md is the ONLY write doctor performs; the file
+# Refreshing tool-layout.md is the ONLY write doctor performs; the file
 # is machine state, gitignored, not project memory.
 #
 # Usage:
@@ -36,8 +35,20 @@ set -uo pipefail
 
 SKILLS_DIRS_RAW="${1:?usage: check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [project-root]}"
 ROOT="${2:-$PWD}"
-OUT="$ROOT/.ai/tools-state.md"
+OUT="$ROOT/.atl/tool-layout.md"
 IFS=':' read -r -a SKILLS_DIRS <<< "$SKILLS_DIRS_RAW"
+
+# Detect host shell flavor to distinguish git bash from WSL in Windows
+SHELL_FLAVOR="native"
+if [ -n "${MSYSTEM:-}" ]; then
+  case "$MSYSTEM" in
+    MINGW*|MSYS*) SHELL_FLAVOR="git-bash" ;;
+  esac
+elif [ -f /proc/version ] && grep -qE "microsoft|WSL" /proc/version 2>/dev/null; then
+  SHELL_FLAVOR="wsl"
+elif [ -n "${WSL_DISTRO_NAME:-}" ]; then
+  SHELL_FLAVOR="wsl"
+fi
 
 # Each skills dir's parent is an agent folder (subagents/hooks live
 # alongside it). De-duplicate in case two skill dirs share a parent.
@@ -58,9 +69,28 @@ BASELINE="git bash rg curl"
 # tool -> "source1, source2, ..."  (provenance: who needs the tool)
 declare -A NEEDS
 
+# source -> "tool1 tool2 ..." (inverse map)
+declare -A DECLARED_TOOLS
+declare -a SOURCES=()
+declare -A SEEN_SOURCE
+
 note() {  # note <tool> <source-label>
   local t="$1" src="$2"
   [ -z "$t" ] && return 0
+
+  # Update inverse map
+  if [ -z "${DECLARED_TOOLS[$src]:-}" ]; then
+    DECLARED_TOOLS[$src]="$t"
+  elif [[ " ${DECLARED_TOOLS[$src]} " != *" $t "* ]]; then
+    DECLARED_TOOLS[$src]+=" $t"
+  fi
+
+  if [ -z "${SEEN_SOURCE[$src]:-}" ]; then
+    SEEN_SOURCE[$src]=1
+    SOURCES+=("$src")
+  fi
+
+  # Update flat tool needs map
   if [ -z "${NEEDS[$t]:-}" ]; then
     NEEDS[$t]="$src"
   elif [[ ",${NEEDS[$t]}," != *",$src,"* ]]; then
@@ -130,30 +160,75 @@ probe_cmd() { case "$1" in python) echo python3 ;; *) echo "$1" ;; esac; }
 missing=0
 total=0
 rows=""
+declare -A TOOL_PRESENT
 for t in $(printf '%s\n' "${!NEEDS[@]}" | sort); do
   total=$((total + 1))
   cmd="$(probe_cmd "$t")"
   if path="$(command -v "$cmd" 2>/dev/null)"; then
-    rows+="| \`$t\` | ✅ present | \`$path\` | ${NEEDS[$t]} |"$'\n'
+    TOOL_PRESENT[$t]=1
+    state="✅ present"
+    if [ "$t" = "bash" ]; then
+      state="✅ present ($SHELL_FLAVOR)"
+    fi
+    rows+="| \`$t\` | $state | \`$path\` | ${NEEDS[$t]} |"$'\n'
   else
+    TOOL_PRESENT[$t]=0
     rows+="| \`$t\` | ❌ **missing** | — | ${NEEDS[$t]} |"$'\n'
     missing=$((missing + 1))
   fi
 done
 
-mkdir -p "$ROOT/.ai"
+# Build the health rollup row per source
+rollup_rows=""
+for src in $(printf '%s\n' "${SOURCES[@]}" | sort -u); do
+  src_tools="${DECLARED_TOOLS[$src]:-}"
+  [ -z "$src_tools" ] && continue
+
+  src_missing=""
+  for t in $src_tools; do
+    if [ "${TOOL_PRESENT[$t]:-0}" -eq 0 ]; then
+      if [ -z "$src_missing" ]; then
+        src_missing="\`$t\`"
+      else
+        src_missing+=", \`$t\`"
+      fi
+    fi
+  done
+
+  formatted_tools=""
+  for t in $src_tools; do
+    if [ -z "$formatted_tools" ]; then
+      formatted_tools="\`$t\`"
+    else
+      formatted_tools+=", \`$t\`"
+    fi
+  done
+
+  if [ -z "$src_missing" ]; then
+    verdict="✅ satisfied"
+  else
+    verdict="❌ broken — missing: $src_missing"
+  fi
+
+  rollup_rows+="| $src | $formatted_tools | $verdict |"$'\n'
+done
+
+mkdir -p "$ROOT/.atl"
 {
-  echo "# Toolchain State"
+  echo "# Toolchain Layout"
   echo
-  echo "> Local CLI toolchain re-probed by \`jaiba-doctor\`. **Gitignored** —"
+  echo "> Local CLI toolchain re-probed by \`jaiba-doctor\` inside \`.atl/\`. **Gitignored** —"
   echo "> this records what is installed on *this machine*, not a project"
   echo "> fact. Regenerate by re-running \`jaiba-doctor\` (or the scaffold"
   echo "> tool check)."
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "- **Shell host:** $SHELL_FLAVOR"
   echo "- **Skills scanned:** $(printf '\`%s\` ' "${SKILLS_DIRS[@]}")"
   echo "- **Agent folder(s):** $(printf '\`%s\` ' "${AGENT_DIRS[@]}")"
   echo "- **Missing:** $missing of $total"
+  echo
+  echo "## Probed Tools"
   echo
   echo "| Tool | State | Path | Needed by |"
   echo "|---|---|---|---|"
@@ -164,6 +239,12 @@ mkdir -p "$ROOT/.ai"
     echo "> depend on them will fail mid-run — AGENTS.md §6 warns about this"
     echo "> each session until resolved."
   fi
+  echo
+  echo "## Skill-Specific Health Rollup"
+  echo
+  echo "| Source | Required Tools | Health Verdict |"
+  echo "|---|---|---|"
+  printf '%s' "$rollup_rows"
 } > "$OUT"
 
 echo "wrote $OUT — $missing missing of $total"

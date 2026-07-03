@@ -1,7 +1,7 @@
 ---
 name: jaiba-doctor
 description: >-
-  Framework-integrity health check for a JAIBA-instrumented project — the maintenance meta-skill that diagnoses whether the `.ai/` brain, the local toolchain, and the external references are still sound, and routes the developer to the fix. Use it whenever someone wants to verify JAIBA is healthy or asks the framework to check itself: "run jaiba doctor", "/jaiba-doctor", "check jaiba health", "is the framework healthy", "diagnose jaiba", "is my brain up to date", "are my references still reachable", "did any of my tools go missing", "check framework integrity before I start planning". It runs three diagnostics — memory coherence (are constitution/adr-log/reference-index complete and consistent with each other and the repo?), tool state (are the CLI tools the installed skills/subagents/hooks need actually present? — refreshes `.ai/tools-state.md`), and external-reference health (is every reference-index entry reachable: are its MCPs/CLIs installed, are remote specs/URLs live, do vendored copies still exist, and are they stale?) — then emits one prioritized report of suggested fixes. Strongly recommended as the pre-flight check right before a `specification` or `planning` workflow, so drift and missing dependencies surface before they derail the work. doctor DIAGNOSES and ROUTES; it does not rebuild the brain (that's `update-brain`), does not bootstrap a project (that's `scaffold`), and does not answer questions about what the brain says (that's `ask`). The only file it writes is `.ai/tools-state.md` (machine state, not project memory). Do NOT use it on a repo that has no `.ai/` yet — there is nothing to diagnose; that's `scaffold`.
+  Framework-integrity health check for a JAIBA-instrumented project — the maintenance meta-skill that diagnoses whether the `.ai/` brain, the local toolchain, and the external references are still sound, and routes the developer to the fix. Use it whenever someone wants to verify JAIBA is healthy or asks the framework to check itself: "run jaiba doctor", "/jaiba-doctor", "check jaiba health", "is the framework healthy", "diagnose jaiba", "is my brain up to date", "are my references still reachable", "did any of my tools go missing", "check framework integrity before I start planning". It runs three diagnostics — memory coherence (are constitution/adr-log/reference-index complete and consistent with each other and the repo?), tool state (are the CLI tools the installed skills/subagents/hooks need actually present? — refreshes `.atl/tool-layout.md`), and external-reference health (is every reference-index entry reachable: are its MCPs/CLIs installed, are remote specs/URLs live, do vendored copies still exist, and are they stale?) — then emits one prioritized report of suggested fixes. Strongly recommended as the pre-flight check right before a `specification` or `planning` workflow, so drift and missing dependencies surface before they derail the work. doctor DIAGNOSES and ROUTES; it does not rebuild the brain (that's `update-brain`), does not bootstrap a project (that's `scaffold`), and does not answer questions about what the brain says (that's `ask`). The only file it writes is `.atl/tool-layout.md` (machine state, not project memory). Do NOT use it on a repo that has no `.ai/` yet — there is nothing to diagnose; that's `scaffold`.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -29,7 +29,7 @@ Its governing principle is the framework's own: **propose, don't
 patch** (`AGENTS.md` §2.9, §5). doctor reads widely and writes almost
 nothing. It surfaces problems and names the skill that fixes each one —
 it does not rebuild the brain, re-vendor a spec, or install a tool
-itself. The **single exception** is `.ai/tools-state.md`: that file is
+itself. The **single exception** is `.atl/tool-layout.md`: that file is
 *machine state, not project memory* (gitignored — `AGENTS.md` §6), so
 refreshing it is doctor's job, not a memory mutation.
 
@@ -94,7 +94,7 @@ into the single report described under "The health report".
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
 | 1 | **Memory coherence** | Are constitution / adr-log / reference-index complete, and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `update-brain` |
-| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine? | `references/tool-state.md` | **Yes** — refreshes `.ai/tools-state.md` |
+| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference-index.md` entry reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
 Why this order: memory coherence is read first because the
@@ -141,7 +141,7 @@ structure:
 
 ## 2. Tool state — <status>
 <findings: tool, needed by which skill/subagent/hook, present/missing>
-(.ai/tools-state.md refreshed)
+(.atl/tool-layout.md refreshed)
 
 ## 3. External-reference health — <status>
 <findings: reference, channel tested, result>
@@ -169,7 +169,7 @@ Rules for the report:
 ## Boundaries
 
 - **Diagnose and route — don't fix.** doctor proposes; the owning skill
-  enacts. The one thing it writes is `.ai/tools-state.md` (machine
+  enacts. The one thing it writes is `.atl/tool-layout.md` (machine
   state, §6), never `.ai/memory/` (that's `update-brain`'s sole right,
   §2.9) and never a vendored file.
 - **Maintenance, not bootstrap.** A repo with no `.ai/` is `scaffold`'s
@@ -177,7 +177,7 @@ Rules for the report:
 - **Carry your own tools.** Skills package independently — doctor's
   probe (`scripts/check-tools.sh`) is its own copy, not a runtime call
   into `scaffold`'s folder.
-- **Read-mostly everywhere except tools-state.** If a check tempts you to
+- **Read-mostly everywhere except tool-layout.** If a check tempts you to
   "just fix" a `[bracket]` in the constitution or freshen a vendored
   spec, stop — that's the route, not the action.
 

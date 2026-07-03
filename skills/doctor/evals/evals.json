@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Before I start planning the next feature, can you run a jaiba health check on this repo and tell me if anything's off?",
-      "expected_output": "Runs all three diagnostics in order. Memory coherence: reads the three .ai/memory files (here mostly complete) and reports them coherent. Tool state: runs the bundled check-tools.sh, refreshes .ai/tools-state.md, reports tools present/missing with provenance. Reference health: walks reference-index.md, tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before planning.",
+      "expected_output": "Runs all three diagnostics in order. Memory coherence: reads the three .ai/memory files (here mostly complete) and reports them coherent. Tool state: runs the bundled check-tools.sh, refreshes .atl/tool-layout.md, reports tools present/missing with provenance. Reference health: walks reference-index.md, tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before planning.",
       "files": []
     },
     {
@@ -34,7 +34,7 @@
         "repo_state": ".ai/memory/ fully populated and coherent",
         "tooling": "one of the globally-installed skills declares `requires: [jq]`, and `jq` is not on PATH"
       },
-      "expected_output": "In preconditions, located BOTH the project-local skills dir (.claude/skills) AND the global skills dir (~/.claude/skills) -- did not scan only the project-local one. Ran check-tools.sh with both paths joined by ':'. Tool-state diagnostic reports `jq` as missing with provenance pointing at the global skill that declares it (e.g. 'skill:planning'), not just project-local skills. .ai/tools-state.md refreshed and lists tools/skills from both locations. Final report leads with the missing jq finding (Broken) and prescribes an install, not a reinstall of the skill.",
+      "expected_output": "In preconditions, located BOTH the project-local skills dir (.claude/skills) AND the global skills dir (~/.claude/skills) -- did not scan only the project-local one. Ran check-tools.sh with both paths joined by ':'. Tool-state diagnostic reports `jq` as missing with provenance pointing at the global skill that declares it (e.g. 'skill:planning'), not just project-local skills. .atl/tool-layout.md refreshed and lists tools/skills from both locations. Final report leads with the missing jq finding (Broken) and prescribes an install, not a reinstall of the skill.",
       "files": []
     }
   ]

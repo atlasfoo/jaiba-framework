@@ -42,12 +42,12 @@ if [[ -z "${ARCHIVE_DATE}" ]]; then
   ARCHIVE_DATE="$(date -u +%Y-%m-%d)"
 fi
 
-# Check for unexpected files in session (besides the four known ones).
+# Check for unexpected files in session (besides the known ones).
 UNEXPECTED=()
 while IFS= read -r -d '' f; do
   base="$(basename "$f")"
   case "$base" in
-    plan.md|tasks.md|walkthrough.md|"${SLUG}-summary.md") ;;
+    plan.md|tasks.md|walkthrough.md|"${SLUG}-summary.md"|.gitignore) ;;
     *) UNEXPECTED+=("$base") ;;
   esac
 done < <(find "${SESSION_DIR}" -maxdepth 1 -type f -print0)

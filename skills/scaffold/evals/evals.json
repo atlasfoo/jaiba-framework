@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "I want to start using JAIBA on this repo. It's a fresh Python service, nothing set up yet. Can you scaffold it?",
-      "expected_output": "Detects no vendor agent dir -> uses .agents/skills as install target. Creates .ai/ skeleton (memory/ specs/ session/ vendored/) plus .ai/.gitignore ignoring session/ and tools-state.md. Installs AGENTS.md at root. Installs the project-scoped skill set. Runs the tool check writing .ai/tools-state.md. Hands off to update-brain:initialize. Ends with a closing report.",
+      "expected_output": "Detects no vendor agent dir -> uses .agents/skills as install target. Creates .ai/ skeleton (memory/ specs/ session/ vendored/) plus .ai/.gitignore ignoring session/. Installs AGENTS.md at root. Creates .atl/ plus .atl/.gitignore ignoring everything. Installs the project-scoped skill set. Hands off first to update-brain:initialize, followed by jaiba-doctor to run the first checkup (which probes the local machine toolchain and writes .atl/tool-layout.md). Ends with a closing report.",
       "files": []
     },
     {
@@ -27,7 +27,7 @@
         "global_skills_state": "every skill listed in skills/scaffold/assets/skillset.txt (planning, specification, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) is already present in `npx skills list -g` output",
         "repo_state": "no .ai/, no AGENTS.md"
       },
-      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed nothing -- not globally, not project-locally. Told the developer their global skillset already covers this project and pointed them at `npx skills update -g` to stay current. Continued the rest of the bootstrap (.ai/ skeleton, AGENTS.md, tool-check pointed at the global skills directory, hand-off to update-brain:initialize). Closing report explicitly notes Case A (already global, nothing installed).",
+      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed nothing -- not globally, not project-locally. Told the developer their global skillset already covers this project and pointed them at `npx skills update -g` to stay current. Continued the rest of the bootstrap (.ai/ skeleton, AGENTS.md, hand-off to update-brain:initialize and doctor). Closing report explicitly notes Case A (already global, nothing installed).",
       "files": []
     },
     {
@@ -38,7 +38,7 @@
         "global_skills_state": "`npx skills list -g` returns only jaiba-scaffold -- none of the skillset.txt entries (planning, specification, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) are global yet",
         "repo_state": "no .ai/, no AGENTS.md"
       },
-      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries with the chosen scope, then continues the rest of the bootstrap (.ai/ skeleton, AGENTS.md, tool-check, hand-off to update-brain:initialize).",
+      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries with the chosen scope, then continues the rest of the bootstrap (.ai/ skeleton, AGENTS.md, hand-off to update-brain:initialize and doctor).",
       "files": []
     },
     {
@@ -49,7 +49,7 @@
         "prior_turn": "scaffold already ran `npx skills list -g` and found planning, specification, and ask already global, but fast, update-brain, create-knowledge, jaiba-doctor, and caveman missing -- and just asked the developer global vs. local for the missing ones",
         "repo_state": ".ai/ skeleton and AGENTS.md not yet created"
       },
-      "expected_output": "Installed only the previously-missing skills (fast, update-brain, create-knowledge, jaiba-doctor, caveman) project-locally (no -g flag), one by one. Did not reinstall or duplicate planning, specification, or ask, which were already global. Continued the bootstrap: .ai/ skeleton, AGENTS.md, then ran the tool check against BOTH the project's local skills dir and the global skills dir (colon-separated paths to check-tools.sh), then handed off to update-brain:initialize. Closing report distinguishes which skills came from where.",
+      "expected_output": "Installed only the previously-missing skills (fast, update-brain, create-knowledge, jaiba-doctor, caveman) project-locally (no -g flag), one by one. Did not reinstall or duplicate planning, specification, or ask, which were already global. Continued the bootstrap: .ai/ skeleton, AGENTS.md, then handed off first to update-brain:initialize, and then to jaiba-doctor to run the first checkup (which probes the local machine toolchain against BOTH the project's local skills dir and the global skills dir). Closing report distinguishes which skills came from where.",
       "files": []
     }
   ]
