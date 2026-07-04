@@ -1,6 +1,6 @@
 ---
 name: jaiba-scaffold
-description: First-run bootstrap of JAIBA into a project. Lays brain skeleton, installs AGENTS.md, installs workflow/meta skills, probes toolchain, then hands to update-brain. One-time install only — don't use if .ai/ exists already.
+description: First-run bootstrap of JAIBA into a project. Lays brain skeleton, installs AGENTS.md, installs workflow/meta skills, then hands to update-brain (which hands to doctor for toolchain probe). One-time install only — don't use if .ai/ exists already.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -22,11 +22,11 @@ per-project — and run from inside a target repo to adopt JAIBA there.
 
 It does the one-time install and nothing else. It lays the brain
 skeleton, drops in the behavioral `AGENTS.md`, installs the
-project-scoped JAIBA skills into the right agent folder, probes the
-local toolchain, and then **hands the project to `update-brain:initialize`**,
-which fills the long-term brain from the repository. After that,
-scaffold has no further role — the everyday work is `planning`,
-`specification`, `ask`, `fast`, and `update-brain`.
+project-scoped JAIBA skills into the right agent folder, and then
+**hands the project to `update-brain:initialize`**, which fills the
+long-term brain from the repository. After that, scaffold has no further
+role — the everyday work is `planning`, `specification`, `ask`, `fast`,
+and `update-brain`.
 
 Think of the boundary this way: **scaffold builds the empty house and
 hands over the keys; `update-brain` moves the furniture in.** Scaffold
@@ -83,7 +83,8 @@ counting vendor-specific agent config directories at the root:
 
 The install **target** is the `skills/` subdirectory of the chosen
 folder — e.g. `.claude/skills/` or `.agents/skills/`. Create it if
-absent. Hold onto this path; the doctor step (6) will scan it.
+absent. Hold onto this path; `jaiba-doctor` will scan it when
+probing the toolchain.
 
 > `.agents/` itself is the *neutral default*, not a vendor — its presence
 > does not count as "an agent is configured."
