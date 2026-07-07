@@ -8,15 +8,14 @@ any remaining gap surfaced.
 This mode runs on a project whose brain already exists. It has **two
 entry paths**, and a single run may involve either or both:
 
-- **Apply proposals** — `planning:summarize` or `specification:archive`
+- **Apply proposals** — `conduct:summarize`
   *proposed* ADRs, reference-index entries, or constitution changes;
   enact them here.
 - **Fix drift** — the project evolved (new module, new integration,
   scope shift) and the brain has fallen behind; re-analyze the affected
   slice and update.
 
-Think of `specification:define`'s "new spec vs amend active spec" split:
-same mode, two on-ramps. Pick the path from the developer's intent; ask
+Same mode, two on-ramps. Pick the path from the developer's intent; ask
 if it's unclear.
 
 ## Preconditions
@@ -24,10 +23,10 @@ if it's unclear.
 1. The brain exists with real content. If `.ai/memory/*.md` are absent or
    bare templates, this is `initialize` — stop and switch.
 2. For **apply proposals**: there is a concrete proposal to enact — an
-   ADR drafted by `planning:summarize` / `specification:archive`, a named
+   ADR drafted by `conduct:summarize`, a named
    integration, a stated scope change. If the developer says "apply the
-   proposed ADR" but you can't find it, ask where it is (usually the last
-   plan summary in `.ai/memory/archive/plans/` or the spec archive).
+   proposed ADR" but you can't find it, ask where it is (usually the most
+   recent `work-closure` entry in `.ai/memory/log/`).
 3. For **fix drift**: a specific contradiction between brain and repo.
    Identify it before editing — don't re-derive the whole brain.
 
@@ -44,6 +43,12 @@ that's *allowed* to write — but it still earns each write:
    and realign if you find one.
 3. **Enact, minimally.** Change only what the trigger justifies. Don't
    "tidy" untouched sections; a noisy memory diff is hard to trust.
+4. **Record.** Append a `brain-change` entry to `.ai/memory/log/`
+   (shape in `assets/log-entry-template.md`) stating what changed,
+   from what to what, and its provenance. The log is append-only —
+   never rewrite a prior entry; a correction is a new entry pointing
+   at the old one. This is what keeps brain evolution auditable
+   without diffing git history.
 
 ## Path A — apply proposals
 
@@ -60,8 +65,9 @@ The proposal usually originated upstream and is waiting to be enacted.
 
 ### Reference-index entries
 
-- Add the integration to the correct tier (code-scope §1–§3 or workflow
-  tooling §4). If that tier's section was pruned at `initialize` because
+- Add the integration to the correct tier (code-scope §1–§4 — including
+  internal cross-component contracts in §3 — or workflow tooling §5).
+  If that tier's section was pruned at `initialize` because
   it was empty, re-create it (and renumber) now that it has an entry.
 - The consumption point must be the **external** surface (OpenAPI /
   vendored spec / docs URL), grounded in real evidence. Vendored copies
@@ -98,7 +104,7 @@ the code") or by another skill noticing a contradiction (`AGENTS.md` §5).
 3. **Apply minimally**, propose → confirm → enact as above.
 
 > Not every divergence is a brain change. If the *repo* is wrong (a bug),
-> the fix belongs in `planning`/`fast`, not in memory. Only update the
+> the fix belongs in `conduct`/`fast`, not in memory. Only update the
 > brain when the *brain* is what's behind.
 
 ## Closing
@@ -122,7 +128,7 @@ End every `update` run with a short report:
 - **Over-editing.** Touching sections the trigger didn't justify makes
   the memory diff untrustworthy. Change the minimum.
 - **Treating a code bug as drift.** If the repo is wrong, that's a
-  `planning`/`fast` fix, not a brain update.
+  `conduct`/`fast` fix, not a brain update.
 - **Inventing a consumption point** for a proposed integration instead of
   grounding it or marking `[MISSING]`.
 - **Touching the constitution for a non-identity change.**

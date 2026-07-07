@@ -4,19 +4,19 @@
     {
       "id": 1,
       "prompt": "I want to start using JAIBA on this repo. It's a fresh Python service, nothing set up yet. Can you scaffold it?",
-      "expected_output": "Detects no vendor agent dir -> uses .agents/skills as install target. Creates .ai/ skeleton (memory/ specs/ session/ vendored/) plus .ai/.gitignore ignoring session/. Installs AGENTS.md at root. Creates .atl/ plus .atl/.gitignore ignoring everything. Installs the project-scoped skill set. Hands off first to update-brain:initialize, followed by jaiba-doctor to run the first checkup (which probes the local machine toolchain and writes .atl/tool-layout.md). Ends with a closing report.",
+      "expected_output": "Detects no vendor agent dir -> uses .agents/skills as install target. Creates .ai/ skeleton (memory/ with log/, work/, vendored/) plus .ai/.gitignore ignoring work/ and .gitkeep in memory/log/ and vendored/ — no specs/ directory. Creates .atl/ plus .atl/.gitignore ignoring everything. Installs the global behavioral contract (assets/jaiba-contract.md) into the user-level agent config (~/.agents/), wiring a reference from the agent's global instructions file if one exists. Drops the minimal AGENTS.md marker at the repo root (not the full protocol). Installs the project-scoped skill set and the subagent battery from assets/agents/ (3 executors + code-analyst, business-analyst, verify) into the global agents/ folder. Hands off first to update-brain:initialize, followed by jaiba-doctor for the first checkup (toolchain probe writes .atl/tool-layout.md). Ends with a closing report covering where the contract, marker, skills and subagents landed.",
       "files": []
     },
     {
       "id": 2,
       "prompt": "set up jaiba here please",
-      "expected_output": "Repo already has its own AGENTS.md at root. Skill must NOT overwrite it -- it stops and offers the two non-destructive options (back up + replace, or install as AGENTS.jaiba.md to coexist) before continuing the rest of the bootstrap.",
+      "expected_output": "Repo already has its own AGENTS.md at root. Skill must NOT overwrite it -- it stops and offers the two non-destructive options (back up + replace with the minimal JAIBA marker, or install the marker as AGENTS.jaiba.md to coexist) before continuing the rest of the bootstrap. It never inlines the full behavioral rules into the repo copy — behavior belongs to the global jaiba-contract.md.",
       "files": ["AGENTS.md"]
     },
     {
       "id": 3,
       "prompt": "can you scaffold jaiba into this project? I think someone may have started already",
-      "expected_output": "Repo already has a populated .ai/memory/constitution.md (real content, not bare template). Skill recognizes the project is already JAIBA-instrumented, refuses to re-scaffold/clobber, and routes the developer to update-brain (and/or planning/ask) instead.",
+      "expected_output": "Repo already has a populated .ai/memory/constitution.md (real content, not bare template). Skill recognizes the project is already JAIBA-instrumented, refuses to re-scaffold/clobber, and routes the developer to update-brain (and/or the conduct chain / ask) instead.",
       "files": [".ai/memory/constitution.md"]
     },
     {
@@ -24,10 +24,10 @@
       "name": "all-skillset-skills-already-global",
       "prompt": "Scaffold jaiba into this repo. It's a fresh Go service.",
       "context": {
-        "global_skills_state": "every skill listed in skills/scaffold/assets/skillset.txt (planning, specification, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) is already present in `npx skills list -g` output",
+        "global_skills_state": "every skill listed in skills/scaffold/assets/skillset.txt (conduct, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) is already present in `npx skills list -g` output",
         "repo_state": "no .ai/, no AGENTS.md"
       },
-      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed nothing -- not globally, not project-locally. Told the developer their global skillset already covers this project and pointed them at `npx skills update -g` to stay current. Continued the rest of the bootstrap (.ai/ skeleton, AGENTS.md, hand-off to update-brain:initialize and doctor). Closing report explicitly notes Case A (already global, nothing installed).",
+      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed no skills -- not globally, not project-locally. Told the developer their global skillset already covers this project and pointed them at `npx skills update -g` to stay current. Still performed the non-skill installs: .ai/ skeleton, global contract + minimal AGENTS.md marker, and the subagent battery check (installing any missing definitions). Hand-off to update-brain:initialize and doctor, with the toolchain probe pointed at the GLOBAL skills directory. Closing report explicitly notes Case A (already global, nothing installed).",
       "files": []
     },
     {
@@ -35,10 +35,10 @@
       "name": "missing-skills-offered-global-or-local",
       "prompt": "Set up jaiba here, this is a new TypeScript monorepo.",
       "context": {
-        "global_skills_state": "`npx skills list -g` returns only jaiba-scaffold -- none of the skillset.txt entries (planning, specification, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) are global yet",
+        "global_skills_state": "`npx skills list -g` returns only jaiba-scaffold -- none of the skillset.txt entries (conduct, ask, fast, update-brain, create-knowledge, jaiba-doctor, caveman) are global yet",
         "repo_state": "no .ai/, no AGENTS.md"
       },
-      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries with the chosen scope, then continues the rest of the bootstrap (.ai/ skeleton, AGENTS.md, hand-off to update-brain:initialize and doctor).",
+      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries with the chosen scope, then continues the rest of the bootstrap (.ai/ skeleton, global contract + marker, subagent battery, hand-off to update-brain:initialize and doctor).",
       "files": []
     },
     {
@@ -46,10 +46,21 @@
       "name": "mixed-global-and-local-after-choice",
       "prompt": "Yes, install the missing ones locally for this project.",
       "context": {
-        "prior_turn": "scaffold already ran `npx skills list -g` and found planning, specification, and ask already global, but fast, update-brain, create-knowledge, jaiba-doctor, and caveman missing -- and just asked the developer global vs. local for the missing ones",
-        "repo_state": ".ai/ skeleton and AGENTS.md not yet created"
+        "prior_turn": "scaffold already ran `npx skills list -g` and found conduct, ask already global, but fast, update-brain, create-knowledge, jaiba-doctor, and caveman missing -- and just asked the developer global vs. local for the missing ones",
+        "repo_state": ".ai/ skeleton and AGENTS.md marker not yet created"
       },
-      "expected_output": "Installed only the previously-missing skills (fast, update-brain, create-knowledge, jaiba-doctor, caveman) project-locally (no -g flag), one by one. Did not reinstall or duplicate planning, specification, or ask, which were already global. Continued the bootstrap: .ai/ skeleton, AGENTS.md, then handed off first to update-brain:initialize, and then to jaiba-doctor to run the first checkup (which probes the local machine toolchain against BOTH the project's local skills dir and the global skills dir). Closing report distinguishes which skills came from where.",
+      "expected_output": "Installed only the previously-missing skills (fast, update-brain, create-knowledge, jaiba-doctor, caveman) project-locally (no -g flag), one by one. Did not reinstall or duplicate conduct or ask, which were already global. Continued the bootstrap: .ai/ skeleton, global contract + minimal AGENTS.md marker, subagent battery, then handed off first to update-brain:initialize, and then to jaiba-doctor (which probes the toolchain against BOTH the project's local skills dir and the global skills dir). Closing report distinguishes which skills came from where.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "existing-drifted-global-contract",
+      "prompt": "bootstrap jaiba in this repo",
+      "context": {
+        "global_agent_config": "~/.claude/ already holds a jaiba-contract.md from an older framework version (content differs from the packaged assets/jaiba-contract.md)",
+        "repo_state": "no .ai/, no AGENTS.md"
+      },
+      "expected_output": "During step 3a, detected the existing global jaiba-contract.md differs from the packaged version. Did NOT silently overwrite the machine-wide file: asked the developer whether to update (back up theirs, install the packaged version) or keep theirs (noting jaiba-doctor will keep flagging the drift). Proceeded with the rest of the bootstrap either way, and the closing report records which choice was made.",
       "files": []
     }
   ]

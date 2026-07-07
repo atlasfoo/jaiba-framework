@@ -30,7 +30,15 @@ maintenance check and widened to cover subagents and hooks.
    agent folder:
    - **Skills** — every `<skills-dir>/**/SKILL.md` `requires:` block.
    - **Subagents** — every `<agent-folder>/agents/*.md` that carries a
-     `requires:` block.
+     `requires:` block. This includes the JAIBA battery `scaffold`
+     installs into the **global** agents folder (`executor-high/
+     medium/low`, `code-analyst`, `business-analyst`, `verify`) — the
+     global skills dir passed to the probe makes its parent's `agents/`
+     get scanned, so the battery's declared tools gain provenance rows
+     (`subagent:executor-high`, …) automatically. If the battery is
+     absent from a machine that has conduct installed, note it:
+     `execute` will fall back to sequential mode until `jaiba-scaffold`
+     reinstalls the definitions.
    - **Hooks** — the leading executable of each hook `command` in
      `<agent-folder>/settings.json` / `settings.local.json` (best-effort,
      `jq`-gated; hooks can run arbitrary shell, so only the invoked
@@ -63,7 +71,7 @@ maintenance check and widened to cover subagents and hooks.
 
 - The "Needed by" column is the whole point — carry it into the report.
   "`sonar-scanner` missing" is weaker than "`sonar-scanner` missing,
-  needed by skill:planning's quality gate."
+  needed by skill:conduct's quality gate."
 - The **fix** for a missing tool is an install, not another skill: say so
   plainly (e.g. "install `jq` — `brew install jq` / `apt install jq`").
   doctor doesn't install it for them.

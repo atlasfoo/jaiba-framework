@@ -1,8 +1,10 @@
 # Diagnostic 1 — Memory coherence
 
-**Question:** are the three long-term brain artifacts —
-`constitution.md`, `adr-log.md`, `reference-index.md` — complete, and
-consistent both with **each other** and with the **repository**?
+**Question:** are the behavioral contract (repo marker + global copy)
+and the constitutive brain artifacts — `constitution.md`,
+`adr-log.md`, `reference-index.md`, plus the append-only
+`.ai/memory/log/` — complete, and consistent both with **each other**
+and with the **repository**?
 
 This diagnostic is **read-only**. doctor never edits `.ai/memory/` — that
 is `update-brain`'s sole right (`AGENTS.md` §2.9). Every finding here
@@ -13,10 +15,44 @@ fix it.
 
 ## What to check
 
-Three layers, cheapest first. Stop escalating a given file once you've
+Four layers, cheapest first. Stop escalating a given file once you've
 found a Broken finding for it — the fix (`update-brain`) is the same
 regardless of how many more issues it has, and a deep audit is
 `update-brain`'s job, not doctor's.
+
+### Layer 0 — Behavioral contract (repo marker + global)
+
+The behavioral contract is split (per `jaiba-scaffold` step 3): a
+minimal `AGENTS.md` marker in the repo, and the actual rules in
+`jaiba-contract.md` inside the agent's **global** config folder
+(e.g. `~/.claude/`, `~/.agents/`). Check both halves:
+
+- **Repo marker.** `AGENTS.md` exists at the project root and points
+  to the global contract (or is a legacy full JAIBA protocol — see
+  below). Missing or unrelated → **Broken**; route to `jaiba-scaffold`
+  (it owns the coexist/replace decision).
+- **Global contract present.** `jaiba-contract.md` exists in the
+  global agent folder you located in the preconditions. A repo marker
+  pointing at a contract that isn't there means every session runs
+  ruleless → **Broken**; route to `jaiba-scaffold` (step 3a reinstall).
+- **Drift vs the packaged version.** Diff the installed copy against
+  this skill's own reference copy, `assets/jaiba-contract.md`
+  (kept in lockstep with the canonical copy scaffold ships):
+
+  ```bash
+  diff -q <global-agent-folder>/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
+  ```
+
+  Different → **Degraded**: the machine runs older (or hand-edited)
+  rules than the framework ships. Report *that* it drifted (quote the
+  version marker in the file's first line if present); the fix is
+  re-running `jaiba-scaffold` step 3a, which backs up and updates.
+  Don't overwrite it yourself — doctor routes.
+- **Legacy monolith.** A repo `AGENTS.md` that still contains the full
+  behavioral protocol (numbered rules, brain map) instead of the
+  minimal marker predates the global split → **Degraded**; works, but
+  drifts silently as the framework evolves. Route to `jaiba-scaffold`
+  step 3.
 
 ### Layer 1 — Completeness (per file)
 
@@ -54,6 +90,22 @@ agree. Look for contradictions such as:
 - **ADR log integrity.** IDs contiguous from `ADR-001`, no rewritten or
   deleted past entries, supersessions reference the old ID (per the adr
   template's rules). A broken chain is a finding.
+- **Curated vs chronological separation.** `adr-log.md` is *curated*
+  memory (decisions currently in force); `.ai/memory/log/` is the
+  *chronological* append-only record (work closures + brain
+  changelog), one file per entry named `<YYYY-MM-DD>-<slug>.md`.
+  Findings: work-history narrative accumulating inside `adr-log.md`
+  (belongs in `log/`); a structural decision that exists only as a
+  log entry with no ADR (should be proposed into `adr-log.md`); log
+  filenames that don't follow the dated naming; an accepted ADR whose
+  enactment has no `brain-change` log entry (the trail is broken).
+- **Old memory layout.** A `.ai/memory/archive/`, `.ai/specs/`, or
+  `.ai/session/` directory still present means the project predates
+  the `work/` + `memory/log/` layout — **Degraded**; route to
+  `update-brain` (update mode) and the framework README's manual
+  migration notes. Executive memory lives in `.ai/work/` and is
+  gitignored; a tracked `work/` (or a tracked plan/tasks/walkthrough
+  anywhere under `.ai/`) is a finding too.
 
 ### Layer 3 — Coherence with the repository (drift)
 
@@ -67,9 +119,10 @@ enough to catch obvious staleness, not a full re-analysis (that *is*
   a repo that's now mostly Go is loud drift.
 - **New external surfaces vs reference-index.** Scan config / compose /
   CI for services the index doesn't list — a `docker-compose.yml` with a
-  `postgres` service, an env var pointing at a new API, a CI step
-  invoking a scanner not in §4. Use `rg` for speed; don't read whole
-  files.
+  `postgres` service, an env var pointing at a new API, a cross-component
+  contract (event schema, internal API between sub-units) not in §3, a
+  CI step invoking a scanner not in §5. Use `rg` for speed; don't read
+  whole files.
 - **Recency signal.** If `git log` shows substantial structural change
   (new top-level dirs, a dependency added, CI reworked) landing *after*
   the brain files were last touched, that's a drift smell worth flagging

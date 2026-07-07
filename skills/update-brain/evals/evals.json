@@ -56,19 +56,20 @@
       "id": 3,
       "name": "update-apply-proposed-adr",
       "mode_under_test": "update",
-      "prompt": "Apply the ADR that the spec archive proposed for the itinerary permissions.",
+      "prompt": "Apply the ADR that the last work closure proposed for the itinerary permissions.",
       "context": {
         "memory_state": "populated",
-        "proposal_source": ".ai/memory/archive/specs/2026-05-30-collaborative-itineraries.md proposed 'Object permissions via django-guardian'",
+        "proposal_source": ".ai/memory/log/2026-05-30-collaborative-itineraries.md (kind: work-closure, written by conduct:summarize) proposed 'Object permissions via django-guardian'",
         "adr_log_state": "last entry is ADR-003"
       },
       "expected_output": [
-        "Located the proposal in the spec archive",
+        "Located the proposal in the work-closure entry under .ai/memory/log/",
         "Showed the change in prose and asked for confirmation BEFORE writing (propose -> confirm -> enact)",
         "Appended ADR-004 from the adr-log template, status flipped Proposed -> Accepted, dated today",
         "Added ADR-004 to the Decision Index table",
         "Did NOT edit or delete any prior ADR",
-        "Reported provenance (the spec archive it came from)"
+        "Recorded a brain-change entry in .ai/memory/log/ for the enactment, keeping the trail ADR <-> log intact",
+        "Reported provenance (the work-closure log entry it came from)"
       ],
       "files": []
     },
@@ -153,12 +154,12 @@
       "prompt": "Build the brain for this repo.",
       "context": {
         "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists (empty .ai/memory/, .ai/specs/, .ai/session/) but AGENTS.md is absent at the project root — likely a partial/manual setup, not a full jaiba-scaffold run",
+        "repo_state": ".ai/ skeleton exists (empty .ai/memory/ with log/, .ai/work/, .ai/vendored/) but AGENTS.md is absent at the project root — likely a partial/manual setup, not a full jaiba-scaffold run",
         "code_facts": ["Node.js Express API, package.json has test/lint scripts"]
       },
       "expected_output": [
         "Agent noticed AGENTS.md is missing entirely as part of its preconditions",
-        "Flagged that this project is missing the JAIBA behavioral contract and the rest of the skillset jaiba-scaffold installs",
+        "Flagged that this project is missing the JAIBA marker (and possibly the global behavioral contract and the rest of what jaiba-scaffold installs)",
         "Recommended jaiba-scaffold, but did not refuse outright",
         "Asked the developer whether to continue with initialize anyway (populate .ai/memory/ from the existing skeleton) or stop and run jaiba-scaffold first",
         "If the developer chose to continue, proceeded with the normal initialize evidence sweep (constitution, adr-log, reference-index from templates)",

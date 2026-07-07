@@ -71,9 +71,11 @@ get re-litigated.
 
 **Decision** — Adopt the JAIBA framework's `.ai/` brain structure:
 `AGENTS.md` at the repo root for agent behavior; `.ai/memory/` for
-long-term memory (`constitution.md`, this file, `reference-index.md`);
-`.ai/specs/` for mid-term product specifications; `.ai/session/` for
-short-term planning and execution artifacts.
+constitutive memory (`constitution.md`, this file,
+`reference-index.md`) plus the append-only chronological record
+`.ai/memory/log/`; `.ai/work/` for executive memory (PRD when
+produced, plan, tasks, walkthrough — gitignored, archived to
+`memory/log/` at close).
 
 **Alternatives Considered**
 - *No structured memory* (status quo): rejected; sessions lose

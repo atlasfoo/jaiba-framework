@@ -94,12 +94,13 @@ Quality Gate (§6), planning conventions (§7).
 
 ### `reference-index.md`
 
-Populate the two tiers (code-scope §1–§3, workflow tooling §4) from the
+Populate the two tiers (code-scope §1–§4, workflow tooling §5) from the
 sweep:
 
 - **Code-scope:** infra the code talks to at runtime, external APIs and
-  their *external* spec/docs surface, packages needing non-obvious
-  context.
+  their *external* spec/docs surface, internal cross-component contracts
+  (event schemas, internal APIs between sub-units of the same solution),
+  packages needing non-obvious context.
 - **Workflow tooling:** scanners / security / review agents found in CI
   or scriptfiles.
 - **Consumption points must be real.** Point an API at its OpenAPI /
@@ -136,7 +137,7 @@ End every `initialize` run with a short report:
    by surprise.
 3. **Next step** — if gaps remain, the developer resolves them (re-run
    the relevant questions or fill by hand). If the brain is clean, the
-   project is ready for `planning` / `specification`.
+   project is ready for the `conduct` chain.
 
 ## Common failure modes
 

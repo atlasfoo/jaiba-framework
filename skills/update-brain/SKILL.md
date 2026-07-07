@@ -1,6 +1,6 @@
 ---
 name: update-brain
-description: Long-term memory maintenance for JAIBA's `.ai/memory/`. Only skill allowed to write constitution.md, adr-log.md, reference-index.md. Two modes: initialize (analyze repo, populate brain), update (apply proposals, fix drift). Called by scaffold/planning:summarize/specification:archive handoffs.
+description: Long-term memory maintenance for JAIBA's `.ai/memory/`. Only skill allowed to write constitution.md, adr-log.md, reference-index.md; owns the append-only `.ai/memory/log/` changelog and all brain templates. Two modes: initialize (analyze repo, populate brain), update (apply proposals, fix drift). Called by scaffold and workflow-close handoffs.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -16,13 +16,13 @@ tags:
 
 The long-term memory workflow of the JAIBA framework. `update-brain` is
 the **only skill allowed to write `.ai/memory/`**. Everywhere else the
-brain is read-mostly: `planning:summarize` and `specification:archive`
-*propose* ADRs and brain changes, but they never enact them — they hand
+brain is read-mostly: `conduct:summarize` *proposes* ADRs and
+brain changes, but never enacts them — it hands
 off here (`AGENTS.md` §2.9, §5).
 
 It exists to close the learning loop at the **project** level. Where
-`planning:summarize` closes a single plan and `specification:archive`
-closes a single requirement, `update-brain` is what keeps the three
+`conduct:summarize` closes a single piece of work, `update-brain`
+is what keeps the three
 long-term artifacts — `constitution.md`, `adr-log.md`,
 `reference-index.md` — true to the repository over the project's life.
 
@@ -38,8 +38,8 @@ ambiguous, ask the developer instead of guessing.
 | Situation | Mode | Read |
 |---|---|---|
 | The brain does not exist yet (no `.ai/memory/*.md`, or the files are bare templates) and the developer wants it built — "set up jaiba", "build the brain", "onboard this repo", "update-brain initialize". Also: invoked by `scaffold` right after it lays the skeleton. | `initialize` | `references/initialize-mode.md` |
-| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `planning:summarize` / `specification:archive`, or **fix drift** ("the constitution is stale", "reconcile memory with the code") after the project evolved. | `update` | `references/update-mode.md` |
-| Anything else — a pure question about the brain (that's `ask`), or *implementing* code (that's `planning`/`fast`) | **Route, don't guess.** See "Hand-off" below. | — |
+| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the constitution is stale", "reconcile memory with the code") after the project evolved. | `update` | `references/update-mode.md` |
+| Anything else — a pure question about the brain (that's `ask`), or *implementing* code (that's `conduct`/`fast`) | **Route, don't guess.** See "Hand-off" below. | — |
 
 ## Universal Preconditions
 
@@ -84,9 +84,10 @@ hands off to `initialize`, which materializes them.
 
 | File written | Lives in | Template |
 |---|---|---|
-| `.ai/memory/constitution.md` | long-term memory | `assets/constitution-template.md` |
-| `.ai/memory/adr-log.md` | long-term memory | `assets/adr-log-template.md` |
-| `.ai/memory/reference-index.md` | long-term memory | `assets/reference-index-template.md` |
+| `.ai/memory/constitution.md` | constitutive memory | `assets/constitution-template.md` |
+| `.ai/memory/adr-log.md` | constitutive memory | `assets/adr-log-template.md` |
+| `.ai/memory/reference-index.md` | constitutive memory | `assets/reference-index-template.md` |
+| `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` | chronological record (append-only) | `assets/log-entry-template.md` |
 | `README.md` (repo root, *conditional*) | repo root | `assets/readme-skeleton.md` |
 
 **Use the templates verbatim** as the structure — the shared shape is
@@ -132,7 +133,7 @@ alone.
 - **Never delete or rewrite** a past ADR. Supersede it with a new entry
   that references the old one by ID (the template spells this out).
 - The usual source of new ADRs is a *proposal* from
-  `planning:summarize` or `specification:archive`; `update` applies it,
+  `conduct:summarize`; `update` applies it,
   flipping the status `Proposed → Accepted`.
 
 ### `reference-index.md` — external references
@@ -173,6 +174,36 @@ bundles, a physical copy of an API's OpenAPI/docs — live under
 `.ai/vendored/`, and an index entry points at that path. See the
 framework README for the folder's role.
 
+### `.ai/memory/log/` — the chronological record
+
+The brain has a fourth surface: an **append-only log**, one file per
+entry (`log/<YYYY-MM-DD>-<slug>.md`, shape in
+`assets/log-entry-template.md`). It fuses two streams into one
+timeline:
+
+- **`work-closure` entries** — written by the *workflow* close step
+  (`summarize`) when it archives the essence of `.ai/work/` before
+  clearing it. This is the one carve-out to "only update-brain writes
+  `.ai/memory/`": the close step appends here, and only here. The
+  three constitutive files above remain exclusively this skill's.
+- **`brain-change` entries** — written by *this skill*, one per
+  `update` run that enacts a change, recording what changed in the
+  constitutive memory and why. This is what makes brain evolution
+  auditable without diffing git history.
+
+Rules that keep the log trustworthy:
+
+- **Append-only.** Never rewrite, rename, or delete an entry. A
+  correction is a new entry pointing at the old one.
+- **The log is not the ADR log.** `adr-log.md` stays separate as
+  *curated* memory — decisions currently in force, explicitly
+  superseded. The log is *chronological* — what happened, in order.
+  Don't let decision records live only as log entries (propose an
+  ADR), and don't narrate work history inside `adr-log.md` (that
+  belongs here).
+- `initialize` creates nothing in `log/` — it starts empty and grows
+  as work closes and the brain evolves.
+
 ### The README
 
 The README is not in `.ai/memory/`, but JAIBA assigns it a role and
@@ -198,8 +229,8 @@ Behavior:
 
 ## The `[MISSING]` / `[NEEDS CLARIFICATION]` discipline
 
-This is where `update-brain` deliberately differs from `planning` and
-`specification`. Those skills *forbid* `[NEEDS CLARIFICATION]` in their
+This is where `update-brain` deliberately differs from `conduct`.
+That skill *forbids* `[NEEDS CLARIFICATION]` in their
 artifacts — they resolve doubts before writing. The brain can't always
 work that way: a brownfield project has facts that simply aren't
 derivable from code (the business objective, the downstream consumers,
@@ -239,7 +270,7 @@ Per `AGENTS.md` §3.5:
                                                           │
         ┌─────────────────────────────────────────────────┘
         ▼
-  [ project work: planning / specification ]
+  [ project work: conduct chain ]
         │  summarize / archive *propose* ADRs, refs, scope changes
         ▼
   update-brain:update ──(applies proposals, fixes drift)──▶ brain stays true
@@ -251,7 +282,7 @@ Per `AGENTS.md` §3.5:
   **not** manage the artifact templates — that is this skill's job. The
   boundary is a hand-off, never a cross-skill file path (skills package
   independently; see `state.md`).
-- **`planning:summarize` / `specification:archive` → `update`.** Both
+- **`conduct:summarize` → `update`.** It
   *propose* ADRs / reference-index entries / constitution changes and
   point the developer here. `update` is where those proposals are
   enacted.
@@ -267,8 +298,7 @@ Per `AGENTS.md` §3.5:
 | The developer now wants… | Route to |
 |---|---|
 | To just ask what the brain says, read-only | `ask` |
-| To plan/implement a code change | `planning` (or `fast` for a contained one) |
-| To formalize a new requirement | `specification` |
+| To plan/implement a code change or formalize a requirement | `conduct` (or `fast` for a contained one) |
 | To set up the `.ai/` skeleton from scratch | `scaffold` (which then calls back here) |
 
 ## Common failure modes

@@ -3,7 +3,7 @@
 # Two entry formats:
 #
 #   bare name       → skill from atlasfoo/jaiba-framework
-#                     e.g.  planning
+#                     e.g.  conduct
 #
 #   owner/repo      → all skills from an external GitHub repo
 #   owner/repo#skill → specific skill from an external GitHub repo
@@ -14,8 +14,7 @@
 # framework grows or external dependencies are added/removed.
 
 # ── JAIBA skills ──────────────────────────────────────────────────────
-planning
-specification
+conduct
 ask
 fast
 update-brain

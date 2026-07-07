@@ -1,9 +1,10 @@
 ---
 name: fast
 description: >-
-  Direct-execution workflow inside the JAIBA framework for small, well-scoped, low-risk changes that don't justify a full plan. Use this skill whenever the developer wants a quick, concrete change made now rather than planned. Trigger on explicit calls like "fast" / "/fast", and on phrases like "quick change", "make a quick adjustment", "update package X", "bump the version of Y", "small fix", "rename this", "quick fix", "just bump", "small change", "tweak this". Also trigger when the developer asks for an adjustment NOT contemplated by an active plan (e.g. "add a validation to the endpoint that was not in the plan", "add a quick check here"). This skill competes with `planning`: prefer `fast` for atomic, low-blast-radius edits, and defer to `planning` for anything that touches many files, changes public contracts, needs a migration, or warrants phase decomposition — `fast` itself will refuse over-large work and hand it to `planning`.
-version: 1.0.0
+  Implicit direct-execution lane of the JAIBA framework for small, well-scoped, low-risk changes that don't justify entering the conduct chain. Not user-invocable — the routing rule triggers it whenever the developer asks for a quick, concrete change made now rather than planned. Trigger on phrases like "quick change", "make a quick adjustment", "update package X", "bump the version of Y", "small fix", "rename this", "quick fix", "just bump", "small change", "tweak this". Also trigger when the developer requests a change NOT contemplated by an active plan (e.g. "add a validation to the endpoint that was not in the plan"). Runs the shared triage (`conduct/references/triage.md`) with default and floor `inline`: atomic, low-blast-radius edits execute on the spot; anything that triages `design` or deeper is surfaced and routed into the `conduct` chain — with an active plan, offering to fold the work in as a new phase or park-and-replan, never silently building a second plan.
+version: 2.0.0
 author: atlasfoo<iscomejia15@outlook.com>
+user-invocable: false
 requires:
   - git
 tags:
@@ -18,44 +19,61 @@ tags:
 Direct execution of a small, well-scoped, low-risk change — without
 writing a plan first. This is the sanctioned exception to the "no
 blind coding" rule (`AGENTS.md` §2.3), and it exists so that trivial
-work doesn't pay the overhead of the full `planning` cycle.
+work doesn't pay the overhead of the full `conduct` chain.
 
 Two things make `fast` safe rather than reckless:
 
 1. **It triages before it acts.** The skill first estimates the blast
-   radius of the change. If the work turns out to be larger than a
-   `fast` change should be, it *refuses* and routes the developer to
-   `planning` — better to hand off early than to half-apply a change
-   that needed a plan.
+   radius of the change using the framework's shared triage. If the
+   work turns out to be larger than `inline`, it *refuses* to edit and
+   routes the developer into the `conduct` chain — better to hand
+   off early than to half-apply a change that needed a design.
 2. **It keeps the brain honest.** When the change is an unplanned
-   adjustment to an *active* plan, `fast` records it into the session
-   artifacts — but only after the developer confirms the change is
-   correct, so the plan never drifts ahead of reality.
+   adjustment to an *active* plan, `fast` records it into the
+   executive artifacts in `.ai/work/` — but only after the developer
+   confirms the change is correct, so the plan never drifts ahead of
+   reality.
+
+## Invocation: implicit only
+
+`fast` is **not user-invocable** — there is no `/fast` command. The
+frontmatter declares `user-invocable: false` (on host agents that
+support the field; elsewhere, this section and the `description:` are
+the contract): the routing rule is the only way in. Whenever the
+developer's message is a **change request** — small on its face, or
+out-of-band relative to an active plan — the host agent routes it
+here. The two sibling lanes are `ask` (questions, also implicit) and
+`conduct` (`execute` for continuation cues; also the only lane
+that keeps an explicit `/conduct` override).
+
+Being implicit changes nothing about discipline: triage still runs
+first, and `fast` still refuses work that is bigger than it looks.
 
 ## The one rule: triage first
 
 Before reading or writing anything else, decide whether this change is
-`fast`-eligible at all. **Investigate scope before touching code** —
-a few surgical reads / greps to estimate how far the change reaches.
+`inline` at all. The blast-radius → depth logic is **shared with
+`conduct`** and lives in one place: the `conduct` skill's
+`references/triage.md` (installed alongside this skill). Read it when
+sizing a change. `fast` consumes it with these parameters:
 
-Quick guardrails (guidelines, not hard limits — surface borderline
-cases to the developer instead of deciding alone):
+| Parameter | Value | Meaning |
+|---|---|---|
+| Default | `inline` | assume contained; escalate only on evidence |
+| Floor | `inline` | `fast` may conclude "this is `design`/`spec` work" and hand off — it never produces executive artifacts of its own |
 
-| `fast`-eligible | Route to `planning` instead |
-|---|---|
-| ~1–3 files, contained blast radius | Many files / many lines |
-| No change to public contracts or APIs consumed elsewhere | Changes interfaces, signatures, schemas others depend on |
-| No data/schema migration that ripples | Needs a migration with downstream impact |
-| Dependency bump with no/contained breaking changes | Dependency upgrade whose breaking changes cascade through the code |
-| Completable and verifiable in a single focused pass | Needs phase decomposition or reversible checkpoints |
+In short, a change stays `inline` when all roughly hold: contained
+footprint (~1–3 files), no contract/API/schema change consumed beyond
+the change site, no migration ripple, verifiable atomically against
+the Quality Gate. Any of the `design` or `spec` signals in the shared
+triage pushes the work out of `fast`. **Investigate scope before
+touching code** — a few surgical reads / greps, per the triage's
+"estimate the blast radius cheaply" steps.
 
-If the change fails any right-column test, **stop and hand off** — see
-"Refusing gracefully" below. When in doubt, ask the developer; don't
-silently over- or under-scope (`AGENTS.md` §2.6).
-
-For the full heuristics, the `requests`-v5-style worked example, and
-how to estimate blast radius cheaply, read
-`references/complexity-triage.md`.
+If the change triages past `inline`, **stop and hand off** — see
+"Refusing gracefully" below. When in doubt, surface your estimate and
+ask the developer; don't silently over- or under-scope
+(`AGENTS.md` §2.6).
 
 ## Universal preconditions
 
@@ -65,7 +83,9 @@ how to estimate blast radius cheaply, read
 > the root of *this* project — where `.git/` lives — never a path
 > relative to this skill's own installation location.
 >
-> If `AGENTS.md` is missing/empty/not the JAIBA contract, or
+> If `AGENTS.md` is missing/empty/not JAIBA's (neither the minimal
+> marker pointing at the global JAIBA contract nor a legacy full
+> protocol), or
 > `.ai/memory/constitution.md` is still a bare `[bracket]` template,
 > this project isn't (fully) JAIBA-instrumented. `fast` doesn't block on
 > this — small, atomic changes are still in scope — but: fall back to
@@ -86,14 +106,14 @@ Context loaded depends on execution context — detect which applies (see
 3. **`.ai/memory/reference-index.md`** — only the entries the change
    touches. Skip entirely if the change touches no indexed integrations.
 
-**Plan adjustment** (`.ai/session/plan.md` exists and the change falls
+**Plan adjustment** (`.ai/work/plan.md` exists and the change falls
 within its scope):
 1. **`AGENTS.md`** — behavioral contract.
-2. **`.ai/session/plan.md`** and **`tasks.md`** — plan context and
+2. **`.ai/work/plan.md`** and **`tasks.md`** — plan context and
    Phase Gate commands (already embedded in `tasks.md § Gate Commands`).
 
 > For plan adjustments, `constitution.md` is not re-read. Gate commands
-> and TDD posture are available in the session files.
+> and TDD posture are available in the work files.
 
 Skip nothing within your applicable context — a "trivial" change
 against the wrong assumptions isn't trivial.
@@ -103,11 +123,12 @@ against the wrong assumptions isn't trivial.
 `fast` behaves slightly differently depending on whether it's
 free-standing or adjusting a live plan. Detect which one applies:
 
-- **Free-standing** — no `.ai/session/plan.md` exists, **or** one
+- **Free-standing** — no `.ai/work/plan.md` exists, **or** one
   exists but the requested change is unrelated to its scope. Example:
-  `/fast update requests to 2.32`. The change stands on its own.
+  *"bump requests to 2.32"* with no plan active. The change stands on
+  its own.
 
-- **Plan adjustment** — `.ai/session/plan.md` exists, is approved/
+- **Plan adjustment** — `.ai/work/plan.md` exists, is approved/
   executing, **and** the requested change falls inside or adjacent to
   the plan's scope but wasn't contemplated by it. Example, mid-plan:
   *"add a validation to the endpoint that was not in the plan"*.
@@ -118,18 +139,20 @@ pollute an unrelated plan or silently expand its approved scope.
 
 ## Flow
 
-1. **Triage.** (See above / `references/complexity-triage.md`.) If not
-   `fast`-eligible, refuse and route to `planning`. Stop here.
+1. **Triage.** (Shared triage, default/floor `inline` — see above.)
+   If the change is not `inline`, refuse and route: no active plan →
+   "Refusing gracefully" below; active plan → the **big out-of-band
+   change** procedure in `references/plan-adjustment.md`. Stop here.
 2. **Determine context.** Free-standing vs. plan adjustment (check
-   whether `.ai/session/plan.md` exists and the change is in scope).
+   whether `.ai/work/plan.md` exists and the change is in scope).
 3. **Read preconditions** per context (see "Universal preconditions"
    above). Gate commands come from `tasks.md § Gate Commands` for plan
    adjustments, and from `constitution.md §6` for free-standing changes.
 4. **For a plan adjustment, check the worktree.** A dirty worktree is
    *expected* if you're mid-phase — read `tasks.md` / `walkthrough.md`
    to confirm the dirt is the in-progress phase, not a surprise from
-   another session. If it looks unexpected, stop and ask
-   (`planning:execute` discipline).
+   another session. If it looks unexpected, stop and ask (same
+   discipline as `conduct`'s `execute` phase).
 5. **Execute atomically** (`AGENTS.md` §2.5). One logical change. If
    it breaks something unrelated, stop and surface it — do not stack
    fixes.
@@ -144,24 +167,24 @@ pollute an unrelated plan or silently expand its approved scope.
    Gate commands from `constitution.md §6`. If it fails and the fix
    isn't itself atomic, stop and surface it.
 7. **Record, per context:**
-   - **Free-standing:** write nothing to `.ai/session/`. The change
+   - **Free-standing:** write nothing to `.ai/work/`. The change
      plus git history is the record; give the developer a one-line
-     recap in chat. (Session artifacts belong to `planning`; creating
-     an orphan `walkthrough.md` with no plan would be cleaned up by
-     nothing.)
+     recap in chat. (Executive artifacts belong to `conduct`;
+     creating an orphan `walkthrough.md` with no plan would be cleaned
+     up by nothing.)
    - **Plan adjustment:** execute first, then **ask the developer to
      confirm the change is correct**. Only on confirmation, update the
-     session artifacts (`tasks.md`, `plan.md`, `walkthrough.md`). The
+     work artifacts (`tasks.md`, `plan.md`, `walkthrough.md`). The
      full procedure is in `references/plan-adjustment.md`.
 8. **Suggest a commit, don't run it.** Propose a conventional-commit
    message (`fix`, `chore`, `refactor`, `perf`, `docs`, …) inferred
    from the change. Run git only if the developer asks (`AGENTS.md`
-   restrictions; same policy as `planning`).
+   restrictions; same policy as `conduct`).
 
 ## Refusing gracefully
 
 Refusing is a feature, not a failure — it's how `fast` stays safe.
-When triage says the work is too big:
+When triage says the work is past `inline` and **no plan is active**:
 
 1. **Don't apply a partial change.** Leave the worktree as you found
    it.
@@ -169,29 +192,39 @@ When triage says the work is too big:
    many files, which contracts change, what migration is implied. A
    developer can't trust "this is too complex" — they can trust "this
    touches 14 call sites and changes the `Client.request` signature".
-3. **Route to `planning`.** Recommend `planning define`, and offer a
-   one-line sketch of what the plan would need to cover. Example:
+3. **Route into the `conduct` chain.** The triage depth carries
+   over (`design`: plan + tasks, no PRD; `spec`: PRD first), and so
+   does the blast-radius evidence you just gathered — the chain's
+   `spec` phase starts from it instead of re-investigating. Offer a
+   one-line sketch of what the design would need to cover. Example:
    > This change breaks the `Client.request` signature in 14 places and
-   > requires a config migration. This is `planning` work, not `fast`.
-   > Shall we build a plan with `planning define`?
+   > requires a config migration — that's `design`-depth work, not a
+   > quick change. Shall we design it properly? I'll carry over what I
+   > found.
+
+When triage says the work is past `inline` and **a plan is active**,
+don't just refuse — follow the big out-of-band procedure in
+`references/plan-adjustment.md`: surface the size, then offer to fold
+the work into the plan as a new phase or to park-and-replan. Never
+create a second plan silently.
 
 ## Asking the human
 
-Same discipline as `planning`: one topic per question, closed options
-when the answer space is closed, plain chat for open questions. Never
-guess business rules or invent conventions (`AGENTS.md` §2.6). The two
-moments `fast` most often needs the human:
+Same discipline as `conduct`: one topic per question, closed
+options when the answer space is closed, plain chat for open
+questions. Never guess business rules or invent conventions
+(`AGENTS.md` §2.6). The two moments `fast` most often needs the human:
 
-- **Borderline triage** — the change is right at the `fast`/`planning`
+- **Borderline triage** — the change is right at the `inline`/`design`
   boundary. Surface your blast-radius estimate and let the developer
   decide.
 - **Plan-adjustment confirmation** — after executing, before writing
-  to the session artifacts.
+  to the work artifacts.
 
 ## Language
 
 Per `AGENTS.md` §3.5: this skill and all framework source are English.
-Anything `fast` writes **into** session artifacts (`walkthrough.md`
+Anything `fast` writes **into** work artifacts (`walkthrough.md`
 notes, `plan.md` amendments) follows the language the developer is
 using in the session.
 
@@ -207,6 +240,11 @@ using in the session.
   plan adjustment, the confirmation gates the write — that's what
   keeps the plan from drifting ahead of approved reality.
 - **Orphaning a `walkthrough.md` on a free-standing change.** Free
-  `fast` writes nothing to `.ai/session/`.
+  `fast` writes nothing to `.ai/work/`.
+- **Building a second plan around out-of-band work.** With a plan
+  active, big out-of-band work has exactly two honest exits — fold it
+  in as a phase, or park-and-replan — both chosen by the developer,
+  in the open. A parallel plan silently forked next to the active one
+  is never an option.
 - **Running the Quality Gate "later".** A `fast` change is done when
   the gate is green, not when the edit is saved.

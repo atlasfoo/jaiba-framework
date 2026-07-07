@@ -6,8 +6,10 @@
 > changes nothing the workflow writes on disk beyond the contributions
 > declared here, and it requires no edit to any framework artifact.
 
-- **Hook:** <the workflow mode(s) this plugs into — `specification:define`,
-  `planning:define`, or both. Name the exact mode, not just the skill.>
+- **Hook:** <the `conduct` phase(s) this plugs into —
+  `conduct:spec` (define step), `conduct:spec` (design
+  step), `conduct:tasks`, `conduct:propose`, or a
+  combination. Name the exact phase (and step), not just the skill.>
 - **Modifier type:** <`input` | `output` | `both`>
 - **Trigger signal:** <the concrete cue that means "this plugin applies
   now". Be specific and matchable: a Linear issue reference like

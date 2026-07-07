@@ -19,9 +19,10 @@
 >
 > **Two tiers, in precedence order.** Entries fall into two classes and
 > the first outranks the second:
-> 1. **Code-scope references** (§1–§3) — infrastructure, external APIs,
->    and packages the *running code* depends on. These come first.
-> 2. **Workflow & verification tooling** (§4) — auxiliaries the
+> 1. **Code-scope references** (§1–§4) — infrastructure, external APIs,
+>    internal cross-component contracts, and packages the *running
+>    code* depends on. These come first.
+> 2. **Workflow & verification tooling** (§5) — auxiliaries the
 >    *development workflow* depends on (quality scanners, security
 >    audits, remote review agents). Secondary: useful, but the code
 >    runs without them.
@@ -70,7 +71,22 @@ Third-party HTTP APIs and their contracts.
 | [Stripe]    | [Payments]            | [URL: stripe.com/docs / MCP `stripe-mcp`]      | [`docs/openapi/stripe-v1.yaml`]          |
 | [Core API]  | [Internal upstream]   | [URL: internal repo link]                      | [`docs/openapi/core-api-v1.yaml`]        |
 
-## 3. Packages and SDKs (with non-obvious context)
+## 3. Internal Cross-Component Contracts
+
+Contracts between components of the *same* solution — a sibling
+package in the monorepo, another project in the `.sln`, a sister
+service of the same product. They are not third-party APIs (§2): both
+sides are under the team's control, but a change on one side still
+breaks the other, so the contract needs an explicit, consultable
+surface. From each sub-unit's point of view (constitution §5.1) these
+are external surfaces.
+
+| Contract           | Between            | How to consult                                  | Contract surface                       |
+|---|---|---|---|
+| [Itinerary events] | [`api` → `worker`] | [Spec at `packages/shared/events.schema.json`]  | [JSON Schema, versioned in-repo]       |
+| [Internal REST]    | [`web` → `api`]    | [Spec at `packages/api/openapi.yaml`]           | [OpenAPI, regenerated on build]        |
+
+## 4. Packages and SDKs (with non-obvious context)
 
 Only packages that require knowledge beyond standard usage. Routine
 framework dependencies stay in the project manifest.
@@ -80,7 +96,7 @@ framework dependencies stay in the project manifest.
 | [django-guardian]    | [Object-level permissions; non-default config in `settings/permissions.py`]      | [URL: django-guardian.readthedocs.io]         |
 | [@org/internal-sdk]  | [Internal fork with patched retry logic; do not upgrade without coordinating]    | [Repo URL / vendored at `.ai/vendored/internal-sdk.txt`] |
 
-## 4. Workflow & Verification Tooling
+## 5. Workflow & Verification Tooling
 
 Secondary references: tools the *development workflow* relies on, not
 the running code — static analysis, security scans, coverage gates,
@@ -98,7 +114,7 @@ this index records *where they are configured and how to invoke them*.
 > locate how it's configured or invoked, record `[MISSING]` and surface
 > it to the human.
 
-## 5. Business Documentation
+## 6. Business Documentation
 
 Product specs, glossaries, and other non-code sources of truth.
 
@@ -107,7 +123,7 @@ Product specs, glossaries, and other non-code sources of truth.
 | PRD MVP 1.0     | [Product requirements] | [`docs/business/mvp-requirements.md`] |
 | Data Dictionary | [Domain glossary]      | [`docs/business/data-dictionary.md`]  |
 
-## 6. Implementation Notes (Snippets)
+## 7. Implementation Notes (Snippets)
 
 Canonical examples for recurring patterns in this project.
 

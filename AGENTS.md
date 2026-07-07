@@ -35,26 +35,25 @@ graph TD
     subgraph Artifacts
         AA[ARTIFACTS]
 
-        AA --> AX([AGENTS.md])
+        AA --> AX([AGENTS.md — minimal repo marker])
+        AA --> AZ([jaiba-contract.md — global behavioral contract])
         AA --> AY([README.md])
-        AA --> AB[Memory]
-        AA --> AC[Spec]
-        AA --> AD[Session]
-        AA --> AE[Configuration]
+        AA --> AB[Constitutive memory  .ai/memory/]
+        AA --> AD[Executive memory  .ai/work/  — gitignored]
+        AA --> AE[Toolchain  .atl/ — gitignored]
 
-        AB --> AF([CONSTITUTION.md])
-        AB --> AG([adr_log.md])
-        AB --> AH([reference_index.md])
+        AB --> AF([constitution.md])
+        AB --> AG([adr-log.md — curated decisions])
+        AB --> AH([reference-index.md])
+        AB --> AM[log/ — append-only: closed work + brain changelog]
 
-        AC --> AI([PRD.md])
-        AC --> AJ([user-stories.md])
-
-        AJ -."each one generates one".-> AK
-
+        AD --> AI([PRD.md — only at spec depth])
         AD --> AK([plan.md])
-        AD --> AL([tasks.md])
-    end
+        AD --> AL([tasks.md — T-NNN graph: depends-on, load])
+        AD --> AN([walkthrough.md])
 
+        AE --> AO([tool-layout.md])
+    end
 
     subgraph skills
         A[SKILLS]
@@ -62,20 +61,32 @@ graph TD
         A --> C[Knowledge Skills]
         A --> D[Meta Skills]
 
-        B --> E([Spec])
-        B --> F([Plan])
-        B --> G([Fast])
-        B --> H([Ask])
+        B --> E([Conduct — SDD chain: propose → spec → tasks → execute → validate → summarize])
+        B --> G([Fast — implicit inline lane])
+        B --> H([Ask — implicit read-only lane])
         B --> I([Update Brain])
 
-        C --> J[[ASP.NET CORE best practices]]
-        C --> L[[How to TDD]]
+        C --> J[[e.g. ASP.NET CORE best practices]]
+        C --> L[[e.g. How to TDD]]
 
         D --> K[[Scaffold]]
-        D --> M[[Custom workflow creator]]
+        D --> N[[Doctor]]
+        D --> M[[Create-knowledge]]
+    end
+
+    subgraph subagents
+        S[SUBAGENT BATTERY — installed globally by scaffold]
+        S --> S1([executor-high / -medium / -low])
+        S --> S2([code-analyst])
+        S --> S3([business-analyst])
+        S --> S4([verify])
     end
 ```
 
+Routing (defined in the global contract, `jaiba-contract.md` §7):
+continuation cue → `conduct:execute` · question → `ask` · small
+contained change → `fast` · new work → the `conduct` chain.
+`/conduct [phase]` stays available as explicit override.
 
 ### File hierarchy
 
@@ -83,48 +94,58 @@ The final output of this framework are skills, template artifacts will be packag
 
 ```
 └── skills
-    ├── planning
+    ├── conduct
     │   ├── assets
+    │   │   ├── prd-template.md          (criteria as parseable schema)
     │   │   ├── plan-template.md
-    │   │   ├── tasks-template.md
+    │   │   ├── tasks-template.md        (T-NNN, depends-on, load)
     │   │   ├── walkthrough-template.md
-    │   │   └── plan-summary-template.md
-    │   ├── references     (one per mode: define, execute, summarize, cleanup)
+    │   │   └── plan-summary-template.md (log-entry compatible)
+    │   ├── references     (triage, subagents, one per phase: propose,
+    │   │                   spec, tasks, execute, validate, summarize)
     │   └── scripts
-    │       └── cleanup.sh
-    ├── specification
-    │   ├── assets
-    │   │   ├── prd-template.md
-    │   │   ├── user-stories-template.md
-    │   │   └── spec-archive-template.md
-    │   ├── references     (one per mode: brainstorm, define, archive)
-    │   └── scripts
-    │       └── archive.sh
-    ├── ask
-    ├── fast
+    │       └── archive.sh (moves closed work essence to .ai/memory/log/)
+    ├── ask                (implicit lane — no slash command)
+    ├── fast               (implicit lane — no slash command)
     ├── update-brain
     │   ├── assets
     │   │   ├── constitution-template.md
     │   │   ├── adr-log-template.md
     │   │   ├── reference-index-template.md
+    │   │   ├── log-entry-template.md
     │   │   └── readme-skeleton.md
     │   └── references     (one per mode: initialize, update)
-    ├── scaffold           (lays the .ai/ skeleton, then invokes
-    │                       update-brain:initialize — owns no templates)
+    ├── scaffold
+    │   └── assets
+    │       ├── jaiba-contract.md   (global behavioral contract — canonical)
+    │       ├── AGENTS.md           (minimal per-repo marker)
+    │       ├── agents/             (subagent battery: executors + specialists)
+    │       ├── skillset.txt
+    │       └── ai.gitignore / atl.gitignore
     ├── create-knowledge
     └── doctor
+        ├── assets
+        │   └── jaiba-contract.md   (lockstep reference copy for drift check)
+        ├── references     (memory-coherence, tool-state, reference-health)
+        └── scripts
+            └── check-tools.sh
 ```
 
 > The memory artifact templates are owned by `update-brain` (the only
 > skill that writes `.ai/memory/`). `scaffold` does not carry its own
 > copies: it creates the `.ai/` skeleton and hands off to
 > `update-brain:initialize`, which materializes the brain from those
-> templates.
+> templates. The behavioral contract is the inverse: `scaffold` owns
+> the canonical copy and `doctor` carries a lockstep reference copy —
+> keep both identical when the contract changes.
 
 
 ## 5. Project status
 
-Read project status and tasks at `.ai/session/state.md` when requested with a full plan.
+Read project status and tasks at `.ai/session/` (`plan.md`, `tasks.md`,
+`walkthrough.md`) when requested with a full plan. (This repo predates
+the `work/` layout its own skills now install; its in-flight session
+stays in `session/` until the active plan closes.)
 
 ## 6. Behavior
 

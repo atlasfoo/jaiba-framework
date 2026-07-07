@@ -4,13 +4,13 @@
     {
       "id": 1,
       "prompt": "Before I start planning the next feature, can you run a jaiba health check on this repo and tell me if anything's off?",
-      "expected_output": "Runs all three diagnostics in order. Memory coherence: reads the three .ai/memory files (here mostly complete) and reports them coherent. Tool state: runs the bundled check-tools.sh, refreshes .atl/tool-layout.md, reports tools present/missing with provenance. Reference health: walks reference-index.md, tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before planning.",
+      "expected_output": "Runs all three diagnostics in order. Memory coherence: Layer 0 first — repo AGENTS.md marker present, global jaiba-contract.md present and diffed against the bundled reference copy (no drift here); then the three .ai/memory files (mostly complete) plus the curated-vs-chronological separation (adr-log.md vs .ai/memory/log/) reported coherent. Tool state: runs the bundled check-tools.sh, refreshes .atl/tool-layout.md, reports tools present/missing with provenance including subagent:* rows from the installed battery. Reference health: walks reference-index.md, tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before entering the conduct chain.",
       "files": []
     },
     {
       "id": 2,
       "prompt": "Something feels stale about jaiba here. Can you check it?",
-      "expected_output": "Finds drift: the constitution claims one stack but the manifest shows another (or names a service with no reference-index entry), and/or the brain still has unfilled [brackets]/[MISSING]. Reports these as evidenced findings and routes the fix to update-brain (update mode for drift, initialize if a file is a bare template) — it does NOT rewrite .ai/memory/ itself. If the tool probe finds a missing CLI, flags it with its 'Needed by' provenance and prescribes an install. Report leads with the most severe (Broken) findings.",
+      "expected_output": "Finds drift: the constitution claims one stack but the manifest shows another (or names a service with no reference-index entry), and/or the brain still has unfilled [brackets]/[MISSING]. Reports these as evidenced findings and routes the fix to update-brain (update mode for drift, initialize if a file is a bare template) — it does NOT rewrite .ai/memory/ itself. If the tool probe finds a missing CLI, flags it with its 'Needed by' provenance and prescribes an install. If old-layout directories survive (.ai/session/, .ai/specs/, .ai/memory/archive/), reports them as Degraded with the manual migration route. Report leads with the most severe (Broken) findings.",
       "files": []
     },
     {
@@ -27,14 +27,25 @@
     },
     {
       "id": 5,
-      "name": "tool-state-covers-global-skills",
+      "name": "tool-state-covers-global-skills-and-battery",
       "prompt": "Run a jaiba health check before I start planning.",
       "context": {
-        "skill_install": "split — planning, specification, ask, fast, and update-brain are installed GLOBALLY (~/.claude/skills/), while create-knowledge and jaiba-doctor are project-local (.claude/skills/)",
+        "skill_install": "split — conduct, ask, fast, and update-brain are installed GLOBALLY (~/.claude/skills/), while create-knowledge and jaiba-doctor are project-local (.claude/skills/); the subagent battery lives in ~/.claude/agents/",
         "repo_state": ".ai/memory/ fully populated and coherent",
         "tooling": "one of the globally-installed skills declares `requires: [jq]`, and `jq` is not on PATH"
       },
-      "expected_output": "In preconditions, located BOTH the project-local skills dir (.claude/skills) AND the global skills dir (~/.claude/skills) -- did not scan only the project-local one. Ran check-tools.sh with both paths joined by ':'. Tool-state diagnostic reports `jq` as missing with provenance pointing at the global skill that declares it (e.g. 'skill:planning'), not just project-local skills. .atl/tool-layout.md refreshed and lists tools/skills from both locations. Final report leads with the missing jq finding (Broken) and prescribes an install, not a reinstall of the skill.",
+      "expected_output": "In preconditions, located BOTH the project-local skills dir (.claude/skills) AND the global skills dir (~/.claude/skills) -- did not scan only the project-local one. Ran check-tools.sh with both paths joined by ':'. Tool-state diagnostic reports `jq` as missing with provenance pointing at the global skill that declares it (e.g. 'skill:conduct'), not just project-local skills. Because the global agent folder was in play, the battery's agents/*.md requires: blocks were scanned too and appear as subagent:executor-high etc. in the layout. .atl/tool-layout.md refreshed and lists tools/skills from both locations. Final report leads with the missing jq finding (Broken) and prescribes an install, not a reinstall of the skill.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "global-contract-drift-detected",
+      "prompt": "check jaiba health",
+      "context": {
+        "repo_state": "AGENTS.md is the minimal JAIBA marker; .ai/memory/ populated and coherent",
+        "global_agent_config": "~/.claude/jaiba-contract.md exists but was hand-edited months ago — its content differs from doctor's bundled assets/jaiba-contract.md reference copy"
+      },
+      "expected_output": "Layer 0 of memory coherence diffs the installed global contract against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-scaffold step 3a (backup + update) — doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
       "files": []
     }
   ]
