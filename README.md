@@ -24,38 +24,31 @@
   - [What is JAIBA?](#what-is-jaiba)
     - [Core principles](#core-principles)
   - [System architecture](#system-architecture)
+  - [🧭 Routing: one chain, two lanes](#-routing-one-chain-two-lanes)
   - [🧠 Memory structure: the agent's brain](#-memory-structure-the-agents-brain)
-    - [`AGENTS.md` — Behavior guidelines](#agentsmd--behavior-guidelines)
-    - [`memory/` — Long-term memory](#memory--long-term-memory)
+    - [The behavioral contract: global + repo marker](#the-behavioral-contract-global--repo-marker)
+    - [`memory/` — Constitutive memory](#memory--constitutive-memory)
       - [`constitution.md`](#constitutionmd)
       - [`adr-log.md`](#adr-logmd)
       - [`reference-index.md`](#reference-indexmd)
-      - [`archive/plans/`](#archiveplans)
-    - [`specs/` — Mid-term memory](#specs--mid-term-memory)
-      - [`PRD.md` (Product Requirements Document)](#prdmd-product-requirements-document)
-      - [`user-stories.md`](#user-storiesmd)
-    - [`session/` — Short-term memory](#session--short-term-memory)
-      - [`plan.md`](#planmd)
-      - [`tasks.md`](#tasksmd)
-      - [`walkthrough.md`](#walkthroughmd)
-      - [`<slug>-summary.md`](#slug-summarymd)
+      - [`log/`](#log)
+    - [`work/` — Executive memory](#work--executive-memory)
     - [`vendored/` — Local copies of external references](#vendored--local-copies-of-external-references)
   - [⚙️ Skills: the workflows](#️-skills-the-workflows)
-    - [📋 `skill: planning`](#-skill-planning)
-    - [📐 `skill: specification`](#-skill-specification)
-    - [🔄 `skill: update-brain`](#-skill-update-brain)
-    - [⚡ `skill: fast`](#-skill-fast)
-    - [💬 `skill: ask`](#-skill-ask)
-    - [🩺 `skill: doctor`](#-skill-doctor)
+    - [🎼 `conduct` — the SDD chain](#-conduct--the-sdd-chain)
+    - [⚡ `fast` — implicit inline lane](#-fast--implicit-inline-lane)
+    - [💬 `ask` — implicit read-only lane](#-ask--implicit-read-only-lane)
+    - [🔄 `update-brain`](#-update-brain)
+    - [🩺 `jaiba-doctor`](#-jaiba-doctor)
+    - [🏗️ `jaiba-scaffold`](#️-jaiba-scaffold)
+  - [🤖 The subagent battery](#-the-subagent-battery)
   - [Typical workflow](#typical-workflow)
   - [Design philosophy](#design-philosophy)
-    - [The agent as co-pilot, not pilot](#the-agent-as-co-pilot-not-pilot)
-    - [Memory as a first-class citizen](#memory-as-a-first-class-citizen)
-    - [Workflows as contracts](#workflows-as-contracts)
   - [Usage examples](#usage-examples)
-    - [Example 1 — `skill: specification` · New requirement](#example-1--skill-specification--new-requirement)
-    - [Example 2 — `skill: planning` within an active spec](#example-2--skill-planning-within-an-active-spec)
-    - [Example 3 — `skill: planning` standalone (outside a spec)](#example-3--skill-planning-standalone-outside-a-spec)
+    - [Example 1 — Deep requirement (spec depth: PRD + plan)](#example-1--deep-requirement-spec-depth-prd--plan)
+    - [Example 2 — Executing with subagent waves](#example-2--executing-with-subagent-waves)
+    - [Example 3 — Shallow change (design depth: plan only)](#example-3--shallow-change-design-depth-plan-only)
+  - [Migrating from the pre-conduct layout](#migrating-from-the-pre-conduct-layout)
   - [Glossary](#glossary)
 
 
@@ -69,8 +62,7 @@ Install all JAIBA skills globally so they are available across all your projects
 
 ```bash
 npx skills add atlasfoo/jaiba-framework --skill jaiba-scaffold -g
-npx skills add atlasfoo/jaiba-framework --skill planning -g
-npx skills add atlasfoo/jaiba-framework --skill specification -g
+npx skills add atlasfoo/jaiba-framework --skill conduct -g
 npx skills add atlasfoo/jaiba-framework --skill update-brain -g
 npx skills add atlasfoo/jaiba-framework --skill fast -g
 npx skills add atlasfoo/jaiba-framework --skill ask -g
@@ -100,12 +92,11 @@ Navigate to the root of your project and invoke the scaffold skill to set up the
 *Or simply: "set up jaiba in this project" or "bootstrap jaiba"*
 
 The scaffold will:
-- Create the `.ai/` brain skeleton and its structure
-- Generate the `AGENTS.md` behavioral guidelines
-- Set up `.gitignore` for the brain folder
-- Probe your local toolchain and record available tools
-
-Once the scaffold is complete, it will hand over to `update-brain:initialize` to analyze your repository and populate the long-term memory.
+- Create the `.ai/` brain skeleton (`memory/` + `memory/log/`, `work/`, `vendored/`) and its `.gitignore`
+- Install the **global JAIBA Behavioral Contract** (`jaiba-contract.md`) into your agent's user-level config — once per machine
+- Drop the minimal `AGENTS.md` marker at the repo root
+- Install the **subagent battery** (executors + specialists) into your agent's global `agents/` folder
+- Hand off to `update-brain:initialize` to populate the long-term memory, and then to `jaiba-doctor` for the first health check and toolchain probe (`.atl/tool-layout.md`)
 
 ### Alternative: Project-scoped installation
 
@@ -169,267 +160,168 @@ JAIBA starts from a simple premise: **the code is the context**, and the agent m
 
 ## System architecture
 
-JAIBA organizes its operation in two layers: the **memory structure** (the agent's brain) and the **skills library** (the executable workflows).
+JAIBA organizes its operation in three layers: the **memory structure** (the agent's brain), the **skills library** (the executable workflows), and the **subagent battery** (delegated execution).
 
 ```
+~/.claude/  (or your agent's global config)
+├── jaiba-contract.md                   ← Global behavioral contract (one per machine)
+├── skills/                             ← JAIBA skills, installed globally
+└── agents/                             ← Subagent battery: executor-high/-medium/-low,
+                                          code-analyst, business-analyst, verify
+
 project/
-├── AGENTS.md                           ← Agent behavior guidelines
+├── AGENTS.md                           ← Minimal marker: points at the global contract
 ├── .ai/                                ← Agent brain
-│   ├── memory/                         ← Long-term memory
-│   │   ├── constitution.md             ← Project executive summary
-│   │   ├── adr-log.md                  ← Architectural decision history
-│   │   ├── reference-index.md          ← Index of dependencies and external APIs
-│   │   └── archive/                    ← Archived summaries of closed work
-│   │       ├── plans/                   ← Closed plan summaries (planning:cleanup)
-│   │       │   └── YYYY-MM-DD-slug.md
-│   │       └── specs/                   ← Delivered spec archives (specification:archive)
-│   │           └── YYYY-MM-DD-spec-slug.md
-│   ├── specs/                          ← Mid-term memory
-│   │   └── [spec-name]/
-│   │       ├── PRD.md                  ← Formalized business requirement
-│   │       └── user-stories.md         ← User story checklist
-│   ├── session/                        ← Short-term memory
-│   │   ├── plan.md                     ← Active plan
-│   │   ├── tasks.md                    ← Task checklist
-│   │   ├── walkthrough.md              ← Session log
-│   │   └── <slug>-summary.md           ← Plan summary, until cleanup archives it
+│   ├── memory/                         ← Constitutive memory (versioned)
+│   │   ├── constitution.md             ← Project identity, stack, quality gate
+│   │   ├── adr-log.md                  ← Curated decisions in force
+│   │   ├── reference-index.md          ← External surfaces + internal cross-component contracts
+│   │   └── log/                        ← Append-only: closed work + brain changelog
+│   │       └── YYYY-MM-DD-slug.md
+│   ├── work/                           ← Executive memory (gitignored)
+│   │   ├── PRD.md                      ← Only when triage demands spec depth
+│   │   ├── plan.md                     ← Active design
+│   │   ├── tasks.md                    ← T-NNN task graph (depends-on, load)
+│   │   └── walkthrough.md              ← Change-by-change narrative
 │   └── vendored/                       ← Local copies of external references
-│       ├── stripe-openapi.yaml          ← e.g. a vendored API contract
-│       └── internal-sdk.txt             ← e.g. a Repomix bundle of a dependency
+├── .atl/                               ← Toolchain layer (gitignored)
+│   └── tool-layout.md                  ← Machine probe written by jaiba-doctor
 └── src/ ...                            ← Your project
 ```
 
 ---
 
+## 🧭 Routing: one chain, two lanes
+
+Since the conduct unification, the developer **does not choose between commands**. The global contract defines a routing rule the agent applies to every message:
+
+| Your message is… | The framework routes to |
+|---|---|
+| A continuation cue with active work ("continue", "next", "go") | `conduct`, phase `execute` |
+| A question (code, active work, past decisions) | `ask` — read-only |
+| A small contained change ("quick fix", "bump X") | `fast` — inline lane |
+| New work to shape or plan | the `conduct` chain (entry phase per triage) |
+
+`ask` and `fast` are **implicit-only**: they have no slash commands. `conduct` keeps `/conduct [phase]` as a deterministic override for when routing misfires or you want to force a phase. The meta-skills (`/jaiba-scaffold`, `/jaiba-doctor`) remain explicit.
+
+A single **triage** (shared by the chain and `fast`) maps each change's blast radius to a depth on the continuum `inline → design → spec`: an atomic edit executes on the spot; a bounded change gets a plan; a multi-faceted requirement gets a PRD *and* a plan. A critical-library bump or a performance fix does **not** produce a PRD — depth follows blast radius, not ceremony.
+
+---
+
 ## 🧠 Memory structure: the agent's brain
 
-The `.ai/` folder is the core of JAIBA. It functions as the agent's persistent memory, divided into three time horizons: long-, mid-, and short-term.
+The `.ai/` folder is the core of JAIBA. Memory collapses into **two categories**:
 
----
+- **Constitutive** — who the project is: identity, decisions, external surfaces. Stable, versioned, in `.ai/memory/`.
+- **Executive** — what is being done right now: PRD (if any), plan, tasks, walkthrough. Ephemeral per piece of work, gitignored, in `.ai/work/`.
 
-### `AGENTS.md` — Behavior guidelines
+### The behavioral contract: global + repo marker
 
-Located at the project root, `AGENTS.md` is the agent's entry point: the file that defines **how it should behave**, what tools it can use, what conventions it must respect, and how it should interact with the human.
+Behavior does not live per-repo anymore. `jaiba-scaffold` installs the **JAIBA Behavioral Contract** (`jaiba-contract.md`) once per machine into the agent's global config: the brain map, the numbered behavioral rules, the routing rule, security and toolchain discipline. Each repo keeps only a **minimal `AGENTS.md` marker** that confirms instrumentation and defers to the global contract for behavior and to the constitution for project facts.
 
-Its role is **behavior configuration, not project context**. Project information (architecture, stack, decisions) lives in `.ai/memory/constitution.md`. `AGENTS.md` points there and is deliberately kept short, establishing only the operating rules.
+`jaiba-doctor` checks the contract's presence and drift against the packaged version on every health check.
 
-Typical structure of an `AGENTS.md` in JAIBA:
-
-```markdown
-# AGENTS.md
-
-## General behavior
-- Always operate within the active skill and its declared mode
-- Do not modify code outside the scope agreed upon in the active plan or spec
-- When in doubt, use `skill: ask` before executing
-
-## Project context
-The full project context (architecture, stack, conventions, and dependencies)
-is in `.ai/memory/constitution.md`. Read it at the start of each session.
-
-## Memory and learning
-- Consult `.ai/memory/` before proposing solutions
-- Record relevant decisions in `session/walkthrough.md`
-- Propose updates to the brain when closing plans or specs
-
-## Restrictions
-- Do not install new dependencies without explicit human approval
-- Do not commit or push autonomously (do so only if the developer explicitly asks)
-- Maintain the agreed scope; if you detect out-of-scope work, notify before proceeding
-```
-
-> `AGENTS.md` is the agent's operating contract with the team. It should be the first read for any agent joining the project.
-
----
-
-### `memory/` — Long-term memory
-
-Contains the structural and permanent knowledge of the project. It is the first thing the agent consults when starting any workflow.
+### `memory/` — Constitutive memory
 
 #### `constitution.md`
-The project's **executive summary**. Answers the most important questions about the system at a glance:
-
-- What does this project do and for whom?
-- What is its technology stack and architecture?
-- What are the team's conventions and scope rules?
-- How does it interact with external systems?
-- What is the project's stance on TDD and other planning conventions?
-
-> It is the equivalent of the technical README a new developer should read before making their first commit.
+The project's **executive summary**: what the system does and for whom, stack and architecture, team conventions, sub-unit scopes (for monorepos / multi-project solutions), and the **Quality Gate**. Authoritative on project specifics.
 
 #### `adr-log.md`
-The project's **architectural decision history** (Architecture Decision Records). Each entry records:
-
-- The decision made
-- The context that motivated it
-- The alternatives considered
-- The expected consequences
-
-> Allows the agent to understand *why* the project is the way it is, not just *how* it is.
+The **curated** decision memory: Architecture Decision Records currently in force — decision, context, alternatives, consequences. Superseded entries are marked, never deleted.
 
 #### `reference-index.md`
-The **index of external dependencies**: integrated APIs, key packages, third-party services, and important libraries. For each entry it documents its purpose, where it is configured, and how it is used within the project.
+The index of **external surfaces** — APIs, packages, services — plus **internal cross-component contracts** (event schemas, APIs between sub-units). Each entry documents purpose, consultation method, and, when vendored, its local copy path.
 
-> Prevents the agent from "reinventing" integrations that already exist or using incorrect versions.
->
-> When a reference is stored locally rather than fetched live, the entry points at its copy under `.ai/vendored/` (see below).
+#### `log/`
+The **chronological** memory: an append-only record fusing closed work and the brain's changelog, one dated file per entry (`YYYY-MM-DD-slug.md`, kinds `work-closure` and `brain-change`). Where `adr-log.md` answers "what do we hold true today", `log/` answers "what happened, in order". Written by `conduct:summarize` (work closures) and `update-brain` (brain changes) — the framework's one sanctioned carve-out to the "only `update-brain` writes memory" rule.
 
-#### `archive/plans/`
-**Archived summaries** of already-closed plans. Each file is the output of the `planning:summarize` skill, archived by the `cleanup` mode in the format `YYYY-MM-DD-<slug>.md`. They function as the project's historical log: a developer (human or agent) can browse this directory to understand what was done, when, and why, without having to reconstruct it from commits.
+### `work/` — Executive memory
 
-> Summaries are written to be concise by design — the live detail lives in `walkthrough.md` during the session; what survives the close is the distilled version.
+The active piece of work, gitignored (multi-session; plan phases are the checkpoints):
 
----
+| File | Produced by | Purpose |
+|---|---|---|
+| `PRD.md` | `spec` phase (only at spec depth) | The *what/why*: business problem + acceptance criteria `<PREFIX>-NNN` in Given/When/Then happy/sad, serialized as a parseable schema the `verify` subagent consumes. |
+| `plan.md` | `spec` phase (design) | The approved design: objective, scope, technical approach, amendments. |
+| `tasks.md` | `tasks` phase | The work graph: tasks with IDs `T-NNN`, `depends-on`, cognitive `load` (high/medium/low), and covered criteria — the input for parallel execution waves. |
+| `walkthrough.md` | `execute` phase | Change-by-change narrative: what, why, deviations, ADR candidates. |
 
-### `specs/` — Mid-term memory
-
-Stores the project's active specifications, generated through the **Specification** workflow. Each spec lives in its own folder and represents a unit of work oriented around a business requirement.
-
-```
-specs/
-└── oauth-authentication/
-    ├── PRD.md              ← Formalized business requirement
-    └── user-stories.md     ← User story checklist
-```
-
-#### `PRD.md` (Product Requirements Document)
-Defines the **what and why** of the requirement: the business problem, acceptance criteria, assumptions, and constraints.
-
-#### `user-stories.md`
-Breaks the PRD down into **concrete user stories**, each a deliverable increment (a screen, an endpoint, an improvement, a fix). Every story is numbered `<PREFIX>-NNN` (a short uppercase prefix unique to the spec) and carries acceptance criteria split into **happy path** and **sad paths** as Given/When/Then — the direct input to business design and integration tests. Functions as a progress checklist during implementation: `planning:summarize` flips each story to `[x]` as plans deliver it.
-
-> A spec can span multiple work sessions. It remains active until all its stories are delivered and `specification:archive` closes it.
-
----
-
-### `session/` — Short-term memory
-
-Contains the artifacts of the **Planning** workflow: the immediate working context for a session or bounded sprint. It is independent of the Specification workflow and focuses on tactical execution.
-
-#### `plan.md`
-The active work plan: session objective, relevant context, and scope agreed upon with the human.
-
-#### `tasks.md`
-The list of concrete tasks derived from the plan, organized in **phases with architectural cohesion**. Each phase declares its dependencies and leaves the code in a reversible, buildable state (suitable for a `chore(wip)` commit if the developer prefers).
-
-#### `walkthrough.md`
-The narrative record of the session: decisions made, problems encountered, and the agent's reasoning. Updated when closing each phase, not task by task. Serves as a log for human review and as a source for building the final summary.
-
-#### `<slug>-summary.md`
-The plan summary, produced by `planning:summarize` when all tasks are complete. It lives temporarily in `session/` so the developer can review it alongside the rest of the session material, and is then moved to `.ai/memory/archive/plans/` by the `cleanup` mode.
-
-> Files in `session/` are **ephemeral**: when `planning:cleanup` runs, the summary is archived in `memory/` and the other files are deleted, leaving the space ready for the next plan.
-
----
+When the work closes, `conduct:summarize` distills the essence into `.ai/memory/log/` and cleans `work/` — in a single, human-confirmed step.
 
 ### `vendored/` — Local copies of external references
 
-Not a memory horizon, but a **store** that backs `reference-index.md`. When an external reference can't (or shouldn't) be fetched live every time it's needed, a local copy is kept here and the index entry points at it.
-
-Typical contents:
-
-- **Vendored API contracts** — a physical copy of a third-party or internal API's OpenAPI/GraphQL spec or docs, so the agent reads the contract from disk instead of guessing at it.
-- **Repomix (or similar) bundles** — a compressed, single-file snapshot of a dependency's source or documentation, useful for libraries with non-obvious usage or internal forks.
-
-The reference-index's *"Vendored at `<path>`"* consultation method always resolves to a path under `.ai/vendored/`. Keeping these copies in-repo means the agent's understanding of an external surface is **versioned alongside the code** — it doesn't drift when the upstream changes, and it works offline.
-
-> Populated and curated by `update-brain`, which records the pointer in `reference-index.md`. The `doctor` skill checks that each vendored path the index references actually exists, and warns when a vendored copy is more than a month old (using git to read its last-commit date) so a stale snapshot gets re-vendored.
+Not a memory category, but a **store** backing `reference-index.md`. When an external reference can't (or shouldn't) be fetched live — an OpenAPI contract, a Repomix bundle of a dependency — a copy lives here and the index entry points at it. Versioned alongside the code; `jaiba-doctor` warns when a vendored copy goes stale (older than a month by git date).
 
 ---
 
 ## ⚙️ Skills: the workflows
 
-Skills are the agent's executable capabilities within JAIBA. Each skill implements a specific workflow with well-defined modes, clear transitions, and human validation checkpoints.
+### 🎼 `conduct` — the SDD chain
 
----
+The unified workflow (it absorbed the former `planning` and `specification` skills). One chain of Spec Driven Development phases; the triage decides how deep each change enters:
 
-### 📋 `skill: planning`
+| Phase | Artifact | What happens |
+|---|---|---|
+| **`propose`** *(optional)* | — (conversational) | Shape a fuzzy requirement: questions, ambiguities, scope. Persists nothing; flows into `spec`. |
+| **`spec`** | `PRD.md` (spec depth only) + `plan.md` (always) | *Define*: PRD with numbered, parseable acceptance criteria — only when triage demands it. *Design*: the plan. Ends at **explicit human approval** of the design. |
+| **`tasks`** | `tasks.md` | Decompose the design into a task graph: `T-NNN`, `depends-on`, `load`, covered criteria. Phases act as multi-session checkpoints with their own gate. |
+| **`execute`** *(implicit)* | `walkthrough.md` | Advance the work — directly or by delegating task waves to the executor subagents. Triggered by continuation cues; no command needed. |
+| **`validate`** | — | Run the plan's quality gate and check acceptance criteria one by one (delegating to the `verify` subagent when available), reporting met/unmet per criterion. |
+| **`summarize`** | log entry in `.ai/memory/log/` | Single closing step: present the final summary, propose ADRs/constitution changes for `update-brain`, archive the essence, clean `work/` — one confirmation. |
 
-The tactical work workflow. Designed for concrete tasks that do not require a full formal specification, but do require organization and traceability.
+> **Golden rules:** the human approves the design before anything executes; execution pauses at phase boundaries; the plan never silently drifts — structural deviations amend `plan.md` explicitly.
 
-| Mode | Description |
-|---|---|
-| **`define`** | The agent collaborates with the human to define the objective, scope, and tasks of the plan. It investigates the code, detects discrepancies between the prompt/spec and the repository's reality, asks questions to resolve them, and generates `plan.md` and `tasks.md`. |
-| **`execute`** *(implicit)* | The agent works through the tasks in the active plan, phase by phase. No explicit invocation is required: it activates when there is an approved plan and the developer's message is a continuation signal (`continue`, `next`, `proceed`). Updates `tasks.md` and `walkthrough.md`, suggests a `chore(wip)` commit at the close of each phase, and pauses at each phase boundary for human review. |
-| **`summarize`** | The agent closes the plan: produces `<slug>-summary.md` with the distilled result of the work, evaluates whether any decision warrants an ADR entry (proposes it, does not write it), and suggests a final commit message in conventional commit format. |
-| **`cleanup`** | The agent archives the summary to `.ai/memory/archive/plans/<YYYY-MM-DD>-<slug>.md` and empties `.ai/session/`. This is destructive: it requires explicit human confirmation. |
+### ⚡ `fast` — implicit inline lane
 
-> **Golden rules of planning:**
-> - The human must approve the plan before the agent enters `execute` mode. Nothing is executed without a validated plan.
-> - Before each `execute` phase, the agent reviews `git status` and suggests starting with a clean worktree.
-> - `summarize` and `cleanup` are separate steps by design: the developer must be able to read the summary before the session is destroyed.
+Direct execution for small, well-scoped, low-risk changes — the sanctioned exception to "no blind coding". Not user-invocable: the routing rule triggers it on "quick fix" / "bump X" / "rename this" style requests.
 
----
+- **Shares conduct's triage** with default and floor `inline`: if the change triages `design` or deeper, `fast` refuses and routes into the chain.
+- **Free-standing:** acts directly, writes nothing to `.ai/work/`; git history plus a one-line recap is the record.
+- **Plan adjustment:** with an active plan, executes the out-of-band change and — after developer confirmation — records it into the plan artifacts.
+- **Big out-of-band change during an active plan:** surfaces it and offers exactly two exits — fold it in as a new plan phase, or park-and-replan. Never builds a second plan silently.
 
-### 📐 `skill: specification`
+### 💬 `ask` — implicit read-only lane
 
-The specification-driven development workflow. For requirements of greater complexity or scope that need to be formalized before implementation. It owns the *what* and the *why* — it **never writes source code**; implementation belongs to `planning`.
+Pure query mode, triggered by interrogative messages. Strictly read-only: reads, searches, explains; never edits code, never writes artifacts.
 
-| Mode | Description |
-|---|---|
-| **`brainstorm`** | Open-ended, **conversational** exploration of a fuzzy requirement. The agent loads full context, asks questions, identifies ambiguities, and helps land the business problem. Writes nothing to disk — its output flows into `define` within the same conversation. |
-| **`define`** | Formalization of the spec: the agent drafts `PRD.md` and `user-stories.md` (each story numbered `<PREFIX>-NNN`, with happy/sad acceptance criteria). Open doubts are resolved via a questionnaire *before* writing — never punted into the artifact. Ends at explicit human approval. Also handles amending an active spec (e.g. adding a retroactive corrective story). |
-| **`archive`** | Formal closure of a fully-delivered spec (all stories `[x]`): the agent drafts an English archive document, proposes ADRs/brain updates, and — after explicit confirmation — moves it to `.ai/memory/archive/specs/` and removes the active spec folder. A single mode with a confirmation gate. |
+- **Answers cold** — orients from the repository, so questions about the active work (`.ai/work/`) or past decisions (`.ai/memory/`) work on a session's first message.
+- **Four domains:** code, active plan, active PRD, decisions (`adr-log.md` + `memory/log/`).
+- **Hands off to action:** a continuation cue routes to `conduct:execute`; new work enters the chain; a contained change goes to `fast` — carrying the context it already gathered.
 
-> Querying an active spec read-only ("what does this spec cover?") is the job of `skill: ask`, not a mode here.
+### 🔄 `update-brain`
 
-> A well-defined spec is the best investment before writing a single line of code.
+The constitutive-memory maintenance workflow — the **only** skill that writes `.ai/memory/` (log appends excepted). `initialize` builds the brain from repository analysis (essential for brownfield onboarding); `update` applies proposed ADRs, reference-index entries, and constitution changes, or reconciles the brain after structural drift. Every brain change leaves a `brain-change` entry in `memory/log/`.
 
----
+### 🩺 `jaiba-doctor`
 
-### 🔄 `skill: update-brain`
-
-The knowledge maintenance workflow. Updates the `memory/` files based on project analysis or in response to significant changes.
-
-**Use cases:**
-
-- **Initialization:** The agent analyzes the existing repository (code, README, configs, documentation) and generates the `memory/` files for the first time. Essential for onboarding into brownfield projects.
-- **Structural maintenance:** When the project evolves significantly (new modules, new integrations, architectural changes), `constitution.md` and `reference-index.md` are re-analyzed and updated.
-- **Applying proposed ADRs:** Takes the ADRs proposed by `planning:summarize` or `specification:archive` and integrates them into `adr-log.md` after human validation.
-
-> The brain is only as useful as it is up to date. **Update Brain** is the skill that closes the learning loop at the project level, complementing the individual closures done by `planning:summarize` and `specification:archive`.
-
----
-
-### ⚡ `skill: fast`
-
-Direct execution without formal planning. For small, well-defined, low-risk tasks where the overhead of creating a plan is not justified. It can run free-standing (e.g. *"bump requests to 2.32"*) or as an unplanned adjustment to an active plan (e.g. *"add a validation to the endpoint that wasn't in the plan"*).
-
-- **Triages before acting.** The agent first estimates the change's blast radius. If the work is too large for `fast` (many files, contract changes, migrations, cascading breaking changes), it refuses and routes the developer to `planning` instead of half-applying it.
-- **Free-standing:** the agent acts directly and writes nothing to `.ai/session/`; git history plus a one-line recap is the record. Does not generate `plan.md` or `tasks.md`.
-- **Plan adjustment:** the agent executes the change, then — only after the developer confirms it is correct — records it into the active session artifacts (`tasks.md`, `plan.md` amendments, `walkthrough.md`), so the plan never drifts ahead of reality.
-
-> Use it judiciously. If the task has more than 2-3 steps, touches multiple files, or changes shared contracts, `fast` itself will hand it back to **planning**.
-
----
-
-### 💬 `skill: ask`
-
-Pure query mode. The agent answers questions, explains code, analyzes architecture, or evaluates options **without modifying anything**. It is strictly read-only: it reads, searches, and explains, but never edits code, writes to `.ai/`, or runs the Quality Gate.
-
-- **Strictly read-only.** The agent does not write or edit code or brain artifacts — safe to invoke reflexively before any action.
-- **Answers cold.** It orients itself from the repository, so questions about the active plan (`session/`) or the active spec (`specs/`) work on the first message of a session, with no prior context.
-- **Three domains.** Code (with `git log`/`blame` for the *why-historical*), the active plan, and the active spec — plus past decisions via `adr-log.md`.
-- **Hands off to action.** When the developer stops asking and asks to *act*, `ask` routes to the owning skill — `planning:execute` for a continuation cue, `planning` for a new plan, `fast` for a contained change — carrying everything it already read into that skill within the same session.
-- Triggers explicitly (`/ask`) and **implicitly** on interrogative/exploratory messages, deliberately yielding to the action skills on imperative or continuation cues.
-
-> Separating query mode from execution mode prevents accidental changes and keeps the human's intent clear. Asking first is not overhead: the context gathered while answering carries straight into whichever skill executes the change.
-
----
-
-### 🩺 `skill: doctor`
-
-The framework health check. A maintenance meta-skill the developer runs manually — ideally as a **pre-flight right before `specification` or `planning`** — to confirm JAIBA is still sound before drift or a missing dependency derails the work. It **diagnoses and routes**; it does not repair (the framework's *propose, don't patch* rule). The one file it writes is `.atl/tool-layout.md` — machine state, not project memory.
-
-It runs three diagnostics and emits a single severity-ordered report of suggested fixes:
+The framework health check — a pre-flight before entering the conduct chain. **Diagnoses and routes; never repairs.** Three diagnostics, one severity-ordered report:
 
 | Diagnostic | What it checks | Where the fix routes |
 |---|---|---|
-| **Memory coherence** | Are `constitution.md` / `adr-log.md` / `reference-index.md` complete (no unfilled `[brackets]`/`[MISSING]`), consistent with each other, and not drifting from the repo? | `update-brain` |
-| **Tool state** | Are the CLI tools the installed skills, subagents, and hooks declare actually present? Refreshes `.atl/tool-layout.md` with a *"Needed by"* provenance column. | install the tool |
-| **External-reference health** | Is every `reference-index.md` entry reachable — its MCP/CLI installed, its remote spec/URL live, its vendored copy present and **fresh** (git last-commit date, flagged if older than a month)? | install the MCP/CLI · fix the endpoint · re-vendor via `update-brain` |
+| **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); constitution / adr-log / reference-index complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `update-brain` / `jaiba-scaffold` |
+| **Tool state** | Are the CLI tools that installed skills, **subagents**, and hooks declare (`requires:`) actually present? Refreshes `.atl/tool-layout.md` with provenance. | install the tool |
+| **External-reference health** | Every `reference-index.md` entry reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `update-brain` |
 
-> doctor presumes a brain to inspect: on a repo with no `.ai/` it routes to `scaffold` rather than inventing findings. Anything it can't verify in the current session (no web tools, no MCP introspection) is reported as `[UNVERIFIED]`, never silently passed.
+### 🏗️ `jaiba-scaffold`
+
+The one-time bootstrap: lays the `.ai/` skeleton, installs the global contract + repo marker, installs skills (global or project-local) and the subagent battery, then hands off to `update-brain:initialize` and `jaiba-doctor`. Never runs on an already-instrumented repo.
+
+---
+
+## 🤖 The subagent battery
+
+`scaffold` installs six native subagent definitions into the agent's global `agents/` folder. The invocation contract (`conduct/references/subagents.md`) governs delegation: which operations delegate, the `requires:` tool convention, a **pre-invocation toolchain check** against `.atl/tool-layout.md` (a missing tool surfaces *before* invocation, never as a mid-run failure), and the concurrency policy.
+
+| Subagent | Role | Used in phase |
+|---|---|---|
+| `executor-high` | Design-heavy, multi-file tasks (`load: high`) | `execute` |
+| `executor-medium` | Bounded implementation tasks (`load: medium`) | `execute` |
+| `executor-low` | Mechanical, repetitive tasks (`load: low`) | `execute` |
+| `code-analyst` | Code survey without loading conduct's context | `spec` (define/design) |
+| `business-analyst` | Contrasts the requirement against constitution / adr-log / reference-index | `propose`, `spec` |
+| `verify` | Consumes the PRD's criteria schema; reports met/unmet per criterion | `validate` |
+
+**Parallelism:** `execute` builds **waves** from the `tasks.md` `depends-on` graph — fan-out capped at 3, two tasks run in parallel only if they don't share files, subagents write source only (conduct is the single writer of `.ai/work/`), and results reintegrate into the walkthrough before the next wave. Hosts without subagent support fall back to sequential execution under the same contract.
 
 ---
 
@@ -440,32 +332,33 @@ It runs three diagnostics and emits a single severity-ordered report of suggeste
                     │    New or legacy project     │
                     └──────────────┬──────────────┘
                                    │
-                          skill: update-brain
-                           (build the brain)
+                            /jaiba-scaffold
+                 (skeleton + contract + skills + agents)
+                                   │
+                     update-brain:initialize → jaiba-doctor
                                    │
                     ┌──────────────▼──────────────┐
-                    │       .ai/memory/ ready      │
+                    │        Brain ready           │
                     └──────────────┬──────────────┘
                                    │
-               ┌───────────────────┼───────────────────┐
-               │                   │                   │
-        Business               Concrete             Question /
-       requirement            task or fix           Exploration
-               │                   │                   │
-    skill: specification    skill: planning         skill: ask
-    (brainstorm → define)   (define → execute      (response without
-               │             → summarize             modifying)
-               │             → cleanup)
-               │                   │
-               └─────────┬─────────┘
-                         │
-                skill: update-brain
-               (consolidate learnings
-                at the project level)
-                         │
-                    ┌────▼────┐
-                    │  repeat  │
-                    └─────────┘
+                        ── routing rule per message ──
+                                   │
+        ┌──────────────┬───────────┴──────────┬─────────────────┐
+        │              │                      │                 │
+    New work      Continuation            Question        Small change
+        │              │                      │                 │
+  conduct    conduct:            ask (read-        fast (inline;
+  chain: propose? → execute                only lane)        refuses > inline
+  spec (PRD? + plan   (waves of                              and routes into
+  → approval) →       subagents)                             the chain)
+  tasks → execute →
+  validate → summarize
+        │
+        └──→ .ai/memory/log/ entry + proposed ADRs → update-brain
+                                   │
+                              ┌────▼────┐
+                              │  repeat  │
+                              └─────────┘
 ```
 
 ---
@@ -482,151 +375,80 @@ The source code and the `.ai/` files are equally part of the project. The agent'
 
 ### Workflows as contracts
 
-Each skill defines clear expectations for both the agent and the human. Knowing which mode the agent is operating in eliminates ambiguity and reduces errors from context misunderstandings.
+Each skill defines clear expectations for both the agent and the human. Knowing which phase conduct is operating in eliminates ambiguity and reduces errors from context misunderstandings.
 
 ---
 
 ## Usage examples
 
-The following examples are based on **TripNest**, a travel planning application built with Python and Django. They illustrate the three main work cycles in JAIBA.
+The following examples are based on **TripNest**, a travel planning application built with Python and Django.
 
 ---
 
-### Example 1 — `skill: specification` · New requirement
+### Example 1 — Deep requirement (spec depth: PRD + plan)
 
-The team wants to add a collaborative itineraries module. It is a requirement with multiple business dimensions, so they start with a spec.
-
-**Brainstorm:**
 > 👤 *"I want users to be able to create itineraries and share them with other people so they can edit them together."*
 
-The agent asks questions to narrow the scope: real-time or asynchronous editing? Can any user edit, or are there roles within the itinerary? What happens if two people edit the same day of the trip at the same time?
+The routing rule reads this as **new work**; the triage scores a cross-cutting blast radius → **spec depth**. The chain enters at `propose`: the agent (optionally delegating a memory contrast to `business-analyst`) asks the narrowing questions — real-time or asynchronous editing? roles? conflict policy?
 
-**Define:**
-The agent drafts `.ai/specs/collaborative-itineraries/PRD.md`:
+In `spec`, it drafts `.ai/work/PRD.md` with numbered, parseable criteria:
 
 ```markdown
-## Business problem
-Users need to coordinate travel plans with companions without relying on
-external tools (WhatsApp, Google Docs). Today there is no way to co-edit
-an itinerary within TripNest.
-
-## Proposed solution
-Add an invitation-based collaboration system on top of existing itineraries,
-with roles (owner / editor / reader) and optimistic conflict control
-(last-write-wins with change history).
-
 ## Acceptance criteria
-- The owner can invite collaborators by email
-- Editors can add, modify, and delete days and activities
-- Readers can only view
-- Changes are reflected in less than 5 seconds for all active collaborators
-- The system records who made each change
+
+​```yaml
+criteria:
+  - id: COL-001
+    kind: happy
+    given: an itinerary owner with a collaborator's email
+    when: they send an invitation
+    then: the collaborator receives edit access with the assigned role
+  - id: COL-002
+    kind: sad
+    given: a reader-role collaborator
+    when: they attempt to modify an activity
+    then: the change is rejected and the UI explains the missing permission
+​```
 ```
 
-And the resulting `user-stories.md` includes stories such as:
-- `[ ]` As an owner, I want to invite a collaborator by email so they can edit my itinerary
-- `[ ]` As an editor, I want to add an activity to a day of the itinerary
-- `[ ]` As a reader, I want to view the itinerary in read-only mode without being able to modify it
-- `[ ]` As an owner, I want to see the change history of my itinerary
+…then the design (`plan.md`). The human approves the design; `tasks` produces the graph (`T-001 … T-014`, each with `depends-on`, `load`, and `covers:` pointing at criteria IDs).
 
-> The stories then get implemented through `skill: planning`, one or more per plan. Each plan declares the stories it covers, derives its tests from their happy/sad criteria, and marks them `[x]` on close. (Read-only questions that arise mid-development — *"should roles reuse `django-guardian`?"* — are answered by `skill: ask`, not by this workflow.)
+### Example 2 — Executing with subagent waves
 
-**Archive:**
-Once every story in the spec is `[x]`, the team closes it.
+> 👤 *"continue"*
 
-> 👤 *"All the collaboration stories are done — archive the spec."*
+Routing: continuation cue → `conduct:execute`. Conduct checks `.atl/tool-layout.md` against each subagent's `requires:`, builds the first wave from the `depends-on` graph, and fans out: `T-003` (model, `load: high`) to `executor-high`, `T-004` (serializer, `load: medium`) to `executor-medium` — in parallel, because they share no files. Each executor returns a diff + report; conduct reviews, logs the walkthrough entry, flips the checkboxes, and runs the phase gate before the next wave.
 
-The agent verifies completeness, drafts an English archive document summarizing the delivered requirement and the plans that built it, proposes an ADR (object permissions via `django-guardian`), and — after explicit confirmation — moves it to `.ai/memory/archive/specs/2026-05-30-collaborative-itineraries.md` and removes the active spec folder.
+At the end, `validate` hands the PRD's criteria schema to `verify`, which reports per criterion:
 
----
-
-### Example 2 — `skill: planning` within an active spec
-
-With the collaborative itineraries spec approved, the team starts the first implementation session: the data model and base permissions.
-
-**Define:**
-
-> 👤 *"Let's start with the collaborative itineraries spec. I want to implement the collaborator model and the permissions logic with django-guardian."*
-
-The agent reads `.ai/specs/collaborative-itineraries/user-stories.md`, reviews the code (discovering that `Itinerary` uses `created_by` instead of `owner`, a discrepancy it clarifies with the developer before proceeding), and proposes the following `plan.md`:
-
-```markdown
-## Plan: Collaborator model and permissions integration
-**Active spec:** collaborative-itineraries
-**Covered stories:**
-- Invite collaborator by email
-- Assign role (owner / editor / reader)
-
-## Tasks (TDD active)
-Phase 1 — Domain model (reversible)
-- [ ] Failing test for ItineraryCollaborator creation and role validation
-- [ ] Implement ItineraryCollaborator (FK to Itinerary and User, role CharField with choices)
-- [ ] Migration
-- [ ] Failing test for role-based permissions
-- [ ] Wire django-guardian (view/change/delete by role)
+```
+COL-001  ✅ met      — invitation flow test green (test_invite_by_email)
+COL-002  ✅ met      — permission rejection covered (test_reader_cannot_edit)
+COL-003  ❌ not met  — change history endpoint returns 404; T-012 unchecked
 ```
 
-> 👤 *"Approved, go ahead."*
+`summarize` then closes in one step: final summary presented, `2026-07-05-collaborative-itineraries.md` appended to `.ai/memory/log/`, an ADR proposed (object permissions via `django-guardian`) for `update-brain`, and `work/` cleaned — after one confirmation.
 
-**Execute *(implicit in "continue")*:**
-The agent verifies `git status` (clean), implements the phase task by task following TDD order, updates `tasks.md` with progress, and at the close of the phase writes in `walkthrough.md`:
-
-```markdown
-## Phase 1 — Domain model   2026-05-26
-
-**Outcome.** ItineraryCollaborator model operational with role-based permissions
-using django-guardian. Migration applied.
-
-**Decisions.**
-- role as CharField with choices (owner/editor/reader): roles are fixed,
-  extensibility is not expected in the short term. If dynamic roles are
-  needed in the future, migration to a separate table will be considered.
-
-**Quality gate.** Pass.
-```
-
-And suggests the commit `chore(wip): domain model for itinerary collaborators`, without executing it. Then pauses.
-
-**Summarize *(at plan close)*:**
-When all phases are complete, the developer says *"let's close this"*. The agent produces `collaborative-itineraries-base-model-summary.md`, marks the corresponding stories in `user-stories.md` as `[x]`, proposes an ADR entry about the choice of `CharField` for `role`, and suggests a final commit like `feat(itineraries): collaborator invitations with role-based access`.
-
-**Cleanup:**
-> 👤 *"go ahead, clean it up"*
-
-The agent runs the skill's `scripts/cleanup.sh`, archiving the summary to `.ai/memory/archive/plans/2026-05-26-collaborative-itineraries-base-model.md` and emptying `session/`.
-
----
-
-### Example 3 — `skill: planning` standalone (outside a spec)
-
-During a code review, the team detects that itinerary queries are generating N+1 problems. There is no open spec for this: it is a targeted technical task.
-
-**Define:**
+### Example 3 — Shallow change (design depth: plan only)
 
 > 👤 *"We have an N+1 problem in the itinerary list view. We need to optimize the queries."*
 
-The agent reviews the relevant code and proposes:
+New work, but the triage scores it **design depth** — bounded blast radius, no business dimension. **No PRD is produced**: the chain enters at `spec`'s design half, writes a short `plan.md` (profiling phase + fix phase), gets approval, and executes. A performance fix never pays the ceremony of a spec.
 
-```markdown
-## Plan: Query optimization in itinerary listing
+*(Had the developer instead said "bump `requests` to 2.32", the routing rule would have sent it to `fast`: triage `inline`, executed on the spot, no executive artifacts at all.)*
 
-## Context
-The `ItineraryListView` loads itineraries with their collaborators and
-activities lazily, generating N+1 queries per itinerary.
+---
 
-## Tasks
-Phase 1 — Profiling (reversible)
-- [ ] Regression test that counts queries with assertNumQueries
-- [ ] Profile with django-debug-toolbar and document baseline count
+## Migrating from the pre-conduct layout
 
-Phase 2 — Fix (depends on: Phase 1)
-- [ ] Add select_related('owner') and prefetch_related('collaborators', 'days__activities')
-- [ ] Adjust serializer if needed
-- [ ] Verify that assertNumQueries drops to the expected range
-```
+Projects instrumented before the conduct unification use `planning`/`specification` skills and an older brain layout. There is no automatic migration; the manual route:
 
-**Execute → Summarize → Cleanup:**
-The agent implements the changes phase by phase, verifies the query reduction, and summarizes with a suggested commit like `perf(itineraries): eliminate N+1 in list view`. Since it is an optimization with no architectural impact, the summary explicitly states *"No ADR proposed; all decisions were tactical."*
+1. `.ai/session/` → `.ai/work/` (rename; add `work/` to `.ai/.gitignore`, remove `session/` from tracking if needed).
+2. `.ai/memory/archive/plans/` and `archive/specs/` → `.ai/memory/log/` (move files; keep their dated names).
+3. `.ai/specs/<name>/` — fold any *active* spec's PRD into `.ai/work/PRD.md` (user stories become the PRD's criteria section); delivered specs go to `memory/log/`.
+4. Replace the full per-repo `AGENTS.md` with the minimal marker and let `jaiba-scaffold` install the global contract (step 3 of its sequence handles both).
+5. Uninstall the `planning` and `specification` skills; install `conduct`.
+6. Run `/jaiba-doctor` — it detects leftover old-layout directories and contract drift, and routes the remainder.
 
 ---
 
@@ -635,11 +457,15 @@ The agent implements the changes phase by phase, verifies the query reduction, a
 | Term | Definition |
 |---|---|
 | **Brain** | The set of files in `.ai/` that make up the agent's persistent context |
-| **Spec** | A formal specification of a business requirement, with PRD and user stories |
-| **Plan** | A tactical work plan bounded to a session or short sprint |
-| **Skill** | An executable workflow with defined modes and human validation checkpoints |
-| **Summary** | The archivable summary of a closed plan, produced by `planning:summarize` |
-| **Update Brain** | The process of updating long-term memory after significant project-level changes |
+| **Constitutive memory** | `.ai/memory/`: constitution, curated ADR log, reference index, chronological log — who the project is |
+| **Executive memory** | `.ai/work/`: PRD (if any), plan, tasks, walkthrough — what is being done right now (gitignored) |
+| **Behavioral contract** | `jaiba-contract.md`, installed once per machine in the agent's global config; each repo keeps a minimal `AGENTS.md` marker pointing at it |
+| **Triage** | The shared blast-radius → depth mapping (`inline → design → spec`) that decides how deep a change enters the chain |
+| **Chain** | Conduct's SDD phases: `propose → spec → tasks → execute → validate → summarize` |
+| **Lane** | An implicit, routing-triggered skill: `ask` (read-only) or `fast` (inline execution) |
+| **Wave** | A set of file-disjoint tasks `execute` fans out to executor subagents in parallel (cap 3) |
+| **Skill** | An executable workflow with defined phases/modes and human validation checkpoints |
+| **Subagent battery** | The six globally-installed agents: three executors by cognitive load + `code-analyst`, `business-analyst`, `verify` |
 | **Human in the loop** | The principle that the human validates and approves before each significant stage |
 
 ---

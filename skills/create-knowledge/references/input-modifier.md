@@ -5,16 +5,18 @@ context it would otherwise have to be told by hand. The workflow's job
 is unchanged; it simply receives a richer requirement than the prompt
 alone carried.
 
-This is the pattern the `specification` skill already anticipates in
-its §Inputs: a tracker ticket is "not handled by `specification` on its
-own" — a knowledge skill fetches it and supplies the content.
+This is the pattern the `conduct` skill already anticipates: the
+PRD template carries `source: ticket` / `source-ref:` frontmatter
+precisely for requirements that arrive through a knowledge skill — the
+plugin fetches the ticket and supplies the content.
 
 ## Where it hooks
 
-Almost always **`specification:define`** (and, by extension,
-`specification:brainstorm` when the requirement starts there). Occasionally
-`planning:define`, if the enrichment is tactical rather than a product
-requirement. Name the exact mode in the contract.
+Almost always **`conduct:spec`** at its define step (and, by
+extension, `conduct:propose` when the requirement starts fuzzy
+there). Occasionally the design step, if the enrichment is tactical
+rather than a product requirement. Name the exact phase (and step) in
+the contract.
 
 ## The flow when it triggers
 
@@ -38,8 +40,8 @@ requirement. Name the exact mode in the contract.
 ## Boundaries
 
 - **Enrich, don't replace the workflow.** You supply the requirement;
-  `specification:define` still surveys the code, still clarifies gaps,
-  still stops for approval. Don't let the fetched ticket short-circuit
+  `conduct:spec` still surveys the code, still clarifies gaps,
+  still stops at the approval gate. Don't let the fetched ticket short-circuit
   the workflow's own discipline.
 - **Surface what you fetched.** The developer must be able to see that
   the spec was shaped by ticket content, and what that content was — a
@@ -56,17 +58,17 @@ requirement. Name the exact mode in the contract.
 The team's `linear-tickets` skill already knows how to read a Linear
 issue via the Linear MCP. Adapt it as an input modifier:
 
-- **Hook:** `specification:define` (and `:brainstorm`).
+- **Hook:** `conduct:spec`, define step (and `conduct:propose`).
 - **Modifier type:** input.
 - **Trigger signal:** a Linear reference in the prompt — `LIN-1234`,
   `ENG-88`, or a `linear.app/.../issue/...` URL.
 - **Behavior:** on that signal, call the Linear MCP to fetch the
   issue's title, description, and acceptance notes; summarize them into
-  a requirement statement; hand that to `specification:define` as the
+  a requirement statement; hand that to `conduct:spec` as the
   input it drafts the PRD from; set the PRD's `source: ticket` /
   `source-ref: <id>`. If the MCP call fails, tell the developer and ask
   them to paste the issue body instead.
 
 Result: the developer types *"let's spec LIN-1234"* and the spec
-workflow starts already knowing the requirement — no copy-paste, no
-extra prompt, and `specification` itself was never modified.
+phase starts already knowing the requirement — no copy-paste, no
+extra prompt, and `conduct` itself was never modified.

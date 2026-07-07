@@ -1,6 +1,6 @@
 ---
 name: jaiba-scaffold
-description: First-run bootstrap of JAIBA into a project. Lays brain skeleton, installs AGENTS.md, installs workflow/meta skills, then hands to update-brain (which hands to doctor for toolchain probe). One-time install only — don't use if .ai/ exists already.
+description: First-run bootstrap of JAIBA into a project. Lays brain skeleton, installs the global behavioral contract plus the minimal AGENTS.md repo marker, installs workflow/meta skills and the subagent battery, then hands to update-brain (which hands to doctor for toolchain probe). One-time install only — don't use if .ai/ exists already.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -21,12 +21,15 @@ installed once into your agent (e.g.
 per-project — and run from inside a target repo to adopt JAIBA there.
 
 It does the one-time install and nothing else. It lays the brain
-skeleton, drops in the behavioral `AGENTS.md`, installs the
-project-scoped JAIBA skills into the right agent folder, and then
+skeleton, installs the **global JAIBA Behavioral Contract** into the
+agent's user-level config (once per machine), drops the minimal
+per-repo `AGENTS.md` marker at the project root, installs the
+project-scoped JAIBA skills into the right agent folder plus the
+subagent battery into the global agents folder, and then
 **hands the project to `update-brain:initialize`**, which fills the
 long-term brain from the repository. After that, scaffold has no further
-role — the everyday work is `planning`, `specification`, `ask`, `fast`,
-and `update-brain`.
+role — the everyday work is `conduct`, `ask`, `fast`, and
+`update-brain`.
 
 Think of the boundary this way: **scaffold builds the empty house and
 hands over the keys; `update-brain` moves the furniture in.** Scaffold
@@ -42,7 +45,7 @@ you'd be clobbering real work — stop and route instead.
 
 | The repo already has… | Meaning | Route to |
 |---|---|---|
-| `.ai/memory/*.md` with **real content** | Fully instrumented | `update-brain` (drift/update), `planning`, or `ask` |
+| `.ai/memory/*.md` with **real content** | Fully instrumented | `update-brain` (drift/update), `conduct`, or `ask` |
 | `.ai/` skeleton but **empty/bare** `memory/` | Half-scaffolded (a prior run stopped before the brain was built) | Resume: skip to **step 5** (hand off to `update-brain:initialize`) |
 | Nothing JAIBA under `.ai/` | Greenfield or legacy, not yet adopted | Continue here |
 
@@ -92,30 +95,56 @@ probing the toolchain.
 ### 2. Lay the `.ai/` brain skeleton
 
 Create the directory tree the brain lives in (empty — you are **not**
-filling it; `update-brain` does that in step 6):
+filling it; `update-brain` does that in step 5):
 
 ```
 .ai/
-├── memory/        (update-brain fills this in step 6)
-├── specs/         (mid-term; starts empty)
-├── session/       (short-term; gitignored)
+├── memory/        (constitutive memory; update-brain fills this in step 5)
+│   └── log/       (append-only record: closed work + brain changelog)
+├── work/          (executive memory: PRD, plan, tasks, walkthrough; gitignored)
 └── vendored/      (local copies of external refs; starts empty)
 ```
 
+There is no `specs/` directory: when a change is deep enough to
+produce a PRD, that PRD is an executive artifact and lives in `work/`
+until the work closes and its essence is archived into `memory/log/`.
+
 Then write `.ai/.gitignore` from `assets/ai.gitignore` — it ignores
-`session/` (per-developer scratch).
-Add a `.gitkeep` to `specs/` and `vendored/` so the empty tracked dirs
-survive a commit (`session/` is gitignored, so it needs none).
+`work/` (per-developer executive memory).
+Add a `.gitkeep` to `memory/log/` and `vendored/` so the empty tracked
+dirs survive a commit (`work/` is gitignored, so it needs none).
 
 Also, create the `.atl/` directory at the project root and write its
 `.gitignore` (from `assets/atl.gitignore`) containing `*` so that the
 entire directory is ignored from source control, keeping machine-local
 state out of the repository.
 
-### 3. Install the behavioral `AGENTS.md`
+### 3. Install the behavioral contract (global) + the repo marker
 
-Copy `assets/AGENTS.md` (the JAIBA Behavioral Protocol) to the repo root
-as `AGENTS.md`.
+The behavioral contract is **split**: behavior lives once per machine
+in the agent's global config; the repo carries only a minimal marker
+that points to it. Two installs:
+
+**3a. Global contract — `assets/jaiba-contract.md`.** Determine the
+*global* agent config folder matching the vendor detected in step 1,
+rooted at the user's home directory (e.g. `~/.claude/` for `.claude/`,
+`~/.agents/` otherwise — create it if absent). Copy
+`assets/jaiba-contract.md` there as `jaiba-contract.md`, then make
+sure the agent actually loads it: if the vendor has a global
+instructions file (e.g. `~/.claude/CLAUDE.md`), append a one-line
+reference to `jaiba-contract.md` unless one is already present.
+
+- **Already there and identical** → leave it, note "already
+  installed".
+- **Already there but different** (an older or hand-edited copy) —
+  this is the one-per-machine file, so ask: **update** (back up
+  theirs, install the packaged version) or **keep theirs** (note the
+  drift; `jaiba-doctor` will keep flagging it).
+
+**3b. Repo marker — `assets/AGENTS.md`.** Copy the minimal per-repo
+`AGENTS.md` to the repo root. It only confirms instrumentation, points
+behavior at the global contract, and defers project facts to the
+constitution.
 
 **Edge case — the repo already has an `AGENTS.md`.** Do not overwrite it;
 that's likely the developer's own contract. Stop and ask, offering two
@@ -125,7 +154,9 @@ non-destructive choices:
 - **Coexist** — install JAIBA's as `AGENTS.jaiba.md` and tell the
   developer to merge or reference it from their own.
 
-Never silently clobber an existing `AGENTS.md`.
+Never silently clobber an existing `AGENTS.md` — and never inline the
+full behavioral rules into the repo copy; behavior belongs to the
+global contract file.
 
 ### 4. Check what's already installed globally, then install what's missing
 
@@ -145,14 +176,14 @@ it and fragment versions across repos.
    Global Skills
 
    jaiba-scaffold   ~/.agents/skills/jaiba-scaffold   Agents: ...
-   planning         ~/.agents/skills/planning         Agents: ...
+   conduct     ~/.agents/skills/conduct     Agents: ...
    ```
 
 2. **Resolve the name to look for, per `assets/skillset.txt` entry:**
 
    | Entry format | Name to check against the global list |
    |---|---|
-   | `planning` (bare name) | `planning` |
+   | `conduct` (bare name) | `conduct` |
    | `owner/repo#skill` | the part after `#`, e.g. `caveman` |
    | `owner/repo` (no `#`, installs everything from that repo) | can't be resolved to one name from the listing — treat as **missing** below; `npx skills add` is idempotent, so a redundant run for this format is harmless |
 
@@ -187,7 +218,7 @@ project.
 
 | Line format | Meaning | Install command |
 |---|---|---|
-| `planning` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill planning [-g]` |
+| `conduct` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill conduct [-g]` |
 | `owner/repo` | all skills from an external GitHub repo | `npx skills add -y owner/repo [-g]` |
 | `owner/repo#skill` | one skill from an external GitHub repo | `npx skills add -y owner/repo --skill skill [-g]` |
 
@@ -200,8 +231,8 @@ correctly registered:
 
 ```bash
 # Example individual calls (project-local; add -g for global)
-npx skills add -y atlasfoo/jaiba-framework --skill planning
-npx skills add -y atlasfoo/jaiba-framework --skill specification
+npx skills add -y atlasfoo/jaiba-framework --skill conduct
+npx skills add -y atlasfoo/jaiba-framework --skill update-brain
 npx skills add -y juliusbrussee/caveman --skill caveman
 ```
 
@@ -212,6 +243,23 @@ but prefer the package manager so versions/locks stay honest.
 > Scaffold never installs *itself* (it's global) or unbuilt skills, and
 > only installs entries from `assets/skillset.txt` — keep that list
 > current, not hardcoded in prose.
+
+**Then install the subagent battery.** Copy every definition in
+`assets/agents/` (the three executors `executor-high/medium/low` plus
+the specialists `code-analyst`, `business-analyst`, `verify` — the
+battery `conduct/references/subagents.md` invokes) into the
+`agents/` subdirectory of the **global** agent folder from step 3a
+(e.g. `~/.claude/agents/`), creating it if absent. They install
+globally for the same reason the contract does: one battery serves
+every repo, and `execute`'s fan-out expects to find them at the agent
+level, not per-project.
+
+- A definition already present and identical → skip it.
+- Already present but different → ask before overwriting (back up
+  theirs), same policy as 3a.
+- The host agent has no native subagent support → skip the copy, say
+  so, and note that `conduct` will run its documented sequential
+  fallback.
 
 ### 5. Hand off to `update-brain:initialize`
 
@@ -239,8 +287,12 @@ and ensure the environment is fully verified with the newly populated memory.
 End with a short, honest report:
 
 1. **Where things landed** — the agent folder used and *why* (zero/one/
-   many vendor dirs detected), the `.ai/` tree created, where `AGENTS.md`
-   went (and how any existing one was handled).
+   many vendor dirs detected), the `.ai/` tree created, where the global
+   `jaiba-contract.md` went (installed / already current / kept theirs
+   with drift noted), where the repo `AGENTS.md` marker went (and how
+   any existing one was handled), and which subagent definitions were
+   installed into the global `agents/` folder (or that the host lacks
+   subagent support).
 2. **Skills installed** — for each `skillset.txt` entry, whether it was
    already global (untouched), newly installed globally, or newly
    installed project-locally, and the source. If Case A applied

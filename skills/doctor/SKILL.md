@@ -1,6 +1,6 @@
 ---
 name: jaiba-doctor
-description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence, tool state, and external-reference health, then routes to fixes. Run before specification/planning workflows to catch drift. Diagnoses and routes only — doesn't rebuild brain (update-brain), bootstrap projects (scaffold), or answer brain questions (ask).
+description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence (incl. global behavioral-contract presence/drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't rebuild brain (update-brain), bootstrap projects (scaffold), or answer brain questions (ask).
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -33,7 +33,7 @@ itself. The **single exception** is `.atl/tool-layout.md`: that file is
 refreshing it is doctor's job, not a memory mutation.
 
 Think of it as a pre-flight check. The natural time to run it is **right
-before a `specification` or `planning` workflow**, so that a stale
+before entering the `conduct` chain**, so that a stale
 constitution, a missing CLI, or an unreachable API surfaces *before* it
 derails the work — not three steps into a plan. It is invoked manually;
 nothing calls it automatically (yet).
@@ -59,8 +59,12 @@ this skill reports.)
 Run these reads once, before any diagnostic. doctor's verdicts must
 reflect the repository, not the prompt's assumptions.
 
-1. **`AGENTS.md`** — the behavioral contract. Note §5 (drift & gaps) and
-   §6 (toolchain awareness): doctor operationalizes both as checks.
+1. **The behavioral contract** — the repo's minimal `AGENTS.md` marker
+   plus the global `jaiba-contract.md` in the agent's user-level config
+   (where the rules actually live since the global split). Note its
+   drift-&-gaps and toolchain-awareness sections: doctor
+   operationalizes both as checks — and the contract's own
+   presence/drift is itself part of diagnostic 1.
 2. **`.ai/` exists and has a brain.** Confirm `.ai/memory/` holds the
    three artifacts. If not, see "When NOT to run doctor".
 3. **Locate every skills directory in play.** JAIBA skills can be
@@ -87,12 +91,12 @@ reflect the repository, not the prompt's assumptions.
 
 Run all three, in this order. Each has its own reference file with the
 detailed procedure — **read the reference before running that check**;
-this page is the orchestrator, not the manual. Collect every finding
+this page conducts, it doesn't narrate. Collect every finding
 into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Are constitution / adr-log / reference-index complete, and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `update-brain` |
+| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are constitution / adr-log / reference-index complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `update-brain` / `scaffold` |
 | 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference-index.md` entry reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
@@ -162,7 +166,7 @@ Rules for the report:
 - **Be honest about what you couldn't check.** List `[UNVERIFIED]` items
   explicitly with the reason (no web access, no MCP introspection, etc.).
 - **If everything is green, say so plainly** and note doctor is a good
-  pre-flight before `planning` / `specification`. Don't manufacture
+  pre-flight before the `conduct` chain. Don't manufacture
   findings to look busy.
 
 ## Boundaries

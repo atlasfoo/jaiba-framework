@@ -3,7 +3,7 @@
 > Documento de planificación. No es un artefacto del cerebro de un proyecto:
 > es la hoja de ruta para evolucionar **el framework mismo**. Cada mejora se
 > ejecutará como su propia spec dentro del repo de JAIBA, en Claude Code,
-> corriendo `skill: specification` (brainstorm → define) sobre ese repo.
+> entrando por la cadena del `conduct` (propose → spec) sobre ese repo.
 >
 > El framework vive en un solo repositorio, así que esto es una **secuencia de
 > specs**, no una *mission*. El orden respeta las dependencias, no la
@@ -55,9 +55,9 @@ AsyncAPI / JSON), propiedad de la *mission*, referenciado por cada componente.
 ## 2. Roadmap y dependencias
 
 ```
-Fase 0 · SPEC-02a  Fixes de doctor + .atl/tool-layout      [independiente]
-Fase 1 · SPEC-01   Orquestador unificado + constitutiva/ejecutiva   [fundación]
-Fase 2 · SPEC-03   Batería de subagentes
+Fase 0 · SPEC-02a  Fixes de doctor + .atl/tool-layout      [ENTREGADA]
+Fase 1 · SPEC-01   Orquestador unificado + constitutiva/ejecutiva   [ENTREGADA — plan orquestador-unificado-memoria, ⊕ SPEC-03]
+Fase 2 · SPEC-03   Batería de subagentes                   [ENTREGADA — absorbida por el plan de SPEC-01]
          SPEC-02b  ATL completo (indiza subagentes + skills externas)
 Fase 3 · SPEC-05   Patrón OKF (serialización del modelo)
 Fase 4 · SPEC-04   Superficies de memoria pluggables   ┐ par
@@ -65,11 +65,11 @@ Fase 5 · SPEC-06   Mission / multicomponente            ┘ acoplado
 ```
 
 ```
-SPEC-01 (fundación)
-  ├─→ SPEC-03 ─→ SPEC-02b
+SPEC-01 ⊕ SPEC-03 (fundación, entregadas juntas)
+  ├─→ SPEC-02b (depende de SPEC-02a + esta entrega)
   ├─→ SPEC-05 ─→ SPEC-04 ─→ SPEC-06
   └─→ (constitution scope, reference-index contrato-interno: back-constraints de 06)
-SPEC-02a  ── independiente, entrega ya
+SPEC-02a  ── entregada
 ```
 
 ---
@@ -103,6 +103,19 @@ máquina a una capa propia, antes de cualquier reorg.
 ### SPEC-01 · Orquestador unificado + modelo constitutiva/ejecutiva
 **Prefijo sugerido:** `ORC` · **Fase 1** · **Profundidad: spec (keystone)** · **Depende de:** nada (pero condiciona a 03, 04, 05, 06)
 
+> **✅ ENTREGADA** (2026-07-05) por el plan `orquestador-unificado-memoria`,
+> que absorbió SPEC-03 completa. Desviaciones aprobadas por el desarrollador
+> respecto a lo escrito abajo: la skill unificada se llamó **`orchestrator`**
+> (no `planning`; colisión con los plan modes nativos); la cadena es
+> `propose → spec → tasks → execute → validate → summarize`;
+> `summarize`+`archive` se **fusionaron en un paso** (invariante de dos pasos
+> revocada explícitamente); `ask`/`fast` quedaron **implícitas-only**
+> (el roadmap contemplaba `/fast` explícito); carpeta ejecutiva = `work/`;
+> `log/` y `adr-log.md` permanecen **separados** (curado vs cronológico).
+> Rename posterior (2026-07-06, inline sin plan — solo naming, sin cambio de
+> comportamiento): `orchestrator` → **`conduct`** (verbo, no sustantivo de rol;
+> más pegajoso; libera la metáfora de orquesta/dirección musical).
+
 **Objetivo.** Disolver `specification` dentro de `planning`, introducir el triage
 interno de profundidad y colapsar la memoria a constitutiva + ejecutiva.
 
@@ -124,10 +137,10 @@ interno de profundidad y colapsar la memoria a constitutiva + ejecutiva.
 - El plan se aprueba antes de `execute`. Human in the loop intacto.
 
 **Criterios de aceptación**
-- `[ ]` Happy: un requerimiento cross-cutting profundo produce PRD + plan + tasks; uno superficial produce solo plan + tasks; el humano aprueba en ambos.
-- `[ ]` Happy: un cambio out-of-band atómico durante un plan activo entra por `fast` sin descarrilar el plan.
-- `[ ]` Sad: un cambio out-of-band **grande** durante un plan activo → `fast` lo surface y ofrece plegarlo como fase o park-and-replan; no crea un segundo plan en silencio.
-- `[ ]` Sad: ante un requerimiento ambiguo, `define` cuestiona antes de escribir; no inventa el triage.
+- `[x]` Happy: un requerimiento cross-cutting profundo produce PRD + plan + tasks; uno superficial produce solo plan + tasks; el humano aprueba en ambos.
+- `[x]` Happy: un cambio out-of-band atómico durante un plan activo entra por `fast` sin descarrilar el plan.
+- `[x]` Sad: un cambio out-of-band **grande** durante un plan activo → `fast` lo surface y ofrece plegarlo como fase o park-and-replan; no crea un segundo plan en silencio.
+- `[x]` Sad: ante un requerimiento ambiguo, `define` cuestiona antes de escribir; no inventa el triage.
 
 **Back-constraints que debe dejar listos (los consumen 04/06)**
 - `constitution` con alcance por sub-unidad.
@@ -141,6 +154,15 @@ interno de profundidad y colapsar la memoria a constitutiva + ejecutiva.
 
 ### SPEC-03 · Batería de subagentes + contrato de invocación
 **Prefijo sugerido:** `SUB` · **Fase 2** · **Profundidad: spec** · **Depende de:** SPEC-01
+
+> **✅ ENTREGADA** (2026-07-05) — absorbida completa por el plan
+> `orquestador-unificado-memoria` de SPEC-01 (decisión del desarrollador,
+> 2026-07-03). Resoluciones de sus preguntas abiertas: catálogo de 6
+> subagentes (3 ejecutores por carga cognitiva `high/medium/low` +
+> `code-analyst`, `business-analyst`, `verify`); paralelismo por oleadas
+> desde el grafo `depends-on` con fan-out ≤3, dos tareas solo en paralelo
+> si no comparten archivos, y regla single-writer sobre `.ai/work/`.
+> Contrato en `conduct/references/subagents.md`.
 
 **Objetivo.** Dotar al framework de subagentes especialistas que `scaffold`
 instala en la config global del agente, e invocarlos desde el orquestador para
@@ -157,9 +179,9 @@ descargar memoria del agente principal y habilitar paralelismo.
 - Indización de los subagentes en el ATL (SPEC-02b, justo después).
 
 **Criterios de aceptación**
-- `[ ]` Happy: `execute` delega una fase a un subagente especialista y recupera el resultado sin cargar el contexto completo en el agente principal.
-- `[ ]` Happy: tras implementar, `verify` chequea los criterios de aceptación y reporta cumplido/incumplido por criterio.
-- `[ ]` Sad: si un subagente declara una herramienta ausente en `tool-layout`, se surface antes de invocarlo.
+- `[x]` Happy: `execute` delega una fase a un subagente especialista y recupera el resultado sin cargar el contexto completo en el agente principal.
+- `[x]` Happy: tras implementar, `verify` chequea los criterios de aceptación y reporta cumplido/incumplido por criterio.
+- `[x]` Sad: si un subagente declara una herramienta ausente en `tool-layout`, se surface antes de invocarlo.
 
 **Abierto para su `define`**
 - Granularidad del catálogo (cuántos subagentes, frontera entre "mediana" y "grande").
@@ -168,7 +190,7 @@ descargar memoria del agente principal y habilitar paralelismo.
 ---
 
 ### SPEC-02b · ATL completo (indización total)
-**Prefijo sugerido:** `ATL` · **Fase 2** · **Profundidad: plan** · **Depende de:** SPEC-02a, SPEC-03
+**Prefijo sugerido:** `ATL` · **Fase 2** · **Profundidad: plan** · **Depende de:** SPEC-02a, y la entrega SPEC-01 ⊕ SPEC-03 (el plan `orquestador-unificado-memoria`, que absorbió SPEC-03)
 
 **Objetivo.** Extender `doctor`/ATL para indizar **todas** las herramientas
 disponibles para el agente, no solo las que declaran las skills del framework.
@@ -268,9 +290,9 @@ control-plane vacío.
 
 ## 4. Orden de ejecución en Claude Code
 
-1. **SPEC-02a** — ya, en paralelo (no bloquea nada).
-2. **SPEC-01** — fundación; abrir como spec propia (dogfooding: `brainstorm → define`).
-3. **SPEC-03** → **SPEC-02b**.
+1. ~~**SPEC-02a**~~ — entregada.
+2. ~~**SPEC-01**~~ — entregada (plan directo sobre el roadmap, ⊕ SPEC-03).
+3. ~~**SPEC-03**~~ — entregada (absorbida por el plan de SPEC-01) → siguiente: **SPEC-02b**.
 4. **SPEC-05**.
 5. **SPEC-04** + **SPEC-06** (par acoplado; 04 primero, 06 sobre ella).
 

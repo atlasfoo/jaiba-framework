@@ -1,6 +1,6 @@
 ---
 name: create-knowledge
-description: Meta-skill converting existing skills into JAIBA knowledge plugins that hook into specification/planning workflows. Use for domain-knowledge skills (best practices, integrations, testing rules) to participate actively in spec/plan creation. Rewrites target skill's SKILL.md and tags only, never modifies workflows or knowledge itself.
+description: Meta-skill converting existing skills into JAIBA knowledge plugins that hook into the conduct workflow chain. Use for domain-knowledge skills (best practices, integrations, testing rules) to participate actively in spec/plan creation. Rewrites target skill's SKILL.md and tags only, never modifies workflows or knowledge itself.
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -16,9 +16,10 @@ tags:
 
 A JAIBA meta-skill. It takes a skill that already *holds knowledge* —
 best practices, domain rules, an external-tracker integration — and
-makes that knowledge **participate** in the `specification` and
-`planning` workflows, automatically, at the right moment, without the
-developer having to paste the rules into every prompt.
+makes that knowledge **participate** in the `conduct` workflow
+chain (its `propose`, `spec`, and `tasks` phases), automatically, at
+the right moment, without the developer having to paste the rules into
+every prompt.
 
 The output is the **same skill**, minimally rewritten so it behaves as
 a *plugin*: it co-triggers with a workflow and folds itself in. You
@@ -31,8 +32,8 @@ the folder layout — is left exactly as you found it.
 ## Why this works without touching the workflows
 
 There is no runtime step where a workflow "calls its plugins". JAIBA
-relies on something simpler: the agent running `planning:define` is the
-*same* agent that has the knowledge skill sitting in its available
+relies on something simpler: the agent running `conduct:spec` is
+the *same* agent that has the knowledge skill sitting in its available
 skills. Skill selection is driven by the `description`. So if a
 knowledge skill's description is engineered to fire **on that workflow,
 in that domain context**, it co-triggers and the agent weaves it in.
@@ -40,13 +41,14 @@ in that domain context**, it co-triggers and the agent weaves it in.
 The vanilla workflows were built expecting this. The sockets already
 exist — you are conforming a skill to them, not inventing them:
 
-- **Input socket** — `specification/SKILL.md` §Inputs already states a
-  tracker ticket is *"not handled by this skill on its own… JAIBA
-  models tracker access as a knowledge skill… that declares it should
-  fire when `specification:define` runs with a ticket reference."*
-- **Output socket** — `planning/references/define-mode.md` lists
-  *"knowledge skills"* among Sources consulted and inputs to the
-  Technical approach, and `plan-template.md` carries a literal slot:
+- **Input socket** — the requirement that enters `conduct:spec`
+  (define step) can arrive via a knowledge skill: the PRD template
+  carries `source: ticket` / `source-ref:` frontmatter for exactly
+  that provenance, and the workflow drafts from whatever requirement
+  input it is handed.
+- **Output socket** — `conduct/references/spec-mode.md` lists
+  *"knowledge skills"* among the sources the Technical approach cites,
+  and `plan-template.md` carries a literal slot:
   `- <Knowledge skill name> (if applicable)`.
 
 Because the connection is description + the existing sockets,
@@ -56,7 +58,7 @@ is enough.
 
 **The known tradeoff (be honest about it):** an output-modifier only
 fires if its description is *pushy enough* to co-trigger during
-`planning:define`. There is no poll that guarantees it. The mitigation
+`conduct:spec`. There is no poll that guarantees it. The mitigation
 is description quality and an explicit hook line — not a workflow edit.
 Say this to the developer when you adapt an output-modifier.
 
@@ -67,9 +69,9 @@ writing — it determines the hook and the behavior.
 
 | Type | What it does | Hooks | Canonical example |
 |---|---|---|---|
-| **input** | Enriches the workflow's *input* before it drafts — fetches/derives context and hands it over as the requirement. | usually `specification:define` | A Linear skill: sees `LIN-1234` in the prompt, fetches the issue, passes its description as the spec's requirement. |
-| **output** | Augments the workflow's *output* — contributes mandatory tasks, artifacts, and rules to the spec or plan. | usually `planning:define`, sometimes `specification:define` | A REST skill: when a plan adds endpoints, requires an `openapi.yaml` artifact and a doc task per endpoint. |
-| **both** | Some skills do both. | both modes | A tracker skill that also imposes a "link the plan to the ticket" task. |
+| **input** | Enriches the workflow's *input* before it drafts — fetches/derives context and hands it over as the requirement. | usually `conduct:spec` (define step) | A Linear skill: sees `LIN-1234` in the prompt, fetches the issue, passes its description as the spec's requirement. |
+| **output** | Augments the workflow's *output* — contributes mandatory tasks, artifacts, and rules to the spec or plan. | usually `conduct:spec` (design step) and `conduct:tasks` | A REST skill: when a plan adds endpoints, requires an `openapi.yaml` artifact and a doc task per endpoint. |
+| **both** | Some skills do both. | both phases | A tracker skill that also imposes a "link the plan to the ticket" task. |
 
 Read the matching reference before you write the contract:
 
@@ -85,8 +87,8 @@ Work on the skill the developer points you at. Touch **only** its
 
 1. **Locate and validate the target.** It must have a `SKILL.md` with
    YAML frontmatter. Refuse three things, with a one-line reason:
-   - a JAIBA **workflow** skill (`planning`, `specification`, `ask`,
-     `fast`, `update-brain`) — those are the sockets, not plugins;
+   - a JAIBA **workflow** skill (`conduct`, `ask`, `fast`,
+     `update-brain`) — those are the sockets, not plugins;
    - a JAIBA **meta** skill (including this one);
    - anything without a `SKILL.md`.
 
@@ -138,13 +140,13 @@ when JAIBA should consult it. Keep the first; add the second.
 
 Input (before): `Knows how to read Linear issues via the Linear MCP and summarize their requirements.`
 
-Output (after): `Knows how to read Linear issues via the Linear MCP and summarize their requirements. JAIBA knowledge plugin (input): whenever the 'specification' workflow runs (especially 'specification:define') and the prompt contains a Linear issue reference (e.g. LIN-1234, or a linear.app/issue URL), trigger and fetch that issue, then hand its description to the spec as the requirement input — so the developer never has to paste the ticket. See this skill's 'JAIBA Integration' section.`
+Output (after): `Knows how to read Linear issues via the Linear MCP and summarize their requirements. JAIBA knowledge plugin (input): whenever the 'conduct' workflow runs its spec phase (especially the define step, and 'propose' when the requirement starts there) and the prompt contains a Linear issue reference (e.g. LIN-1234, or a linear.app/issue URL), trigger and fetch that issue, then hand its description to the spec as the requirement input — so the developer never has to paste the ticket. See this skill's 'JAIBA Integration' section.`
 
 **Example — output modifier (an ASP.NET skill):**
 
 Input (before): `Organization's ASP.NET Core best practices: clean architecture layering, xUnit testing conventions, and per-endpoint Markdown docs.`
 
-Output (after): `Organization's ASP.NET Core best practices: clean architecture layering, xUnit testing conventions, and per-endpoint Markdown docs. JAIBA knowledge plugin (output): whenever 'planning:define' (or 'specification:define') is producing a plan or spec for ASP.NET Core work — new controllers, endpoints, or services — trigger and contribute its mandated tasks and artifacts (e.g. a Markdown doc task per endpoint, the layering and xUnit rules) into the workflow's output, and cite this skill under the plan's 'Sources consulted'. See this skill's 'JAIBA Integration' section.`
+Output (after): `Organization's ASP.NET Core best practices: clean architecture layering, xUnit testing conventions, and per-endpoint Markdown docs. JAIBA knowledge plugin (output): whenever 'conduct:spec' (or 'conduct:tasks') is producing a PRD, plan, or task graph for ASP.NET Core work — new controllers, endpoints, or services — trigger and contribute its mandated tasks and artifacts (e.g. a Markdown doc task per endpoint, the layering and xUnit rules) into the workflow's output, and cite this skill under the plan's 'Sources consulted'. See this skill's 'JAIBA Integration' section.`
 
 Notice both name the **workflow mode** and the **trigger signal**
 explicitly, and stay pushy ("whenever… trigger and…"). That is what
@@ -158,7 +160,7 @@ makes co-triggering reliable.
 - **One skill, one job.** Don't merge two knowledge skills, and don't
   split one. Adapt the skill as it is.
 - **Never edit a workflow.** If you feel the only way to make a plugin
-  work is to change `planning` or `specification`, stop and say so —
+  work is to change `conduct`, stop and say so —
   that is a framework change, out of scope here, and it would break the
   "installs with zero framework edits" guarantee.
 - **No invented integrations.** If the skill claims an MCP or API that
@@ -169,7 +171,8 @@ makes co-triggering reliable.
 
 - **A description that names the domain but not the workflow.** Then it
   triggers on chit-chat about the domain, not at spec/plan time. Always
-  bind it to `specification:define` / `planning:define`.
+  bind it to the exact `conduct` phase (`spec`, `tasks`, or
+  `propose`).
 - **Editing the knowledge.** Out of scope. If the rules are wrong,
   that's a conversation, not a silent rewrite.
 - **Double-injecting the contract** on a re-run. Update in place.

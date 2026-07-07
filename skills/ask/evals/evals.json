@@ -7,40 +7,42 @@
       "domain_under_test": "active-plan",
       "prompt": "what's left to do in the plan?",
       "context": {
-        "session_state": "active",
+        "work_state": "active",
         "prior_conversation": "none (first message of the session)",
-        "session_files": {
-          "plan.md": "approved, slug=collaborative-itineraries-base-model, spec=collaborative-itineraries",
-          "tasks.md": "Phase 1 fully checked; Phase 2 has 2 of 4 tasks unchecked; Phase 3 untouched",
-          "walkthrough.md": "Phase 1 block present"
+        "invocation": "implicit — interrogative message; there is no /ask command",
+        "work_files": {
+          "plan.md": "approved, slug=collaborative-itineraries-base-model",
+          "tasks.md": "Phase 1 fully checked; Phase 2 has T-006 and T-007 unchecked; Phase 3 untouched",
+          "walkthrough.md": "Phase 1 entries present"
         }
       },
       "expected_output": [
-        "Agent oriented cold: read .ai/session/plan.md and tasks.md before answering, not from assumed memory",
-        "Answer names the specific open tasks (the two Phase 2 tasks and Phase 3), grounded in tasks.md",
+        "Routing triggered ask implicitly on the interrogative — no command involved",
+        "Agent oriented cold: read .ai/work/plan.md and tasks.md before answering, not from assumed memory",
+        "Answer names the specific open tasks (T-006, T-007 and Phase 3), grounded in tasks.md",
         "Answer is concise, referenced by file (no full-file dump)",
         "Nothing written to .ai/ ; no code edited; Quality Gate not run",
-        "If it offered a next step, it offered planning:execute and waited — did not start executing"
+        "If it offered a next step, it offered conduct's execute phase and waited — did not start executing"
       ],
       "files": []
     },
     {
       "id": 2,
-      "name": "cold-spec-question-disambiguates",
-      "domain_under_test": "active-spec",
-      "prompt": "does the spec already cover account deletion?",
+      "name": "cold-prd-criteria-question",
+      "domain_under_test": "active-prd",
+      "prompt": "which acceptance criteria are still unmet?",
       "context": {
-        "session_state": "specs-present",
+        "work_state": "active at spec depth",
         "prior_conversation": "none",
-        "specs_present": ["auth", "collaborative-itineraries"],
-        "developer_named_spec": false
+        "work_files": {
+          "PRD.md": "criteria schema COL-001..COL-004; tasks.md covers: hints map COL-004 to unchecked T-012"
+        }
       },
       "expected_output": [
-        "Agent recognized the spec was not named and more than one exists",
-        "Agent confirmed which spec (auth) before reading, instead of guessing",
-        "After confirmation, read auth/PRD.md and user-stories.md and answered with the specific story (or its absence) and its checkbox state",
-        "If the story exists but is clearly unimplemented in code, the gap is marked as inference, not fact",
-        "Read-only: nothing written, no code changed"
+        "Agent read .ai/work/PRD.md's criteria schema and cross-referenced tasks.md covers: hints",
+        "Answer lists the unmet criteria by id (COL-004) with the open task that covers each",
+        "Inference labeled as inference: an unchecked task suggests unmet, but only validate/verify confirms — the agent said so instead of asserting",
+        "Read-only: nothing written, no code changed, no criterion status flipped"
       ],
       "files": []
     },
@@ -50,9 +52,8 @@
       "domain_under_test": "code",
       "prompt": "explain how the invitation endpoint works, where is the email validated?",
       "context": {
-        "session_state": "empty",
-        "active_spec": null,
-        "note": "pure code question; no plan or spec needed to answer"
+        "work_state": "empty",
+        "note": "pure code question; no plan or PRD needed to answer"
       },
       "expected_output": [
         "Agent went straight to the relevant source via grep/glob; did not do a full brain precondition sweep",
@@ -69,19 +70,19 @@
       "domain_under_test": "handoff",
       "prompt": "why does the itinerary listing make so many queries?",
       "context": {
-        "session_state": "active",
-        "session_files": {
+        "work_state": "active",
+        "work_files": {
           "plan.md": "approved, executing"
         },
-        "follow_up_after_answer": "do it with fast",
+        "follow_up_after_answer": "ok fix it, it's small",
         "simulated_finding": "N+1 in the collaborator loop at itineraries/views.py:58"
       },
       "expected_output": [
         "First turn stays in ask: locates the view, explains the N+1 in a few lines referenced by path:line",
-        "Offers a route (fast or planning) and WAITS — does not change code on the question turn",
-        "On the follow-up 'do it with fast', hands off to fast carrying the already-located view and diagnosis",
+        "Offers a route (fast for the contained fix, or a plan phase) and WAITS — does not change code on the question turn",
+        "On the follow-up change request, the routing rule hands off to fast carrying the already-located view and diagnosis",
         "Does not re-investigate from scratch after the hand-off (shared-session context reused)",
-        "The actual edit happens under fast's contract (triage + Quality Gate), only after the developer asked for it"
+        "The actual edit happens under fast's contract (shared triage + Quality Gate), only after the developer asked for it"
       ],
       "files": []
     },
@@ -91,35 +92,35 @@
       "domain_under_test": "trigger-discipline",
       "prompt": "could we upgrade requests to version 5? how complex would that be?",
       "context": {
-        "session_state": "empty",
+        "work_state": "empty",
         "simulated_blast_radius": "many call sites + a Session subclass whose signature changes",
-        "note": "this is a feasibility QUESTION, not a /fast request"
+        "note": "this is a feasibility QUESTION, not a change request"
       },
       "expected_output": [
         "Agent treated this as a question, not an action — did NOT bump the version",
         "Investigated read-only to answer feasibility: counted call sites, flagged the breaking contract change",
-        "Answer states the blast radius concretely and concludes it is planning-sized, not fast-sized",
-        "Offered the route (planning define) without executing it; waited for the developer",
+        "Answer states the blast radius concretely and concludes it is chain-sized (design depth at least), not inline",
+        "Offered the route (enter the conduct chain) without executing it; waited for the developer",
         "No file modified"
       ],
       "files": []
     },
     {
       "id": 6,
-      "name": "no-active-plan-says-so",
+      "name": "no-active-work-says-so",
       "domain_under_test": "orientation-empty",
       "prompt": "what phase of the plan are we on?",
       "context": {
-        "session_state": "empty",
-        "session_files": {
+        "work_state": "empty",
+        "work_files": {
           "plan.md": "absent"
         }
       },
       "expected_output": [
-        "Agent checked .ai/session/ and found no plan.md",
-        "Answered plainly that there is no active plan — did not reconstruct a hypothetical one",
-        "If a <slug>-summary.md were present it would mention the plan was finished but not cleaned up (honest state)",
-        "Offered a constructive next step (e.g. planning define) without acting on it"
+        "Agent checked .ai/work/ and found no plan.md",
+        "Answered plainly that there is no active work — did not reconstruct a hypothetical plan",
+        "If .ai/memory/log/ holds a recent work-closure entry, it may cite that as the last finished work (honest state)",
+        "Offered a constructive next step (start new work through the conduct chain) without acting on it"
       ],
       "files": []
     },
@@ -127,7 +128,7 @@
       "id": 7,
       "name": "no-brain-still-answers-code-question",
       "domain_under_test": "brain-discovery-empty",
-      "prompt": "what does the auth module do, and is there a spec for it?",
+      "prompt": "what does the auth module do, and is there a PRD for it?",
       "context": {
         "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
         "repo_state": "no .ai/ directory at all, no AGENTS.md at the project root",
@@ -136,7 +137,7 @@
       "expected_output": [
         "Agent checked for .ai/ and AGENTS.md as part of orienting cold",
         "Still answered the code-question half from the source (auth/views.py) — did not refuse entirely",
-        "For the spec half, said plainly there is no spec because this project has no JAIBA brain yet — did not invent one",
+        "For the PRD half, said plainly there is none because this project has no JAIBA brain yet — did not invent one",
         "Offered jaiba-scaffold as a next step and waited — did not install or write anything",
         "Read-only throughout: nothing written, no code changed"
       ],
@@ -149,11 +150,12 @@
       "prompt": "why did we decide to use django-guardian for permissions?",
       "context": {
         "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists, AGENTS.md present and is the JAIBA behavioral contract, but .ai/memory/adr-log.md is still the bare [bracket] template"
+        "repo_state": ".ai/ skeleton exists, AGENTS.md is the valid minimal JAIBA marker, but .ai/memory/adr-log.md is still the bare [bracket] template and .ai/memory/log/ is empty"
       },
       "expected_output": [
-        "Agent opened .ai/memory/adr-log.md and recognized it as a bare template, not an empty-but-real log",
-        "Answered plainly that the ADR log hasn't been initialized yet, so this decision (if made) isn't recorded",
+        "The minimal AGENTS.md marker was accepted as valid instrumentation (contract lives globally)",
+        "Agent opened .ai/memory/adr-log.md and recognized it as a bare template, not an empty-but-real log; checked .ai/memory/log/ for closure entries too",
+        "Answered plainly that decision memory hasn't been initialized, so this decision (if made) isn't recorded",
         "Did not invent a plausible-sounding rationale to fill the gap",
         "Fell back to git log/blame on the relevant code as a read-only secondary source, if useful, and labeled it as inference vs. recorded fact",
         "Offered update-brain initialize as a next step and waited"

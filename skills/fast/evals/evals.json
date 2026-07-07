@@ -3,19 +3,21 @@
   "evals": [
     {
       "id": 1,
-      "name": "free-standing-accepted",
+      "name": "free-standing-accepted-implicit",
       "context_under_test": "free-standing",
-      "prompt": "/fast bump requests from 2.31 to 2.32 in the manifest",
+      "prompt": "bump requests from 2.31 to 2.32 in the manifest",
       "context": {
-        "session_state": "empty",
+        "work_state": "empty",
+        "invocation": "implicit — routing rule classifies a small contained change; there is no /fast command",
         "constitution_quality_gate": "present",
         "reference_index_has": ["requests"]
       },
       "expected_output": [
-        "Agent triaged scope first (confirmed the bump touches only the manifest, no breaking changes reaching call sites)",
+        "Routing triggered fast implicitly — the lane activated without any slash command",
+        "Shared triage (conduct/references/triage.md, default+floor inline) confirmed the bump touches only the manifest",
         "Change applied to the dependency manifest only",
         "Quality Gate run after the change",
-        "Nothing written to .ai/session/ (no plan active, no orphan walkthrough.md created)",
+        "Nothing written to .ai/work/ (free-standing writes no executive artifacts)",
         "A conventional-commit message suggested (chore(deps): ...), not executed",
         "One-line recap given in chat"
       ],
@@ -23,20 +25,20 @@
     },
     {
       "id": 2,
-      "name": "too-complex-refused",
+      "name": "too-complex-routes-into-chain",
       "context_under_test": "triage-refusal",
-      "prompt": "/fast update the requests package to version 5",
+      "prompt": "quick change: update the requests package to version 5",
       "context": {
-        "session_state": "empty",
+        "work_state": "empty",
         "simulated_blast_radius": "23 call sites across 9 modules, a custom requests.Session subclass whose signature changes, adapter/retry config moves to a new API",
         "constitution_quality_gate": "present"
       },
       "expected_output": [
         "Agent investigated blast radius before editing (counted call sites, detected contract + migration impact)",
-        "Agent refused to execute the change as fast work",
+        "Shared triage scored the work above inline (design at least) — fast refused to execute it",
         "No partial change applied; worktree left untouched",
         "Refusal was concrete (named file/call-site count and the changed contract), not just 'too complex'",
-        "Agent routed the developer to planning define with a one-line sketch of what the plan must cover"
+        "Agent routed the developer into the conduct chain, carrying the triage evidence and depth so it isn't re-derived from scratch"
       ],
       "files": []
     },
@@ -46,64 +48,86 @@
       "context_under_test": "plan-adjustment",
       "prompt": "add an email format validation to the invitation endpoint, it was not in the plan",
       "context": {
-        "session_state": "active",
-        "session_files": {
+        "work_state": "active",
+        "work_files": {
           "plan.md": "approved, executing, slug=collaborative-itineraries-base-model",
-          "tasks.md": "Phase 2 (invitation service) in progress",
-          "walkthrough.md": "Phase 1 block present"
+          "tasks.md": "Phase 2 (invitation service) in progress, tasks T-005..T-008",
+          "walkthrough.md": "Phase 1 entries present"
         },
         "git_status": "dirty-from-current-phase",
         "constitution_tdd_mode": "enabled"
       },
       "expected_output": [
-        "Agent triaged the change as fast-eligible (one serializer + one test, contained)",
+        "Agent triaged the change as inline (one serializer + one test, contained)",
         "Agent recognized the change as a plan adjustment (in scope of the active plan)",
         "Dirty worktree treated as expected mid-phase, not as a blocking surprise",
         "Behavioral change with TDD enabled: a test was added/adjusted and passes",
         "Quality Gate run green",
-        "Agent executed the change THEN asked the developer to confirm correctness BEFORE writing session artifacts",
-        "On confirmation: tasks.md got the new checked task tagged (fast, <date>), plan.md got a Plan amendments bullet, walkthrough.md got an out-of-band note",
+        "Agent executed the change THEN asked the developer to confirm correctness BEFORE writing executive artifacts",
+        "On confirmation: tasks.md got a new checked task with the next free T-NNN id (no renumbering), tagged (fast, <date>); plan.md got a Plan amendments bullet; walkthrough.md got the out-of-band block",
         "Agent did not advance the plan itself; suggested a commit without running it"
       ],
       "files": []
     },
     {
       "id": 4,
+      "name": "big-out-of-band-fold-or-park",
+      "context_under_test": "plan-adjustment-oversized",
+      "prompt": "we also need to add SSO login with Azure AD, can you slip that in while we're at it?",
+      "context": {
+        "work_state": "active",
+        "work_files": {
+          "plan.md": "approved, executing, slug=collaborative-itineraries-base-model",
+          "tasks.md": "Phase 2 of 3 in progress"
+        },
+        "simulated_blast_radius": "new auth flow, new external integration, settings + middleware + user model — clearly design/spec depth"
+      },
+      "expected_output": [
+        "Agent triaged the request as far above inline while a plan is active",
+        "Did NOT touch code and did NOT create a second plan silently",
+        "Surfaced the size with evidence and offered exactly two exits: fold it into the active plan as a new phase (via the conduct chain, with a dated amendment) or park-and-replan (pause at the last reversible checkpoint, re-enter the chain)",
+        "Waited for the developer's choice; the active plan.md was not overwritten or drifted",
+        "Whichever exit is chosen, the folding/replanning itself belongs to conduct — fast only surfaced and routed"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
       "name": "borderline-asks-developer",
       "context_under_test": "triage-borderline",
-      "prompt": "/fast extract the pricing calculation logic to its own module and update the imports",
+      "prompt": "small change: extract the pricing calculation logic to its own module and update the imports",
       "context": {
-        "session_state": "empty",
+        "work_state": "empty",
         "simulated_blast_radius": "ambiguous — could be 2 files or could ripple through ~8 importers",
         "constitution_quality_gate": "present"
       },
       "expected_output": [
         "Agent investigated before deciding (located the pricing logic and counted importers)",
         "Agent surfaced its blast-radius estimate to the developer rather than deciding silently",
-        "Agent offered the choice: proceed as fast vs. route to planning, and waited for the decision",
+        "Agent offered the choice: proceed as inline vs. enter the conduct chain, and waited for the decision",
         "No code changed before the developer chose"
       ],
       "files": []
     },
     {
-      "id": 5,
+      "id": 6,
       "name": "uninstrumented-project-still-executes",
       "context_under_test": "brain-discovery-uninstrumented",
-      "prompt": "/fast bump lodash from 4.17.20 to 4.17.21 in package.json",
+      "prompt": "bump lodash from 4.17.20 to 4.17.21 in package.json",
       "context": {
         "skill_install": "global (~/.claude/skills/), project has never used JAIBA",
         "repo_state": "no AGENTS.md (or one unrelated to JAIBA), no .ai/ directory",
-        "session_state": "empty",
+        "work_state": "empty",
         "ci_facts": "package.json has a `test` script; CI workflow runs `npm test`"
       },
       "expected_output": [
-        "Agent ran the brain check, found no JAIBA AGENTS.md / constitution, but did NOT block the change",
+        "Agent ran the brain check, found no JAIBA marker / constitution, but did NOT block the change",
         "Triaged scope normally (single dependency bump, contained)",
         "Treated the change as free-standing — did not look for an active plan",
         "Quality Gate fallback used the repo's own package.json `test` script / CI command, not constitution.md §6 (which doesn't exist)",
         "Change applied to package.json (and lockfile if present)",
         "Closing recap mentioned jaiba-scaffold once as an opportunity, without making it a precondition for the change",
-        "Nothing written to .ai/session/"
+        "Nothing written to .ai/work/"
       ],
       "files": []
     }

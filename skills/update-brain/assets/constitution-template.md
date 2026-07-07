@@ -66,6 +66,26 @@ What belongs inside this project, and what does not.
     services, list them here, e.g., `@org/logger`, `@org/ui-components`.
     Otherwise: "None."]
 
+### 5.1 Sub-unit scope
+
+> Fill this only when the repository holds more than one deliverable
+> unit — packages/libs in a monorepo or turborepo, projects in a
+> `.sln`, apps in a workspace. It lets a plan or spec target one
+> sub-unit precisely instead of the whole repo, and tells the agent
+> which boundaries a change must not cross. Single-unit repositories:
+> replace the table with "Single unit."
+
+| Sub-unit | Path | Scope (one line) | May depend on |
+|---|---|---|---|
+| [api]    | [`packages/api`] | [REST backend; owns persistence]  | [`shared`]                          |
+| [web]    | [`packages/web`] | [Frontend; no direct DB access]   | [`api` public contract, `shared`]   |
+| [shared] | [`packages/shared`] | [Cross-cutting types + utils]  | [nothing internal]                  |
+
+> Contracts *between* sub-units (event schemas, internal APIs) are
+> external surfaces from each sub-unit's point of view — record them
+> in `reference-index.md` § Internal Cross-Component Contracts, not
+> here.
+
 ## 6. Quality Gate
 
 The Quality Gate is split into two tiers run at different points in the
@@ -84,7 +104,7 @@ atomically before moving on.
 - **Type checking:** [Zero errors from the project's type checker.]
 - **Formatting:** [Code conforms to the project's formatter; no diffs.]
 
-### Plan Gate (runs once at `planning:summarize` — may be slow)
+### Plan Gate (runs once at `conduct:validate` — may be slow)
 
 A plan is **not done** until all of these pass. Failures block the summary
 and require corrective action before closing.
@@ -96,7 +116,7 @@ and require corrective action before closing.
 
 ## 7. Planning Conventions
 
-How plans and specs are structured for this project. The `planning`
+How plans and specs are structured for this project. The `conduct`
 skill reads this section to decide phase structure and task ordering.
 
 - **TDD mode:** `enabled`
@@ -115,10 +135,10 @@ skill reads this section to decide phase structure and task ordering.
 - **Phase structure:** Phases group tasks by **architectural
   cohesion**, not by chronology. Each phase declares its dependencies
   on prior phases and must leave the codebase reversible and
-  buildable on completion. The default `planning:execute` flow pauses
+  buildable on completion. The default `conduct:execute` flow pauses
   at every phase boundary for human review.
 
-- **Git strategy (suggestion, not enforcement):** The `planning`
+- **Git strategy (suggestion, not enforcement):** The `conduct`
   skill suggests a `chore(wip): <phase>` message at each phase
   boundary and a conventional-commit message at plan close. The
   developer chooses what to do with those suggestions — squash, merge,
@@ -130,8 +150,8 @@ skill reads this section to decide phase structure and task ordering.
     suggests both options at close and the developer picks.]
 
 - **Definition of ready** (before a plan enters `execute` mode):
-  - Plan is written to `.ai/session/plan.md`
-  - Tasks are decomposed in `.ai/session/tasks.md`
+  - Plan is written to `.ai/work/plan.md`
+  - Tasks are decomposed in `.ai/work/tasks.md`
   - All clarifying questions have been resolved (no
     `[NEEDS CLARIFICATION]` blocks in the artifacts)
   - Human has explicitly approved the plan
