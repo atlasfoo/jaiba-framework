@@ -40,7 +40,7 @@ minimal `AGENTS.md` marker in the repo, and the actual rules in
   (kept in lockstep with the canonical copy scaffold ships):
 
   ```bash
-  diff -q <global-agent-folder>/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
+  diff -q --strip-trailing-cr <global-agent-folder>/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
   ```
 
   Different → **Degraded**: the machine runs older (or hand-edited)
