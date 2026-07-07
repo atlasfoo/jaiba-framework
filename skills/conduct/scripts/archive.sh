@@ -51,7 +51,7 @@ fi
 # fall back to today.
 ARCHIVE_DATE=""
 if [[ -f "${PLAN_PATH}" ]]; then
-  ARCHIVE_DATE="$(grep -E '^created:' "${PLAN_PATH}" | head -n1 | sed -E 's/created:[[:space:]]*//' | tr -d '"' || true)"
+  ARCHIVE_DATE="$(grep -E '^created:' "${PLAN_PATH}" | head -n1 | sed -E 's/created:[[:space:]]*//' | tr -d "'\"\r" | cut -d' ' -f1 || true)"
 fi
 if [[ -z "${ARCHIVE_DATE}" ]]; then
   ARCHIVE_DATE="$(date -u +%Y-%m-%d)"

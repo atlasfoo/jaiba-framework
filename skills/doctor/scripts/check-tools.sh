@@ -161,7 +161,9 @@ missing=0
 total=0
 rows=""
 declare -A TOOL_PRESENT
-for t in $(printf '%s\n' "${!NEEDS[@]}" | sort); do
+readarray -t sorted_tools < <(printf '%s\n' "${!NEEDS[@]}" | sort)
+for t in "${sorted_tools[@]}"; do
+  [ -z "$t" ] && continue
   total=$((total + 1))
   cmd="$(probe_cmd "$t")"
   if path="$(command -v "$cmd" 2>/dev/null)"; then
@@ -180,7 +182,9 @@ done
 
 # Build the health rollup row per source
 rollup_rows=""
-for src in $(printf '%s\n' "${SOURCES[@]}" | sort -u); do
+readarray -t sorted_sources < <(printf '%s\n' "${SOURCES[@]}" | sort -u)
+for src in "${sorted_sources[@]}"; do
+  [ -z "$src" ] && continue
   src_tools="${DECLARED_TOOLS[$src]:-}"
   [ -z "$src_tools" ] && continue
 
