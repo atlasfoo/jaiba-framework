@@ -69,25 +69,55 @@ BASELINE="git bash rg curl"
 # tool -> "source1, source2, ..."  (provenance: who needs the tool)
 declare -A NEEDS
 
+# mcp tool (prefix stripped) -> "source1, source2, ..."  (provenance).
+# MCP servers aren't CLI tools on PATH — `command -v` can't verify them,
+# so `requires: [mcp:foo]` entries are indexed here instead of NEEDS.
+# A later diagnostic (doctor #3) verifies MCP reachability.
+declare -A MCP_NEEDS
+
 # source -> "tool1 tool2 ..." (inverse map)
 declare -A DECLARED_TOOLS
 declare -a SOURCES=()
 declare -A SEEN_SOURCE
 
+# Hooks unverified flag: set to 1 if jq is missing and hooks can't be scanned
+HOOKS_UNVERIFIED=0  # consumed by report rendering
+
+register_source() {  # register_source <source-label>
+  local src="$1"
+  if [ -z "${SEEN_SOURCE[$src]:-}" ]; then
+    SEEN_SOURCE[$src]=1
+    SOURCES+=("$src")
+  fi
+}
+
 note() {  # note <tool> <source-label>
   local t="$1" src="$2"
   [ -z "$t" ] && return 0
 
-  # Update inverse map
+  # Update inverse map. Store the original token (prefix included) so a
+  # source's rollup entry can later distinguish `mcp:context7` from a
+  # plain CLI tool by checking the prefix on each space-separated token.
   if [ -z "${DECLARED_TOOLS[$src]:-}" ]; then
     DECLARED_TOOLS[$src]="$t"
   elif [[ " ${DECLARED_TOOLS[$src]} " != *" $t "* ]]; then
     DECLARED_TOOLS[$src]+=" $t"
   fi
 
-  if [ -z "${SEEN_SOURCE[$src]:-}" ]; then
-    SEEN_SOURCE[$src]=1
-    SOURCES+=("$src")
+  register_source "$src"
+
+  # mcp:* entries are indexed, not probed: `command -v` can't resolve an
+  # MCP server, so route them into MCP_NEEDS (prefix stripped) instead
+  # of the flat NEEDS map that feeds the CLI probe loop below.
+  if [[ "$t" == mcp:* ]]; then
+    local mt="${t#mcp:}"
+    [ -z "$mt" ] && return 0
+    if [ -z "${MCP_NEEDS[$mt]:-}" ]; then
+      MCP_NEEDS[$mt]="$src"
+    elif [[ ",${MCP_NEEDS[$mt]}," != *",$src,"* ]]; then
+      MCP_NEEDS[$mt]="${MCP_NEEDS[$mt]}, $src"
+    fi
+    return 0
   fi
 
   # Update flat tool needs map
@@ -115,6 +145,7 @@ for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
   [ -d "$SKILLS_DIR" ] || continue
   while IFS= read -r -d '' f; do
     label="skill:$(basename "$(dirname "$f")")"
+    register_source "$label"
     while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
   done < <(find "$SKILLS_DIR" -name SKILL.md -print0 2>/dev/null)
 done
@@ -125,6 +156,7 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
   if [ -d "$AGENT_DIR/agents" ]; then
     while IFS= read -r -d '' f; do
       label="subagent:$(basename "$f" .md)"
+      register_source "$label"
       while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
     done < <(find "$AGENT_DIR/agents" -name '*.md' -print0 2>/dev/null)
   fi
@@ -149,6 +181,8 @@ if command -v jq >/dev/null 2>&1; then
       done < <(jq -r '.hooks // {} | .. | .command? // empty' "$cfg" 2>/dev/null)
     done
   done
+else
+  HOOKS_UNVERIFIED=1
 fi
 
 # 4. Baseline, always.
