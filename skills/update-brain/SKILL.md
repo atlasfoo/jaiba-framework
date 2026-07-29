@@ -1,6 +1,6 @@
 ---
 name: update-brain
-description: Long-term memory maintenance for JAIBA's `.ai/memory/`. Only skill allowed to write constitution.md, adr-log.md, reference-index.md; owns the append-only `.ai/memory/log/` changelog and all brain templates. Two modes: initialize (analyze repo, populate brain), update (apply proposals, fix drift). Called by scaffold and workflow-close handoffs.
+description: "Long-term memory maintenance for JAIBA's `.ai/memory/`. Populates brain templates; can update ADR log and drift corrections."
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
