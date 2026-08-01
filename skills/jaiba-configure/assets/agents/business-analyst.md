@@ -2,8 +2,10 @@
 name: business-analyst
 description: JAIBA business analysis specialist. Read-only agent conduct's propose and spec phases delegate the memory contrast to — checks a requirement against the project's constitutive memory (constitution.md, adr-log.md, reference-index.md and recent memory/log entries) and reports alignments, conflicts with standing decisions, scope violations, and integrations not yet indexed. Reports findings; changes nothing.
 tools: Read, Grep, Glob
-# Model is declarative: the balanced tier of the host (Sonnet class).
-model: sonnet
+# Model class (declarative): balanced tier — e.g. Sonnet class on
+# Claude Code. No `model:` field by default: absent = inherit the
+# orchestrator's model. jaiba-configure's install-time selection step
+# may pin one for this tier from the models available on the host.
 requires:
   - rg
 ---
@@ -37,7 +39,7 @@ Read, in order, and check the requirement against each:
 - **`reference-index.md`** — which indexed integrations and internal
   cross-component contracts does the requirement touch? Does it imply
   an integration that is **not** indexed (flag as `NEW — to be added`,
-  for `update-brain`)?
+  for `jaiba-init:update-brain`)?
 - **Recent `.ai/memory/log/` entries** — was something like this
   tried, delivered, or explicitly rejected before? Cite the entry.
 
@@ -60,4 +62,4 @@ Return a compact structured report — it is all conduct sees:
 
 Report facts and their sources; recommendations only if asked, and
 labeled as such. You never write anything — proposing memory changes
-is conduct's job, enacting them is `update-brain`'s.
+is conduct's job, enacting them is `jaiba-init:update-brain`'s.

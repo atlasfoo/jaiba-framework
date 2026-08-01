@@ -101,10 +101,19 @@ If either check fails, **stop here** — do not enter any phase or write
 to `.ai/work/`. An orphaned plan with no constitution to ground it
 helps no one. Route instead:
 
-- No `.ai/` at all → `jaiba-scaffold`.
-- `.ai/` exists but `.ai/memory/` is bare templates → `update-brain`
-  in `initialize` mode.
-- `AGENTS.md` missing or not the JAIBA contract → `jaiba-scaffold`.
+- No `.ai/` at all → `jaiba-init` (bootstrap).
+- `.ai/` exists but `.ai/memory/` is bare templates → `jaiba-init`,
+  which resumes at its `update-brain:initialize` mode.
+- `AGENTS.md` missing or not the JAIBA repo marker → `jaiba-init`
+  (bootstrap; it drops the marker as part of the sequence).
+
+All three are repo-state failures, and repo instrumentation is
+`jaiba-init`'s job alone — its own "When NOT to bootstrap" table decides
+whether the run is a fresh bootstrap or a resume, so route there and let
+it pick. `jaiba-configure` is *not* an answer to any of these: it is a
+machine-level prerequisite (the global behavioral contract, the skillset,
+the subagent battery). Name it only when that global side is what's
+missing — a separate check, not a repo-state one.
 
 ## Triage: how deep does the chain run?
 
@@ -247,7 +256,8 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - `validate` gates `summarize`: criteria unmet ⇒ back to `execute`
   (or the developer explicitly waives, recorded in the summary).
 - `summarize` is one step: present the summary, propose ADRs (enacting
-  them is `update-brain`'s job), archive to `.ai/memory/log/`, clean
+  them is `jaiba-init:update-brain`'s job), archive to
+  `.ai/memory/log/`, clean
   `.ai/work/` — with one explicit confirmation before the destructive
   part.
 
@@ -263,4 +273,4 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - **Writing to `.ai/memory/` directly.** Only the `summarize` step's
   log entry (via `scripts/archive.sh`) touches memory, and only
   `log/`. Constitution/ADR/reference changes are proposals for
-  `update-brain`.
+  `jaiba-init:update-brain`.

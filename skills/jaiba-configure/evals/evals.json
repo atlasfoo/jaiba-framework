@@ -1,0 +1,113 @@
+{
+  "skill_name": "jaiba-configure",
+  "evals": [
+    {
+      "id": 1,
+      "name": "fresh-machine-full-configure",
+      "prompt": "I just installed JAIBA on a new laptop. Can you configure it for me?",
+      "context": {
+        "host": "vendor identity not determinable from the running agent",
+        "global_config_state": "no ~/.claude/, no ~/.agents/, nothing installed"
+      },
+      "expected_output": "Runs the greeting banner. Identifies the host agent by self-introspection (not by scanning any repo); unable to resolve a vendor, falls back to the neutral ~/.agents/ as the global config root and says why. Installs assets/jaiba-contract.md as ~/.agents/jaiba-contract.md and wires a reference from the vendor's global instructions file if one exists. Checks `npx skills list -g`, installs the missing skillset.txt entries at the chosen scope, then copies the subagent battery from assets/agents/ (executor-high/medium/low, code-analyst, business-analyst, verify) into ~/.agents/agents/. Creates NOTHING inside any repository — no .ai/, no .atl/, no AGENTS.md. Closing report covers host + config root, contract, skills, battery, and names jaiba-init as the next step for setting up a specific project without invoking it.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "project-intent-hands-off-to-jaiba-init",
+      "prompt": "Set up JAIBA for this repo I'm working on.",
+      "context": {
+        "host": "Claude Code",
+        "repo_state": "no .ai/, no AGENTS.md",
+        "global_config_state": "nothing installed under ~/.claude/"
+      },
+      "expected_output": "Performs only the global work: contract into ~/.claude/jaiba-contract.md, skillset install, subagent battery into ~/.claude/agents/. Does not create the .ai/ skeleton, the .atl/ directory, or an AGENTS.md marker in the repo, and does not invoke jaiba-init or jaiba-doctor. Closes by telling the developer that the machine is configured and that the repo-scoped setup is `jaiba-init`, to be run from inside that repo — a mention, not an invocation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "rerun-on-already-configured-machine",
+      "prompt": "I upgraded jaiba, re-run the configure to refresh my setup.",
+      "context": {
+        "global_config_state": "~/.claude/jaiba-contract.md is byte-identical to the packaged assets/jaiba-contract.md; all six subagent definitions present and identical; every skillset.txt entry already in `npx skills list -g`"
+      },
+      "expected_output": "Does NOT refuse to re-run — global configuration is refreshable by design. Compares each artifact against the packaged version, finds everything current, installs and overwrites nothing, and reports each item as 'already current'. Applies Case A for skills: nothing installed, developer pointed at `npx skills update -g`. Closing report states plainly that the machine was already up to date.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "all-skillset-skills-already-global",
+      "prompt": "Configure jaiba on this machine.",
+      "context": {
+        "global_skills_state": "every skill listed in skills/jaiba-configure/assets/skillset.txt (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) is already present in `npx skills list -g` output",
+        "global_config_state": "no jaiba-contract.md, no agents/ definitions yet"
+      },
+      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed no skills -- not globally, not project-locally. Told the developer their global skillset is complete and pointed them at `npx skills update -g` to stay current. Still performed the other global installs: the behavioral contract into the global config root and the subagent battery into its agents/ folder. Closing report explicitly notes Case A (already global, nothing installed).",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "missing-skills-offered-global-or-local",
+      "prompt": "Install the jaiba skillset for me.",
+      "context": {
+        "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- none of the skillset.txt entries (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) are global yet"
+      },
+      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`, the recommended scope) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries one by one with the chosen scope, then installs the subagent battery.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "project-local-choice-targets-current-directory",
+      "prompt": "Yes, install the missing ones locally for the project I'm in.",
+      "context": {
+        "prior_turn": "jaiba-configure already ran `npx skills list -g` and found conduct, ask already global, but fast, jaiba-init, create-knowledge, jaiba-doctor, and caveman missing -- and just asked the developer global vs. project-local for the missing ones",
+        "cwd": "a repo with a .claude/ directory at its root"
+      },
+      "expected_output": "Resolved the project-local target from the current working directory: .claude/ exists at its root, so skills go to .claude/skills/. Installed only the previously-missing skills (fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) without -g, one by one. Did not reinstall or duplicate conduct or ask, which were already global. Then installed the contract and the subagent battery GLOBALLY regardless of the project-local skills choice — those are never project-scoped. Created no .ai/, .atl/ or AGENTS.md in that repo. Closing report distinguishes which skills came from where.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "existing-drifted-global-contract",
+      "prompt": "configure jaiba on this machine",
+      "context": {
+        "global_agent_config": "~/.claude/ already holds a jaiba-contract.md from an older framework version (content differs from the packaged assets/jaiba-contract.md)"
+      },
+      "expected_output": "During step 2, detected the existing global jaiba-contract.md differs from the packaged version. Did NOT silently overwrite the machine-wide file: asked the developer whether to update (back up theirs, install the packaged version) or keep theirs (noting jaiba-doctor will keep flagging the drift). Proceeded with the skillset and subagent battery either way, and the closing report records which choice was made.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "drifted-subagent-definition",
+      "prompt": "refresh my jaiba setup",
+      "context": {
+        "global_config_state": "~/.claude/agents/executor-high.md exists but was hand-edited by the developer; the other five definitions are identical to the packaged ones",
+        "global_skills_state": "all skillset.txt entries already global"
+      },
+      "expected_output": "Skipped the five identical subagent definitions as already current and did not overwrite the hand-edited executor-high.md: asked first, offering to back theirs up before installing the packaged version. Same non-destructive policy as the contract. Reports which definitions were skipped, which were installed, and what the developer chose for the drifted one.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "model-selection-per-tier-choices",
+      "prompt": "Configure jaiba on this machine.",
+      "context": {
+        "host": "Claude Code, fresh global config -- no jaiba-contract.md, no agents/ yet",
+        "host_model_roster": "an Opus-class, a Sonnet-class, and a Haiku-class model are all available to this host at runtime"
+      },
+      "expected_output": "After copying the six packaged subagent definitions (which carry no model: field), ran the model-selection step: enumerated the models available to THIS host at runtime (never a list hardcoded in the skill itself), then asked once per tier -- high, medium (grouping executor-medium with code-analyst, business-analyst, and verify under one question, since all four share the balanced tier), and low -- with 'leave blank, inherit the orchestrator's model' offered as an explicit option alongside the discovered models in every question, not just implied. Developer picked the Opus-class model for high, the Sonnet-class model for medium, and left low blank. Wrote model: <opus-class value> into the installed executor-high.md, model: <sonnet-class value> into the installed executor-medium.md AND the three specialist copies, and left executor-low.md with no model: field at all. Did not touch the packaged source under this skill's own assets/agents/ -- only the copies at the global config root. Closing report's subagent-battery bullet states the per-tier result plainly (two tiers pinned, one inherits).",
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "model-selection-full-inherit-router-host",
+      "prompt": "Configure jaiba on this machine. It's for a router that dynamically switches models across requests -- don't hardcode anything.",
+      "context": {
+        "host": "a router-style host where model identity varies per request, not a fixed per-agent choice",
+        "host_model_roster": "no stable enumerable roster to offer -- or the developer explicitly wants every tier to inherit"
+      },
+      "expected_output": "Still ran the model-selection step and still asked once per tier -- offering 'leave blank, inherit the orchestrator's model' is unconditional, never skipped just because the host looks router-shaped. Developer chose to leave all three tiers blank. None of the six installed agent definitions ended up with a model: field -- all six inherit the orchestrator's model per request, which is exactly the router-friendly behavior the developer asked for. Did not invent a fallback model class or refuse the request for lack of an enumerable roster. Closing report states plainly that every tier inherits.",
+      "files": []
+    }
+  ]
+}

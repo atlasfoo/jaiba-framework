@@ -4,7 +4,7 @@ Close the work in **one step**: distill the essence, show it to the
 human, propose what the brain should learn, then — on one explicit
 confirmation — archive to `.ai/memory/log/` and clean `.ai/work/`.
 End state: `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` exists, ADR/brain
-proposals are on the table for `update-brain`, a final
+proposals are on the table for `jaiba-init:update-brain`, a final
 conventional-commit message is suggested, and `.ai/work/` is empty.
 
 There is deliberately **one confirmation, not two ceremonies**: the
@@ -38,7 +38,7 @@ showing it.
    the walkthrough's checkpoint blocks: is it structural? Will future
    work need the *why*? If yes, include the proposed ADR block
    (status: Proposed) in the summary — **propose only**; enacting is
-   `update-brain`'s right. If no: state "No ADR proposed; all
+   `jaiba-init:update-brain`'s right. If no: state "No ADR proposed; all
    decisions were tactical." Same for reference-index entries (a NEW
    integration the work introduced) and constitution changes (scope /
    gate / sub-unit shifts) worth promoting.
@@ -63,8 +63,8 @@ showing it.
    script before running it** — it is short by design.
 7. **Report and hand off.** Where the log entry lives; that
    `.ai/work/` is ready for the next piece of work; and — if ADRs or
-   brain changes were proposed — that `update-brain` is the next stop
-   to enact them.
+   brain changes were proposed — that `jaiba-init:update-brain` is the
+   next stop to enact them.
 
 ## When *not* to run the script
 
@@ -90,7 +90,7 @@ delivered (ITIN-008 corrective, also delivered).
 3. `bash scripts/archive.sh collaborative-itineraries` → entry at
    `.ai/memory/log/2026-07-03-collaborative-itineraries.md`, work
    cleaned.
-4. Report + point at `update-brain` for the proposed ADR.
+4. Report + point at `jaiba-init:update-brain` for the proposed ADR.
 
 ## Common failure modes
 
@@ -103,6 +103,6 @@ delivered (ITIN-008 corrective, also delivered).
 - **ADR fatigue.** Tactical choices stay in the log entry. If it
   wouldn't matter to someone joining in six months, it's not an ADR.
 - **Writing to `adr-log.md` or the constitution directly.** Propose;
-  `update-brain` enacts.
+  `jaiba-init:update-brain` enacts.
 - **Editing an archived entry later.** `.ai/memory/log/` is
   append-only — corrections are new entries referencing the old one.

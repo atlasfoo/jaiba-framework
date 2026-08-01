@@ -1,6 +1,6 @@
 ---
 name: jaiba-doctor
-description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence (incl. global behavioral-contract presence/drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't rebuild brain (update-brain), bootstrap projects (scaffold), or answer brain questions (ask).
+description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence (incl. global behavioral-contract presence/drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -21,8 +21,9 @@ The **checkup** skill. `jaiba-doctor` inspects a JAIBA-instrumented
 project and reports whether the framework is still sound: is the brain
 complete and self-consistent, is the local toolchain intact, and is
 every external reference still reachable? It is the diagnostic
-counterpart to the skills that *build* things — where `scaffold`
-installs and `update-brain` populates, `doctor` **checks and routes**.
+counterpart to the skills that *build* things — where `jaiba-configure`
+sets up the machine and `jaiba-init` instruments the repo and populates
+its brain, `doctor` **checks and routes**.
 
 Its governing principle is the framework's own: **propose, don't
 patch** (`AGENTS.md` §2.9, §5). doctor reads widely and writes almost
@@ -44,12 +45,12 @@ doctor is a *maintenance* action — it presumes a brain to inspect.
 
 | Situation | Meaning | Route to |
 |---|---|---|
-| No `.ai/` at all, or `.ai/memory/` is empty | Project was never instrumented | `scaffold` |
-| Brain exists but the developer wants it *rebuilt/reconciled* | That's the fix, not the diagnosis | `update-brain` |
+| No `.ai/` at all, or `.ai/memory/` is empty | Project was never instrumented | `jaiba-init` (bootstrap) |
+| Brain exists but the developer wants it *rebuilt/reconciled* | That's the fix, not the diagnosis | `jaiba-init:update-brain` |
 | Developer just wants to *know what the brain says* | Read-only question | `ask` |
 | Brain exists and the developer wants a *health check* | — | **Continue here** |
 
-If `.ai/memory/*.md` is missing entirely, stop and route to `scaffold`;
+If `.ai/memory/*.md` is missing entirely, stop and route to `jaiba-init`;
 there is nothing to diagnose. (A brain full of bare `[brackets]` is a
 *finding*, not a stop condition — that's exactly the kind of incoherence
 this skill reports.)
@@ -69,13 +70,14 @@ reflect the repository, not the prompt's assumptions.
    three artifacts. If not, see "When NOT to run doctor".
 3. **Locate every skills directory in play.** JAIBA skills can be
    installed project-locally, globally (e.g. `~/.claude/skills/`,
-   `~/.agents/skills/`), or split across both — `jaiba-scaffold` step 4
-   now offers that choice, and skills already global before scaffold ran
-   are left there. doctor's tool-state and reference checks need to scan
+   `~/.agents/skills/`), or split across both — `jaiba-configure` step 3
+   now offers that choice, and skills already global before it ran are
+   left there. doctor's tool-state and reference checks need to scan
    *all* of them, not just the project's:
 
-   - **Project-local:** detect the agent folder the same way `scaffold`
-     does — a single vendor dir (`.claude/`, `.cursor/`, `.gemini/`, …)
+   - **Project-local:** detect the agent folder the same way `jaiba-init`
+     does (bootstrap step 1) — a single vendor dir (`.claude/`,
+     `.cursor/`, `.gemini/`, …)
      if exactly one exists at the project root; otherwise the neutral
      `.agents/`. Its `skills/` subdir is the project-local skills dir, if
      it exists.
@@ -96,8 +98,8 @@ into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are constitution / adr-log / reference-index complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `update-brain` / `scaffold` |
-| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
+| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are constitution / adr-log / reference-index complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `jaiba-init:update-brain` (brain, repo marker) / `jaiba-configure` (global contract) |
+| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference-index.md` entry reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
 Why this order: memory coherence is read first because the
@@ -125,7 +127,10 @@ When a check can't be completed (e.g. no web tools to test a URL, no MCP
 introspection available), report it as **`[UNVERIFIED]`** with the
 reason — never silently pass it. An unchecked dependency reported as
 healthy is exactly the false confidence the framework's gap discipline
-(§5.4) exists to prevent.
+(§5.4) exists to prevent. Diagnostic 2 is the concrete case: an `mcp:`
+`requires:` entry can't be resolved by `command -v`, and hooks can't be
+scanned without `jq` — both render as `[UNVERIFIED]` rather than being
+silently dropped or marked healthy.
 
 ## The health report
 
@@ -143,7 +148,7 @@ structure:
 <findings: file, what's wrong, why it matters>
 
 ## 2. Tool state — <status>
-<findings: tool, needed by which skill/subagent/hook, present/missing>
+<findings: tool, needed by which skill/subagent/hook, present/missing/[UNVERIFIED]>
 (.atl/tool-layout.md refreshed)
 
 ## 3. External-reference health — <status>
@@ -160,9 +165,9 @@ Rules for the report:
   skimming should hit the blocking problems first.
 - **Every finding names its fix and the skill that owns it.** "Brain is
   stale" is not actionable; "constitution.md doesn't mention the new
-  `payments` service — run `update-brain` (update mode)" is. doctor
-  diagnoses; the *fix* lives in `update-brain`, `scaffold`, a package
-  install, or a re-vendor.
+  `payments` service — run `jaiba-init:update-brain` (update mode)" is.
+  doctor diagnoses; the *fix* lives in `jaiba-init`, `jaiba-configure`, a
+  package install, or a re-vendor.
 - **Be honest about what you couldn't check.** List `[UNVERIFIED]` items
   explicitly with the reason (no web access, no MCP introspection, etc.).
 - **If everything is green, say so plainly** and note doctor is a good
@@ -173,13 +178,13 @@ Rules for the report:
 
 - **Diagnose and route — don't fix.** doctor proposes; the owning skill
   enacts. The one thing it writes is `.atl/tool-layout.md` (machine
-  state, §6), never `.ai/memory/` (that's `update-brain`'s sole right,
-  §2.9) and never a vendored file.
-- **Maintenance, not bootstrap.** A repo with no `.ai/` is `scaffold`'s
+  state, §6), never `.ai/memory/` (that's `jaiba-init:update-brain`'s
+  sole right, §2.9) and never a vendored file.
+- **Maintenance, not bootstrap.** A repo with no `.ai/` is `jaiba-init`'s
   job, not a finding to repair here.
 - **Carry your own tools.** Skills package independently — doctor's
   probe (`scripts/check-tools.sh`) is its own copy, not a runtime call
-  into `scaffold`'s folder.
+  into `jaiba-configure`'s folder.
 - **Read-mostly everywhere except tool-layout.** If a check tempts you to
   "just fix" a `[bracket]` in the constitution or freshen a vendored
   spec, stop — that's the route, not the action.
@@ -188,11 +193,11 @@ Rules for the report:
 
 - **Patching the brain instead of routing.** Editing `.ai/memory/` to
   "fix" an incoherence doctor found violates §2.9. Report it and point
-  at `update-brain`.
+  at `jaiba-init:update-brain`.
 - **Passing an unchecked dependency as healthy.** No web tools doesn't
   mean a URL is reachable — mark it `[UNVERIFIED]`, don't green-light it.
 - **Running on an un-instrumented repo.** No `.ai/` means nothing to
-  diagnose; route to `scaffold` rather than inventing findings.
+  diagnose; route to `jaiba-init` rather than inventing findings.
 - **A wall of equal-weight findings.** Without severity ordering the
   developer can't tell a missing required tool from a month-old vendored
   spec. Always lead with ❌.

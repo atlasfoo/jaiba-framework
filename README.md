@@ -15,7 +15,7 @@
 
 - [🦀 JAIBA](#-jaiba)
   - [🚀 Getting Started](#-getting-started)
-    - [1. Install JAIBA skills globally (Recommended)](#1-install-jaiba-skills-globally-recommended)
+    - [1. Configure your machine (once)](#1-configure-your-machine-once)
     - [2. Initialize JAIBA in your repository](#2-initialize-jaiba-in-your-repository)
     - [Alternative: Project-scoped installation](#alternative-project-scoped-installation)
   - [Installation modes](#installation-modes)
@@ -38,9 +38,9 @@
     - [🎼 `conduct` — the SDD chain](#-conduct--the-sdd-chain)
     - [⚡ `fast` — implicit inline lane](#-fast--implicit-inline-lane)
     - [💬 `ask` — implicit read-only lane](#-ask--implicit-read-only-lane)
-    - [🔄 `update-brain`](#-update-brain)
+    - [🧰 `jaiba-configure` — machine setup](#-jaiba-configure--machine-setup)
+    - [🏗️ `jaiba-init` — repo bootstrap and brain maintenance](#️-jaiba-init--repo-bootstrap-and-brain-maintenance)
     - [🩺 `jaiba-doctor`](#-jaiba-doctor)
-    - [🏗️ `jaiba-scaffold`](#️-jaiba-scaffold)
   - [🤖 The subagent battery](#-the-subagent-battery)
   - [Typical workflow](#typical-workflow)
   - [Design philosophy](#design-philosophy)
@@ -54,28 +54,36 @@
 
 ## 🚀 Getting Started
 
-To adopt JAIBA in your project, follow these steps:
+Adoption happens in **two independent runs**, because setup itself is split in two: one skill sets up your *machine*, another instruments each *repository*.
 
-### 1. Install JAIBA skills globally (Recommended)
+### 1. Configure your machine (once)
 
-Install all JAIBA skills globally so they are available across all your projects:
+Install the machine-setup skill, then run it:
 
 ```bash
-npx skills add atlasfoo/jaiba-framework --skill jaiba-scaffold -g
-npx skills add atlasfoo/jaiba-framework --skill conduct -g
-npx skills add atlasfoo/jaiba-framework --skill update-brain -g
-npx skills add atlasfoo/jaiba-framework --skill fast -g
-npx skills add atlasfoo/jaiba-framework --skill ask -g
-npx skills add atlasfoo/jaiba-framework --skill doctor -g
+npx skills add atlasfoo/jaiba-framework --skill jaiba-configure -g
 ```
 
-Or install them all at once:
+```text
+/jaiba-configure
+```
+
+*Or simply: "configure jaiba on this machine"*
+
+`jaiba-configure` does exactly three things, all of them global — it touches **no repository**:
+- Installs the **global JAIBA Behavioral Contract** (`jaiba-contract.md`) into your agent's user-level config
+- Installs the **workflow/meta skillset** (`conduct`, `ask`, `fast`, `jaiba-init`, `jaiba-doctor`, …) globally — or project-locally, if you want one project's versions pinned
+- Installs the **subagent battery** (executors + specialists) into your agent's global `agents/` folder
+
+It is **safe to re-run**: that is how a machine gets refreshed after a framework upgrade. Anything already present but different is a question, never a silent overwrite.
+
+Prefer to install the skillset yourself? This still works, and `jaiba-configure` will simply report everything as already current:
 
 ```bash
 npx skills add -y atlasfoo/jaiba-framework -g
 ```
 
-**Benefits of global installation:**
+**Benefits of the global skillset:**
 - Skills are available instantly in any project without per-project setup
 - Consistent behavior across all your projects
 - Automatic updates apply to all projects
@@ -83,24 +91,26 @@ npx skills add -y atlasfoo/jaiba-framework -g
 
 ### 2. Initialize JAIBA in your repository
 
-Navigate to the root of your project and invoke the scaffold skill to set up the framework:
+Navigate to the root of the project you want to adopt and run:
 
 ```text
-/jaiba-scaffold
+/jaiba-init
 ```
 
 *Or simply: "set up jaiba in this project" or "bootstrap jaiba"*
 
-The scaffold will:
-- Create the `.ai/` brain skeleton (`memory/` + `memory/log/`, `work/`, `vendored/`) and its `.gitignore`
-- Install the **global JAIBA Behavioral Contract** (`jaiba-contract.md`) into your agent's user-level config — once per machine
-- Drop the minimal `AGENTS.md` marker at the repo root
-- Install the **subagent battery** (executors + specialists) into your agent's global `agents/` folder
-- Hand off to `update-brain:initialize` to populate the long-term memory, and then to `jaiba-doctor` for the first health check and toolchain probe (`.atl/tool-layout.md`)
+`jaiba-init` instruments **that one repo**, end to end:
+- Creates the `.ai/` brain skeleton (`memory/` + `memory/log/`, `work/`, `vendored/`) and its `.gitignore`, plus the gitignored `.atl/` for machine-local state
+- Drops the minimal `AGENTS.md` marker at the repo root (offering replace / coexist if you already have one)
+- **Checks** that the global contract and subagent battery exist — and only checks: if they're missing it names `jaiba-configure`, it never installs them itself
+- Continues into its own `update-brain` initialize mode to populate the long-term memory — an internal mode switch, not a hand-off to another skill
+- Hands off to `jaiba-doctor` for the first health check and toolchain probe (`.atl/tool-layout.md`)
+
+Run it once per repository. On an already-instrumented repo it resumes or routes instead of bootstrapping.
 
 ### Alternative: Project-scoped installation
 
-If you prefer to keep JAIBA skills scoped to individual projects (not recommended), the `jaiba-scaffold` skill will install them locally during initialization. In this case, you only need to install the scaffold skill globally in step 1.
+If you prefer JAIBA's skills scoped to individual projects rather than to your machine (not recommended), answer *project-local* when `jaiba-configure` asks where the missing skills should go; only `jaiba-configure` itself needs to stay global. Step 2 is unchanged either way — `jaiba-init` is always repo-scoped.
 
 ---
 
@@ -115,14 +125,14 @@ Skills are installed globally using `npx skills add` and are available across al
 | **Command** | `npx skills add -y atlasfoo/jaiba-framework --skill <skill-name>` |
 | **Location** | `~/.agents/skills/` (user home directory) |
 | **Availability** | All projects automatically have access |
-| **Setup per project** | Only initialize `.ai/` brain with `/jaiba-scaffold` |
+| **Setup per project** | Only instrument the repo with `/jaiba-init` |
 | **Disk footprint** | Minimal — skills are stored once |
 | **Updates** | `npx skills update` applies to all projects |
 | **Recommended for** | Teams, multi-project workflows, clean repositories |
 
 **How it works:**
-1. Install skills once globally
-2. In each project, run `/jaiba-scaffold` to initialize only the brain (`.ai/`)
+1. Run `/jaiba-configure` once — contract, skillset and subagents land in your agent's global config
+2. In each project, run `/jaiba-init` to instrument the repo (`AGENTS.md` marker + `.ai/` brain + `.atl/`)
 3. All skills automatically activate in every project you work on
 
 ### Project-scoped installation (Legacy)
@@ -131,12 +141,12 @@ Skills are installed locally in each project under `.agents/` or `.claude/skills
 
 | Aspect | Project-scoped |
 |--------|-----------------|
-| **Command** | Skills auto-install during scaffold if not global |
+| **Command** | `jaiba-configure` installs the missing skills locally when you choose *project-local* |
 | **Location** | `.agents/` or project skill folder |
 | **Availability** | Only in that specific project |
-| **Setup per project** | Full scaffold including skill installation |
+| **Setup per project** | A `jaiba-configure` run per project, plus the `jaiba-init` run |
 | **Disk footprint** | Each project has its own copy of skills |
-| **Updates** | Must re-scaffold or manually update per project |
+| **Updates** | Must re-run `jaiba-configure`, or update manually, per project |
 | **Recommended for** | Legacy setups, isolated environments |
 
 ---
@@ -202,7 +212,7 @@ Since the conduct unification, the developer **does not choose between commands*
 | A small contained change ("quick fix", "bump X") | `fast` — inline lane |
 | New work to shape or plan | the `conduct` chain (entry phase per triage) |
 
-`ask` and `fast` are **implicit-only**: they have no slash commands. `conduct` keeps `/conduct [phase]` as a deterministic override for when routing misfires or you want to force a phase. The meta-skills (`/jaiba-scaffold`, `/jaiba-doctor`) remain explicit.
+`ask` and `fast` are **implicit-only**: they have no slash commands. `conduct` keeps `/conduct [phase]` as a deterministic override for when routing misfires or you want to force a phase. The meta-skills (`/jaiba-configure`, `/jaiba-init`, `/jaiba-doctor`) remain explicit.
 
 A single **triage** (shared by the chain and `fast`) maps each change's blast radius to a depth on the continuum `inline → design → spec`: an atomic edit executes on the spot; a bounded change gets a plan; a multi-faceted requirement gets a PRD *and* a plan. A critical-library bump or a performance fix does **not** produce a PRD — depth follows blast radius, not ceremony.
 
@@ -217,7 +227,7 @@ The `.ai/` folder is the core of JAIBA. Memory collapses into **two categories**
 
 ### The behavioral contract: global + repo marker
 
-Behavior does not live per-repo anymore. `jaiba-scaffold` installs the **JAIBA Behavioral Contract** (`jaiba-contract.md`) once per machine into the agent's global config: the brain map, the numbered behavioral rules, the routing rule, security and toolchain discipline. Each repo keeps only a **minimal `AGENTS.md` marker** that confirms instrumentation and defers to the global contract for behavior and to the constitution for project facts.
+Behavior does not live per-repo anymore. `jaiba-configure` installs the **JAIBA Behavioral Contract** (`jaiba-contract.md`) once per machine into the agent's global config: the brain map, the numbered behavioral rules, the routing rule, security and toolchain discipline. Each repo keeps only a **minimal `AGENTS.md` marker** — dropped by `jaiba-init` — that confirms instrumentation and defers to the global contract for behavior and to the constitution for project facts. The split is the same one that separates the two setup skills: `jaiba-configure` owns the machine half, `jaiba-init` the repo half.
 
 `jaiba-doctor` checks the contract's presence and drift against the packaged version on every health check.
 
@@ -233,7 +243,7 @@ The **curated** decision memory: Architecture Decision Records currently in forc
 The index of **external surfaces** — APIs, packages, services — plus **internal cross-component contracts** (event schemas, APIs between sub-units). Each entry documents purpose, consultation method, and, when vendored, its local copy path.
 
 #### `log/`
-The **chronological** memory: an append-only record fusing closed work and the brain's changelog, one dated file per entry (`YYYY-MM-DD-slug.md`, kinds `work-closure` and `brain-change`). Where `adr-log.md` answers "what do we hold true today", `log/` answers "what happened, in order". Written by `conduct:summarize` (work closures) and `update-brain` (brain changes) — the framework's one sanctioned carve-out to the "only `update-brain` writes memory" rule.
+The **chronological** memory: an append-only record fusing closed work and the brain's changelog, one dated file per entry (`YYYY-MM-DD-slug.md`, kinds `work-closure` and `brain-change`). Where `adr-log.md` answers "what do we hold true today", `log/` answers "what happened, in order". Written by `conduct:summarize` (work closures) and `jaiba-init:update-brain` (brain changes) — the framework's one sanctioned carve-out to the "only `jaiba-init:update-brain` writes memory" rule.
 
 ### `work/` — Executive memory
 
@@ -267,7 +277,7 @@ The unified workflow (it absorbed the former `planning` and `specification` skil
 | **`tasks`** | `tasks.md` | Decompose the design into a task graph: `T-NNN`, `depends-on`, `load`, covered criteria. Phases act as multi-session checkpoints with their own gate. |
 | **`execute`** *(implicit)* | `walkthrough.md` | Advance the work — directly or by delegating task waves to the executor subagents. Triggered by continuation cues; no command needed. |
 | **`validate`** | — | Run the plan's quality gate and check acceptance criteria one by one (delegating to the `verify` subagent when available), reporting met/unmet per criterion. |
-| **`summarize`** | log entry in `.ai/memory/log/` | Single closing step: present the final summary, propose ADRs/constitution changes for `update-brain`, archive the essence, clean `work/` — one confirmation. |
+| **`summarize`** | log entry in `.ai/memory/log/` | Single closing step: present the final summary, propose ADRs/constitution changes for `jaiba-init:update-brain`, archive the essence, clean `work/` — one confirmation. |
 
 > **Golden rules:** the human approves the design before anything executes; execution pauses at phase boundaries; the plan never silently drifts — structural deviations amend `plan.md` explicitly.
 
@@ -288,9 +298,18 @@ Pure query mode, triggered by interrogative messages. Strictly read-only: reads,
 - **Four domains:** code, active plan, active PRD, decisions (`adr-log.md` + `memory/log/`).
 - **Hands off to action:** a continuation cue routes to `conduct:execute`; new work enters the chain; a contained change goes to `fast` — carrying the context it already gathered.
 
-### 🔄 `update-brain`
+### 🧰 `jaiba-configure` — machine setup
 
-The constitutive-memory maintenance workflow — the **only** skill that writes `.ai/memory/` (log appends excepted). `initialize` builds the brain from repository analysis (essential for brownfield onboarding); `update` applies proposed ADRs, reference-index entries, and constitution changes, or reconciles the brain after structural drift. Every brain change leaves a `brain-change` entry in `memory/log/`.
+The **machine** half of setup, and nothing else: the global behavioral contract, the workflow/meta skillset, the subagent battery. It never touches a repository — no `.ai/`, no `.atl/`, no `AGENTS.md` — and carries no brain templates at all. Run from anywhere, once per machine, and **safe to re-run** as the upgrade path: every divergence from the packaged version is a question, never a silent overwrite. It names `jaiba-init` as the next step for a specific project, but never invokes it.
+
+### 🏗️ `jaiba-init` — repo bootstrap and brain maintenance
+
+The **repo** half of setup, and the framework's long-term memory owner. Two modes:
+
+- **Bootstrap** (bare `jaiba-init`) — instrument this repository: the `AGENTS.md` marker, the `.ai/` skeleton and `.atl/`, then the constitutive memory, then the first `jaiba-doctor` checkup. It *checks* for the global contract and battery and routes to `jaiba-configure` if they're absent; it never installs them.
+- **Maintain** (`jaiba-init:update-brain`) — the constitutive-memory workflow, and the **only** skill that writes `.ai/memory/` (log appends excepted). Its `initialize` sub-mode builds the brain from repository analysis (essential for brownfield onboarding); `update` applies proposed ADRs, reference-index entries and constitution changes, or reconciles the brain after structural drift. Every brain change leaves a `brain-change` entry in `memory/log/`.
+
+Bootstrap ends *inside* `initialize`: laying the skeleton and filling the brain are two modes of the same skill, so there is no hand-off between them — `jaiba-init` owns the templates and the initialize logic outright.
 
 ### 🩺 `jaiba-doctor`
 
@@ -298,19 +317,15 @@ The framework health check — a pre-flight before entering the conduct chain. *
 
 | Diagnostic | What it checks | Where the fix routes |
 |---|---|---|
-| **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); constitution / adr-log / reference-index complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `update-brain` / `jaiba-scaffold` |
+| **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); constitution / adr-log / reference-index complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `jaiba-init` (brain, repo marker) / `jaiba-configure` (global contract) |
 | **Tool state** | Are the CLI tools that installed skills, **subagents**, and hooks declare (`requires:`) actually present? Refreshes `.atl/tool-layout.md` with provenance. | install the tool |
-| **External-reference health** | Every `reference-index.md` entry reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `update-brain` |
-
-### 🏗️ `jaiba-scaffold`
-
-The one-time bootstrap: lays the `.ai/` skeleton, installs the global contract + repo marker, installs skills (global or project-local) and the subagent battery, then hands off to `update-brain:initialize` and `jaiba-doctor`. Never runs on an already-instrumented repo.
+| **External-reference health** | Every `reference-index.md` entry reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `jaiba-init:update-brain` |
 
 ---
 
 ## 🤖 The subagent battery
 
-`scaffold` installs six native subagent definitions into the agent's global `agents/` folder. The invocation contract (`conduct/references/subagents.md`) governs delegation: which operations delegate, the `requires:` tool convention, a **pre-invocation toolchain check** against `.atl/tool-layout.md` (a missing tool surfaces *before* invocation, never as a mid-run failure), and the concurrency policy.
+`jaiba-configure` installs six native subagent definitions into the agent's global `agents/` folder. The invocation contract (`conduct/references/subagents.md`) governs delegation: which operations delegate, the `requires:` tool convention, a **pre-invocation toolchain check** against `.atl/tool-layout.md` (a missing tool surfaces *before* invocation, never as a mid-run failure), and the concurrency policy.
 
 | Subagent | Role | Used in phase |
 |---|---|---|
@@ -328,14 +343,22 @@ The one-time bootstrap: lays the `.ai/` skeleton, installs the global contract +
 ## Typical workflow
 
 ```
-                    ┌─────────────────────────────┐
-                    │    New or legacy project     │
-                    └──────────────┬──────────────┘
-                                   │
-                            /jaiba-scaffold
-                 (skeleton + contract + skills + agents)
-                                   │
-                     update-brain:initialize → jaiba-doctor
+    ┌────────────────────────────┐   ┌─────────────────────────────┐
+    │   Your machine (once)      │   │    New or legacy project     │
+    └─────────────┬──────────────┘   └──────────────┬──────────────┘
+                  │                                 │
+          /jaiba-configure                     /jaiba-init
+   (contract + skillset + subagents)   (AGENTS.md marker + .ai/ + .atl/)
+                  │                                 │
+                  │  independent: neither           │
+                  │  invokes the other; init        ▼
+                  └── only *checks* for it ─▶ update-brain:initialize
+                                                    │  (internal mode switch)
+                                                    ▼
+                                              jaiba-doctor
+                                          (first checkup + probe)
+                                                    │
+                                   ┌────────────────┘
                                    │
                     ┌──────────────▼──────────────┐
                     │        Brain ready           │
@@ -354,7 +377,7 @@ The one-time bootstrap: lays the `.ai/` skeleton, installs the global contract +
   tasks → execute →
   validate → summarize
         │
-        └──→ .ai/memory/log/ entry + proposed ADRs → update-brain
+        └──→ .ai/memory/log/ entry + proposed ADRs → jaiba-init:update-brain
                                    │
                               ┌────▼────┐
                               │  repeat  │
@@ -427,7 +450,7 @@ COL-002  ✅ met      — permission rejection covered (test_reader_cannot_edit)
 COL-003  ❌ not met  — change history endpoint returns 404; T-012 unchecked
 ```
 
-`summarize` then closes in one step: final summary presented, `2026-07-05-collaborative-itineraries.md` appended to `.ai/memory/log/`, an ADR proposed (object permissions via `django-guardian`) for `update-brain`, and `work/` cleaned — after one confirmation.
+`summarize` then closes in one step: final summary presented, `2026-07-05-collaborative-itineraries.md` appended to `.ai/memory/log/`, an ADR proposed (object permissions via `django-guardian`) for `jaiba-init:update-brain`, and `work/` cleaned — after one confirmation.
 
 ### Example 3 — Shallow change (design depth: plan only)
 
@@ -446,7 +469,7 @@ Projects instrumented before the conduct unification use `planning`/`specificati
 1. `.ai/session/` → `.ai/work/` (rename; add `work/` to `.ai/.gitignore`, remove `session/` from tracking if needed).
 2. `.ai/memory/archive/plans/` and `archive/specs/` → `.ai/memory/log/` (move files; keep their dated names).
 3. `.ai/specs/<name>/` — fold any *active* spec's PRD into `.ai/work/PRD.md` (user stories become the PRD's criteria section); delivered specs go to `memory/log/`.
-4. Replace the full per-repo `AGENTS.md` with the minimal marker and let `jaiba-scaffold` install the global contract (step 3 of its sequence handles both).
+4. Replace the full per-repo `AGENTS.md` with the minimal marker (`jaiba-init` bootstrap step 3 offers replace/coexist) and run `jaiba-configure` to install the global contract (its step 2).
 5. Uninstall the `planning` and `specification` skills; install `conduct`.
 6. Run `/jaiba-doctor` — it detects leftover old-layout directories and contract drift, and routes the remainder.
 

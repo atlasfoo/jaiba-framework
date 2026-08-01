@@ -1,7 +1,7 @@
 <!-- jaiba-contract v2 — global behavioral contract. Installed once per
-     machine by jaiba-scaffold into the agent's global config folder.
-     Canonical copy: skills/scaffold/assets/jaiba-contract.md; doctor
-     carries a lockstep reference copy for drift detection.
+     machine by jaiba-configure into the agent's global config folder.
+     Canonical copy: skills/jaiba-configure/assets/jaiba-contract.md;
+     doctor carries a lockstep reference copy for drift detection.
      Section numbering §1–§6 is preserved from the pre-split per-repo
      AGENTS.md, so skill references citing "AGENTS.md §N" resolve to
      §N here. -->
@@ -17,7 +17,7 @@ for that, read the project's `.ai/memory/constitution.md`.
 A project is JAIBA-instrumented when its root holds a (minimal)
 `AGENTS.md` pointing here and an `.ai/` brain. If the repo you are in
 has neither, this contract is dormant — nothing below applies until
-`jaiba-scaffold` runs there.
+`jaiba-init` instruments that repo.
 
 JAIBA is tool-agnostic: nothing in this file assumes a specific IDE,
 agent runtime, or model provider.
@@ -35,7 +35,7 @@ Read these before you act.
 | `.ai/memory/reference-index.md` | long-term | Map of external dependencies, APIs, services, packages, and cross-component internal contracts. |
 | `.ai/memory/log/` | long-term | Append-only chronological record: closed work + brain changelog, one dated file per entry. |
 | `.ai/work/` | short-term | Executive memory (gitignored): `PRD.md` (when depth demands one), `plan.md`, `tasks.md`, `walkthrough.md`. |
-| `.atl/tool-layout.md` | environment | Local CLI toolchain probe written by `jaiba-doctor` (gitignored — machine state, not project memory). Which tools the installed skills, subagents, and hooks need are present or missing here. |
+| `.atl/tool-layout.md` | environment | Local toolchain probe written by `jaiba-doctor` (gitignored — machine state, not project memory). Full inventory of installed skills, subagents, and hooks, with their declared tools marked present, missing, or `[UNVERIFIED]` (e.g. an `mcp:` dependency — indexed here, verified by diagnostic 3). |
 
 If any of these files is missing or empty, say so before acting on
 assumptions about its contents.
@@ -49,7 +49,7 @@ session.
    prior sessions or pre-training to infer project state. Read the
    `.ai/` tree and the relevant source files.
 2. **Workflows over plain prompts.** Prefer invoking a JAIBA skill
-   (`conduct`, `update-brain`, `fast`, `ask`) over freeform
+   (`conduct`, `jaiba-init`, `fast`, `ask`) over freeform
    action. If the developer's intent doesn't fit any skill or the
    routing rule (§7), ask before acting.
 3. **No blind coding.** Substantive implementation requires an
@@ -73,7 +73,7 @@ session.
    as final directives. Re-read and realign before continuing.
 9. **Memory is read-mostly.** Never delete `adr-log.md` entries or
    rewrite `constitution.md` without explicit user instruction.
-   Propose changes via the `update-brain` skill; do not enact them
+   Propose changes via `jaiba-init:update-brain`; do not enact them
    silently. (`conduct:summarize` holds the one carve-out: it may
    *append* the closing entry to `.ai/memory/log/`.)
 10. **Explain the why.** For non-trivial changes, document the
@@ -122,8 +122,8 @@ start. Keep it honest:
 
 1. **Notify briefly.** Point out the specific contradiction (file
    vs reality).
-2. **Propose, don't patch.** Suggest invoking `update-brain` to
-   reconcile. Do not silently rewrite memory.
+2. **Propose, don't patch.** Suggest invoking `jaiba-init:update-brain`
+   to reconcile. Do not silently rewrite memory.
 3. **Stub missing references.** If a task needs an external
    integration not listed in `reference-index.md`, surface the gap
    and propose adding a stub before proceeding.
@@ -135,10 +135,10 @@ start. Keep it honest:
    write a `.ai/memory` file and any such annotation remains, **warn the
    human explicitly**: name the file and what is outstanding, before you
    rely on that file or end your turn. This holds for every skill, not
-   just `update-brain` — an incomplete brain the human doesn't know
+   just `jaiba-init` — an incomplete brain the human doesn't know
    about is worse than a visible gap, because it gets trusted as if it
-   were complete. Resolving these is `update-brain`'s job; surfacing
-   them is everyone's.
+   were complete. Resolving these is `jaiba-init:update-brain`'s job;
+   surfacing them is everyone's.
 
 ## 6. Toolchain Awareness
 
@@ -174,5 +174,5 @@ the lanes have no slash commands:
 
 `/conduct [phase]` remains available as an explicit,
 deterministic override when routing misfires or a phase must be
-forced. `jaiba-doctor` and `jaiba-scaffold` are explicit meta-skills;
-they are never routed to implicitly.
+forced. `jaiba-doctor`, `jaiba-configure` and `jaiba-init` are explicit
+meta-skills; they are never routed to implicitly.

@@ -1,4 +1,4 @@
-# `update-brain:initialize`
+# `jaiba-init:update-brain:initialize`
 
 Build the long-term brain for the first time. End state: the three
 artifacts exist and are populated from real repository evidence —
@@ -7,8 +7,8 @@ artifacts exist and are populated from real repository evidence —
 undeterminable one either resolved by asking or marked and surfaced.
 
 This is the onboarding mode. It runs on a brand-new project, on a legacy
-codebase being adopted into JAIBA, or right after `scaffold` lays the
-`.ai/` skeleton and hands off.
+codebase being adopted into JAIBA, or as step 4 of this skill's own
+**bootstrap** mode, right after it lays the `.ai/` skeleton.
 
 ## Preconditions
 
@@ -17,9 +17,10 @@ codebase being adopted into JAIBA, or right after `scaffold` lays the
    If they already carry real content, this is `update`, not
    `initialize` — stop and switch.
 2. `.ai/memory/` exists (or you can create it). If the wider `.ai/`
-   skeleton is missing and the developer expected `scaffold` to have run,
-   say so — but creating the three files in `.ai/memory/` is within this
-   mode's remit.
+   skeleton is missing, the repo was never bootstrapped — say so and
+   offer `jaiba-init`'s bootstrap mode, which lays the skeleton and then
+   returns here. Creating the three files in `.ai/memory/` is still
+   within this mode's remit if the developer prefers to press on.
 
 ## Detect, then create
 
@@ -31,8 +32,9 @@ artifacts:
 - **If it exists as a bare template** → fill it in place.
 - **If it exists with real content** → you're in the wrong mode; stop.
 
-Do not assume the files are missing — check first. (`scaffold` may or
-may not have created empty ones; this mode is the same either way.)
+Do not assume the files are missing — check first. (Bootstrap mode lays
+only the directories, but a prior partial run may have left empty files;
+this mode is the same either way.)
 
 ## The evidence sweep
 

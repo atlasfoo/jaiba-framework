@@ -1,9 +1,10 @@
 ---
 name: executor-low
 description: JAIBA low-load task executor. Implements a single task delegated by conduct's execute phase when the task is labeled load:low — mechanical, repetitive, zero-judgment work such as renames, boilerplate, config echoes. Receives the task, minimal context, and the phase gate commands; returns a diff summary and a report. Never writes .ai/ artifacts, never commits.
-# Model is declarative: the fast/cheap tier of the host (Haiku/Flash
-# class). Hosts resolve the alias to their current model in that class.
-model: haiku
+# Model class (declarative): fast/cheap tier — e.g. Haiku/Flash class
+# on Claude Code. No `model:` field by default: absent = inherit the
+# orchestrator's model. jaiba-configure's install-time selection step
+# may pin one for this tier from the models available on the host.
 requires:
   - git
 ---

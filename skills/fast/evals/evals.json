@@ -126,7 +126,7 @@
         "Treated the change as free-standing — did not look for an active plan",
         "Quality Gate fallback used the repo's own package.json `test` script / CI command, not constitution.md §6 (which doesn't exist)",
         "Change applied to package.json (and lockfile if present)",
-        "Closing recap mentioned jaiba-scaffold once as an opportunity, without making it a precondition for the change",
+        "Closing recap mentioned jaiba-init once as an opportunity, without making it a precondition for the change",
         "Nothing written to .ai/work/"
       ],
       "files": []

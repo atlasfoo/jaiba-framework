@@ -88,5 +88,5 @@ produced, plan, tasks, walkthrough — gitignored, archived to
   traceable; onboarding (human or agent) is faster.
 - *Negative / Risks:* Requires discipline to keep memory current;
   stale memory can mislead the agent.
-- *Follow-ups:* Schedule periodic `update-brain` runs after major
+- *Follow-ups:* Schedule periodic `jaiba-init:update-brain` runs after major
   milestones.

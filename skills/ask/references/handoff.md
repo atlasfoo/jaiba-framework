@@ -13,8 +13,8 @@ The reason `ask` exists *next to* the action lanes, rather than each
 skill orienting from scratch, is that they share one session. When the
 developer asks first and acts second, everything `ask` read — the plan,
 the PRD, the relevant code, the decision history — is already in
-context. The receiving skill (`conduct`, `fast`, `update-brain`)
-doesn't re-investigate; it inherits.
+context. The receiving skill (`conduct`, `fast`,
+`jaiba-init:update-brain`) doesn't re-investigate; it inherits.
 
 So the hand-off is not "start over in another skill". It's "carry this
 understanding into execution". Make that explicit when you route:
@@ -56,7 +56,7 @@ an explanation *and* a fix, and they're owed both, in that order.
 | Advance the approved, active plan | `conduct` — `execute` phase | Only if `.ai/work/plan.md` exists *and* is approved *and* the message is a continuation cue. If no plan is active, a continuation cue is meaningless — ask what they mean. |
 | Spec / design / plan new work | `conduct` — chain entry | "let's plan this", a fuzzy requirement to shape (`propose`), or work too big for `fast`. The chain's triage decides the depth (design vs. spec — PRD only when warranted). |
 | Small, contained change now | `fast` | `fast` runs the shared triage; if the change is bigger than it looks, `fast` itself escalates into the conduct chain (or, with a plan active, offers fold-as-phase / park-and-replan). Don't pre-judge size in `ask` beyond a rough offer. |
-| Reconcile / update the brain | `update-brain` | For drift you surfaced while answering. Propose it; don't edit memory from `ask`. |
+| Reconcile / update the brain | `jaiba-init:update-brain` | For drift you surfaced while answering. Propose it; don't edit memory from `ask`. |
 
 `ask`, like `fast`, is a pure routing lane — the developer never
 invokes any of these by command except `/conduct [phase]`, which
@@ -77,7 +77,8 @@ them to type a command.
 4. **Then proceed under that skill's rules.** Once handed off, the
    receiving skill owns the discipline: conduct's `execute`
    phase checks the worktree and approval; `fast` triages blast
-   radius; `update-brain` proposes before patching. `ask`'s read-only
+   radius; `jaiba-init:update-brain` proposes before patching. `ask`'s
+   read-only
    guarantee ends where the action skill's contract begins — and the
    developer crossed that line deliberately.
 

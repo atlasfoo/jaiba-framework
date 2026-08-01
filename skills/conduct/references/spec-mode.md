@@ -50,7 +50,8 @@ depth:
 5. **Write `.ai/work/PRD.md`** from `assets/prd-template.md`. One to
    two screens: problem, goals/non-goals, users, proposed solution,
    scope, assumptions, dependencies (cite `reference-index.md`; flag
-   NEW integrations for `update-brain`), success metrics — and the
+   NEW integrations for `jaiba-init:update-brain`), success metrics — and
+   the
    **acceptance criteria schema**: every criterion `<PREFIX>-NNN`,
    Given/When/Then, happy and sad paths, inside the fenced `yaml`
    block exactly as the template shows. That block is a machine

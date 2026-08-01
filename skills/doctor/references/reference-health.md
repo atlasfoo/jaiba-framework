@@ -9,7 +9,7 @@ drifted stale)?
 
 This diagnostic is **read-only**: it tests, it doesn't repair. Fixes
 route out — install the missing MCP/CLI, restore the dead endpoint, or
-re-vendor via `update-brain`.
+re-vendor via `jaiba-init:update-brain`.
 
 > Depends on diagnostic 1: if memory coherence found the index is still a
 > bare template or riddled with `[MISSING]`, say so and note that
@@ -90,7 +90,7 @@ git log -1 --format=%cs -- <vendored-path>   # YYYY-MM-DD of last commit touchin
 - Older than **1 month** → **Degraded (stale)**: warn that the vendored
   reference may be outdated and suggest re-vendoring (re-pack the
   Repomix/OpenAPI copy) — the *fix* of recording the refreshed copy in
-  the index is `update-brain`'s.
+  the index is `jaiba-init:update-brain`'s.
 - Within a month → ✅ fresh.
 - No git history for the path (untracked, just added) → not stale;
   note it's not yet committed if relevant, but don't flag as old.
@@ -105,9 +105,9 @@ vendored file look brand-new and defeat the check.
   channel tested, and the result. Group by the index's precedence
   (code-scope findings before workflow-tooling findings).
 - **Route each fix to its owner:** missing MCP/CLI → install it; dead
-  URL → fix the endpoint or re-point the index (`update-brain`); missing
-  vendored file or stale snapshot → re-vendor, then record via
-  `update-brain`.
+  URL → fix the endpoint or re-point the index
+  (`jaiba-init:update-brain`); missing vendored file or stale snapshot →
+  re-vendor, then record via `jaiba-init:update-brain`.
 - **List `[UNVERIFIED]` entries explicitly** with the reason (no web
   tools, no MCP introspection). The framework's whole gap discipline
   (§5.4) is that an unchecked dependency must never masquerade as a

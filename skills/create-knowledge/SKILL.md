@@ -87,9 +87,10 @@ Work on the skill the developer points you at. Touch **only** its
 
 1. **Locate and validate the target.** It must have a `SKILL.md` with
    YAML frontmatter. Refuse three things, with a one-line reason:
-   - a JAIBA **workflow** skill (`conduct`, `ask`, `fast`,
-     `update-brain`) — those are the sockets, not plugins;
-   - a JAIBA **meta** skill (including this one);
+   - a JAIBA **workflow** skill (`conduct`, `ask`, `fast`) — those are
+     the sockets, not plugins;
+   - a JAIBA **meta** skill (`jaiba-configure`, `jaiba-init`,
+     `jaiba-doctor`, including this one);
    - anything without a `SKILL.md`.
 
 2. **Read the target's `SKILL.md`** in full, and skim its `references/`

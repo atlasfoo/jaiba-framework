@@ -7,37 +7,42 @@ and the constitutive brain artifacts — `constitution.md`,
 and with the **repository**?
 
 This diagnostic is **read-only**. doctor never edits `.ai/memory/` — that
-is `update-brain`'s sole right (`AGENTS.md` §2.9). Every finding here
-resolves to the same prescription: *run `update-brain`* (update mode to
-reconcile drift, or initialize mode if a file is still a bare template).
-Your job is to make the finding **specific enough to act on**, not to
-fix it.
+is `jaiba-init:update-brain`'s sole right (`AGENTS.md` §2.9). Every brain
+finding here resolves to the same prescription: *run
+`jaiba-init:update-brain`* (update mode to reconcile drift, or initialize
+mode if a file is still a bare template). The one exception is the
+*global* contract in layer 0, which is machine-level and belongs to
+`jaiba-configure`. Your job is to make the finding **specific enough to
+act on**, not to fix it.
 
 ## What to check
 
 Four layers, cheapest first. Stop escalating a given file once you've
-found a Broken finding for it — the fix (`update-brain`) is the same
-regardless of how many more issues it has, and a deep audit is
-`update-brain`'s job, not doctor's.
+found a Broken finding for it — the fix (`jaiba-init:update-brain`) is
+the same regardless of how many more issues it has, and a deep audit is
+that skill's job, not doctor's.
 
 ### Layer 0 — Behavioral contract (repo marker + global)
 
-The behavioral contract is split (per `jaiba-scaffold` step 3): a
-minimal `AGENTS.md` marker in the repo, and the actual rules in
-`jaiba-contract.md` inside the agent's **global** config folder
-(e.g. `~/.claude/`, `~/.agents/`). Check both halves:
+The behavioral contract is split across the two setup skills: a minimal
+`AGENTS.md` marker in the repo (dropped by `jaiba-init`, bootstrap step
+3), and the actual rules in `jaiba-contract.md` inside the agent's
+**global** config folder (installed by `jaiba-configure`, step 2 — e.g.
+`~/.claude/`, `~/.agents/`). Each half routes to its own skill. Check
+both:
 
 - **Repo marker.** `AGENTS.md` exists at the project root and points
   to the global contract (or is a legacy full JAIBA protocol — see
-  below). Missing or unrelated → **Broken**; route to `jaiba-scaffold`
-  (it owns the coexist/replace decision).
+  below). Missing or unrelated → **Broken**; route to `jaiba-init`
+  (bootstrap step 3 owns the coexist/replace decision).
 - **Global contract present.** `jaiba-contract.md` exists in the
   global agent folder you located in the preconditions. A repo marker
   pointing at a contract that isn't there means every session runs
-  ruleless → **Broken**; route to `jaiba-scaffold` (step 3a reinstall).
+  ruleless → **Broken**; route to `jaiba-configure` (step 2 installs or
+  refreshes it).
 - **Drift vs the packaged version.** Diff the installed copy against
   this skill's own reference copy, `assets/jaiba-contract.md`
-  (kept in lockstep with the canonical copy scaffold ships):
+  (kept in lockstep with the canonical copy `jaiba-configure` ships):
 
   ```bash
   diff -q --strip-trailing-cr <global-agent-folder>/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
@@ -46,13 +51,16 @@ minimal `AGENTS.md` marker in the repo, and the actual rules in
   Different → **Degraded**: the machine runs older (or hand-edited)
   rules than the framework ships. Report *that* it drifted (quote the
   version marker in the file's first line if present); the fix is
-  re-running `jaiba-scaffold` step 3a, which backs up and updates.
-  Don't overwrite it yourself — doctor routes.
+  re-running `jaiba-configure` step 2, which asks before overwriting and
+  backs up the developer's copy. Don't overwrite it yourself — doctor
+  routes.
 - **Legacy monolith.** A repo `AGENTS.md` that still contains the full
   behavioral protocol (numbered rules, brain map) instead of the
   minimal marker predates the global split → **Degraded**; works, but
-  drifts silently as the framework evolves. Route to `jaiba-scaffold`
-  step 3.
+  drifts silently as the framework evolves. Route to `jaiba-init`
+  (bootstrap step 3, which offers replace/coexist for an existing
+  `AGENTS.md`), and to `jaiba-configure` step 2 if the global contract is
+  absent too.
 
 ### Layer 1 — Completeness (per file)
 
@@ -70,7 +78,7 @@ developer doesn't know about gets trusted as if it were complete.
 
 > A file that is *all* brackets means initialize never finished (or never
 > ran). That's still a finding here, not a stop condition — report it and
-> route to `update-brain` (initialize mode).
+> route to `jaiba-init:update-brain` (initialize mode).
 
 ### Layer 2 — Internal coherence (file vs file)
 
@@ -102,7 +110,7 @@ agree. Look for contradictions such as:
 - **Old memory layout.** A `.ai/memory/archive/`, `.ai/specs/`, or
   `.ai/session/` directory still present means the project predates
   the `work/` + `memory/log/` layout — **Degraded**; route to
-  `update-brain` (update mode) and the framework README's manual
+  `jaiba-init:update-brain` (update mode) and the framework README's manual
   migration notes. Executive memory lives in `.ai/work/` and is
   gitignored; a tracked `work/` (or a tracked plan/tasks/walkthrough
   anywhere under `.ai/`) is a finding too.
@@ -111,7 +119,7 @@ agree. Look for contradictions such as:
 
 The brain is supposed to mirror the repo. Do a **light** drift sweep —
 enough to catch obvious staleness, not a full re-analysis (that *is*
-`update-brain:update`). Cheap, high-signal probes:
+`jaiba-init:update-brain:update`). Cheap, high-signal probes:
 
 - **Manifest vs constitution.** Does the language/stack the constitution
   claims match the actual manifest(s) (`package.json`, `pyproject.toml`,
@@ -136,10 +144,10 @@ useful than an exhaustive audit.
 
 - **Make every finding evidenced and routed.** Not "brain is stale" but
   "`constitution.md` claims a Python stack; `pyproject.toml` is gone and
-  `go.mod` is present — run `update-brain` (update mode)."
+  `go.mod` is present — run `jaiba-init:update-brain` (update mode)."
 - **Collapse to the right fix.** Pervasive brackets / a never-populated
-  file → `update-brain` **initialize**. Drift or a few gaps in an
-  otherwise real brain → `update-brain` **update**.
+  file → `jaiba-init:update-brain` **initialize**. Drift or a few gaps
+  in an otherwise real brain → `jaiba-init:update-brain` **update**.
 - **Don't confabulate the fix content.** doctor says *what's wrong* and
   *which skill fixes it*; it never drafts the corrected constitution text
   — that would be patching the brain by the back door.

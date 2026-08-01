@@ -93,7 +93,7 @@ ask the developer; don't silently over- or under-scope
 > Gate (constitution §6 isn't available) — README, CI config, or failing
 > those, the package manager's own scripts (`package.json`, `Makefile`,
 > `justfile`, …). Treat the change as free-standing (skip "plan
-> adjustment" entirely), and mention `jaiba-scaffold` once, in the
+> adjustment" entirely), and mention `jaiba-init` once, in the
 > closing recap, as an opportunity rather than a blocker.
 
 Context loaded depends on execution context — detect which applies (see

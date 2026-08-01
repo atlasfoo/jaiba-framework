@@ -1,7 +1,7 @@
 <!--
   JAIBA README skeleton.
 
-  This is the default structure `update-brain:initialize` writes when a
+  This is the default structure `jaiba-init:update-brain:initialize` writes when a
   project's README.md is *completely empty*. It is intentionally
   human-first: unlike `.ai/memory/` (which is for agents and English-only),
   the README serves humans and agents alike and may be written in the

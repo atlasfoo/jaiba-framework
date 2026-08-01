@@ -7,9 +7,9 @@ how a subagent declares its tool needs, what must be checked **before**
 invoking, and how parallel results come back together.
 
 The battery ships as native agent definitions in the framework's
-scaffold assets (`skills/scaffold/assets/agents/`) and is installed by
-`jaiba-scaffold` into the host agent's agents folder (e.g.
-`.claude/agents/` or the global equivalent):
+machine-setup assets (`skills/jaiba-configure/assets/agents/`) and is
+installed by `jaiba-configure` into the host agent's global agents folder
+(e.g. `~/.claude/agents/` or the vendor-neutral equivalent):
 
 | Agent | Definition asset | Role | Used by phase |
 |---|---|---|---|
@@ -34,7 +34,7 @@ Four operations, each bounded to its phase:
    requirement contrasted against `constitution.md`, `adr-log.md`,
    `reference-index.md` and recent `.ai/memory/log/` entries:
    conflicts with standing decisions, scope violations, integrations
-   not yet indexed (NEW — for `update-brain`).
+   not yet indexed (NEW — for `jaiba-init:update-brain`).
 3. **Task execution** (`execute`) → the executor tier matching the
    task's `load` (mapping below). Wave construction and fan-out rules
    live in `execute-mode.md § Delegating to executors`.
@@ -69,13 +69,37 @@ linters) are *not* declared here — they arrive per invocation inside
 the gate commands, and their presence is the project gate's problem,
 surfaced by doctor's probe of the project skillset.
 
+An entry may also be prefixed `mcp:<server-name>` (e.g. `mcp:context7`)
+to declare a dependency on an MCP server instead of a CLI tool — the
+two kinds mix freely in one list:
+
+```yaml
+requires:
+  - git
+  - rg
+  - mcp:context7
+```
+
+The prefix marks a different kind of dependency, not a different tool:
+an MCP is an agent-runtime concept, not a `PATH` binary, so it's never
+probed via `command -v`. ATL *indexes* `mcp:` entries — the probe
+records who needs them and renders each as `[UNVERIFIED]` in
+`.atl/tool-layout.md`, never counted present, never counted missing.
+Confirming an MCP is actually configured and reachable is diagnostic
+3's job (reference-health), not the ATL probe's.
+
 ## Pre-invocation toolchain check
 
 Before invoking **any** subagent, check the toolchain state at
 `.atl/tool-layout.md` (written by `jaiba-doctor`):
 
 1. **The subagent exists** in the host's agents folder. Not installed
-   ⇒ say so and use the fallback path — don't invoke and hope.
+   ⇒ say so, **suggest running `jaiba-configure` to install the battery
+   for this agent specifically**, and use the fallback path in the
+   meantime — don't invoke and hope. Never assume the battery is
+   present just because `jaiba-configure` was run on this machine
+   before: it may have been run for a different host (e.g. Claude Code
+   configured, Cursor — running this same repo — not).
 2. **Every tool in its `requires:` is recorded as present.** A tool
    listed as **missing** ⇒ **surface it now**: name the tool, name the
    subagent that demands it, and offer the choice — install it, or
@@ -97,15 +121,22 @@ battery:
 
 | `load` | Executor | Model class (declarative) | Fits |
 |---|---|---|---|
-| `high` | `executor-high` | top reasoning tier — Opus/Sonnet class | design judgment, multi-file changes, ambiguity to resolve while working |
-| `medium` | `executor-medium` | balanced tier — Sonnet class | bounded implementation with a clear contract |
-| `low` | `executor-low` | fast/cheap tier — Haiku/Flash class | mechanical, repetitive, zero-judgment work |
+| `high` | `executor-high` | top reasoning tier — e.g. Opus-class on Claude Code | design judgment, multi-file changes, ambiguity to resolve while working |
+| `medium` | `executor-medium` | balanced tier — e.g. Sonnet-class on Claude Code | bounded implementation with a clear contract |
+| `low` | `executor-low` | fast/cheap tier — e.g. Haiku-class on Claude Code | mechanical, repetitive, zero-judgment work |
 
-The model per tier is **declarative**: each definition names the model
-class, not a frozen model ID — the host resolves it to whatever
-current model fills that class. If in doubt between two tiers, take
-the higher one; a `low` executor improvising on a `medium` task costs
-more than the tier saved.
+The model per tier is **declarative and unset by default**: the
+shipped agent definitions carry no `model:` field at all, which means
+"inherit the orchestrator's model" — the router-friendly default, and
+the only sane one on a host where hardcoding a provider's model ID
+would be vendor lock-in. `jaiba-configure` offers an install-time
+selection step (`jaiba-configure/SKILL.md § Then select a model per
+tier`) that enumerates the models actually available on that host at
+runtime and, per tier, either pins one into the installed copy's
+frontmatter or leaves it blank on request — never a model list
+hardcoded into a skill. If in doubt between two tiers when assigning
+`load` to a task, take the higher one; a `low` executor improvising on
+a `medium` task costs more than the tier saved.
 
 ## The invocation envelope (executors)
 
