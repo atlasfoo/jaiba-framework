@@ -130,8 +130,10 @@ The same index-vs-verify split applies to hooks when `jq` is missing:
 the probe can't parse `settings*.json` without it, so it can't derive
 hook tool needs — but instead of silently reporting zero hook
 dependencies (indistinguishable from "hooks need nothing"), it emits an
-explicit `[UNVERIFIED — jq missing, hooks not scanned]` marker in both
-the Agent Layers hooks summary and the health rollup. The fix there is
+explicit unverified marker in both the Agent Layers hooks summary
+(`⚠️ Not scanned — jq is missing, so hook commands in settings*.json
+could not be parsed. Hook-derived tool needs are unknown.`) and the
+health rollup (`❔ unverified — jq missing, hooks not scanned`). The fix there is
 narrower than MCP's: install `jq` and re-run this same probe, since
 hooks are a CLI-tool fact this diagnostic is equipped to check once it
 can parse the config.

@@ -124,7 +124,7 @@ note() {  # note <tool> <source-label>
     [ -z "$mt" ] && return 0
     if [ -z "${MCP_NEEDS[$mt]:-}" ]; then
       MCP_NEEDS[$mt]="$src"
-    elif [[ ",${MCP_NEEDS[$mt]}," != *",$src,"* ]]; then
+    elif [[ ", ${MCP_NEEDS[$mt]}, " != *", $src, "* ]]; then
       MCP_NEEDS[$mt]="${MCP_NEEDS[$mt]}, $src"
     fi
     return 0
@@ -133,7 +133,7 @@ note() {  # note <tool> <source-label>
   # Update flat tool needs map
   if [ -z "${NEEDS[$t]:-}" ]; then
     NEEDS[$t]="$src"
-  elif [[ ",${NEEDS[$t]}," != *",$src,"* ]]; then
+  elif [[ ", ${NEEDS[$t]}, " != *", $src, "* ]]; then
     NEEDS[$t]="${NEEDS[$t]}, $src"
   fi
 }
@@ -199,7 +199,7 @@ for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
       SKILL_LABELS+=("$label")
     fi
     while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-  done < <(find -L "$SKILLS_DIR" -name SKILL.md -not -path '*/evals/*' -print0 2>/dev/null)
+  done < <(find -L "$SKILLS_DIR" -type d -name evals -prune -o -name SKILL.md -print0 2>/dev/null)
 done
 
 # 2. Subagents: <agent>/agents/*.md with a `requires:` block, for every
@@ -213,7 +213,7 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
       fi
       register_source "$label"
       while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-    done < <(find -L "$AGENT_DIR/agents" -name '*.md' -not -path '*/evals/*' -print0 2>/dev/null)
+    done < <(find -L "$AGENT_DIR/agents" -type d -name evals -prune -o -name '*.md' -print0 2>/dev/null)
   fi
 done
 
@@ -393,8 +393,8 @@ mkdir -p "$ROOT/.atl"
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "- **Shell host:** $SHELL_FLAVOR"
-  echo "- **Skills scanned:** $(printf '\`%s\` ' "${SKILLS_DIRS[@]}")"
-  echo "- **Agent folder(s):** $(printf '\`%s\` ' "${AGENT_DIRS[@]}")"
+  echo "- **Skills scanned:** $(printf '`%s` ' "${SKILLS_DIRS[@]}")"
+  echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
   echo "- **Missing:** $missing of $total"
   echo "- **Unverified (MCP):** $unverified"
   echo

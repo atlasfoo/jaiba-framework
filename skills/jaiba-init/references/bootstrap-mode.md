@@ -106,11 +106,15 @@ full behavioral rules into the repo copy; behavior belongs to the
 
 **While you're here, check the global side — and only check.** The repo
 marker points at a machine-level `jaiba-contract.md` (e.g.
-`~/.claude/jaiba-contract.md`, `~/.agents/jaiba-contract.md`) and the
-subagent battery in the matching global `agents/` folder. If either is
-absent, this machine was never configured:
+`~/.claude/jaiba-contract.md`, `~/.agents/jaiba-contract.md`), the
+subagent battery in the matching global `agents/` folder, and the
+JAIBA workflow/meta skillset (`conduct`, `ask`, `fast`, `jaiba-doctor`,
+…) — check your own skill list, not the machine's, since a machine can
+have `jaiba-configure` run for one agent and not another. If any of the
+three is absent, this agent was never configured:
 
-- Say so plainly, name what's missing (contract, battery, or both).
+- Say so plainly, name what's missing (contract, skillset, battery, or
+  any combination).
 - Point the developer at **`jaiba-configure`** as the prerequisite.
 - **Do not install it yourself.** Global setup is `jaiba-configure`'s
   entire job; doing it here would rebuild the coupling this split
@@ -154,8 +158,9 @@ End with a short, honest report:
    `.atl/` directory, and where the repo `AGENTS.md` marker went (and how
    an existing one was handled).
 2. **Global prerequisites** — whether the machine-level
-   `jaiba-contract.md` and subagent battery were found, and if not, an
-   explicit "run `jaiba-configure`" recommendation.
+   `jaiba-contract.md`, the workflow/meta skillset, and the subagent
+   battery were found for *this agent*, and if not, an explicit "run
+   `jaiba-configure`" recommendation naming what's missing.
 3. **Brain state** — what `initialize` created or filled, and every
    `[MISSING]` / `[NEEDS CLARIFICATION]` that remains, per file
    (`AGENTS.md` §5.4).
