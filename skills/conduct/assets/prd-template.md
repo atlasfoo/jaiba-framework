@@ -57,7 +57,8 @@ one. Not a design doc — no schemas, no sequence diagrams.>
 
 - <External integration or package, cited from
   `.ai/memory/reference-index.md`. A NEW integration not yet indexed:
-  flag as "NEW — to be added" so it surfaces for `update-brain`.>
+  flag as "NEW — to be added" so it surfaces for
+  `jaiba-init:update-brain`.>
 
 ## Success metrics
 

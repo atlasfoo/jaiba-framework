@@ -7,8 +7,9 @@ This is the one diagnostic that **writes**: it refreshes
 `.atl/tool-layout.md`. That file is machine state (gitignored, `AGENTS.md`
 §6), not project memory, so rewriting it is squarely doctor's job — it
 does not violate the "propose, don't patch" rule that governs the brain.
-It is the same probe `scaffold` runs once at install time, re-run as a
-maintenance check and widened to cover subagents and hooks.
+doctor owns this probe outright: `jaiba-init` defers the first run here
+(bootstrap step 5) rather than probing itself, and every later checkup
+re-runs it, widened to cover subagents and hooks.
 
 ## Procedure
 
@@ -44,14 +45,15 @@ maintenance check and widened to cover subagents and hooks.
    agent folder:
    - **Skills** — every `<skills-dir>/**/SKILL.md` `requires:` block.
    - **Subagents** — every `<agent-folder>/agents/*.md` that carries a
-     `requires:` block. This includes the JAIBA battery `scaffold`
-     installs into the **global** agents folder (`executor-high/
+     `requires:` block. This includes the JAIBA battery
+     `jaiba-configure` installs into the **global** agents folder
+     (`executor-high/
      medium/low`, `code-analyst`, `business-analyst`, `verify`) — the
      global skills dir passed to the probe makes its parent's `agents/`
      get scanned, so the battery's declared tools gain provenance rows
      (`subagent:executor-high`, …) automatically. If the battery is
      absent from a machine that has conduct installed, note it:
-     `execute` will fall back to sequential mode until `jaiba-scaffold`
+     `execute` will fall back to sequential mode until `jaiba-configure`
      reinstalls the definitions.
    - **Hooks** — the leading executable of each hook `command` in
      `<agent-folder>/settings.json` / `settings.local.json` (best-effort,

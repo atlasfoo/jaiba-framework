@@ -1,12 +1,13 @@
 {
-  "skill_name": "update-brain",
+  "skill_name": "jaiba-init",
   "evals": [
     {
       "id": 1,
       "name": "initialize-brownfield-dotnet",
-      "mode_under_test": "initialize",
+      "mode_under_test": "update-brain:initialize",
       "prompt": "Set up jaiba on this repo and build the brain. It's an existing .NET service we've been running for a while.",
       "context": {
+        "repo_state": ".ai/ skeleton and the AGENTS.md marker already exist (a prior bootstrap run laid them)",
         "memory_state": "empty (.ai/memory/ has no *.md, or bare templates)",
         "code_facts": [
           "ASP.NET Core 8 Web API, layered (Api/Application/Domain/Infrastructure)",
@@ -34,7 +35,7 @@
     {
       "id": 2,
       "name": "initialize-empty-readme-fill",
-      "mode_under_test": "initialize",
+      "mode_under_test": "update-brain:initialize",
       "prompt": "Build the brain. Also our README.md is basically blank.",
       "context": {
         "memory_state": "empty",
@@ -55,7 +56,7 @@
     {
       "id": 3,
       "name": "update-apply-proposed-adr",
-      "mode_under_test": "update",
+      "mode_under_test": "update-brain:update",
       "prompt": "Apply the ADR that the last work closure proposed for the itinerary permissions.",
       "context": {
         "memory_state": "populated",
@@ -76,7 +77,7 @@
     {
       "id": 4,
       "name": "update-fix-drift-new-integration",
-      "mode_under_test": "update",
+      "mode_under_test": "update-brain:update",
       "prompt": "The reference index doesn't mention the new payments integration we added last sprint — reconcile it.",
       "context": {
         "memory_state": "populated, reference-index has no payments entry",
@@ -95,7 +96,7 @@
     {
       "id": 5,
       "name": "update-rejects-non-identity-change",
-      "mode_under_test": "update",
+      "mode_under_test": "update-brain:update",
       "prompt": "We just bumped Serilog from 3.1 to 3.2 and refactored the order validator. Update the constitution.",
       "context": {
         "memory_state": "populated",
@@ -127,7 +128,7 @@
     {
       "id": 7,
       "name": "initialize-prunes-inapplicable-sections",
-      "mode_under_test": "initialize",
+      "mode_under_test": "update-brain:initialize",
       "prompt": "Build the brain for this repo.",
       "context": {
         "memory_state": "empty",
@@ -149,21 +150,112 @@
     },
     {
       "id": 8,
-      "name": "missing-agents-md-flags-scaffold-but-can-proceed",
+      "name": "missing-agents-md-marker-can-proceed",
       "mode_under_test": "brain-discovery",
       "prompt": "Build the brain for this repo.",
       "context": {
         "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists (empty .ai/memory/ with log/, .ai/work/, .ai/vendored/) but AGENTS.md is absent at the project root — likely a partial/manual setup, not a full jaiba-scaffold run",
+        "repo_state": ".ai/ skeleton exists (empty .ai/memory/ with log/, .ai/work/, .ai/vendored/) but AGENTS.md is absent at the project root — a partial/manual setup, not a full jaiba-init bootstrap run",
         "code_facts": ["Node.js Express API, package.json has test/lint scripts"]
       },
       "expected_output": [
         "Agent noticed AGENTS.md is missing entirely as part of its preconditions",
-        "Flagged that this project is missing the JAIBA marker (and possibly the global behavioral contract and the rest of what jaiba-scaffold installs)",
-        "Recommended jaiba-scaffold, but did not refuse outright",
-        "Asked the developer whether to continue with initialize anyway (populate .ai/memory/ from the existing skeleton) or stop and run jaiba-scaffold first",
+        "Flagged that this project is missing the JAIBA repo marker",
+        "Recommended a jaiba-init bootstrap run (which drops the marker), but did not refuse outright",
+        "Asked the developer whether to continue with update-brain:initialize anyway (populate .ai/memory/ from the existing skeleton) or bootstrap first",
         "If the developer chose to continue, proceeded with the normal initialize evidence sweep (constitution, adr-log, reference-index from templates)",
-        "Did not write or copy AGENTS.md itself — that remains jaiba-scaffold's responsibility"
+        "Did NOT confuse the repo marker with the machine-level jaiba-contract.md — global setup is jaiba-configure's job"
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "bootstrap-bare-invocation-fresh-repo",
+      "mode_under_test": "bootstrap",
+      "prompt": "jaiba-init",
+      "context": {
+        "repo_state": "no .ai/, no .atl/, no AGENTS.md; a plain git repo with a single .claude/ vendor dir at the root",
+        "global_state": "~/.claude/jaiba-contract.md present, ~/.claude/agents/ has the subagent battery",
+        "code_facts": ["Rust workspace, cargo test/clippy/fmt in CI"]
+      },
+      "expected_output": [
+        "Bare invocation with no sub-mode selected the bootstrap mode, not initialize or update",
+        "Confirmed it was at the project root (where .git/ lives) before writing anything",
+        "Detected exactly one vendor dir (.claude/) and used it — did NOT fall back to .agents/",
+        "Created .ai/memory/log/, .ai/work/, .ai/vendored/, .ai/.gitignore from assets/ai.gitignore, .gitkeep in log/ and vendored/",
+        "Created .atl/ with its .gitignore from assets/atl.gitignore",
+        "Dropped the repo marker AGENTS.md from assets/AGENTS.md at the root",
+        "Did NOT install any global skills, contract, or subagent battery — those are jaiba-configure's",
+        "Continued into update-brain:initialize itself as an internal mode transition, not a hand-off to another skill",
+        "Closed by handing off to jaiba-doctor for the first checkup and the .atl/tool-layout.md probe"
+      ],
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "bootstrap-resumes-half-bootstrapped-repo",
+      "mode_under_test": "bootstrap",
+      "prompt": "Set up jaiba in this repo.",
+      "context": {
+        "repo_state": ".ai/ exists with memory/, memory/log/, work/, vendored/ and AGENTS.md at the root, but .ai/memory/ has no *.md at all — a prior run stopped before the brain was built"
+      },
+      "expected_output": [
+        "Recognized the half-bootstrapped state from the 'When NOT to bootstrap' resume table",
+        "Skipped the skeleton and marker steps rather than re-laying or clobbering them",
+        "Went straight to the update-brain:initialize step",
+        "Did not treat the existing AGENTS.md as an edge case needing backup — it is JAIBA's own marker",
+        "Still closed with the jaiba-doctor hand-off"
+      ],
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "bootstrap-refuses-instrumented-repo",
+      "mode_under_test": "bootstrap",
+      "prompt": "jaiba-init",
+      "context": {
+        "repo_state": ".ai/memory/constitution.md, adr-log.md and reference-index.md all carry real prose (no bare [brackets]); AGENTS.md present"
+      },
+      "expected_output": [
+        "Read the brain state before writing and recognized the repo is already instrumented",
+        "Did NOT lay the skeleton, overwrite AGENTS.md, or re-run initialize",
+        "Routed instead to jaiba-init:update-brain (drift/update), conduct, or ask",
+        "Explained how it told skeleton from instrumented (real prose vs bare [brackets])"
+      ],
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "bootstrap-flags-missing-global-setup-without-installing",
+      "mode_under_test": "bootstrap",
+      "prompt": "Adopt jaiba into this project.",
+      "context": {
+        "repo_state": "greenfield: no .ai/, no AGENTS.md, two vendor dirs at the root (.claude/ and .cursor/)",
+        "global_state": "no jaiba-contract.md in any user-level agent config; no subagent battery installed"
+      },
+      "expected_output": [
+        "Two vendor dirs → fell back to the neutral .agents/ folder rather than guessing between .claude/ and .cursor/",
+        "Detected that the machine-level jaiba-contract.md and the subagent battery are absent",
+        "Said so plainly and named jaiba-configure as the prerequisite to run",
+        "Did NOT install the contract, the skillset, or the subagent battery itself",
+        "Treated the missing global setup as a warning, not a stop condition — finished the repo-local bootstrap anyway",
+        "Surfaced the gap again in the closing report"
+      ],
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "bootstrap-existing-foreign-agents-md",
+      "mode_under_test": "bootstrap",
+      "prompt": "jaiba-init",
+      "context": {
+        "repo_state": "no .ai/, but the root already has a hand-written AGENTS.md that is the team's own agent contract (not JAIBA's marker)"
+      },
+      "expected_output": [
+        "Did NOT silently overwrite the existing AGENTS.md",
+        "Stopped and asked, offering both non-destructive choices: replace with a backup (AGENTS.bak.md) or coexist as AGENTS.jaiba.md",
+        "Did not inline the full behavioral rules into the repo copy — behavior belongs to the global contract",
+        "Reported in the closing which option was taken and where the developer's original ended up"
       ],
       "files": []
     }

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# JAIBA scaffold — greeting banner.
+# JAIBA configure — greeting banner.
 #
-# Purely cosmetic: prints a short banner to mark the start of a scaffold
-# run. Run this first, before step 0, so the developer knows scaffold has
-# kicked off.
+# Purely cosmetic: prints a short banner to mark the start of a
+# jaiba-configure run. Run this first, before step 1, so the developer
+# knows the machine setup has kicked off.
 clear;
 cat << 'EOF'
     ▒▒          ▒▒                                ▒▒          ▒▒
@@ -30,4 +30,4 @@ cat << 'EOF'
       ░░        ▒▒                                ▒▒░░
                 ▒▒                                ▒▒
 EOF
-echo -e "\033[31mJAIBA landing at your project!\033[0m"
+echo -e "\033[31mJAIBA landing on your machine!\033[0m"

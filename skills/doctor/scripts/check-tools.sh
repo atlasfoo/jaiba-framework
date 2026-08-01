@@ -2,8 +2,9 @@
 #
 # JAIBA doctor — local toolchain probe (maintenance check).
 #
-# The diagnostic toolchain probe. Where scaffold used to probe once at
-# install time, doctor RE-probes during a health check and widens the net: it derives
+# The diagnostic toolchain probe. doctor owns it outright: `jaiba-init`
+# defers the first probe here (bootstrap step 5) instead of running its
+# own, and doctor RE-probes on every health check. It derives
 # the required CLI tools from installed skills, from subagent
 # definitions, AND from hook command lines, tracks WHICH of them needs
 # each tool (provenance), checks every tool against this machine, and
@@ -21,7 +22,7 @@
 #                           dir like ~/.claude/skills). Pass several,
 #                           separated by ':', if the project's skillset
 #                           is split across project-local and global
-#                           locations (per jaiba-scaffold step 4). Each
+#                           locations (per jaiba-configure step 3). Each
 #                           directory's parent is treated as an agent
 #                           folder, so subagents (agents/*.md) and hook
 #                           configs (settings*.json) next to each are
@@ -63,7 +64,7 @@ for d in "${SKILLS_DIRS[@]}"; do
 done
 
 # Framework baseline — tools the JAIBA skills assume regardless of any
-# one declaration. Same set scaffold uses, so the two probes agree.
+# one declaration.
 BASELINE="git bash rg curl"
 
 # tool -> "source1, source2, ..."  (provenance: who needs the tool)
@@ -388,8 +389,7 @@ mkdir -p "$ROOT/.atl"
   echo
   echo "> Local CLI toolchain re-probed by \`jaiba-doctor\` inside \`.atl/\`. **Gitignored** —"
   echo "> this records what is installed on *this machine*, not a project"
-  echo "> fact. Regenerate by re-running \`jaiba-doctor\` (or the scaffold"
-  echo "> tool check)."
+  echo "> fact. Regenerate by re-running \`jaiba-doctor\`."
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "- **Shell host:** $SHELL_FLAVOR"

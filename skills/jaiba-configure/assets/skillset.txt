@@ -1,4 +1,4 @@
-# JAIBA project-scoped skill set installed by jaiba-scaffold.
+# JAIBA workflow/meta skill set installed by jaiba-configure.
 #
 # Two entry formats:
 #

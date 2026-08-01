@@ -65,8 +65,8 @@ Once oriented, answer per the SKILL.md rules: grounded in the files you
 opened, snippets not dumps, facts distinguished from inferences. If
 orientation itself surfaced a contradiction (the plan cites a criterion
 that isn't in the PRD; the PRD assumes a model the code renamed),
-that *is* part of the answer — surface it, and propose `update-brain`
-if reconciliation is warranted.
+that *is* part of the answer — surface it, and propose
+`jaiba-init:update-brain` if reconciliation is warranted.
 
 ## What orientation is *not*
 

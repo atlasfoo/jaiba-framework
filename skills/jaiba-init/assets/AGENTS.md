@@ -7,14 +7,14 @@ minimal: behavior does not live per-repo.
 1. **Behavior** — follow the **JAIBA Behavioral Contract** installed
    globally in your agent configuration (file `jaiba-contract.md` in
    the agent's global config folder, e.g. `~/.claude/` or `~/.agents/`;
-   installed once per machine by `jaiba-scaffold`). It defines the
+   installed once per machine by `jaiba-configure`). It defines the
    brain map, the routing rule (continuation → `conduct:execute` ·
    question → `ask` · small change → `fast`), and the numbered
    behavioral rules.
 
    *If you cannot find the global contract*, say so before doing
    substantive work and route the developer to `jaiba-doctor` (checks
-   presence/drift) or `jaiba-scaffold` (reinstalls it). Do not
+   presence/drift) or `jaiba-configure` (reinstalls it). Do not
    improvise the missing rules.
 
 2. **Project facts** — identity, stack, scope, and the Quality Gate

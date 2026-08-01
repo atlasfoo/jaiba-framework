@@ -7,9 +7,9 @@ how a subagent declares its tool needs, what must be checked **before**
 invoking, and how parallel results come back together.
 
 The battery ships as native agent definitions in the framework's
-scaffold assets (`skills/scaffold/assets/agents/`) and is installed by
-`jaiba-scaffold` into the host agent's agents folder (e.g.
-`.claude/agents/` or the global equivalent):
+machine-setup assets (`skills/jaiba-configure/assets/agents/`) and is
+installed by `jaiba-configure` into the host agent's global agents folder
+(e.g. `~/.claude/agents/` or the vendor-neutral equivalent):
 
 | Agent | Definition asset | Role | Used by phase |
 |---|---|---|---|
@@ -34,7 +34,7 @@ Four operations, each bounded to its phase:
    requirement contrasted against `constitution.md`, `adr-log.md`,
    `reference-index.md` and recent `.ai/memory/log/` entries:
    conflicts with standing decisions, scope violations, integrations
-   not yet indexed (NEW — for `update-brain`).
+   not yet indexed (NEW — for `jaiba-init:update-brain`).
 3. **Task execution** (`execute`) → the executor tier matching the
    task's `load` (mapping below). Wave construction and fan-out rules
    live in `execute-mode.md § Delegating to executors`.

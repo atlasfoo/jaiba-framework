@@ -64,18 +64,18 @@ graph TD
         B --> E([Conduct — SDD chain: propose → spec → tasks → execute → validate → summarize])
         B --> G([Fast — implicit inline lane])
         B --> H([Ask — implicit read-only lane])
-        B --> I([Update Brain])
 
         C --> J[[e.g. ASP.NET CORE best practices]]
         C --> L[[e.g. How to TDD]]
 
-        D --> K[[Scaffold]]
+        D --> K[[Jaiba-configure — machine setup]]
+        D --> I[[Jaiba-init — repo bootstrap + update-brain modes]]
         D --> N[[Doctor]]
         D --> M[[Create-knowledge]]
     end
 
     subgraph subagents
-        S[SUBAGENT BATTERY — installed globally by scaffold]
+        S[SUBAGENT BATTERY — installed globally by jaiba-configure]
         S --> S1([executor-high / -medium / -low])
         S --> S2([code-analyst])
         S --> S3([business-analyst])
@@ -107,21 +107,21 @@ The final output of this framework are skills, template artifacts will be packag
     │       └── archive.sh (moves closed work essence to .ai/memory/log/)
     ├── ask                (implicit lane — no slash command)
     ├── fast               (implicit lane — no slash command)
-    ├── update-brain
+    ├── jaiba-init         (repo-scoped: bootstrap + update-brain modes)
     │   ├── assets
+    │   │   ├── AGENTS.md           (minimal per-repo marker)
+    │   │   ├── ai.gitignore / atl.gitignore
     │   │   ├── constitution-template.md
     │   │   ├── adr-log-template.md
     │   │   ├── reference-index-template.md
     │   │   ├── log-entry-template.md
     │   │   └── readme-skeleton.md
-    │   └── references     (one per mode: initialize, update)
-    ├── scaffold
+    │   └── references     (bootstrap, initialize, update)
+    ├── jaiba-configure    (machine-scoped: contract, skillset, battery)
     │   └── assets
     │       ├── jaiba-contract.md   (global behavioral contract — canonical)
-    │       ├── AGENTS.md           (minimal per-repo marker)
     │       ├── agents/             (subagent battery: executors + specialists)
-    │       ├── skillset.txt
-    │       └── ai.gitignore / atl.gitignore
+    │       └── skillset.txt
     ├── create-knowledge
     └── doctor
         ├── assets
@@ -131,13 +131,18 @@ The final output of this framework are skills, template artifacts will be packag
             └── check-tools.sh
 ```
 
-> The memory artifact templates are owned by `update-brain` (the only
-> skill that writes `.ai/memory/`). `scaffold` does not carry its own
-> copies: it creates the `.ai/` skeleton and hands off to
-> `update-brain:initialize`, which materializes the brain from those
-> templates. The behavioral contract is the inverse: `scaffold` owns
-> the canonical copy and `doctor` carries a lockstep reference copy —
-> keep both identical when the contract changes.
+> Ownership follows the repo/machine split. **`jaiba-init` owns
+> everything a repository gets**: the `AGENTS.md` marker, the `.ai/` and
+> `.atl/` gitignores, and the memory artifact templates — it lays the
+> skeleton *and*, in its `update-brain` mode, materializes the brain
+> from those templates (it is the only skill that writes `.ai/memory/`).
+> There is no hand-off between the two: they are modes of one skill.
+> **`jaiba-configure` owns everything the machine gets**: the canonical
+> global behavioral contract, the skillset, the subagent battery — and
+> carries no brain templates at all. The contract is the one file with
+> two copies: `jaiba-configure` holds the canonical one and `doctor` a
+> lockstep reference copy for drift detection — keep both identical when
+> the contract changes.
 
 
 ## 5. Project status

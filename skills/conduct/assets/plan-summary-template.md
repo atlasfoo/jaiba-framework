@@ -12,7 +12,7 @@ adr: <ADR-id proposed, or "none">
 > `.ai/work/` by `conduct:summarize`, moved by
 > `scripts/archive.sh`. **English, always** (long-term memory).
 > Concise: one screen. The walkthrough was the narrative; this is the
-> record. Follows the log-entry contract owned by `update-brain`
+> record. Follows the log-entry contract owned by `jaiba-init`
 > (`log-entry-template.md`): append-only once archived — corrections
 > are new entries.
 
@@ -49,7 +49,7 @@ If nothing notable: "None.">
 decision, alternatives, consequences) plus any reference-index /
 constitution changes worth promoting — or, explicitly: "No ADR
 proposed; all decisions were tactical." Enacting them is
-`update-brain`'s job.>
+`jaiba-init:update-brain`'s job.>
 
 ## Pointers
 

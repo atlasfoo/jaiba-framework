@@ -10,19 +10,19 @@
     {
       "id": 2,
       "prompt": "Something feels stale about jaiba here. Can you check it?",
-      "expected_output": "Finds drift: the constitution claims one stack but the manifest shows another (or names a service with no reference-index entry), and/or the brain still has unfilled [brackets]/[MISSING]. Reports these as evidenced findings and routes the fix to update-brain (update mode for drift, initialize if a file is a bare template) — it does NOT rewrite .ai/memory/ itself. If the tool probe finds a missing CLI, flags it with its 'Needed by' provenance and prescribes an install. If old-layout directories survive (.ai/session/, .ai/specs/, .ai/memory/archive/), reports them as Degraded with the manual migration route. Report leads with the most severe (Broken) findings.",
+      "expected_output": "Finds drift: the constitution claims one stack but the manifest shows another (or names a service with no reference-index entry), and/or the brain still has unfilled [brackets]/[MISSING]. Reports these as evidenced findings and routes the fix to jaiba-init:update-brain (update mode for drift, initialize if a file is a bare template) — it does NOT rewrite .ai/memory/ itself. If the tool probe finds a missing CLI, flags it with its 'Needed by' provenance and prescribes an install. If old-layout directories survive (.ai/session/, .ai/specs/, .ai/memory/archive/), reports them as Degraded with the manual migration route. Report leads with the most severe (Broken) findings.",
       "files": []
     },
     {
       "id": 3,
       "prompt": "are all my external references still reachable? I haven't touched this project in a while",
-      "expected_output": "Focuses on reference health (still runs the full checkup). For each reference-index entry: checks the named channel (MCP server installed/enabled, CLI on PATH, URL reachable if web tools exist, spec/vendored file on disk). Runs `git log -1 --format=%cs` on each vendored file and flags any older than 1 month as Degraded/stale, suggesting a re-vendor recorded via update-brain. Marks anything it cannot test (no web tools, no MCP introspection) as [UNVERIFIED] rather than passing it. Routes each fix to its owner.",
+      "expected_output": "Focuses on reference health (still runs the full checkup). For each reference-index entry: checks the named channel (MCP server installed/enabled, CLI on PATH, URL reachable if web tools exist, spec/vendored file on disk). Runs `git log -1 --format=%cs` on each vendored file and flags any older than 1 month as Degraded/stale, suggesting a re-vendor recorded via jaiba-init:update-brain. Marks anything it cannot test (no web tools, no MCP introspection) as [UNVERIFIED] rather than passing it. Routes each fix to its owner.",
       "files": []
     },
     {
       "id": 4,
       "prompt": "run jaiba doctor on this project",
-      "expected_output": "Detects there is no .ai/ brain to diagnose (repo was never instrumented). Refuses to invent findings and routes the developer to `scaffold` to bootstrap JAIBA first, explaining doctor is a maintenance/health-check skill that presumes an existing brain.",
+      "expected_output": "Detects there is no .ai/ brain to diagnose (repo was never instrumented). Refuses to invent findings and routes the developer to `jaiba-init` to bootstrap JAIBA first, explaining doctor is a maintenance/health-check skill that presumes an existing brain.",
       "files": []
     },
     {
@@ -30,7 +30,7 @@
       "name": "tool-state-covers-global-skills-and-battery",
       "prompt": "Run a jaiba health check before I start planning.",
       "context": {
-        "skill_install": "split — conduct, ask, fast, and update-brain are installed GLOBALLY (~/.claude/skills/), while create-knowledge and jaiba-doctor are project-local (.claude/skills/); the subagent battery lives in ~/.claude/agents/",
+        "skill_install": "split — conduct, ask, fast, and jaiba-init are installed GLOBALLY (~/.claude/skills/), while create-knowledge and jaiba-doctor are project-local (.claude/skills/); the subagent battery lives in ~/.claude/agents/",
         "repo_state": ".ai/memory/ fully populated and coherent",
         "tooling": "one of the globally-installed skills declares `requires: [jq]`, and `jq` is not on PATH"
       },
@@ -45,7 +45,7 @@
         "repo_state": "AGENTS.md is the minimal JAIBA marker; .ai/memory/ populated and coherent",
         "global_agent_config": "~/.claude/jaiba-contract.md exists but was hand-edited months ago — its content differs from doctor's bundled assets/jaiba-contract.md reference copy"
       },
-      "expected_output": "Layer 0 of memory coherence diffs the installed global contract against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-scaffold step 3a (backup + update) — doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
+      "expected_output": "Layer 0 of memory coherence diffs the installed global contract against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-configure step 2 (ask + backup + update) — doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
       "files": []
     },
     {

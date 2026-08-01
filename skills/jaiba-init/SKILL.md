@@ -1,34 +1,47 @@
 ---
-name: update-brain
-description: "Long-term memory maintenance for JAIBA's `.ai/memory/`. Populates brain templates; can update ADR log and drift corrections."
+name: jaiba-init
+description: "Repo-scoped JAIBA setup and long-term memory. Bootstraps one repository — AGENTS.md marker, `.ai/` skeleton, constitutive memory, then hands to jaiba-doctor — and afterwards owns `.ai/memory/` maintenance via its update-brain mode (populate templates, apply ADRs, fix drift)."
 version: 1.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
 tags:
   - jaiba
-  - workflows
-  - jaiba-workflows
+  - meta
+  - jaiba-meta
+  - bootstrap
   - brain
 ---
 
-# Update Brain Skill
+# jaiba-init
 
-The long-term memory workflow of the JAIBA framework. `update-brain` is
-the **only skill allowed to write `.ai/memory/`**. Everywhere else the
-brain is read-mostly: `conduct:summarize` *proposes* ADRs and
-brain changes, but never enacts them — it hands
-off here (`AGENTS.md` §2.9, §5).
+The **repo-scoped** half of JAIBA setup, and the framework's long-term
+memory owner. `jaiba-init` does two things, in two modes:
 
-It exists to close the learning loop at the **project** level. Where
-`conduct:summarize` closes a single piece of work, `update-brain`
-is what keeps the three
-long-term artifacts — `constitution.md`, `adr-log.md`,
-`reference-index.md` — true to the repository over the project's life.
+- **Bootstrap** (`jaiba-init`, bare) — instrument *this repository*:
+  the `AGENTS.md` marker, the `.ai/` brain skeleton and `.atl/`, the
+  constitutive memory, then the first `jaiba-doctor` checkup.
+- **Maintain** (`jaiba-init:update-brain`) — keep the brain true to the
+  repository for the rest of the project's life.
 
-This skill has **two modes**, each documented in its own reference
-file. Read the relevant reference *before* taking action — the
-selection table below tells you which one.
+Everything here is scoped to **one repo**. The machine-level half of
+setup — the global behavioral contract, the skillset, the subagent
+battery — belongs to **`jaiba-configure`** and is never performed here.
+
+In its `update-brain` mode this is the **only skill allowed to write
+`.ai/memory/`**. Everywhere else the brain is read-mostly:
+`conduct:summarize` *proposes* ADRs and brain changes, but never enacts
+them — it hands off here (`AGENTS.md` §2.9, §5).
+
+That mode exists to close the learning loop at the **project** level.
+Where `conduct:summarize` closes a single piece of work,
+`jaiba-init:update-brain` is what keeps the three long-term
+artifacts — `constitution.md`, `adr-log.md`, `reference-index.md` — true
+to the repository over the project's life.
+
+Each mode is documented in its own reference file. Read the relevant
+reference *before* taking action — the selection table below tells you
+which one.
 
 ## Mode Selection
 
@@ -37,9 +50,15 @@ ambiguous, ask the developer instead of guessing.
 
 | Situation | Mode | Read |
 |---|---|---|
-| The brain does not exist yet (no `.ai/memory/*.md`, or the files are bare templates) and the developer wants it built — "set up jaiba", "build the brain", "onboard this repo", "update-brain initialize". Also: invoked by `scaffold` right after it lays the skeleton. | `initialize` | `references/initialize-mode.md` |
-| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the constitution is stale", "reconcile memory with the code") after the project evolved. | `update` | `references/update-mode.md` |
-| Anything else — a pure question about the brain (that's `ask`), or *implementing* code (that's `conduct`/`fast`) | **Route, don't guess.** See "Hand-off" below. | — |
+| The repo is not instrumented at all — no `.ai/` whatsoever — and the developer wants JAIBA adopted here: "set up jaiba in this repo", "onboard this project", "jaiba-init", or the skill invoked bare with no sub-mode. | **bootstrap** (the default) | `references/bootstrap-mode.md` |
+| The `.ai/` skeleton exists but the brain does not (no `.ai/memory/*.md`, or the files are bare templates) and the developer wants it built — "build the brain", "initialize the memory". Also: reached from bootstrap mode's step 4, and from a half-bootstrapped repo (see the resume table in `references/bootstrap-mode.md`). | `update-brain:initialize` | `references/initialize-mode.md` |
+| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the constitution is stale", "reconcile memory with the code") after the project evolved. | `update-brain:update` | `references/update-mode.md` |
+| Anything else — a pure question about the brain (that's `ask`), *implementing* code (that's `conduct`/`fast`), or **machine-level** setup (that's `jaiba-configure`) | **Route, don't guess.** See "Hand-off" below. | — |
+
+Bare `jaiba-init` means bootstrap; `jaiba-init:update-brain` selects the
+maintenance mode, which then picks `initialize` or `update` from the two
+rows above. Bootstrap always ends by entering `initialize` itself — that
+transition is internal to this skill, not a hand-off.
 
 ## Universal Preconditions
 
@@ -58,18 +77,27 @@ ground truth before writing a word.
    relative to this skill's own installation location.
 
    If `AGENTS.md` is missing entirely, or exists but isn't the JAIBA
-   contract (no `.ai/` Brain Map, no numbered Behavioral Rules), this
-   project was never scaffolded. `update-brain` can still populate
-   `.ai/memory/` if a `.ai/` skeleton exists, but flag this clearly —
-   the developer is missing the behavioral contract and the rest of
-   the skillset that `jaiba-scaffold` installs. Recommend it, then
-   continue with `initialize` if the developer wants `.ai/memory/`
-   built anyway.
-2. **The current state of `.ai/memory/`** — do the three files exist?
-   Are they real content or untouched templates (full of `[brackets]`)?
-   This is what disambiguates `initialize` from `update`.
+   marker (no pointer to the global contract, no `.ai/` Brain Map), this
+   project was never instrumented. In **bootstrap** mode that is the
+   expected starting state — dropping the marker is step 3, carry on. In
+   the **`update-brain`** modes it is a finding: the brain can still be
+   populated if a `.ai/` skeleton exists, but flag it clearly and
+   recommend a `jaiba-init` bootstrap run, then continue with
+   `initialize` if the developer wants `.ai/memory/` built anyway.
+
+   Separately, the *machine-level* behavioral contract
+   (`jaiba-contract.md` in the agent's user-level config) and the
+   subagent battery are **`jaiba-configure`**'s responsibility, not this
+   skill's. If they're absent, say so and point the developer at
+   `jaiba-configure` — never install them from here.
+2. **The current state of `.ai/`** — does the directory exist at all
+   (no `.ai/` → **bootstrap**)? Do the three memory files exist? Are
+   they real content or untouched templates (full of `[brackets]`)?
+   This is what disambiguates bootstrap from `initialize` from
+   `update`.
 3. **The repository itself** — for `initialize`, the whole evidence
    sweep (see its reference); for `update`, the slice that changed.
+   Bootstrap defers this to the `initialize` step it ends in.
 
 If a precondition is unclear (e.g. the files are half-filled — neither
 fresh templates nor complete), surface it and ask which mode the
@@ -77,18 +105,23 @@ developer means rather than guessing.
 
 ## Artifacts at a Glance
 
-`update-brain` owns the **templates** for the three long-term artifacts.
-They live in this skill's `assets/` and are the single source of truth
-for the brain's shape — `scaffold` does **not** carry its own copies; it
-hands off to `initialize`, which materializes them.
+`jaiba-init` owns every template it writes into a repository — both the
+three long-term brain artifacts and the bootstrap files. They live in
+this skill's `assets/` and are the single source of truth for their
+shape. No other skill carries copies: `jaiba-configure` owns only the
+*machine-level* assets (the global contract, the skillset, the subagent
+battery).
 
-| File written | Lives in | Template |
-|---|---|---|
-| `.ai/memory/constitution.md` | constitutive memory | `assets/constitution-template.md` |
-| `.ai/memory/adr-log.md` | constitutive memory | `assets/adr-log-template.md` |
-| `.ai/memory/reference-index.md` | constitutive memory | `assets/reference-index-template.md` |
-| `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` | chronological record (append-only) | `assets/log-entry-template.md` |
-| `README.md` (repo root, *conditional*) | repo root | `assets/readme-skeleton.md` |
+| File written | Lives in | Written by | Template |
+|---|---|---|---|
+| `AGENTS.md` (repo marker) | repo root | bootstrap | `assets/AGENTS.md` |
+| `.ai/.gitignore` | brain skeleton | bootstrap | `assets/ai.gitignore` |
+| `.atl/.gitignore` | machine state | bootstrap | `assets/atl.gitignore` |
+| `.ai/memory/constitution.md` | constitutive memory | `initialize` | `assets/constitution-template.md` |
+| `.ai/memory/adr-log.md` | constitutive memory | `initialize` | `assets/adr-log-template.md` |
+| `.ai/memory/reference-index.md` | constitutive memory | `initialize` | `assets/reference-index-template.md` |
+| `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` | chronological record (append-only) | `update` | `assets/log-entry-template.md` |
+| `README.md` (repo root, *conditional*) | repo root | `initialize` | `assets/readme-skeleton.md` |
 
 **Use the templates verbatim** as the structure — the shared shape is
 what keeps the brain legible across the project's life. Fill the
@@ -100,9 +133,10 @@ what keeps the brain legible across the project's life. Fill the
 
 ## What each artifact may contain — and when it may change
 
-These rules are the heart of the skill. They hold in **both** modes:
-`initialize` fills the artifact for the first time under them; `update`
-only changes an artifact when its specific trigger below is met.
+These rules are the heart of the `update-brain` mode. They hold in
+**both** its sub-modes: `initialize` fills the artifact for the first
+time under them; `update` only changes an artifact when its specific
+trigger below is met.
 
 ### `constitution.md` — project identity
 
@@ -183,8 +217,9 @@ timeline:
 
 - **`work-closure` entries** — written by the *workflow* close step
   (`summarize`) when it archives the essence of `.ai/work/` before
-  clearing it. This is the one carve-out to "only update-brain writes
-  `.ai/memory/`": the close step appends here, and only here. The
+  clearing it. This is the one carve-out to "only
+  `jaiba-init:update-brain` writes `.ai/memory/`": the close step
+  appends here, and only here. The
   three constitutive files above remain exclusively this skill's.
 - **`brain-change` entries** — written by *this skill*, one per
   `update` run that enacts a change, recording what changed in the
@@ -229,7 +264,7 @@ Behavior:
 
 ## The `[MISSING]` / `[NEEDS CLARIFICATION]` discipline
 
-This is where `update-brain` deliberately differs from `conduct`.
+This is where `jaiba-init` deliberately differs from `conduct`.
 That skill *forbids* `[NEEDS CLARIFICATION]` in their
 artifacts — they resolve doubts before writing. The brain can't always
 work that way: a brownfield project has facts that simply aren't
@@ -266,27 +301,39 @@ Per `AGENTS.md` §3.5:
 ## Relationship with the rest of the framework
 
 ```
-  scaffold ──(lays .ai/ skeleton, then invokes)──▶ update-brain:initialize
-                                                          │
-        ┌─────────────────────────────────────────────────┘
+  jaiba-configure  [independent — machine-level setup: contract, skillset, subagents]
+                   (jaiba-init step 3 only checks for it; never installs it — no shared file path)
+
+  jaiba-init ──(marker, .ai/ skeleton, .atl/)──▶ :update-brain:initialize
+        │                                   (internal mode transition)
+        └──────────────────────────────▶ jaiba-doctor (first checkup)
+                          │
+        ┌─────────────────┘
         ▼
   [ project work: conduct chain ]
         │  summarize / archive *propose* ADRs, refs, scope changes
         ▼
-  update-brain:update ──(applies proposals, fixes drift)──▶ brain stays true
+  jaiba-init:update-brain:update ──(applies proposals, fixes drift)──▶ brain stays true
 ```
 
-- **`scaffold` → `initialize`.** `scaffold` (a meta skill, not yet
-  built) creates the `.ai/` directory skeleton and copies `AGENTS.md`,
-  then immediately invokes `update-brain:initialize`. `scaffold` does
-  **not** manage the artifact templates — that is this skill's job. The
-  boundary is a hand-off, never a cross-skill file path (skills package
-  independently; see `state.md`).
+- **`jaiba-configure` ∥ `jaiba-init`.** They are **independent**: one
+  configures the *machine*, the other instruments a *repo*. Neither
+  invokes the other. `jaiba-init` only *detects* whether the global
+  contract and subagent battery exist and, if not, names
+  `jaiba-configure` as the prerequisite the developer should run.
+- **bootstrap → `initialize` is internal.** Laying the skeleton and
+  filling the brain are two modes of *this* skill, so bootstrap
+  transitions into `initialize` directly rather than handing off. The
+  artifact templates have always belonged here.
+- **`jaiba-init` → `jaiba-doctor`.** Bootstrap's closing hand-off: the
+  first checkup and the local toolchain probe (`.atl/tool-layout.md`).
+  A real cross-skill boundary, never a cross-skill file path (skills
+  package independently; see `state.md`).
 - **`conduct:summarize` → `update`.** It
   *propose* ADRs / reference-index entries / constitution changes and
   point the developer here. `update` is where those proposals are
   enacted.
-- **`doctor` (future) reads `reference-index.md`.** This skill *records*
+- **`doctor` reads `reference-index.md`.** This skill *records*
   references (including the secondary verification-tooling tier);
   `doctor` *tests* their reachability. Don't test reachability here.
 - **Drift (`AGENTS.md` §5).** When any skill notices the brain
@@ -299,10 +346,17 @@ Per `AGENTS.md` §3.5:
 |---|---|
 | To just ask what the brain says, read-only | `ask` |
 | To plan/implement a code change or formalize a requirement | `conduct` (or `fast` for a contained one) |
-| To set up the `.ai/` skeleton from scratch | `scaffold` (which then calls back here) |
+| Machine-level setup — the global behavioral contract, the skillset, the subagent battery | `jaiba-configure` |
+| A health check of an already-instrumented repo | `jaiba-doctor` |
 
 ## Common failure modes
 
+- **Bootstrapping an instrumented repo.** A populated `.ai/memory/` or an
+  existing `AGENTS.md` is the developer's; check state before laying
+  anything down (bootstrap-mode's "When NOT to bootstrap" table).
+- **Doing `jaiba-configure`'s job.** Installing a global contract, a
+  skillset or the subagent battery from here re-creates the coupling
+  this skill was split to remove. Detect, report, route.
 - **Confabulating facts.** Filling the business objective or a downstream
   consumer with a plausible guess because asking felt slower. The brain's
   value is that it's *true*; a confident wrong fact poisons every later

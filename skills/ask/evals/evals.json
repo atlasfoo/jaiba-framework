@@ -138,7 +138,7 @@
         "Agent checked for .ai/ and AGENTS.md as part of orienting cold",
         "Still answered the code-question half from the source (auth/views.py) — did not refuse entirely",
         "For the PRD half, said plainly there is none because this project has no JAIBA brain yet — did not invent one",
-        "Offered jaiba-scaffold as a next step and waited — did not install or write anything",
+        "Offered jaiba-init (bootstrap) as a next step and waited — did not instrument or write anything",
         "Read-only throughout: nothing written, no code changed"
       ],
       "files": []
@@ -158,7 +158,7 @@
         "Answered plainly that decision memory hasn't been initialized, so this decision (if made) isn't recorded",
         "Did not invent a plausible-sounding rationale to fill the gap",
         "Fell back to git log/blame on the relevant code as a read-only secondary source, if useful, and labeled it as inference vs. recorded fact",
-        "Offered update-brain initialize as a next step and waited"
+        "Offered jaiba-init, resuming at its update-brain:initialize mode, as a next step and waited"
       ],
       "files": []
     }

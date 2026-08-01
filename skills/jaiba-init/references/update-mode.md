@@ -1,4 +1,4 @@
-# `update-brain:update`
+# `jaiba-init:update-brain:update`
 
 Reconcile an existing brain with reality. End state: the long-term
 artifacts in `.ai/memory/` reflect the project as it now is — proposals

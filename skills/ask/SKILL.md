@@ -74,13 +74,15 @@ outcomes:
   not the JAIBA contract) — say so plainly. Code questions still work
   from the repository directly; plan/PRD/decision questions get "there
   is no active work — this project has no JAIBA brain yet." Offer
-  `jaiba-scaffold` as the next step, then wait — `ask` doesn't install
-  anything.
+  `jaiba-init` (bootstrap) as the next step, then wait — `ask` doesn't
+  instrument anything. If the *global* contract is also missing, name
+  `jaiba-configure` as its machine-level prerequisite; still don't run
+  either.
 - **Partially instrumented** (`.ai/` exists but `.ai/memory/` is bare
   templates) — questions about active work still function (`.ai/work/`
   doesn't depend on the long-term brain); decision questions ("why did
   we choose X?") get "the ADR log hasn't been initialized yet." Offer
-  `update-brain` initialize.
+  `jaiba-init`, which resumes at its `update-brain:initialize` mode.
 
 ## What `ask` answers
 
@@ -127,8 +129,8 @@ plan or PRD exists at all — read `references/orientation.md`.
 - **Surface drift, don't patch it.** If, while answering, you notice
   the brain contradicts the code (the plan references a field the model
   renamed, the PRD assumes a flow the code dropped), point out the
-  specific contradiction. Then *propose* `update-brain` — `ask` never
-  rewrites memory itself (`AGENTS.md` §5).
+  specific contradiction. Then *propose* `jaiba-init:update-brain` —
+  `ask` never rewrites memory itself (`AGENTS.md` §5).
 - **Distinguish fact from inference.** "The handler validates the email
   here (`auth/views.py:42`)" is a fact you read. "This probably fails
   when the token is expired" is an inference — mark it as one.
@@ -152,7 +154,7 @@ Quick routing (the framework routing rule, seen from `ask`):
 | Advance the approved, active plan (cue: "continue", "next", "go") | `conduct` — `execute` phase |
 | Spec, design, or plan new work ("let's plan this", "we need a feature that…", "help me think this through") | `conduct` — chain entry (`propose` or `spec`, per triage) |
 | A small, contained change now ("quick change", "bump the version", "quick fix") | `fast` |
-| Reconcile the brain with reality ("update the constitution", "record this decision") | `update-brain` |
+| Reconcile the brain with reality ("update the constitution", "record this decision") | `jaiba-init:update-brain` |
 
 For the nuances — how to tell a question from an action cue, what to
 carry across the hand-off, and how to avoid both over- and
@@ -198,7 +200,8 @@ applies here.
   and you *fix* it. That's `fast`, not `ask`. Explain the
   cause, then offer to fix it — and wait.
 - **Patching drift you spotted.** Noticing the brain is stale is an
-  `ask` outcome; rewriting it is not. Propose `update-brain`.
+  `ask` outcome; rewriting it is not. Propose
+  `jaiba-init:update-brain`.
 - **Dumping files.** "Explain this module" is not an invitation to
   paste 300 lines. Summarize, quote the load-bearing parts, link by
   line.

@@ -10,7 +10,7 @@
 >   work, written when conduct's `summarize` step archives
 >   the executive memory (`.ai/work/`) before clearing it. The
 >   walkthrough was the narrative; this is the record.
-> - **`brain-change`** — a changelog note appended by `update-brain`
+> - **`brain-change`** — a changelog note appended by `jaiba-init:update-brain`
 >   whenever it enacts a change to the constitutive memory
 >   (constitution, adr-log, reference-index): what changed, from what
 >   to what, and why.
