@@ -69,6 +69,25 @@ linters) are *not* declared here — they arrive per invocation inside
 the gate commands, and their presence is the project gate's problem,
 surfaced by doctor's probe of the project skillset.
 
+An entry may also be prefixed `mcp:<server-name>` (e.g. `mcp:context7`)
+to declare a dependency on an MCP server instead of a CLI tool — the
+two kinds mix freely in one list:
+
+```yaml
+requires:
+  - git
+  - rg
+  - mcp:context7
+```
+
+The prefix marks a different kind of dependency, not a different tool:
+an MCP is an agent-runtime concept, not a `PATH` binary, so it's never
+probed via `command -v`. ATL *indexes* `mcp:` entries — the probe
+records who needs them and renders each as `[UNVERIFIED]` in
+`.atl/tool-layout.md`, never counted present, never counted missing.
+Confirming an MCP is actually configured and reachable is diagnostic
+3's job (reference-health), not the ATL probe's.
+
 ## Pre-invocation toolchain check
 
 Before invoking **any** subagent, check the toolchain state at

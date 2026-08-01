@@ -47,6 +47,18 @@
       },
       "expected_output": "Layer 0 of memory coherence diffs the installed global contract against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-scaffold step 3a (backup + update) — doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
       "files": []
+    },
+    {
+      "id": 7,
+      "name": "agent-layers-mcp-unverified",
+      "prompt": "Run a jaiba health check — I need the full tool and agent inventory before proceeding.",
+      "context": {
+        "repo_state": ".ai/memory/ fully populated and coherent; AGENTS.md present",
+        "skill_setup": "project-local skill `example-skill` exists under .claude/skills/ and declares `requires: [mcp:anthropic-mcp]` in its SKILL.md frontmatter",
+        "tooling": "jq is installed and on PATH; the mcp:anthropic-mcp server is not installed on the system"
+      },
+      "expected_output": "Doctor's tool-state diagnostic renders the new Agent Layers section in .atl/tool-layout.md. The section lists installed skills by name with their origin (framework/external read from tags block) and their declared requires. The example-skill row shows `mcp:anthropic-mcp` in the Requires column. The Skill-Specific Health Rollup table includes a row for example-skill where the Health Verdict shows '❔ unverified — MCP: `mcp:anthropic-mcp` (verify via doctor diagnostic 3)' — the MCP entry is never counted in the present/missing tool tallies. The .atl/tool-layout.md header shows 'Unverified (MCP): 1' counter. Hooks were scanned successfully (jq is present), and no jq-missing warning appears. The output leading summary reports 'wrote .atl/tool-layout.md' without indicating any broken tools.",
+      "files": []
     }
   ]
 }

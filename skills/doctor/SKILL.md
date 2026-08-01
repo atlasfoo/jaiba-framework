@@ -97,7 +97,7 @@ into the single report described under "The health report".
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
 | 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are constitution / adr-log / reference-index complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `update-brain` / `scaffold` |
-| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
+| 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference-index.md` entry reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
 Why this order: memory coherence is read first because the
@@ -125,7 +125,10 @@ When a check can't be completed (e.g. no web tools to test a URL, no MCP
 introspection available), report it as **`[UNVERIFIED]`** with the
 reason — never silently pass it. An unchecked dependency reported as
 healthy is exactly the false confidence the framework's gap discipline
-(§5.4) exists to prevent.
+(§5.4) exists to prevent. Diagnostic 2 is the concrete case: an `mcp:`
+`requires:` entry can't be resolved by `command -v`, and hooks can't be
+scanned without `jq` — both render as `[UNVERIFIED]` rather than being
+silently dropped or marked healthy.
 
 ## The health report
 
@@ -143,7 +146,7 @@ structure:
 <findings: file, what's wrong, why it matters>
 
 ## 2. Tool state — <status>
-<findings: tool, needed by which skill/subagent/hook, present/missing>
+<findings: tool, needed by which skill/subagent/hook, present/missing/[UNVERIFIED]>
 (.atl/tool-layout.md refreshed)
 
 ## 3. External-reference health — <status>

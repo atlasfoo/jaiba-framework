@@ -35,7 +35,7 @@ Read these before you act.
 | `.ai/memory/reference-index.md` | long-term | Map of external dependencies, APIs, services, packages, and cross-component internal contracts. |
 | `.ai/memory/log/` | long-term | Append-only chronological record: closed work + brain changelog, one dated file per entry. |
 | `.ai/work/` | short-term | Executive memory (gitignored): `PRD.md` (when depth demands one), `plan.md`, `tasks.md`, `walkthrough.md`. |
-| `.atl/tool-layout.md` | environment | Local CLI toolchain probe written by `jaiba-doctor` (gitignored — machine state, not project memory). Which tools the installed skills, subagents, and hooks need are present or missing here. |
+| `.atl/tool-layout.md` | environment | Local toolchain probe written by `jaiba-doctor` (gitignored — machine state, not project memory). Full inventory of installed skills, subagents, and hooks, with their declared tools marked present, missing, or `[UNVERIFIED]` (e.g. an `mcp:` dependency — indexed here, verified by diagnostic 3). |
 
 If any of these files is missing or empty, say so before acting on
 assumptions about its contents.
