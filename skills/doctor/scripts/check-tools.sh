@@ -198,7 +198,7 @@ for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
       SKILL_LABELS+=("$label")
     fi
     while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-  done < <(find -L "$SKILLS_DIR" -name SKILL.md -print0 2>/dev/null)
+  done < <(find -L "$SKILLS_DIR" -name SKILL.md -not -path '*/evals/*' -print0 2>/dev/null)
 done
 
 # 2. Subagents: <agent>/agents/*.md with a `requires:` block, for every
@@ -212,7 +212,7 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
       fi
       register_source "$label"
       while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-    done < <(find -L "$AGENT_DIR/agents" -name '*.md' -print0 2>/dev/null)
+    done < <(find -L "$AGENT_DIR/agents" -name '*.md' -not -path '*/evals/*' -print0 2>/dev/null)
   fi
 done
 
