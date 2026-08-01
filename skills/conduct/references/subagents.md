@@ -94,7 +94,12 @@ Before invoking **any** subagent, check the toolchain state at
 `.atl/tool-layout.md` (written by `jaiba-doctor`):
 
 1. **The subagent exists** in the host's agents folder. Not installed
-   ⇒ say so and use the fallback path — don't invoke and hope.
+   ⇒ say so, **suggest running `jaiba-configure` to install the battery
+   for this agent specifically**, and use the fallback path in the
+   meantime — don't invoke and hope. Never assume the battery is
+   present just because `jaiba-configure` was run on this machine
+   before: it may have been run for a different host (e.g. Claude Code
+   configured, Cursor — running this same repo — not).
 2. **Every tool in its `requires:` is recorded as present.** A tool
    listed as **missing** ⇒ **surface it now**: name the tool, name the
    subagent that demands it, and offer the choice — install it, or

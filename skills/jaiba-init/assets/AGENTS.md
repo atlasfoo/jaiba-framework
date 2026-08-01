@@ -17,6 +17,15 @@ minimal: behavior does not live per-repo.
    presence/drift) or `jaiba-configure` (reinstalls it). Do not
    improvise the missing rules.
 
+   *If the JAIBA workflow/meta skills (`conduct`, `ask`, `fast`,
+   `jaiba-doctor`, `jaiba-init`, `create-knowledge`, …) aren't
+   available to **you specifically*** — check your own skill list, not
+   the machine's — **say so before doing substantive work** and route
+   the developer to `jaiba-configure` to install them for this agent.
+   A machine can have JAIBA configured for one agent (e.g. Claude Code)
+   and not another (e.g. Cursor) at the same time; never assume a prior
+   `jaiba-configure` run covered the agent you're running as now.
+
 2. **Project facts** — identity, stack, scope, and the Quality Gate
    live in `.ai/memory/constitution.md`, which is authoritative on
    project specifics. Decisions in force: `.ai/memory/adr-log.md`.
