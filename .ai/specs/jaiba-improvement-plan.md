@@ -58,7 +58,7 @@ AsyncAPI / JSON), propiedad de la *mission*, referenciado por cada componente.
 Fase 0 · SPEC-02a  Fixes de doctor + .atl/tool-layout      [ENTREGADA]
 Fase 1 · SPEC-01   Orquestador unificado + constitutiva/ejecutiva   [ENTREGADA — plan orquestador-unificado-memoria, ⊕ SPEC-03]
 Fase 2 · SPEC-03   Batería de subagentes                   [ENTREGADA — absorbida por el plan de SPEC-01]
-         SPEC-02b  ATL completo (indiza subagentes + skills externas)
+         SPEC-02b  ATL completo (indiza subagentes + skills externas)   [ENTREGADA — plan spec-02b-atl-completo]
 Fase 3 · SPEC-05   Patrón OKF (serialización del modelo)
 Fase 4 · SPEC-04   Superficies de memoria pluggables   ┐ par
 Fase 5 · SPEC-06   Mission / multicomponente            ┘ acoplado
@@ -201,9 +201,9 @@ disponibles para el agente, no solo las que declaran las skills del framework.
 - Señalar herramientas **requeridas pero ausentes** con su demandante.
 
 **Criterios de aceptación**
-- `[ ]` Happy: una skill externa instalada (p. ej. context7) aparece indizada con sus `requires:` resueltos.
-- `[ ]` Happy: una herramienta requerida y ausente se reporta con quién la necesita.
-- `[ ]` Sad: el probe marca `[UNVERIFIED]` lo que no puede comprobar; nunca lo da por presente.
+- `[x]` Happy: una skill externa instalada (p. ej. context7) aparece indizada con sus `requires:` resueltos.
+- `[x]` Happy: una herramienta requerida y ausente se reporta con quién la necesita.
+- `[x]` Sad: el probe marca `[UNVERIFIED]` lo que no puede comprobar; nunca lo da por presente.
 
 ---
 
@@ -292,9 +292,10 @@ control-plane vacío.
 
 1. ~~**SPEC-02a**~~ — entregada.
 2. ~~**SPEC-01**~~ — entregada (plan directo sobre el roadmap, ⊕ SPEC-03).
-3. ~~**SPEC-03**~~ — entregada (absorbida por el plan de SPEC-01) → siguiente: **SPEC-02b**.
-4. **SPEC-05**.
-5. **SPEC-04** + **SPEC-06** (par acoplado; 04 primero, 06 sobre ella).
+3. ~~**SPEC-03**~~ — entregada (absorbida por el plan de SPEC-01).
+4. ~~**SPEC-02b**~~ — entregada (plan `spec-02b-atl-completo`) → siguiente: **SPEC-05**.
+5. **SPEC-05**.
+6. **SPEC-04** + **SPEC-06** (par acoplado; 04 primero, 06 sobre ella).
 
 Cada spec lleva, al final de su sección, las preguntas que su propio `define`
 debe resolver. Ninguna bloquea el plan; todas son internas a su ejecución.
