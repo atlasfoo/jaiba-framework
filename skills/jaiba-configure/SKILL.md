@@ -1,7 +1,7 @@
 ---
 name: jaiba-configure
 description: Machine-level setup of JAIBA for the host agent. Installs or refreshes the global behavioral contract in the host's user-level config, installs the workflow/meta skillset (global, or project-local if the developer pins versions), and installs the subagent battery into the global agents folder. Not repo-scoped — instrumenting a specific project is jaiba-init's job. Safe to re-run to refresh a machine.
-version: 2.0.0
+version: 2.1.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
@@ -196,7 +196,7 @@ correctly registered:
 ```bash
 # Example individual calls (global; drop -g for project-local)
 npx skills add -y atlasfoo/jaiba-framework --skill conduct -g
-npx skills add -y atlasfoo/jaiba-framework --skill update-brain -g
+npx skills add -y atlasfoo/jaiba-framework --skill jaiba-init -g
 npx skills add -y juliusbrussee/caveman --skill caveman -g
 ```
 
@@ -224,6 +224,37 @@ per-project.
 - The host agent has no native subagent support → skip the copy, say so,
   and note that `conduct` will run its documented sequential fallback.
 
+**Then select a model per tier.** The packaged definitions ship with no
+`model:` field — absent means "inherit the orchestrator's model", the
+router-friendly default and the right choice on hosts where model
+selection isn't meaningful. Offer to pin one instead:
+
+1. **Discover what's available.** Enumerate the models the *current host
+   agent* can run, from its own configuration or your own knowledge of it
+   at runtime. Never hardcode a provider's model list in this skill —
+   the roster is a property of the host you're running on right now, not
+   of this file.
+2. **Ask once, per tier, not per agent.** Three tiers group the battery:
+   **high** (`executor-high` alone — top reasoning), **medium**
+   (`executor-medium`, `code-analyst`, `business-analyst`, `verify` —
+   balanced), **low** (`executor-low` alone — fast/cheap). A single
+   structured question per tier, options built from step 1's discovery,
+   plus **"leave blank — inherit the orchestrator's model"** always
+   offered as a choice, never just an implied default. For example, on
+   Claude Code the tiers might resolve to an Opus-class, a Sonnet-class,
+   and a Haiku-class model respectively — but that mapping is illustrative
+   of the *shape* of the choice, not a list to hardcode; a different host
+   surfaces whatever roster it actually has. Offer "select the specialists
+   separately from `executor-medium`" only if the developer asks — by
+   default the medium tier's choice applies to all four of its agents.
+3. **Write the result into the installed copies**, not the packaged
+   source: a chosen model becomes a `model: <value>` line in that
+   definition's frontmatter at the install destination; leaving a tier
+   blank means the copy keeps no `model:` field at all. Re-running this
+   step on an already-configured machine (§ Re-running is fine) shows the
+   current per-tier state and asks again rather than silently preserving
+   or silently overwriting it.
+
 ## Closing
 
 End with a short, honest report:
@@ -242,6 +273,8 @@ End with a short, honest report:
 4. **Subagent battery** — which definitions were installed, skipped as
    current, or kept on the developer's request; or that the host lacks
    subagent support and `conduct` will fall back to sequential execution.
+   Include the per-tier model result — pinned model or "inherits the
+   orchestrator's model" for each of high/medium/low.
 5. **Next step** — if the developer's intent is to set up JAIBA for a
    *specific project*, tell them to run **`jaiba-init`** from inside that
    repo: it lays the `.ai/` brain skeleton and the `AGENTS.md` marker,

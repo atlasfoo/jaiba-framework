@@ -86,6 +86,28 @@
       },
       "expected_output": "Skipped the five identical subagent definitions as already current and did not overwrite the hand-edited executor-high.md: asked first, offering to back theirs up before installing the packaged version. Same non-destructive policy as the contract. Reports which definitions were skipped, which were installed, and what the developer chose for the drifted one.",
       "files": []
+    },
+    {
+      "id": 9,
+      "name": "model-selection-per-tier-choices",
+      "prompt": "Configure jaiba on this machine.",
+      "context": {
+        "host": "Claude Code, fresh global config -- no jaiba-contract.md, no agents/ yet",
+        "host_model_roster": "an Opus-class, a Sonnet-class, and a Haiku-class model are all available to this host at runtime"
+      },
+      "expected_output": "After copying the six packaged subagent definitions (which carry no model: field), ran the model-selection step: enumerated the models available to THIS host at runtime (never a list hardcoded in the skill itself), then asked once per tier -- high, medium (grouping executor-medium with code-analyst, business-analyst, and verify under one question, since all four share the balanced tier), and low -- with 'leave blank, inherit the orchestrator's model' offered as an explicit option alongside the discovered models in every question, not just implied. Developer picked the Opus-class model for high, the Sonnet-class model for medium, and left low blank. Wrote model: <opus-class value> into the installed executor-high.md, model: <sonnet-class value> into the installed executor-medium.md AND the three specialist copies, and left executor-low.md with no model: field at all. Did not touch the packaged source under this skill's own assets/agents/ -- only the copies at the global config root. Closing report's subagent-battery bullet states the per-tier result plainly (two tiers pinned, one inherits).",
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "model-selection-full-inherit-router-host",
+      "prompt": "Configure jaiba on this machine. It's for a router that dynamically switches models across requests -- don't hardcode anything.",
+      "context": {
+        "host": "a router-style host where model identity varies per request, not a fixed per-agent choice",
+        "host_model_roster": "no stable enumerable roster to offer -- or the developer explicitly wants every tier to inherit"
+      },
+      "expected_output": "Still ran the model-selection step and still asked once per tier -- offering 'leave blank, inherit the orchestrator's model' is unconditional, never skipped just because the host looks router-shaped. Developer chose to leave all three tiers blank. None of the six installed agent definitions ended up with a model: field -- all six inherit the orchestrator's model per request, which is exactly the router-friendly behavior the developer asked for. Did not invent a fallback model class or refuse the request for lack of an enumerable roster. Closing report states plainly that every tier inherits.",
+      "files": []
     }
   ]
 }

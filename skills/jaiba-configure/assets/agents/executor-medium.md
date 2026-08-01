@@ -1,9 +1,10 @@
 ---
 name: executor-medium
 description: JAIBA medium-load task executor. Implements a single task delegated by conduct's execute phase when the task is labeled load:medium — a bounded implementation with a clear contract. Receives the task, minimal context, and the phase gate commands; returns a diff summary and a report. Never writes .ai/ artifacts, never commits.
-# Model is declarative: the balanced tier of the host (Sonnet class).
-# Hosts resolve the alias to their current model in that class.
-model: sonnet
+# Model class (declarative): balanced tier — e.g. Sonnet class on
+# Claude Code. No `model:` field by default: absent = inherit the
+# orchestrator's model. jaiba-configure's install-time selection step
+# may pin one for this tier from the models available on the host.
 requires:
   - git
 ---

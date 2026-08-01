@@ -1,9 +1,10 @@
 ---
 name: executor-high
 description: JAIBA high-load task executor. Implements a single task delegated by conduct's execute phase when the task is labeled load:high — design judgment, multi-file changes, ambiguity to resolve while working. Receives the task, minimal context, and the phase gate commands; returns a diff summary and a report. Never writes .ai/ artifacts, never commits.
-# Model is declarative: the top reasoning tier of the host (Opus/Sonnet
-# class). Hosts resolve the alias to their current model in that class.
-model: opus
+# Model class (declarative): top reasoning tier — e.g. Opus/Sonnet
+# class on Claude Code. No `model:` field by default: absent = inherit
+# the orchestrator's model. jaiba-configure's install-time selection
+# step may pin one for this tier from the models available on the host.
 requires:
   - git
 ---

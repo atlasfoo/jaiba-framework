@@ -17,7 +17,7 @@
 conduct
 ask
 fast
-update-brain
+jaiba-init
 create-knowledge
 jaiba-doctor
 

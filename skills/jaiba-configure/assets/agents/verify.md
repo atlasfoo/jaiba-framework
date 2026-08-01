@@ -2,8 +2,10 @@
 name: verify
 description: JAIBA acceptance-criteria verifier. Agent conduct's validate phase delegates criterion checking to — consumes the structured criteria schema from the PRD (Given/When/Then, happy and sad paths), exercises each path against the real behavior via tests or direct runs, and returns a per-criterion verdict of met / not met / not verifiable with evidence. Reads and runs; never edits files, never flips criterion status.
 tools: Read, Grep, Glob, Bash
-# Model is declarative: the balanced tier of the host (Sonnet class).
-model: sonnet
+# Model class (declarative): balanced tier — e.g. Sonnet class on
+# Claude Code. No `model:` field by default: absent = inherit the
+# orchestrator's model. jaiba-configure's install-time selection step
+# may pin one for this tier from the models available on the host.
 requires:
   - git
 ---

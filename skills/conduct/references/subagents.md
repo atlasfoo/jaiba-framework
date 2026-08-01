@@ -121,15 +121,22 @@ battery:
 
 | `load` | Executor | Model class (declarative) | Fits |
 |---|---|---|---|
-| `high` | `executor-high` | top reasoning tier — Opus/Sonnet class | design judgment, multi-file changes, ambiguity to resolve while working |
-| `medium` | `executor-medium` | balanced tier — Sonnet class | bounded implementation with a clear contract |
-| `low` | `executor-low` | fast/cheap tier — Haiku/Flash class | mechanical, repetitive, zero-judgment work |
+| `high` | `executor-high` | top reasoning tier — e.g. Opus-class on Claude Code | design judgment, multi-file changes, ambiguity to resolve while working |
+| `medium` | `executor-medium` | balanced tier — e.g. Sonnet-class on Claude Code | bounded implementation with a clear contract |
+| `low` | `executor-low` | fast/cheap tier — e.g. Haiku-class on Claude Code | mechanical, repetitive, zero-judgment work |
 
-The model per tier is **declarative**: each definition names the model
-class, not a frozen model ID — the host resolves it to whatever
-current model fills that class. If in doubt between two tiers, take
-the higher one; a `low` executor improvising on a `medium` task costs
-more than the tier saved.
+The model per tier is **declarative and unset by default**: the
+shipped agent definitions carry no `model:` field at all, which means
+"inherit the orchestrator's model" — the router-friendly default, and
+the only sane one on a host where hardcoding a provider's model ID
+would be vendor lock-in. `jaiba-configure` offers an install-time
+selection step (`jaiba-configure/SKILL.md § Then select a model per
+tier`) that enumerates the models actually available on that host at
+runtime and, per tier, either pins one into the installed copy's
+frontmatter or leaves it blank on request — never a model list
+hardcoded into a skill. If in doubt between two tiers when assigning
+`load` to a task, take the higher one; a `low` executor improvising on
+a `medium` task costs more than the tier saved.
 
 ## The invocation envelope (executors)
 
