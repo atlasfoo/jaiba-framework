@@ -86,14 +86,16 @@ ask the developer; don't silently over- or under-scope
 > If `AGENTS.md` is missing/empty/not JAIBA's (neither the minimal
 > marker pointing at the global JAIBA contract nor a legacy full
 > protocol), or
-> `.ai/memory/constitution.md` is still a bare `[bracket]` template,
-> this project isn't (fully) JAIBA-instrumented. `fast` doesn't block on
-> this — small, atomic changes are still in scope — but: fall back to
-> whatever verification commands the repo itself defines for the Phase
-> Gate (constitution §6 isn't available) — README, CI config, or failing
-> those, the package manager's own scripts (`package.json`, `Makefile`,
-> `justfile`, …). Treat the change as free-standing (skip "plan
-> adjustment" entirely), and mention `jaiba-init` once, in the
+> `.ai/memory/` is incomplete (neither concept bundle at `index.md` nor
+> legacy flat at `constitution.md`), this project isn't (fully)
+> JAIBA-instrumented. `fast` doesn't block on this — small, atomic
+> changes are still in scope — but: fall back to whatever verification
+> commands the repo itself defines for the Phase Gate (in the concept
+> bundle, the `quality-gate` concept; in legacy flat, `constitution.md
+> §6`; see `jaiba-contract.md §1` if unsure which) — README, CI config,
+> or failing those, the package manager's own scripts (`package.json`,
+> `Makefile`, `justfile`, …). Treat the change as free-standing (skip
+> "plan adjustment" entirely), and mention `jaiba-init` once, in the
 > closing recap, as an opportunity rather than a blocker.
 
 Context loaded depends on execution context — detect which applies (see
@@ -101,10 +103,16 @@ Context loaded depends on execution context — detect which applies (see
 
 **Free-standing** (no active plan or change unrelated to it):
 1. **`AGENTS.md`** — behavioral contract.
-2. **`.ai/memory/constitution.md` §6 only** — Phase Gate commands and
-   TDD mode flag. Read this section only; skip the rest of the file.
-3. **`.ai/memory/reference-index.md`** — only the entries the change
-   touches. Skip entirely if the change touches no indexed integrations.
+2. **Phase Gate commands and TDD mode flag:**
+   - Concept bundle (when `.ai/memory/index.md` exists): the `quality-gate` concept
+   - Legacy flat (when `constitution.md` exists, no `index.md`): `constitution.md §6`
+   Read the applicable section only; skip the rest of your brain.
+3. **External integrations the change touches:**
+   - Concept bundle: `reference` concepts, mapped through `.ai/memory/index.md`
+   - Legacy flat: `.ai/memory/reference-index.md`
+   Skip entirely if the change touches no indexed integrations.
+   
+   Use `jaiba-contract.md §1` (Brain Map) to determine your brain layout.
 
 **Plan adjustment** (`.ai/work/plan.md` exists and the change falls
 within its scope):
@@ -112,8 +120,8 @@ within its scope):
 2. **`.ai/work/plan.md`** and **`tasks.md`** — plan context and
    Phase Gate commands (already embedded in `tasks.md § Gate Commands`).
 
-> For plan adjustments, `constitution.md` is not re-read. Gate commands
-> and TDD posture are available in the work files.
+> For plan adjustments, the brain is not re-read. Gate commands and TDD
+> posture are available in the work files (`tasks.md`).
 
 Skip nothing within your applicable context — a "trivial" change
 against the wrong assumptions isn't trivial.
@@ -147,7 +155,8 @@ pollute an unrelated plan or silently expand its approved scope.
    whether `.ai/work/plan.md` exists and the change is in scope).
 3. **Read preconditions** per context (see "Universal preconditions"
    above). Gate commands come from `tasks.md § Gate Commands` for plan
-   adjustments, and from `constitution.md §6` for free-standing changes.
+   adjustments, and from the brain (either `quality-gate` concept or
+   `constitution.md §6` per layout) for free-standing changes.
 4. **For a plan adjustment, check the worktree.** A dirty worktree is
    *expected* if you're mid-phase — read `tasks.md` / `walkthrough.md`
    to confirm the dirt is the in-progress phase, not a surprise from
@@ -164,8 +173,8 @@ pollute an unrelated plan or silently expand its approved scope.
      signal it wasn't `fast` work — reconsider triage.
 6. **Run the Phase Gate.** For plan adjustments use the commands from
    `tasks.md § Gate Commands`; for free-standing changes use the Phase
-   Gate commands from `constitution.md §6`. If it fails and the fix
-   isn't itself atomic, stop and surface it.
+   Gate commands from the brain (`quality-gate` concept or `constitution.md §6`
+   per layout). If it fails and the fix isn't itself atomic, stop and surface it.
 7. **Record, per context:**
    - **Free-standing:** write nothing to `.ai/work/`. The change
      plus git history is the record; give the developer a one-line

@@ -59,7 +59,7 @@ Fase 0 · SPEC-02a  Fixes de doctor + .atl/tool-layout      [ENTREGADA]
 Fase 1 · SPEC-01   Orquestador unificado + constitutiva/ejecutiva   [ENTREGADA — plan orquestador-unificado-memoria, ⊕ SPEC-03]
 Fase 2 · SPEC-03   Batería de subagentes                   [ENTREGADA — absorbida por el plan de SPEC-01]
          SPEC-02b  ATL completo (indiza subagentes + skills externas)   [ENTREGADA — plan spec-02b-atl-completo]
-Fase 3 · SPEC-05   Patrón OKF (serialización del modelo)
+Fase 3 · SPEC-05   Patrón OKF (serialización del modelo)   [ENTREGADA — plan okf-serializacion-cerebro]
 Fase 4 · SPEC-04   Superficies de memoria pluggables   ┐ par
 Fase 5 · SPEC-06   Mission / multicomponente            ┘ acoplado
 ```
@@ -210,6 +210,11 @@ disponibles para el agente, no solo las que declaran las skills del framework.
 ### SPEC-05 · Patrón OKF (serialización del cerebro)
 **Prefijo sugerido:** `OKF` · **Fase 3** · **Profundidad: spec** · **Depende de:** SPEC-01
 
+> **✅ ENTREGADA** (2026-08-01) por el plan `okf-serializacion-cerebro`.
+> Sin desviaciones estructurales respecto a lo escrito abajo. La fase 6
+> del plan dogfoodeó la entrega instrumentando el cerebro propio de este
+> repo — ver `.ai/memory/log/2026-08-01-okf-serializacion-cerebro.md`.
+
 **Objetivo.** Adoptar el **patrón** de OKF (no el formato literal v0.1) como
 convención de serialización del modelo constitutiva/ejecutiva ya estabilizado.
 
@@ -223,8 +228,8 @@ convención de serialización del modelo constitutiva/ejecutiva ya estabilizado.
 - Backends de almacenamiento (SPEC-04). OKF deja storage/serving fuera de alcance — y nosotros también, aquí.
 
 **Criterios de aceptación**
-- `[ ]` Happy: el cerebro se lee y escribe como grafo de conceptos enlazados; un agente nuevo lo navega desde `index.md`.
-- `[ ]` Sad: nada del framework queda atado a tooling propietario de OKF; el cambio es solo de convención de archivos.
+- `[x]` Happy: el cerebro se lee y escribe como grafo de conceptos enlazados; un agente nuevo lo navega desde `index.md`.
+- `[x]` Sad: nada del framework queda atado a tooling propietario de OKF; el cambio es solo de convención de archivos.
 
 ---
 
@@ -294,7 +299,7 @@ control-plane vacío.
 2. ~~**SPEC-01**~~ — entregada (plan directo sobre el roadmap, ⊕ SPEC-03).
 3. ~~**SPEC-03**~~ — entregada (absorbida por el plan de SPEC-01).
 4. ~~**SPEC-02b**~~ — entregada (plan `spec-02b-atl-completo`) → siguiente: **SPEC-05**.
-5. **SPEC-05**.
+5. ~~**SPEC-05**~~ — entregada (plan `okf-serializacion-cerebro`) → siguiente: **SPEC-04**.
 6. **SPEC-04** + **SPEC-06** (par acoplado; 04 primero, 06 sobre ella).
 
 Cada spec lleva, al final de su sección, las preguntas que su propio `define`

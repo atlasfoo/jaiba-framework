@@ -1,3 +1,9 @@
+---
+type: walkthrough
+slug: <kebab-case-slug>                # e.g. collaborative-itineraries
+created: <YYYY-MM-DD>
+---
+
 # Walkthrough: <plan slug>
 
 > Change-by-change log of the work's execution, written **as you go**

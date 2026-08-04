@@ -28,9 +28,8 @@
   - [🧠 Memory structure: the agent's brain](#-memory-structure-the-agents-brain)
     - [The behavioral contract: global + repo marker](#the-behavioral-contract-global--repo-marker)
     - [`memory/` — Constitutive memory](#memory--constitutive-memory)
-      - [`constitution.md`](#constitutionmd)
-      - [`adr-log.md`](#adr-logmd)
-      - [`reference-index.md`](#reference-indexmd)
+      - [Concept bundle (current default)](#concept-bundle-current-default)
+      - [Legacy flat layout (still supported)](#legacy-flat-layout-still-supported)
       - [`log/`](#log)
     - [`work/` — Executive memory](#work--executive-memory)
     - [`vendored/` — Local copies of external references](#vendored--local-copies-of-external-references)
@@ -183,9 +182,11 @@ project/
 ├── AGENTS.md                           ← Minimal marker: points at the global contract
 ├── .ai/                                ← Agent brain
 │   ├── memory/                         ← Constitutive memory (versioned)
-│   │   ├── constitution.md             ← Project identity, stack, quality gate
-│   │   ├── adr-log.md                  ← Curated decisions in force
-│   │   ├── reference-index.md          ← External surfaces + internal cross-component contracts
+│   │   ├── index.md                    ← Bundle entry point (current default — see below)
+│   │   ├── identity/                   ← project, architecture, purpose, scope, quality-gate, conventions
+│   │   ├── decisions/                  ← one file per ADR: <NNN>-<slug>.md
+│   │   ├── references/                 ← one file per external surface: <slug>.md
+│   │   │                                  (legacy flat: constitution.md / adr-log.md / reference-index.md — still supported, no index.md)
 │   │   └── log/                        ← Append-only: closed work + brain changelog
 │   │       └── YYYY-MM-DD-slug.md
 │   ├── work/                           ← Executive memory (gitignored)
@@ -233,17 +234,54 @@ Behavior does not live per-repo anymore. `jaiba-configure` installs the **JAIBA 
 
 ### `memory/` — Constitutive memory
 
-#### `constitution.md`
-The project's **executive summary**: what the system does and for whom, stack and architecture, team conventions, sub-unit scopes (for monorepos / multi-project solutions), and the **Quality Gate**. Authoritative on project specifics.
+`.ai/memory/` comes in **two supported layouts** — a repo holds one or
+the other, resolved by whether `index.md` exists (both existing at once
+is treated as ambiguous and surfaced to the human, never silently
+picked). Neither is a fallback: the flat layout is a fully supported,
+warning-free state, not drift toward the bundle. Converting one to the
+other is optional and human-triggered (`jaiba-init:update-brain:migrate`)
+— it is never offered unprompted.
 
-#### `adr-log.md`
-The **curated** decision memory: Architecture Decision Records currently in force — decision, context, alternatives, consequences. Superseded entries are marked, never deleted.
+#### Concept bundle (current default)
 
-#### `reference-index.md`
-The index of **external surfaces** — APIs, packages, services — plus **internal cross-component contracts** (event schemas, APIs between sub-units). Each entry documents purpose, consultation method, and, when vendored, its local copy path.
+What `jaiba-init:update-brain:initialize` builds today: one file per
+concept, of a closed `type:` (`project`, `architecture`, `purpose`,
+`scope`, `sub-unit`, `quality-gate`, `convention`, `decision`,
+`reference`, `snippet`, `log-entry`, plus the `index` type below), all
+reachable in one hop from `.ai/memory/index.md`. Relations are
+file-relative markdown links, never section-number citations. The
+closed vocabulary and per-type frontmatter live in
+`jaiba-init/references/okf-pattern.md`.
+
+- **`index.md`** — the bundle's only entry point: one link and one line
+  (each concept's `description:`) per concept, grouped by `type:`.
+- **`identity/`** — `project.md`, `architecture.md`, `purpose.md`,
+  `scope.md`, `quality-gate.md`, `conventions.md`, and
+  `units/<slug>.md` for monorepos / multi-project solutions.
+- **`decisions/<NNN>-<slug>.md`** — one file per Architecture Decision
+  Record. Superseded decisions stay in place, flipped to
+  `status: superseded` with a `superseded-by:` link — never deleted,
+  never renumbered.
+- **`references/<slug>.md`** — one file per **external surface** (APIs,
+  packages, services) or **internal cross-component contract** (event
+  schemas, APIs between sub-units), carrying `tier`, `kind`, `role` and
+  its consultation point; when vendored, the local copy path.
+
+#### Legacy flat layout (still supported)
+
+Projects instrumented before the concept bundle, or that simply haven't
+converted, keep three files instead — same content, one file each:
+
+- **`constitution.md`** — the project's **executive summary**: what the
+  system does and for whom, stack and architecture, team conventions,
+  sub-unit scopes, and the **Quality Gate**.
+- **`adr-log.md`** — the **curated** decision memory: ADRs currently in
+  force. Superseded entries are marked, never deleted.
+- **`reference-index.md`** — the index of **external surfaces** and
+  **internal cross-component contracts**, one entry each.
 
 #### `log/`
-The **chronological** memory: an append-only record fusing closed work and the brain's changelog, one dated file per entry (`YYYY-MM-DD-slug.md`, kinds `work-closure` and `brain-change`). Where `adr-log.md` answers "what do we hold true today", `log/` answers "what happened, in order". Written by `conduct:summarize` (work closures) and `jaiba-init:update-brain` (brain changes) — the framework's one sanctioned carve-out to the "only `jaiba-init:update-brain` writes memory" rule.
+The **chronological** memory: an append-only record fusing closed work and the brain's changelog, one dated file per entry (`YYYY-MM-DD-slug.md`, kinds `work-closure` and `brain-change`). Where the decision concepts (or `adr-log.md` in the legacy flat layout) answer "what do we hold true today", `log/` answers "what happened, in order" — identical in both layouts. Written by `conduct:summarize` (work closures) and `jaiba-init:update-brain` (brain changes) — the framework's one sanctioned carve-out to the "only `jaiba-init:update-brain` writes memory" rule.
 
 ### `work/` — Executive memory
 
@@ -260,7 +298,7 @@ When the work closes, `conduct:summarize` distills the essence into `.ai/memory/
 
 ### `vendored/` — Local copies of external references
 
-Not a memory category, but a **store** backing `reference-index.md`. When an external reference can't (or shouldn't) be fetched live — an OpenAPI contract, a Repomix bundle of a dependency — a copy lives here and the index entry points at it. Versioned alongside the code; `jaiba-doctor` warns when a vendored copy goes stale (older than a month by git date).
+Not a memory category, but a **store** backing the `reference` concepts (or `reference-index.md` in the legacy flat layout). When an external reference can't (or shouldn't) be fetched live — an OpenAPI contract, a Repomix bundle of a dependency — a copy lives here and the reference's `resource:` (or index entry) points at it. Versioned alongside the code; `jaiba-doctor` warns when a vendored copy goes stale (older than a month by git date).
 
 ---
 
@@ -295,7 +333,7 @@ Direct execution for small, well-scoped, low-risk changes — the sanctioned exc
 Pure query mode, triggered by interrogative messages. Strictly read-only: reads, searches, explains; never edits code, never writes artifacts.
 
 - **Answers cold** — orients from the repository, so questions about the active work (`.ai/work/`) or past decisions (`.ai/memory/`) work on a session's first message.
-- **Four domains:** code, active plan, active PRD, decisions (`adr-log.md` + `memory/log/`).
+- **Four domains:** code, active plan, active PRD, decisions (`decision` concepts, or `adr-log.md` in the legacy flat layout, plus `memory/log/`).
 - **Hands off to action:** a continuation cue routes to `conduct:execute`; new work enters the chain; a contained change goes to `fast` — carrying the context it already gathered.
 
 ### 🧰 `jaiba-configure` — machine setup
@@ -307,7 +345,7 @@ The **machine** half of setup, and nothing else: the global behavioral contract,
 The **repo** half of setup, and the framework's long-term memory owner. Two modes:
 
 - **Bootstrap** (bare `jaiba-init`) — instrument this repository: the `AGENTS.md` marker, the `.ai/` skeleton and `.atl/`, then the constitutive memory, then the first `jaiba-doctor` checkup. It *checks* for the global contract and battery and routes to `jaiba-configure` if they're absent; it never installs them.
-- **Maintain** (`jaiba-init:update-brain`) — the constitutive-memory workflow, and the **only** skill that writes `.ai/memory/` (log appends excepted). Its `initialize` sub-mode builds the brain from repository analysis (essential for brownfield onboarding); `update` applies proposed ADRs, reference-index entries and constitution changes, or reconciles the brain after structural drift. Every brain change leaves a `brain-change` entry in `memory/log/`.
+- **Maintain** (`jaiba-init:update-brain`) — the constitutive-memory workflow, and the **only** skill that writes `.ai/memory/` (log appends excepted). Its `initialize` sub-mode builds the brain from repository analysis (essential for brownfield onboarding), producing the concept bundle by default; `update` applies proposed decisions, references and identity changes (bundle) or ADRs, reference-index entries and constitution changes (legacy flat), or reconciles the brain after structural drift; `migrate` converts an existing flat brain to the bundle, human-triggered only. Every brain change leaves a `brain-change` entry in `memory/log/`.
 
 Bootstrap ends *inside* `initialize`: laying the skeleton and filling the brain are two modes of the same skill, so there is no hand-off between them — `jaiba-init` owns the templates and the initialize logic outright.
 
@@ -317,9 +355,9 @@ The framework health check — a pre-flight before entering the conduct chain. *
 
 | Diagnostic | What it checks | Where the fix routes |
 |---|---|---|
-| **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); constitution / adr-log / reference-index complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `jaiba-init` (brain, repo marker) / `jaiba-configure` (global contract) |
+| **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); resolves the `.ai/memory/` layout first (concept bundle vs legacy flat, per the dual-resolution rule) and checks it — bundle graph integrity (no broken links, every concept carries `type:`) or the three flat files — complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `jaiba-init` (brain, repo marker) / `jaiba-configure` (global contract) |
 | **Tool state** | Are the CLI tools that installed skills, **subagents**, and hooks declare (`requires:`) actually present? Refreshes `.atl/tool-layout.md` with provenance. | install the tool |
-| **External-reference health** | Every `reference-index.md` entry reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `jaiba-init:update-brain` |
+| **External-reference health** | Every `reference` concept (or `reference-index.md` entry, legacy flat) reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `jaiba-init:update-brain` |
 
 ---
 
@@ -333,7 +371,7 @@ The framework health check — a pre-flight before entering the conduct chain. *
 | `executor-medium` | Bounded implementation tasks (`load: medium`) | `execute` |
 | `executor-low` | Mechanical, repetitive tasks (`load: low`) | `execute` |
 | `code-analyst` | Code survey without loading conduct's context | `spec` (define/design) |
-| `business-analyst` | Contrasts the requirement against constitution / adr-log / reference-index | `propose`, `spec` |
+| `business-analyst` | Contrasts the requirement against the identity/decision/reference concepts (or constitution / adr-log / reference-index, legacy flat) | `propose`, `spec` |
 | `verify` | Consumes the PRD's criteria schema; reports met/unmet per criterion | `validate` |
 
 **Parallelism:** `execute` builds **waves** from the `tasks.md` `depends-on` graph — fan-out capped at 3, two tasks run in parallel only if they don't share files, subagents write source only (conduct is the single writer of `.ai/work/`), and results reintegrate into the walkthrough before the next wave. Hosts without subagent support fall back to sequential execution under the same contract.
@@ -464,6 +502,11 @@ New work, but the triage scores it **design depth** — bounded blast radius, no
 
 ## Migrating from the pre-conduct layout
 
+> Not to be confused with converting `.ai/memory/` from the legacy flat
+> layout to the concept bundle — that's `jaiba-init:update-brain:migrate`,
+> optional and human-triggered. This section covers an older, unrelated
+> migration: off the pre-`conduct` skillset entirely.
+
 Projects instrumented before the conduct unification use `planning`/`specification` skills and an older brain layout. There is no automatic migration; the manual route:
 
 1. `.ai/session/` → `.ai/work/` (rename; add `work/` to `.ai/.gitignore`, remove `session/` from tracking if needed).
@@ -480,7 +523,9 @@ Projects instrumented before the conduct unification use `planning`/`specificati
 | Term | Definition |
 |---|---|
 | **Brain** | The set of files in `.ai/` that make up the agent's persistent context |
-| **Constitutive memory** | `.ai/memory/`: constitution, curated ADR log, reference index, chronological log — who the project is |
+| **Constitutive memory** | `.ai/memory/`: identity, decision and reference concepts reachable from `index.md` (or constitution / curated ADR log / reference index, legacy flat) plus the chronological log — who the project is |
+| **Concept bundle** | The current-default `.ai/memory/` layout: one file per constitutive concept, closed `type:` vocabulary, all reachable from `index.md` |
+| **Legacy flat layout** | The pre-bundle `.ai/memory/` layout — three files (`constitution.md`, `adr-log.md`, `reference-index.md`) plus `log/`. Still fully supported; converting to the bundle is optional and human-triggered |
 | **Executive memory** | `.ai/work/`: PRD (if any), plan, tasks, walkthrough — what is being done right now (gitignored) |
 | **Behavioral contract** | `jaiba-contract.md`, installed once per machine in the agent's global config; each repo keeps a minimal `AGENTS.md` marker pointing at it |
 | **Triage** | The shared blast-radius → depth mapping (`inline → design → spec`) that decides how deep a change enters the chain |

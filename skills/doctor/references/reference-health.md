@@ -1,26 +1,33 @@
 # Diagnostic 3 — External-reference health
 
-**Question:** for every entry in `reference-index.md`, is the surface it
-points at actually reachable *right now*? That breaks into three sub-
-checks per entry: is its **access channel** available (the MCP/CLI it
-names), is its **checkpoint reachable** (a remote spec/URL responds, a
-vendored file exists), and — for vendored copies — is it **fresh** (not
-drifted stale)?
+**Question:** for every `reference` concept (or `reference-index.md`
+entry in the legacy flat layout), is the surface it points at actually
+reachable *right now*? That breaks into three sub-checks per entry: is
+its **access channel** available (the MCP/CLI it names), is its
+**checkpoint reachable** (a remote spec/URL responds, a vendored file
+exists), and — for vendored copies — is it **fresh** (not drifted
+stale)?
 
 This diagnostic is **read-only**: it tests, it doesn't repair. Fixes
 route out — install the missing MCP/CLI, restore the dead endpoint, or
 re-vendor via `jaiba-init:update-brain`.
 
-> Depends on diagnostic 1: if memory coherence found the index is still a
-> bare template or riddled with `[MISSING]`, say so and note that
-> reference health can't be meaningfully tested until the index is real.
-> Don't test bracketed placeholder rows.
+> Depends on diagnostic 1: if memory coherence found the reference
+> concepts (or `reference-index.md` in the legacy flat layout) are still
+> bare templates or riddled with `[MISSING]`, say so and note that
+> reference health can't be meaningfully tested until they're real.
+> Don't test bracketed placeholder rows or concepts.
 
 ## How the index encodes a reference
 
-Each row's "How to consult" / "Location" column uses the index's
-vocabulary (see the reference-index template's "How to Consult"
-section). The channel keyword tells you what to test:
+Resolve the layout first (see `jaiba-contract.md` §1). In the concept
+bundle, each `reference` concept's `resource:` frontmatter key
+(`okf-pattern.md`) carries the channel; in the legacy flat layout, the
+`reference-index.md` row's "How to consult" / "Location" column does
+the same (see the reference-index template's "How to Consult"
+section). The rest of this diagnostic says "the index" as shorthand for
+whichever source you resolved. Either way, the same vocabulary tells
+you what to test:
 
 | Channel in the index | What to verify |
 |---|---|
@@ -30,11 +37,12 @@ section). The channel keyword tells you what to test:
 | **Spec at `<path>`** | the file exists in-repo |
 | **Vendored at `<path>`** | the file exists under `.ai/vendored/` **and** is fresh |
 
-Walk all entries, but honor the index's **precedence**: §1–§3 (code-scope
-— infra, external APIs, packages the running code needs) outrank §4
-(workflow & verification tooling). A broken code-scope reference is a
-heavier finding than a broken scanner, and the report ordering should
-reflect that.
+Walk all entries, but honor **precedence**: `tier: code-scope` (infra,
+external APIs, packages the running code needs — `reference-index.md`
+§1–§3 in the legacy flat layout) outranks `tier: workflow` (workflow &
+verification tooling — `reference-index.md` §4). A broken code-scope
+reference is a heavier finding than a broken scanner, and the report
+ordering should reflect that.
 
 ## Sub-check A — Access channel (MCP / CLI availability)
 

@@ -35,8 +35,8 @@ depth:
 2. **Detect gaps and contradictions** between the requirement and
    reality: assumed models/endpoints/integrations that don't exist
    (gaps — fine, name them), conflicts with an existing model, a
-   standing ADR, or the constitution's scope (contradictions —
-   headline questions).
+   standing `decision` concept, or the `scope` concept
+   (contradictions — headline questions).
 3. **Clarify before writing — questionnaire mode.** One topic per
    question; closed options where the answer space is closed. Loop
    until nothing is pending. Never emit `[NEEDS CLARIFICATION]` into
@@ -49,9 +49,11 @@ depth:
    unambiguous.
 5. **Write `.ai/work/PRD.md`** from `assets/prd-template.md`. One to
    two screens: problem, goals/non-goals, users, proposed solution,
-   scope, assumptions, dependencies (cite `reference-index.md`; flag
-   NEW integrations for `jaiba-init:update-brain`), success metrics — and
-   the
+   scope, assumptions, dependencies (one `reference` concept per
+   external surface, cited as a link per **Citing the brain** below;
+   an integration with no `reference` concept yet is flagged
+   "NEW — to be added" for `jaiba-init:update-brain`, not linked),
+   success metrics — and the
    **acceptance criteria schema**: every criterion `<PREFIX>-NNN`,
    Given/When/Then, happy and sad paths, inside the fenced `yaml`
    block exactly as the template shows. That block is a machine
@@ -79,13 +81,76 @@ depth:
      breaking-changes summary of the bump, refactor rationale).
    - **Covered criteria** — the `<PREFIX>-NNN` IDs this plan
      delivers, when a PRD exists. "None — design depth" otherwise.
-   - **Scope in/out**, **Technical approach** (cite constitution,
-     reference-index, knowledge skills), **Discrepancies vs PRD**
-     (only if deviating from the approved PRD), **Sources consulted**.
+   - **Scope in/out**, **Technical approach** (cite the
+     `architecture` and `convention` concepts, the `reference`
+     concepts for external surfaces, and any knowledge skills),
+     **Discrepancies vs PRD** (only if deviating from the approved
+     PRD), **Sources consulted** — every brain citation in these
+     sections written as a link per **Citing the brain** below.
 4. **Respect sub-unit boundaries.** If the design crosses a boundary
-   from constitution §5.1 or touches an internal cross-component
-   contract (reference-index §3), say so explicitly in the approach —
-   that's exactly what reviewers need to see.
+   declared by a `sub-unit` concept, or touches a `reference` concept
+   of `kind: internal-contract`, say so explicitly in the approach and
+   link it — that's exactly what reviewers need to see.
+
+## Citing the brain
+
+`spec` is the phase that writes most of the executive artifacts'
+references to long-term memory, so it owns the citation shape. Three
+steps, in order:
+
+1. **Resolve the concept, never a path.** Ask for the `type:` you need
+   — `architecture`, `convention`, `quality-gate`, `scope`,
+   `sub-unit`, `decision`, `reference` — and let the layout tell you
+   where it lives, per the dual-resolution rule (`AGENTS.md` §1). In a
+   **concept bundle** (`.ai/memory/index.md` present) `index.md` maps
+   the `type:` to its file. In the **legacy flat layout**
+   (`constitution.md`, no `index.md`) the same concept is the matching
+   section of the flat file — `quality-gate` and `convention` are
+   `constitution.md` §6 and §7–§8, a `decision` is an `adr-log.md`
+   entry, a `reference` a `reference-index.md` row. Both layouts are
+   supported; never assume the bundle exists.
+2. **Write the citation as a file-relative markdown link**, resolved
+   from the artifact that carries it. `.ai/work/` sits beside
+   `.ai/memory/`, so the prefix is `../memory/`:
+   - bundle — `[identity/architecture.md](../memory/identity/architecture.md)`,
+     `[Stripe](../memory/references/stripe.md)`,
+     `[ADR-004 event bus](../memory/decisions/004-event-bus.md)`;
+   - legacy flat — `[constitution.md](../memory/constitution.md)`,
+     `[Stripe (reference-index.md)](../memory/reference-index.md)`.
+     The link still navigates; the section name belongs in the label,
+     never in the target.
+   Never a bare section citation (`constitution.md §6`), never an
+   absolute or repo-rooted path. `plan-template.md § Sources
+   consulted` shows the shape it expects.
+3. **Verify the target exists before you emit the link.** A citation
+   is a claim about the brain, and an unverified claim is the thing
+   the next rule forbids.
+
+### A citation that doesn't resolve is surfaced, never emitted
+
+This carries the same weight as the `[MISSING]` discipline
+(`AGENTS.md` §5.4), and binds both directions — writing a citation
+here, in `tasks`, or in `summarize`, and reading one back in a later
+phase or in `ask`.
+
+**When a citation would point at a brain concept that does not exist —
+wrong slug, wrong path, a `type:` never created, a flat file that isn't
+there — stop and tell the human.** Name the artifact, the citation as
+written, and the concept it fails to reach. Then, and only then:
+
+- the concept exists under another name or path ⇒ fix the link and
+  continue;
+- the concept genuinely does not exist yet ⇒ leave `[MISSING] <what
+  was needed>` in the artifact where the reviewer will see it, and
+  route the gap to `jaiba-init:update-brain` — `spec` never invents a
+  concept to satisfy its own citation;
+- reading an artifact whose citation is already dead ⇒ same surface,
+  before acting on anything that citation was supposed to ground.
+
+Never silently emit a dead link, never silently substitute a plausible
+path, never silently drop the citation to make the artifact look
+clean. A dead citation the human cannot see is worse than a visible
+gap, because the next reader trusts it.
 
 ## The approval gate
 
@@ -101,7 +166,9 @@ Do not write source code. If the developer amends, apply and re-ask.
 (new capability, new actors).
 
 1. Define: survey `Itinerary` (has `created_by`, no collaborator
-   model), reference-index (django-guardian present). One
+   model); the `reference` concept for django-guardian resolves, so
+   the PRD's Dependencies cite
+   `[django-guardian](../memory/references/django-guardian.md)`. One
    clarification: "owner" maps to `created_by`? → yes, role concept.
    Prefix `ITIN`. PRD written; schema carries `ITIN-001`
    (invite by email, happy + already-invited/no-permission sad paths),
@@ -128,6 +195,11 @@ is the gate plus the stated scope.
 - **Prose inside the criteria schema.** The `yaml` block is parsed by
   `validate`. Malformed YAML there breaks criterion-by-criterion
   verification.
+- **Citing a concept you never resolved.** A plausible-looking
+  `../memory/references/<guess>.md` is a dead link with good posture.
+  Resolve, then link — and surface what doesn't resolve.
+- **Citing by section number.** `constitution.md §6` is not an
+  address; in a bundle it resolves to nothing at all.
 - **Drifting into implementation detail in the PRD.** The PRD says
   *what* and *why*; schemas and libraries belong to the design;
   decomposition belongs to `tasks`.

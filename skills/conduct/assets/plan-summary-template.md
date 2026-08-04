@@ -1,4 +1,5 @@
 ---
+type: log-entry
 date: <YYYY-MM-DD>                     # archival date
 slug: <plan slug>
 kind: work-closure

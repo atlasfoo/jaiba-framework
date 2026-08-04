@@ -16,14 +16,25 @@ brain reflexively (`AGENTS.md` §3.2).
 Decide which domain(s) the question touches. This tells you what to
 look for.
 
-| Question is about… | Orient by… |
-|---|---|
-| A piece of code, a symbol, a behavior | Locating it in source (grep / glob). No brain read needed unless the *why* is historical. |
-| "The plan" (tasks left, ordering, scope) | Finding the active work in `.ai/work/`. |
-| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` — it exists only when triage ran the chain at `spec` depth. |
-| A past decision ("why did we…") | `.ai/memory/adr-log.md` (standing decisions), then `walkthrough.md` for tactical calls in flight. |
-| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` — append-only, one entry per closed piece of work, newest by date prefix. |
-| The project in general (stack, conventions) | `.ai/memory/constitution.md`. |
+Three rows below touch `.ai/memory/` itself, which comes in two supported
+shapes. Resolve which one the repo holds exactly as `jaiba-contract.md`
+§1 (Brain Map, *Dual resolution*) prescribes — this file doesn't restate
+that rule, only points each question at its OKF and legacy targets. The
+`type:` vocabulary behind the OKF column is the closed set in
+`jaiba-init/references/okf-pattern.md`.
+
+| Question is about… | Orient by (OKF bundle — `index.md` present) | Orient by (legacy flat — no `index.md`) |
+|---|---|---|
+| A piece of code, a symbol, a behavior | Locating it in source (grep / glob). No brain read needed unless the *why* is historical. | Same — the memory layout doesn't apply. |
+| "The plan" (tasks left, ordering, scope) | Finding the active work in `.ai/work/`. | Same — `.ai/work/` sits outside the constitutive bundle and isn't affected by which layout `.ai/memory/` uses. |
+| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` — it exists only when triage ran the chain at `spec` depth. | Same. |
+| A past decision ("why did we…") | The `decision` concept, found by `type: decision` via `.ai/memory/index.md`. | `.ai/memory/adr-log.md` (standing decisions). |
+| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` — append-only, one entry per closed piece of work, newest by date prefix. Unchanged by layout: `log/` lives at the same path either way. | Same. |
+| The project in general (stack, conventions) | The relevant concept by `type:` — `project`, `architecture`, or `convention` — via `.ai/memory/index.md`. | `.ai/memory/constitution.md`. |
+
+Either branch, a decision question that needs the tactical *why* behind
+a still-open call also reads `walkthrough.md`, not just the standing
+decision.
 
 ## Step 2 — locate the active artifact
 

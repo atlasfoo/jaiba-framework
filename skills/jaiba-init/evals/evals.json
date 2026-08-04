@@ -21,14 +21,14 @@
       },
       "expected_output": [
         "Did the evidence sweep (code, .csproj, README, CI) before writing anything",
-        "Created/filled constitution.md, adr-log.md, reference-index.md from assets templates",
-        "constitution Quality Gate commands sourced from CI (dotnet test, snyk); did NOT invent commands",
+        "Created/filled index.md plus the identity/, decisions/ and references/ concepts from assets/concepts/ templates",
+        "quality-gate concept's commands sourced from CI (dotnet test, snyk); did NOT invent commands",
         "Asked the human for business objective and downstream consumers; marked [MISSING] for any deferred",
-        "adr-log kept only ADR-001 (dated today); did NOT back-fill pre-adoption architecture decisions",
-        "reference-index Payments API points at the vendored OpenAPI path, NOT the internal contracts assembly",
-        "snyk recorded under the secondary Workflow & Verification Tooling tier",
+        "decisions/ kept only ADR-001 (decisions/001-<slug>.md, dated today); did NOT back-fill pre-adoption architecture decisions",
+        "references/payments-api.md (tier: code-scope, kind: external-api) points at the vendored OpenAPI path, NOT the internal contracts assembly",
+        "snyk recorded as its own reference concept, tier: workflow, kind: tooling",
         "README judged incomplete (missing requirements + how-to) → advised what to add, did NOT overwrite it",
-        "Wrote the brain in English; ended with an explicit list of remaining [MISSING]/[bracket] gaps per file"
+        "Wrote the brain in English; ended with an explicit list of remaining [MISSING]/[bracket] gaps per concept"
       ],
       "files": []
     },
@@ -59,17 +59,20 @@
       "mode_under_test": "update-brain:update",
       "prompt": "Apply the ADR that the last work closure proposed for the itinerary permissions.",
       "context": {
-        "memory_state": "populated",
+        "memory_state": "populated concept bundle (index.md plus identity/, decisions/, references/ concepts)",
         "proposal_source": ".ai/memory/log/2026-05-30-collaborative-itineraries.md (kind: work-closure, written by conduct:summarize) proposed 'Object permissions via django-guardian'",
-        "adr_log_state": "last entry is ADR-003"
+        "decisions_state": "decisions/ holds 001-jaiba-brain-adoption.md, 002-<slug>.md and 003-<slug>.md; 002 carries status: superseded"
       },
       "expected_output": [
+        "Resolved the layout first (index.md present -> concept bundle) before deciding where to write",
         "Located the proposal in the work-closure entry under .ai/memory/log/",
         "Showed the change in prose and asked for confirmation BEFORE writing (propose -> confirm -> enact)",
-        "Appended ADR-004 from the adr-log template, status flipped Proposed -> Accepted, dated today",
-        "Added ADR-004 to the Decision Index table",
-        "Did NOT edit or delete any prior ADR",
-        "Recorded a brain-change entry in .ai/memory/log/ for the enactment, keeping the trail ADR <-> log intact",
+        "Created decisions/004-<slug>.md from assets/concepts/decision.md, id: ADR-004 matching the filename, status: accepted, dated today",
+        "Took the next NNN by scanning the decisions/ directory for the highest numeric prefix — NOT from index.md, and did NOT reuse the superseded 002's number",
+        "Regenerated index.md so the new decision appears in its decision group (one link, one description line)",
+        "Did NOT edit or delete any prior decision concept",
+        "Recorded a brain-change entry in .ai/memory/log/ for the enactment, keeping the trail decision <-> log intact",
+        "In a legacy flat repo the equivalent enactment would append the entry to adr-log.md and add its Decision Index row instead",
         "Reported provenance (the work-closure log entry it came from)"
       ],
       "files": []
@@ -78,17 +81,21 @@
       "id": 4,
       "name": "update-fix-drift-new-integration",
       "mode_under_test": "update-brain:update",
-      "prompt": "The reference index doesn't mention the new payments integration we added last sprint — reconcile it.",
+      "prompt": "The brain doesn't mention the new payments integration we added last sprint — reconcile it.",
       "context": {
-        "memory_state": "populated, reference-index has no payments entry",
+        "memory_state": "populated concept bundle; references/ has no payments concept, and the project had no external-api reference at all until now",
         "code_facts": ["new StripeClient wired in Infrastructure", "STRIPE_API_KEY referenced in .env.example", "no vendored Stripe spec, docs only at stripe.com/docs"]
       },
       "expected_output": [
-        "Scoped the drift to reference-index.md specifically (not a full brain re-derivation)",
-        "Added Stripe under External APIs (code-scope tier)",
+        "Scoped the drift to the one missing reference concept (not a full brain re-derivation)",
+        "Created references/stripe.md from assets/concepts/reference.md with tier: code-scope, kind: external-api, role: upstream",
+        "Treated the first surface of a previously-absent category as an ordinary file creation — no section to re-create, nothing to renumber",
         "Consumption point grounded in real evidence (docs URL + STRIPE_API_KEY in .env.example), not invented",
         "Did not read or echo the actual secret; pointed at .env.example",
-        "Proposed -> confirm -> enact; minimal change, untouched sections left alone",
+        "Regenerated index.md so the new reference appears in its reference group",
+        "Did NOT re-inventory the partner inside identity/purpose.md or identity/scope.md; at most one line, one link in Relations, and only if the boundary actually moved",
+        "Proposed -> confirm -> enact; minimal change, untouched concepts left alone",
+        "In a legacy flat repo the equivalent is a row under reference-index.md's External APIs tier, re-creating and renumbering that section if it had been pruned when empty",
         "If any consumption detail was unfindable, marked [MISSING] rather than guessing"
       ],
       "files": []
@@ -97,15 +104,17 @@
       "id": 5,
       "name": "update-rejects-non-identity-change",
       "mode_under_test": "update-brain:update",
-      "prompt": "We just bumped Serilog from 3.1 to 3.2 and refactored the order validator. Update the constitution.",
+      "prompt": "We just bumped Serilog from 3.1 to 3.2 and refactored the order validator. Update the identity concepts.",
       "context": {
-        "memory_state": "populated",
+        "memory_state": "populated concept bundle",
         "change_nature": "version bump + behavior-preserving refactor, no scope/consumer/gate/upstream change"
       },
       "expected_output": [
-        "Recognized this is NOT a constitution event (no identity/scope/consumer/Quality Gate change)",
-        "Declined to edit constitution.md and explained why",
-        "Did not propose an ADR (no structural decision)",
+        "Recognized this is NOT an identity event (no architecture/scope/consumer/Quality Gate change)",
+        "Declined to edit identity/architecture.md — or any other identity concept — and explained why",
+        "Did not create a decision concept (no structural decision) and therefore consumed no NNN",
+        "Left index.md alone: no concept was added, removed or renamed, so there was nothing to regenerate",
+        "Same verdict in a legacy flat repo — constitution.md would not be edited either",
         "Pointed the developer at where such tactical changes are recorded instead (walkthrough/git), not memory"
       ],
       "files": []
@@ -116,12 +125,12 @@
       "mode_under_test": "selection",
       "prompt": "update the brain",
       "context": {
-        "memory_state": "ambiguous: constitution.md has real content but reference-index.md is still a bare template"
+        "memory_state": "ambiguous: identity/project.md and identity/architecture.md carry real content, but identity/quality-gate.md and identity/conventions.md are still bare [bracket] templates and references/ has no concepts yet"
       },
       "expected_output": [
         "Did not silently pick a mode",
-        "Surfaced the mixed state (some real content, some bare template) and asked whether to initialize the missing parts or update existing ones",
-        "Did not overwrite the populated constitution"
+        "Surfaced the mixed state (some concepts real, some still bare templates) and asked whether to initialize the missing parts or update existing ones",
+        "Did not overwrite the populated identity concepts"
       ],
       "files": []
     },
@@ -140,9 +149,9 @@
         ]
       },
       "expected_output": [
-        "reference-index.md kept only the sections that apply (packages, if any)",
-        "Removed the External APIs, Infrastructure, Business Documentation and Workflow Tooling sections entirely — did NOT leave them as headings full of bracket rows",
-        "Remaining sections renumbered contiguously",
+        "references/ kept only the concepts that apply (a package reference, if any)",
+        "Created no reference concepts for the External APIs, Infrastructure, Business Documentation or Workflow Tooling categories — did NOT leave placeholder files or bracket-only concepts for them",
+        "No index or numbering to maintain — each surface is its own file, so there was nothing to renumber",
         "Did NOT use [MISSING] for these — they are inapplicable categories, not unfound facts",
         "Distinguished this from genuinely-unknown facts (e.g. business objective), which were asked or marked [MISSING]"
       ],
@@ -155,7 +164,7 @@
       "prompt": "Build the brain for this repo.",
       "context": {
         "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists (empty .ai/memory/ with log/, .ai/work/, .ai/vendored/) but AGENTS.md is absent at the project root — a partial/manual setup, not a full jaiba-init bootstrap run",
+        "repo_state": ".ai/ skeleton exists (empty .ai/memory/ with identity/, decisions/, references/, log/, .ai/work/, .ai/vendored/) but AGENTS.md is absent at the project root — a partial/manual setup, not a full jaiba-init bootstrap run",
         "code_facts": ["Node.js Express API, package.json has test/lint scripts"]
       },
       "expected_output": [
@@ -163,7 +172,7 @@
         "Flagged that this project is missing the JAIBA repo marker",
         "Recommended a jaiba-init bootstrap run (which drops the marker), but did not refuse outright",
         "Asked the developer whether to continue with update-brain:initialize anyway (populate .ai/memory/ from the existing skeleton) or bootstrap first",
-        "If the developer chose to continue, proceeded with the normal initialize evidence sweep (constitution, adr-log, reference-index from templates)",
+        "If the developer chose to continue, proceeded with the normal initialize evidence sweep (index.md, identity/, decisions/, references/ concepts from assets/concepts/ templates)",
         "Did NOT confuse the repo marker with the machine-level jaiba-contract.md — global setup is jaiba-configure's job"
       ],
       "files": []
@@ -182,7 +191,7 @@
         "Bare invocation with no sub-mode selected the bootstrap mode, not initialize or update",
         "Confirmed it was at the project root (where .git/ lives) before writing anything",
         "Detected exactly one vendor dir (.claude/) and used it — did NOT fall back to .agents/",
-        "Created .ai/memory/log/, .ai/work/, .ai/vendored/, .ai/.gitignore from assets/ai.gitignore, .gitkeep in log/ and vendored/",
+        "Created .ai/memory/identity/, decisions/, references/, log/, .ai/work/, .ai/vendored/, .ai/.gitignore from assets/ai.gitignore, .gitkeep in identity/, decisions/, references/, log/ and vendored/",
         "Created .atl/ with its .gitignore from assets/atl.gitignore",
         "Dropped the repo marker AGENTS.md from assets/AGENTS.md at the root",
         "Did NOT install any global skills, contract, or subagent battery — those are jaiba-configure's",
@@ -197,7 +206,7 @@
       "mode_under_test": "bootstrap",
       "prompt": "Set up jaiba in this repo.",
       "context": {
-        "repo_state": ".ai/ exists with memory/, memory/log/, work/, vendored/ and AGENTS.md at the root, but .ai/memory/ has no *.md at all — a prior run stopped before the brain was built"
+        "repo_state": ".ai/ exists with memory/ (identity/, decisions/, references/, log/), work/, vendored/ and AGENTS.md at the root, but .ai/memory/ has no *.md at all — a prior run stopped before the brain was built"
       },
       "expected_output": [
         "Recognized the half-bootstrapped state from the 'When NOT to bootstrap' resume table",

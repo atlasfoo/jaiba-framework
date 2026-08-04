@@ -35,9 +35,9 @@ them — it hands off here (`AGENTS.md` §2.9, §5).
 
 That mode exists to close the learning loop at the **project** level.
 Where `conduct:summarize` closes a single piece of work,
-`jaiba-init:update-brain` is what keeps the three long-term
-artifacts — `constitution.md`, `adr-log.md`, `reference-index.md` — true
-to the repository over the project's life.
+`jaiba-init:update-brain` is what keeps the constitutive concept
+graph — `.ai/memory/`'s identity concepts, decisions, and
+references — true to the repository over the project's life.
 
 Each mode is documented in its own reference file. Read the relevant
 reference *before* taking action — the selection table below tells you
@@ -51,8 +51,9 @@ ambiguous, ask the developer instead of guessing.
 | Situation | Mode | Read |
 |---|---|---|
 | The repo is not instrumented at all — no `.ai/` whatsoever — and the developer wants JAIBA adopted here: "set up jaiba in this repo", "onboard this project", "jaiba-init", or the skill invoked bare with no sub-mode. | **bootstrap** (the default) | `references/bootstrap-mode.md` |
-| The `.ai/` skeleton exists but the brain does not (no `.ai/memory/*.md`, or the files are bare templates) and the developer wants it built — "build the brain", "initialize the memory". Also: reached from bootstrap mode's step 4, and from a half-bootstrapped repo (see the resume table in `references/bootstrap-mode.md`). | `update-brain:initialize` | `references/initialize-mode.md` |
-| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the constitution is stale", "reconcile memory with the code") after the project evolved. | `update-brain:update` | `references/update-mode.md` |
+| The `.ai/` skeleton exists but the brain does not (no `.ai/memory/index.md`, or the concept files it links to are bare templates) and the developer wants it built — "build the brain", "initialize the memory". Also: reached from bootstrap mode's step 4, and from a half-bootstrapped repo (see the resume table in `references/bootstrap-mode.md`). | `update-brain:initialize` | `references/initialize-mode.md` |
+| The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the identity concepts are stale", "reconcile memory with the code") after the project evolved. | `update-brain:update` | `references/update-mode.md` |
+| The brain exists in populated flat layout (`constitution.md`, `adr-log.md`, `reference-index.md` with real content, no `index.md`) and the developer explicitly wants to convert it to the OKF concept bundle — "convert the brain to OKF", "migrate to the new format", "I want the concept bundle". Also: optional and human-triggered, never offered unprompted. | `update-brain:migrate` | `references/migrate-mode.md` |
 | Anything else — a pure question about the brain (that's `ask`), *implementing* code (that's `conduct`/`fast`), or **machine-level** setup (that's `jaiba-configure`) | **Route, don't guess.** See "Hand-off" below. | — |
 
 Bare `jaiba-init` means bootstrap; `jaiba-init:update-brain` selects the
@@ -91,10 +92,10 @@ ground truth before writing a word.
    skill's. If they're absent, say so and point the developer at
    `jaiba-configure` — never install them from here.
 2. **The current state of `.ai/`** — does the directory exist at all
-   (no `.ai/` → **bootstrap**)? Do the three memory files exist? Are
-   they real content or untouched templates (full of `[brackets]`)?
-   This is what disambiguates bootstrap from `initialize` from
-   `update`.
+   (no `.ai/` → **bootstrap**)? Does `.ai/memory/index.md` exist, and
+   are the identity concepts it links to real content or untouched
+   templates (full of `[brackets]`)? This is what disambiguates
+   bootstrap from `initialize` from `update`.
 3. **The repository itself** — for `initialize`, the whole evidence
    sweep (see its reference); for `update`, the slice that changed.
    Bootstrap defers this to the `initialize` step it ends in.
@@ -106,81 +107,129 @@ developer means rather than guessing.
 ## Artifacts at a Glance
 
 `jaiba-init` owns every template it writes into a repository — both the
-three long-term brain artifacts and the bootstrap files. They live in
-this skill's `assets/` and are the single source of truth for their
-shape. No other skill carries copies: `jaiba-configure` owns only the
-*machine-level* assets (the global contract, the skillset, the subagent
-battery).
+concept templates that populate `.ai/memory/` and the bootstrap files.
+They live in this skill's `assets/` and are the single source of truth
+for their shape. No other skill carries copies: `jaiba-configure` owns
+only the *machine-level* assets (the global contract, the skillset, the
+subagent battery).
+
+The brain itself follows the **OKF pattern** (full authority:
+`references/okf-pattern.md`): one concept per file, each carrying a
+`type:` in its frontmatter, `.ai/memory/index.md` as the single entry
+point. Each concept type has its own template under
+`assets/concepts/<name>.md`:
+
+| Concept `type:` | Template | Instance written to |
+|---|---|---|
+| `index` | `assets/concepts/index.md` | `.ai/memory/index.md` |
+| `project` | `assets/concepts/project.md` | `.ai/memory/identity/project.md` |
+| `architecture` | `assets/concepts/architecture.md` | `.ai/memory/identity/architecture.md` |
+| `purpose` | `assets/concepts/purpose.md` | `.ai/memory/identity/purpose.md` |
+| `scope` | `assets/concepts/scope.md` | `.ai/memory/identity/scope.md` |
+| `sub-unit` (multi-unit repos only) | `assets/concepts/sub-unit.md` | `.ai/memory/identity/units/<slug>.md` |
+| `quality-gate` | `assets/concepts/quality-gate.md` | `.ai/memory/identity/quality-gate.md` |
+| `convention` | `assets/concepts/conventions.md` | `.ai/memory/identity/conventions.md` |
+| `decision` (one per ADR) | `assets/concepts/decision.md` | `.ai/memory/decisions/<NNN>-<slug>.md` |
+| `reference` (one per external surface) | `assets/concepts/reference.md` | `.ai/memory/references/<slug>.md` |
+| `log-entry` (append-only) | `assets/log-entry-template.md` | `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` |
+
+Plus the bootstrap files, which aren't concepts at all:
 
 | File written | Lives in | Written by | Template |
 |---|---|---|---|
 | `AGENTS.md` (repo marker) | repo root | bootstrap | `assets/AGENTS.md` |
 | `.ai/.gitignore` | brain skeleton | bootstrap | `assets/ai.gitignore` |
 | `.atl/.gitignore` | machine state | bootstrap | `assets/atl.gitignore` |
-| `.ai/memory/constitution.md` | constitutive memory | `initialize` | `assets/constitution-template.md` |
-| `.ai/memory/adr-log.md` | constitutive memory | `initialize` | `assets/adr-log-template.md` |
-| `.ai/memory/reference-index.md` | constitutive memory | `initialize` | `assets/reference-index-template.md` |
-| `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` | chronological record (append-only) | `update` | `assets/log-entry-template.md` |
 | `README.md` (repo root, *conditional*) | repo root | `initialize` | `assets/readme-skeleton.md` |
 
-**Use the templates verbatim** as the structure — the shared shape is
-what keeps the brain legible across the project's life. Fill the
-`[brackets]` from evidence; don't restructure them.
+> **Two authoring conventions inside `assets/concepts/`.** The eight
+> single-instance identity types (`index`, `project`, `architecture`,
+> `purpose`, `scope`, `sub-unit`, `quality-gate`, `convention`) are each
+> written as raw-frontmatter-first, copy-and-fill documents — read the
+> template, replace the `[brackets]`, done. `decision` and `reference`
+> are **N-instance** types — a repository accumulates many ADRs and many
+> external surfaces over its life — so their templates read instead as
+> prose guidance plus a fenced ` ```markdown ` example: the guidance
+> covers when a new instance is warranted and the naming/precedence
+> rules that don't fit a single fillable file, and the fenced block is
+> what gets copied per new instance. This is a **deliberate split**, not
+> drift to normalize — expect both conventions when reading or writing
+> to `assets/concepts/`.
+
+**Use each template's fillable content as the structure** — the shared
+shape is what keeps the brain legible across the project's life. For the
+eight identity types, copy the file and fill the `[brackets]` from
+evidence. For `decision` and `reference`, copy the fenced example
+verbatim per new instance and follow the surrounding guidance for when
+to create one. Don't restructure either style.
 
 > `README.md` is special: it is **not** part of `.ai/memory/`, it is a
 > human-facing repo file. See "The README" below for exactly when this
 > skill touches it.
 
-## What each artifact may contain — and when it may change
+## What each concept may contain — and when it may change
 
 These rules are the heart of the `update-brain` mode. They hold in
-**both** its sub-modes: `initialize` fills the artifact for the first
-time under them; `update` only changes an artifact when its specific
-trigger below is met.
+**both** its sub-modes: `initialize` fills the concept for the first
+time under them; `update` only changes a concept when its specific
+trigger below is met. They are mode-selection-level guidance —
+the full frontmatter contract, the closed `type:` vocabulary, and the
+link convention are `references/okf-pattern.md`'s job; each
+`assets/concepts/<name>.md` template is the per-type authority on its
+own fields and examples. Don't restate either here.
 
-### `constitution.md` — project identity
+### Identity concepts — `identity/*.md`
 
-Change it **only** when the project's identity actually shifts:
+Covers `project`, `architecture`, `purpose`, `scope`, `sub-unit`,
+`quality-gate`, and `convention`. Change one **only** when the
+project's identity actually shifts:
 
 - A new **upstream** dependency (a service this project now consumes) or
-  **downstream** consumer (something that now depends on this project).
+  **downstream** consumer (something that now depends on this project) —
+  as a `reference` concept carrying the matching `role`, linked from
+  `purpose.md` or `scope.md`.
 - A change in **consumers** / who the project serves.
 - A change to the **Quality Gate** (new threshold, new required check).
 - A change in **scope** (something moves in or out of "what this
-  project does").
+  project does"), including a unit added to or removed from a
+  multi-unit repo (`sub-unit`).
 
-A bug fix, a refactor, or a routine version bump does **not** touch the
-constitution. If the change doesn't move identity/scope/gate, leave it
-alone.
+A bug fix, a refactor, or a routine version bump does **not** touch
+identity. If the change doesn't move identity/scope/gate, leave the
+concepts alone.
 
-### `adr-log.md` — architectural decision history
+### `decision` concepts — `decisions/<NNN>-<slug>.md`
 
-- Record an entry **only** for an architectural decision made **after**
+- Write a new file **only** for an architectural decision made **after**
   the framework was initialized in this project. The seed entry
   `ADR-001` (adoption of the JAIBA brain) is the boundary.
-- **Never back-fill history.** Do not reconstruct ADRs for decisions
+- **Never back-fill history.** Do not reconstruct decisions for choices
   taken *before* the brain existed — `initialize` does not mine the git
-  history for past architecture choices. The log starts at adoption and
-  grows forward. (The *why* of pre-existing structure, when it matters,
-  is surfaced read-only by `skill: ask` via `git log`/`blame`, not
-  frozen into the ADR log retroactively.)
-- **Never delete or rewrite** a past ADR. Supersede it with a new entry
-  that references the old one by ID (the template spells this out).
-- The usual source of new ADRs is a *proposal* from
-  `conduct:summarize`; `update` applies it,
-  flipping the status `Proposed → Accepted`.
+  history for past architecture choices. The series starts at adoption
+  and grows forward. (The *why* of pre-existing structure, when it
+  matters, is surfaced read-only by `skill: ask` via `git log`/`blame`,
+  not frozen into a decision concept retroactively.)
+- **Never delete or rewrite** a past decision. Supersede it with a new
+  file that links to the old one by ID (`assets/concepts/decision.md`
+  spells out the two-file mechanics).
+- The usual source of a new decision is a *proposal* from
+  `conduct:summarize`; `update` applies it, flipping `status:`
+  `proposed → accepted`.
+- Full propose/don't-propose triggers, the `status:` vocabulary, and the
+  `ADR-001` worked example: `assets/concepts/decision.md`.
 
-### `reference-index.md` — external references
+### `reference` concepts — `references/<slug>.md`
 
-The index maps every **external** surface the project touches. Two
-tiers, in precedence order (the template enforces this):
+One file per **external** surface the project touches. Two tiers, in
+precedence order (`assets/concepts/reference.md`'s `tier:` key
+enforces this):
 
-1. **Code-scope references** — infrastructure, external APIs, packages
-   the *running code* depends on. **Primary.**
-2. **Workflow & verification tooling** — scanners, security audits,
-   remote review agents the *workflow* depends on. **Secondary**, and
-   the input surface that the future `doctor` skill tests for
-   reachability.
+1. **`code-scope`** — infrastructure, external APIs, internal
+   cross-component contracts, packages the *running code* depends on.
+   **Primary.**
+2. **`workflow`** — scanners, security audits, remote review agents the
+   *workflow* depends on. **Secondary**, and the input surface that the
+   future `doctor` skill tests for reachability.
 
 Two hard rules:
 
@@ -189,24 +238,24 @@ Two hard rules:
   where the data contracts are written. A local-only copy of an
   OpenAPI is referenced at the *vendored* path, not at the code that
   consumes it.
-- **Never invent a consumption point.** Every "how to consult" must be
+- **Never invent a consumption point.** Every `resource:` must be
   grounded in real repo evidence (a config file, an env var, a CI step,
   a vendored spec). If you cannot find where a reference is consumed,
   **do not guess** — record it as `[MISSING]` and tell the human.
-- **Prune sections that don't apply.** If the project has no entries for
-  a whole category — no external APIs, no business documentation, no
-  verification tooling — **remove that section** rather than leaving a
-  heading full of bracket rows. This is the inverse of `[MISSING]`:
-  `[MISSING]` marks a fact that *should* be there but couldn't be found
-  (ask the human); pruning removes a category that genuinely *doesn't
-  apply*. Renumber the remaining sections so they stay contiguous. A
-  reference-index padded with empty template sections reads as
-  unfinished and erodes trust in the brain.
+
+There is no monolithic index to prune anymore: a category the project
+has no entries for — no external APIs, no business documentation, no
+verification tooling — simply has **no files** under `references/`.
+Never write a placeholder reference concept for a surface the project
+doesn't have; that is the graph's equivalent of the old "prune the
+empty section" rule.
 
 Locally stored ("vendored") copies of external references — Repomix
 bundles, a physical copy of an API's OpenAPI/docs — live under
-`.ai/vendored/`, and an index entry points at that path. See the
-framework README for the folder's role.
+`.ai/vendored/`, and a reference concept's `resource:` points at that
+path. See the framework README for the folder's role. Full `tier:`,
+`kind:`, `role:`, and `resource:` vocabulary plus worked examples:
+`assets/concepts/reference.md`.
 
 ### `.ai/memory/log/` — the chronological record
 
@@ -219,8 +268,8 @@ timeline:
   (`summarize`) when it archives the essence of `.ai/work/` before
   clearing it. This is the one carve-out to "only
   `jaiba-init:update-brain` writes `.ai/memory/`": the close step
-  appends here, and only here. The
-  three constitutive files above remain exclusively this skill's.
+  appends here, and only here. The identity, decision, and reference
+  concepts above remain exclusively this skill's.
 - **`brain-change` entries** — written by *this skill*, one per
   `update` run that enacts a change, recording what changed in the
   constitutive memory and why. This is what makes brain evolution
@@ -230,12 +279,12 @@ Rules that keep the log trustworthy:
 
 - **Append-only.** Never rewrite, rename, or delete an entry. A
   correction is a new entry pointing at the old one.
-- **The log is not the ADR log.** `adr-log.md` stays separate as
+- **The log is not the decision record.** `decisions/` stays separate as
   *curated* memory — decisions currently in force, explicitly
   superseded. The log is *chronological* — what happened, in order.
-  Don't let decision records live only as log entries (propose an
-  ADR), and don't narrate work history inside `adr-log.md` (that
-  belongs here).
+  Don't let decision records live only as log entries (propose a
+  `decision` concept instead), and don't narrate work history inside
+  `decisions/` (that belongs here).
 - `initialize` creates nothing in `log/` — it starts empty and grows
   as work closes and the brain evolves.
 
@@ -293,7 +342,7 @@ So the order is:
 Per `AGENTS.md` §3.5:
 
 - **This skill's source** (SKILL.md, references, templates) — English.
-- **`.ai/memory/` artifacts** (constitution, adr-log, reference-index) —
+- **`.ai/memory/` concepts** (identity, decisions, references, log) —
   **English, always.** They are agent-facing long-term memory. Even when
   the developer is working in another language, the brain is English.
 - **`README.md`** — the project's own language; it is human-facing.
@@ -313,6 +362,7 @@ Per `AGENTS.md` §3.5:
   [ project work: conduct chain ]
         │  summarize / archive *propose* ADRs, refs, scope changes
         ▼
+  jaiba-init:update-brain:migrate ──(convert flat → OKF bundle)──▶ brain in new layout
   jaiba-init:update-brain:update ──(applies proposals, fixes drift)──▶ brain stays true
 ```
 
@@ -330,10 +380,10 @@ Per `AGENTS.md` §3.5:
   A real cross-skill boundary, never a cross-skill file path (skills
   package independently; see `state.md`).
 - **`conduct:summarize` → `update`.** It
-  *propose* ADRs / reference-index entries / constitution changes and
-  point the developer here. `update` is where those proposals are
-  enacted.
-- **`doctor` reads `reference-index.md`.** This skill *records*
+  *propose* `decision` concepts / `reference` entries / identity
+  changes and point the developer here. `update` is where those
+  proposals are enacted.
+- **`doctor` reads `reference` concepts.** This skill *records*
   references (including the secondary verification-tooling tier);
   `doctor` *tests* their reachability. Don't test reachability here.
 - **Drift (`AGENTS.md` §5).** When any skill notices the brain
@@ -361,15 +411,16 @@ Per `AGENTS.md` §3.5:
   consumer with a plausible guess because asking felt slower. The brain's
   value is that it's *true*; a confident wrong fact poisons every later
   session. Ask, or mark `[MISSING]`.
-- **Back-filling ADRs.** Reconstructing pre-adoption architecture
-  decisions into `adr-log.md`. The log starts at `ADR-001` and grows
-  forward; history before the brain is `ask`'s territory, not the log's.
-- **Touching the constitution for non-identity changes.** A refactor or
-  version bump is not a constitution event. Only identity / scope /
+- **Back-filling decisions.** Reconstructing pre-adoption architecture
+  choices as `decision` concepts. The series starts at `ADR-001` and
+  grows forward; history before the brain is `ask`'s territory, not the
+  decisions directory's.
+- **Touching identity concepts for non-identity changes.** A refactor or
+  version bump is not an identity event. Only identity / scope /
   consumers / Quality Gate changes are.
-- **Inventing a consumption point in the index.** Pointing at the
-  internal assembly instead of the external spec, or fabricating a URL.
-  Ground every entry in real evidence or mark `[MISSING]`.
+- **Inventing a consumption point in a reference concept.** Pointing at
+  the internal assembly instead of the external spec, or fabricating a
+  URL. Ground every `resource:` in real evidence or mark `[MISSING]`.
 - **Overwriting a populated README.** Only an *empty* README gets the
   skeleton. A non-empty one gets advice, not a rewrite.
 - **A non-English brain.** `.ai/memory/` is English-only even when the

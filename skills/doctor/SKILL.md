@@ -66,8 +66,10 @@ reflect the repository, not the prompt's assumptions.
    drift-&-gaps and toolchain-awareness sections: doctor
    operationalizes both as checks — and the contract's own
    presence/drift is itself part of diagnostic 1.
-2. **`.ai/` exists and has a brain.** Confirm `.ai/memory/` holds the
-   three artifacts. If not, see "When NOT to run doctor".
+2. **`.ai/` exists and has a brain.** Confirm `.ai/memory/` holds real
+   content — the concept bundle (`index.md` plus its concepts) or the
+   three legacy flat artifacts (`constitution.md`, `adr-log.md`,
+   `reference-index.md`). If not, see "When NOT to run doctor".
 3. **Locate every skills directory in play.** JAIBA skills can be
    installed project-locally, globally (e.g. `~/.claude/skills/`,
    `~/.agents/skills/`), or split across both — `jaiba-configure` step 3
@@ -98,9 +100,9 @@ into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are constitution / adr-log / reference-index complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `jaiba-init:update-brain` (brain, repo marker) / `jaiba-configure` (global contract) |
+| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are the identity, decision, and reference concepts (or constitution / adr-log / reference-index in the legacy flat layout) complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `jaiba-init:update-brain` (brain, repo marker) / `jaiba-configure` (global contract) |
 | 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
-| 3 | **External-reference health** | Is every `reference-index.md` entry reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
+| 3 | **External-reference health** | Is every `reference` concept (or `reference-index.md` entry in the legacy flat layout) reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
 Why this order: memory coherence is read first because the
 reference-index it validates is also the **input** to diagnostic 3 — you
@@ -164,8 +166,9 @@ Rules for the report:
 - **Lead with severity.** Order suggested fixes ❌ before ⚠️; a developer
   skimming should hit the blocking problems first.
 - **Every finding names its fix and the skill that owns it.** "Brain is
-  stale" is not actionable; "constitution.md doesn't mention the new
-  `payments` service — run `jaiba-init:update-brain` (update mode)" is.
+  stale" is not actionable; "the `architecture` concept (`constitution.md`
+  in the legacy flat layout) doesn't mention the new `payments` service —
+  run `jaiba-init:update-brain` (update mode)" is.
   doctor diagnoses; the *fix* lives in `jaiba-init`, `jaiba-configure`, a
   package install, or a re-vendor.
 - **Be honest about what you couldn't check.** List `[UNVERIFIED]` items
