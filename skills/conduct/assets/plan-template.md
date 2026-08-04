@@ -1,4 +1,5 @@
 ---
+type: plan
 slug: <kebab-case-identifier>          # e.g. collaborative-itineraries
 created: <YYYY-MM-DD>
 depth: design                          # design | spec (what triage decided)
@@ -37,10 +38,10 @@ plan's tests. At design depth, write "None — design depth.">
 
 ## Technical approach
 
-<The *how*, in plain prose. Reference the architectural style and
-conventions from `constitution.md`; respect sub-unit boundaries
-(§5.1) and name any internal cross-component contract touched
-(`reference-index.md` §3). Cite specific reference-index entries for
+<The *how*, in plain prose. Reference the `architecture` and
+`convention` concepts for the project's style and conventions; respect
+the `sub-unit` concepts' boundaries and name any `internal-contract`
+reference concepts touched. Cite specific `reference` concepts for
 external integrations. If knowledge skills (TDD, ASP.NET, etc.) are
 relevant, cite the patterns they prescribe.
 
@@ -56,8 +57,8 @@ write "None.">
 
 ## Sources consulted
 
-- `.ai/memory/constitution.md` § <section>
-- `.ai/memory/reference-index.md` § <section>
+- `[<concept file>](../memory/<path-to-concept>.md)` — the constitutive concept(s) consulted, e.g. `[identity/architecture.md](../memory/identity/architecture.md)`
+- `[<reference label>](../memory/references/<slug>.md)` — the `reference` concept(s) consulted for external integrations, e.g. `[Stripe](../memory/references/stripe.md)`
 - `.ai/work/PRD.md` (if spec depth)
 - `.ai/memory/log/<entry>` (prior related work, if any)
 - <Knowledge skill name> (if applicable)

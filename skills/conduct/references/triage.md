@@ -43,9 +43,12 @@ delivery.
    ripple.
 3. **Check contract impact.** Function signatures, API shapes,
    serialized formats, DB schemas, public types — and internal
-   cross-component contracts (`reference-index.md` §3): a change that
-   crosses a sub-unit boundary (constitution §5.1) ripples by
-   definition.
+   cross-component contracts, recorded as `reference` concepts of
+   `kind: internal-contract` (`references/<slug>.md` in a concept
+   bundle, the matching `reference-index.md` §3 row in the legacy flat
+   layout): a change that crosses a boundary declared by a `sub-unit`
+   concept (`identity/units/<slug>.md`, or `constitution.md` §5.1 in
+   the legacy flat layout) ripples by definition.
 4. **Check migration / breaking-change ripple.** For dependency
    upgrades, skim the changelog for the target version.
 5. **Check verifiability.** One focused pass against the Quality Gate,

@@ -26,11 +26,10 @@ minimal: behavior does not live per-repo.
    and not another (e.g. Cursor) at the same time; never assume a prior
    `jaiba-configure` run covered the agent you're running as now.
 
-2. **Project facts** — identity, stack, scope, and the Quality Gate
-   live in `.ai/memory/constitution.md`, which is authoritative on
-   project specifics. Decisions in force: `.ai/memory/adr-log.md`.
-   External surfaces: `.ai/memory/reference-index.md`. Active work:
-   `.ai/work/`.
+2. **Project facts** — identity, stack, scope, the Quality Gate,
+   decisions in force, and external surfaces live in the constitutive
+   memory under `.ai/memory/` (resolved per `jaiba-contract.md` §1
+   — Brain Map — once populated). Active work: `.ai/work/`.
 
 Anything project-specific a maintainer wants agents to know belongs in
-the constitution, not appended here.
+the constitutive memory, not appended here.

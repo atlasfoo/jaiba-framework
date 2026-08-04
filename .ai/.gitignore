@@ -1,0 +1,8 @@
+# JAIBA — local-only brain state. Do not commit.
+#
+# Copied to `.ai/.gitignore` by jaiba-init.
+#   work/           executive memory: PRD (when produced), plan.md,
+#                   tasks.md, walkthrough.md. Per-developer, per-change
+#                   scratch — never shared. Its essence is archived to
+#                   memory/log/ at close.
+work/

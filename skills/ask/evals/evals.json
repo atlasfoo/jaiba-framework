@@ -150,11 +150,11 @@
       "prompt": "why did we decide to use django-guardian for permissions?",
       "context": {
         "skill_install": "global (~/.claude/skills/)",
-        "repo_state": ".ai/ skeleton exists, AGENTS.md is the valid minimal JAIBA marker, but .ai/memory/adr-log.md is still the bare [bracket] template and .ai/memory/log/ is empty"
+        "repo_state": ".ai/ skeleton exists, AGENTS.md is the valid minimal JAIBA marker, but .ai/memory/ holds no concepts at all — no index.md and no decisions/ files (initialize never ran, or a prior run left only bare [bracket] templates) — and .ai/memory/log/ is empty"
       },
       "expected_output": [
         "The minimal AGENTS.md marker was accepted as valid instrumentation (contract lives globally)",
-        "Agent opened .ai/memory/adr-log.md and recognized it as a bare template, not an empty-but-real log; checked .ai/memory/log/ for closure entries too",
+        "Agent checked .ai/memory/index.md and the decisions/ directory and recognized the brain hasn't been initialized (absent or bare templates), not an empty-but-real log; checked .ai/memory/log/ for closure entries too",
         "Answered plainly that decision memory hasn't been initialized, so this decision (if made) isn't recorded",
         "Did not invent a plausible-sounding rationale to fill the gap",
         "Fell back to git log/blame on the relevant code as a read-only secondary source, if useful, and labeled it as inference vs. recorded fact",

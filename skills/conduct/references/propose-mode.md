@@ -47,7 +47,9 @@ time.
 4. **Offer shapes, don't dictate one.** When there's a real fork
    (async vs real-time, build vs integrate), lay out 2–3 viable shapes
    with trade-offs and let the developer choose. Ground the options in
-   what the code and `reference-index.md` already support.
+   what the code and the brain's `reference` concepts already support
+   (`references/<slug>.md` in a concept bundle, the matching
+   `reference-index.md` row in the legacy flat layout).
 5. **Split if it's too big.** Better one well-defined piece of work
    than one sprawling, unbuildable one.
 6. **Converge and pre-triage.** Propose is done when the developer can

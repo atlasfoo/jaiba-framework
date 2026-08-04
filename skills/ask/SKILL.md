@@ -94,7 +94,7 @@ prior session or pre-training (`AGENTS.md` §2.1):
 | **Code** | "what does this endpoint do?", "explain this module", "where is X handled?", "why does this break?" | The source files, their tests, `git log`/`git blame` for the *why-historical*. |
 | **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`. |
 | **Active PRD** | "what does the PRD cover?", "which criteria are still unmet?", "what's out of scope?" | `.ai/work/PRD.md` (exists only at `spec` depth). |
-| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | `.ai/memory/adr-log.md` (standing decisions), `.ai/memory/log/` (closed work, chronological), then `walkthrough.md` for tactical calls in flight. |
+| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | The `decision` concept via `.ai/memory/index.md` (`.ai/memory/adr-log.md` in the legacy flat layout), `.ai/memory/log/` (closed work, chronological), then `walkthrough.md` for tactical calls in flight. |
 
 A question can span domains ("does the plan cover criterion AUTH-002
 from the PRD?") — read what the question needs from each, no more.
