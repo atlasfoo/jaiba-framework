@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-005
-title: Subagent concurrency model
+title: "Subagent concurrency model"
 description: Task waves built from the depends-on graph, fan-out capped at 3, parallel only across disjoint file footprints, conduct is the single writer of .ai/work/.
 status: accepted
-date: 2026-07-06
+date: "2026-07-06"
 tags: [subagents, execution, concurrency]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-005: Subagent concurrency model

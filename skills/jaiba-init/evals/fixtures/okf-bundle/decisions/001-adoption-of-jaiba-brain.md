@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-001
-title: Adoption of the JAIBA brain structure
+title: "Adoption of the JAIBA brain structure"
 description: The project keeps agent-facing memory in .ai/ under the JAIBA framework.
 status: accepted
-date: 2026-06-02
+date: "2026-06-02"
 tags: [meta, memory, tooling]
-updated: 2026-06-02
+updated: "2026-06-02"
 ---
 
 # ADR-001: Adoption of the JAIBA brain structure

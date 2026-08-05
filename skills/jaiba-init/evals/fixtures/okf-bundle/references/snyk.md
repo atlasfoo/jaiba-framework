@@ -1,6 +1,6 @@
 ---
 type: reference
-title: Snyk
+title: "Snyk"
 description: Dependency vulnerability scan, run as a step in `.github/workflows/ci.yml`.
 tier: workflow
 kind: tooling

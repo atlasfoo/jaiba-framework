@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-006
-title: Index-everything, verify-what-you-can toolchain probe
+title: "Index-everything, verify-what-you-can toolchain probe"
 description: The ATL probe indexes every scanned source unconditionally and renders an explicit [UNVERIFIED] state instead of a silent zero.
 status: accepted
-date: 2026-08-01
+date: "2026-08-01"
 tags: [toolchain, doctor, atl]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-006: Index-everything, verify-what-you-can toolchain probe

@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-002
-title: Retry policy for the Payments API HttpClient
+title: "Retry policy for the Payments API HttpClient"
 description: Wrap the Payments API HttpClient with a Polly retry policy for transient failures.
 status: accepted
-date: 2026-06-10
+date: "2026-06-10"
 tags: [payments, resilience, infrastructure]
-updated: 2026-06-10
+updated: "2026-06-10"
 ---
 
 # ADR-002: Retry policy for the Payments API HttpClient

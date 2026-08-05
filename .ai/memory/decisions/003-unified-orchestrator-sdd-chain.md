@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-003
-title: Unified orchestrator with an SDD chain and blast-radius triage
+title: "Unified orchestrator with an SDD chain and blast-radius triage"
 description: specification and planning dissolve into one conduct skill (propose→spec→tasks→execute→validate→summarize); depth follows blast radius, not the command chosen.
 status: accepted
-date: 2026-07-06
+date: "2026-07-06"
 tags: [workflow, conduct]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-003: Unified orchestrator with an SDD chain and blast-radius triage

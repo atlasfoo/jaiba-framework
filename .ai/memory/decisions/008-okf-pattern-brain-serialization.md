@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-008
-title: OKF pattern adopted as brain serialization convention
+title: "OKF pattern adopted as brain serialization convention"
 description: .ai/memory/ gains a concept-bundle layout (one file per concept, closed type: vocabulary, file-relative links) shaped after OKF v0.1, alongside the still-supported legacy flat layout.
 status: accepted
-date: 2026-08-02
+date: "2026-08-02"
 tags: [memory-model, okf, architecture]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-008: OKF pattern adopted as brain serialization convention

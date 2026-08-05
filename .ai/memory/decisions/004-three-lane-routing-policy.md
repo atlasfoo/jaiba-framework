@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-004
-title: Three-lane routing policy
+title: "Three-lane routing policy"
 description: ask and fast become implicit-only lanes selected by a routing rule; conduct stays dual (implicit + explicit /conduct override).
 status: accepted
-date: 2026-07-06
+date: "2026-07-06"
 tags: [workflow, routing]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-004: Three-lane routing policy

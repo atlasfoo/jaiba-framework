@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-001
-title: Adoption of the JAIBA brain structure
+title: "Adoption of the JAIBA brain structure"
 description: This repository — which builds the JAIBA framework itself — keeps its own agent-facing memory under .ai/, dogfooding the framework it ships.
 status: accepted
-date: 2026-07-03
+date: "2026-07-03"
 tags: [meta, memory, tooling]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-001: Adoption of the JAIBA brain structure

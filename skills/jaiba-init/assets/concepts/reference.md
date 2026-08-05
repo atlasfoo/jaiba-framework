@@ -56,14 +56,14 @@
 ```markdown
 ---
 type: reference
-title: [Surface name]
+title: "[Surface name]"
 description: [One line: what this surface is and what the project uses it for]
 tier: [code-scope | workflow]
 kind: [infrastructure | external-api | internal-contract | package | tooling | business-doc]
 role: [upstream | downstream | infrastructure | —]
 resource: [MCP `<server>` / CLI `<tool>` / URL: `<address>` / vendored at `<path>` / spec at `<path>`]
 tags: [tag, tag]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 
 # [Surface name]
@@ -191,14 +191,14 @@ they need the project's upstream partners:
 ```markdown
 ---
 type: reference
-title: Auth0
+title: "Auth0"
 description: Identity provider; issues the JWTs the API validates on every request.
 tier: code-scope
 kind: external-api
 role: upstream
 resource: URL: `auth0.com/docs` / vendored at `.ai/vendored/auth0.txt`
 tags: [auth, identity, external]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 ```
 
@@ -207,14 +207,14 @@ Infrastructure the project operates:
 ```markdown
 ---
 type: reference
-title: Redis
+title: "Redis"
 description: Cache and session store behind the API's read paths.
 tier: code-scope
 kind: infrastructure
 role: infrastructure
 resource: CLI `redis-cli` / connection string in `REDIS_URL`
 tags: [cache, sessions, infra]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 ```
 
@@ -223,13 +223,13 @@ Workflow tooling, where `role` does not apply:
 ```markdown
 ---
 type: reference
-title: SonarQube
+title: "SonarQube"
 description: Static analysis and quality gate; runs in CI on every pull request.
 tier: workflow
 kind: tooling
 role: —
 resource: CLI `sonar-scanner` / URL: `sonar.company.com`
 tags: [quality, ci]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 ```
