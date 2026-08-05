@@ -51,14 +51,14 @@
 ---
 type: decision
 id: ADR-[NNN]
-title: [Short descriptive title]
+title: "[Short descriptive title]"
 description: [One line: what was decided]
 status: [proposed | accepted | rejected | deprecated | superseded]
-date: [YYYY-MM-DD]
+date: "[YYYY-MM-DD]"
 supersedes: "[ADR-NNN](NNN-slug.md)"
 superseded-by: "[ADR-NNN](NNN-slug.md)"
 tags: [tag, tag]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 
 # ADR-[NNN]: [Short descriptive title]
@@ -126,8 +126,10 @@ followable.
 
 **Links are file-relative.** Both `supersedes` and `superseded-by`
 point at a sibling in the same directory, so they are a bare filename:
-`[ADR-002](002-rest-only.md)`. They are quoted in the frontmatter only
-so the `[…](…)` form reads unambiguously as one value.
+`[ADR-002](002-rest-only.md)`. `title`, `date` and `updated` are quoted
+for consistency with the rest of the bundle's concepts; `supersedes`
+and `superseded-by` must be quoted regardless, so the `[…](…)` form
+reads unambiguously as one value.
 
 ## Superseding a decision
 
@@ -161,12 +163,12 @@ explicitly asks to record **now**.
 ---
 type: decision
 id: ADR-001
-title: Adoption of the JAIBA brain structure
+title: "Adoption of the JAIBA brain structure"
 description: The project keeps agent-facing memory in .ai/ under the JAIBA framework.
 status: accepted
-date: [YYYY-MM-DD]
+date: "[YYYY-MM-DD]"
 tags: [meta, memory, tooling]
-updated: [YYYY-MM-DD]
+updated: "[YYYY-MM-DD]"
 ---
 
 # ADR-001: Adoption of the JAIBA brain structure

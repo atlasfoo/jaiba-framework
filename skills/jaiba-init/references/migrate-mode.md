@@ -356,6 +356,14 @@ End every `migrate` run with a report:
    temporary cost of not deleting the developer's data on their behalf,
    and they need to know it so they can close the window as soon as they
    have reviewed the bundle. The backup is what makes closing it safe.
+7. **Ask, in the same turn, whether to close the window now.** Don't
+   stop at describing the ambiguous state — offer to delete the flat
+   trio right there, once the developer has reviewed the bundle above.
+   A separate confirmation, same conversation: "Review the bundle above
+   — reply to confirm and I'll delete `constitution.md`, `adr-log.md`
+   and `reference-index.md` now" beats leaving deletion to a future,
+   possibly-never run where every skill keeps stopping on the ambiguous
+   layout in the meantime.
 
 ## Common failure modes
 

@@ -1,6 +1,6 @@
 ---
 type: reference
-title: Payments API
+title: "Payments API"
 description: External payment processor; Orders API calls it via a typed HttpClient to capture payment for orders.
 tier: code-scope
 kind: external-api

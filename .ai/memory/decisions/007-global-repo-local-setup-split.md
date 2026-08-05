@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-007
-title: Framework must not assume a single vendor or a single machine
+title: "Framework must not assume a single vendor or a single machine"
 description: Setup splits into jaiba-configure (global, machine-level) and jaiba-init (repo-local); the shipped subagent battery drops hardcoded model IDs.
 status: accepted
-date: 2026-08-01
+date: "2026-08-01"
 tags: [setup, subagents, model-agnostic]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-007: Framework must not assume a single vendor or a single machine

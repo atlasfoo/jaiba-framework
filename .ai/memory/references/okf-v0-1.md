@@ -1,6 +1,6 @@
 ---
 type: reference
-title: OKF v0.1 (Open Knowledge Format)
+title: "OKF v0.1 (Open Knowledge Format)"
 description: Draft spec this framework's concept-bundle memory layout borrows its shape from — not a runtime dependency.
 tier: workflow
 kind: business-doc

@@ -267,6 +267,75 @@
         "Reported in the closing which option was taken and where the developer's original ended up"
       ],
       "files": []
+    },
+    {
+      "id": 14,
+      "name": "migrate-flat-legacy-to-bundle",
+      "mode_under_test": "update-brain:migrate",
+      "prompt": "Migrate this repo's brain from the flat layout to the concept-bundle layout.",
+      "context": {
+        "memory_state": "populated flat brain: constitution.md, adr-log.md (ADR-001 accepted, ADR-002 accepted), reference-index.md (§1 Infrastructure, §2 External APIs, §3 Workflow Tooling; §3 Internal Contracts, §4 Packages, §5 Business Docs, §6 Snippets all pruned/absent); one log/ entry",
+        "note": "the flat input and the expected bundle output are both checked in as fixtures for this exact scenario"
+      },
+      "expected_output": [
+        "Checked index.md absent and flat content real BEFORE writing anything (preconditions 1-2)",
+        "Proposed the concept inventory in prose and waited for confirmation before any write",
+        "Backed up the flat trio + log/ to .ai/.migration-backup-<timestamp>/ outside .ai/memory/, with its own self-ignoring .gitignore, BEFORE the first concept write",
+        "identity/project.md, architecture.md, purpose.md, scope.md, quality-gate.md, conventions.md created one-to-one from constitution.md §1-3/§5-8, §7+§8 merged into one conventions.md",
+        "§4 'With Whom' dissolved per-surface, not per-row: Payments API became one references/payments-api.md (role: upstream, merging §4's role with the reference-index row), linked once from purpose.md's Relations — not re-inventoried as prose",
+        "The constitution's [MISSING] for downstream consumers was copied verbatim into purpose.md's Relations — not resolved, not dropped, not reworded",
+        "decisions/001-...md and decisions/002-...md created with id: ADR-001/ADR-002 preserving the flat log's own numbering, status: accepted lowercased, date taken from each entry (never today's date)",
+        "references/postgresql.md (tier: code-scope, kind: infrastructure) and references/snyk.md (tier: workflow, kind: tooling, role: —) created from reference-index.md §1 and §3",
+        "No reference concept invented for the pruned §3 Internal Contracts / §4 Packages / §5 Business Docs / §6 Snippets sections — they were absent in the flat source entirely, not template residue, so nothing to report there either",
+        "index.md written LAST, grouped by type:, one link and one description line per concept, no Decision Index table and no reference-index prose carried over",
+        "Existing log/ entry gained only missing frontmatter keys — body, filename and date untouched",
+        "A brain-change log entry appended recording the inventory, the backup path, and the carried-over [MISSING] count",
+        "Closed by stating explicitly that the flat originals are still in place and that deleting them is a separate, human-confirmed step — did not delete them or treat confirmation of the migration as consent to delete",
+        "Resulting bundle is content-equivalent (modulo the agent's own prose/slugs) to the checked-in okf-bundle fixture for this same scenario"
+      ],
+      "files": [
+        "fixtures/flat-legacy/constitution.md",
+        "fixtures/flat-legacy/adr-log.md",
+        "fixtures/flat-legacy/reference-index.md",
+        "fixtures/flat-legacy/log/2026-06-10-payments-retry-policy-adr.md"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "migrate-refuses-when-bundle-already-exists",
+      "mode_under_test": "update-brain:migrate",
+      "prompt": "Migrate the brain to the concept-bundle format.",
+      "context": {
+        "memory_state": "already a populated concept bundle: index.md present alongside identity/, decisions/, references/"
+      },
+      "expected_output": [
+        "Checked for index.md FIRST, before reading constitution.md or anything else",
+        "Recognized the brain is already a bundle and stopped without writing a single byte",
+        "Did NOT merge into, top up, or overwrite the existing bundle",
+        "Said so plainly and routed the developer to update-brain:update for maintenance instead",
+        "Did not create a backup, since no write was attempted"
+      ],
+      "files": [
+        "fixtures/okf-bundle/index.md",
+        "fixtures/okf-bundle/identity/project.md"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "migrate-refuses-bare-flat-template",
+      "mode_under_test": "update-brain:migrate",
+      "prompt": "Migrate our brain to the new bundle format.",
+      "context": {
+        "memory_state": "flat layout present but untouched: constitution.md, adr-log.md and reference-index.md are still the bare templates, all fields bracketed placeholders, no index.md"
+      },
+      "expected_output": [
+        "Checked index.md absent (precondition 1 passes) then checked whether the flat content is real (precondition 2)",
+        "Recognized the flat files are template residue, not real project content, and stopped without writing",
+        "Explained that there is nothing to translate and that this is initialize's job, not migrate's",
+        "Did not fabricate concepts from bracketed placeholder rows",
+        "Did not create a backup, since no write was attempted"
+      ],
+      "files": []
     }
   ]
 }

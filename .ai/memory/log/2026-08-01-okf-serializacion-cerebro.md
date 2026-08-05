@@ -70,9 +70,9 @@ No new ADR proposed here — Phase 6 already enacted eight `decision`
 concepts directly via `jaiba-init:update-brain:initialize`
 (governance-compliant: `conduct` invoked the skill, never wrote
 `.ai/memory/` itself). See
-[`.ai/memory/decisions/001-jaiba-brain-adoption.md`](../memory/decisions/001-jaiba-brain-adoption.md)
+[`.ai/memory/decisions/001-jaiba-brain-adoption.md`](../decisions/001-jaiba-brain-adoption.md)
 through
-[`008-okf-pattern-brain-serialization.md`](../memory/decisions/008-okf-pattern-brain-serialization.md)
+[`008-okf-pattern-brain-serialization.md`](../decisions/008-okf-pattern-brain-serialization.md)
 — the last of which is this plan's own adoption decision, landed
 against itself.
 

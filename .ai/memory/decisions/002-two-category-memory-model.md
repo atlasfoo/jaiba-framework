@@ -1,12 +1,12 @@
 ---
 type: decision
 id: ADR-002
-title: Memory splits into constitutive and executive categories
+title: "Memory splits into constitutive and executive categories"
 description: .ai/memory/ (curated, versioned, who-the-project-is) and .ai/work/ (ephemeral, gitignored, what-is-being-done) replace a single memory tree.
 status: accepted
-date: 2026-07-06
+date: "2026-07-06"
 tags: [memory, architecture]
-updated: 2026-08-03
+updated: "2026-08-03"
 ---
 
 # ADR-002: Memory splits into constitutive and executive categories

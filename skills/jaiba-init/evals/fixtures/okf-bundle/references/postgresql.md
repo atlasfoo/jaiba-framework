@@ -1,6 +1,6 @@
 ---
 type: reference
-title: PostgreSQL
+title: "PostgreSQL"
 description: Primary datastore for orders, accessed via Entity Framework Core.
 tier: code-scope
 kind: infrastructure
