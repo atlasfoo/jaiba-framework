@@ -1,3 +1,12 @@
+---
+type: log-entry
+date: <YYYY-MM-DD>
+slug: <kebab-case-slug>
+kind: work-closure | brain-change
+depth: <design | spec, work-closure only — omit for brain-change>
+adr: <ADR-NNN or "none">
+---
+
 # Memory Log Entry
 
 > **Meta-instruction for the agent:**
@@ -11,21 +20,22 @@
 >   the executive memory (`.ai/work/`) before clearing it. The
 >   walkthrough was the narrative; this is the record.
 > - **`brain-change`** — a changelog note appended by `jaiba-init:update-brain`
->   whenever it enacts a change to the constitutive memory
->   (constitution, adr-log, reference-index): what changed, from what
->   to what, and why.
+>   whenever it enacts a change to the constitutive memory (an identity,
+>   decision, or reference concept in the bundle — or `constitution.md`
+>   / `adr-log.md` / `reference-index.md` in the legacy flat layout):
+>   what changed, from what to what, and why.
 >
 > **Append-only discipline.** Entries are never rewritten, renamed, or
 > deleted — a correction is a *new* entry that references the old one.
 > The log's value is that it can be trusted as history; the moment an
 > entry can be edited after the fact, it can't.
 >
-> **The log is not the ADR log.** `adr-log.md` is *curated* memory —
-> the decisions currently in force, superseded explicitly, always
-> readable as "how things are and why". The log is *chronological*
-> memory — what happened, in order. A decision lives in `adr-log.md`;
-> the closure of the work that produced it lives here, pointing at the
-> ADR by ID.
+> **The log is not the ADR log.** `decisions/` (or `adr-log.md` in the
+> legacy flat layout) is *curated* memory — the decisions currently in
+> force, superseded explicitly, always readable as "how things are and
+> why". The log is *chronological* memory — what happened, in order. A
+> decision lives there; the closure of the work that produced it lives
+> here, pointing at the ADR by ID.
 
 ---
 
@@ -34,6 +44,7 @@
 date: <YYYY-MM-DD>
 slug: <kebab-case-slug>
 kind: work-closure | brain-change
+depth: <design | spec, work-closure only — omit for brain-change>
 adr: <ADR-NNN proposed or enacted by this entry, or "none">
 ---
 

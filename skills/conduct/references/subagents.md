@@ -31,10 +31,14 @@ Four operations, each bounded to its phase:
    into conduct's context. Conduct consumes the
    *report*, not the code.
 2. **Business analysis** (`propose`, `spec`) → `business-analyst`. The
-   requirement contrasted against `constitution.md`, `adr-log.md`,
-   `reference-index.md` and recent `.ai/memory/log/` entries:
-   conflicts with standing decisions, scope violations, integrations
-   not yet indexed (NEW — for `jaiba-init:update-brain`).
+   requirement contrasted against the constitutive memory — the
+   `identity` concepts (`scope` above all), the `decision` concepts,
+   the `reference` concepts, and recent `.ai/memory/log/` entries
+   (`identity/scope.md`, `decisions/`, `references/` in a concept
+   bundle; `constitution.md`, `adr-log.md`, `reference-index.md` in
+   the legacy flat layout): conflicts with standing decisions, scope
+   violations, integrations not yet indexed (NEW — for
+   `jaiba-init:update-brain`).
 3. **Task execution** (`execute`) → the executor tier matching the
    task's `load` (mapping below). Wave construction and fan-out rules
    live in `execute-mode.md § Delegating to executors`.

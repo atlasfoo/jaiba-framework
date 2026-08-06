@@ -16,7 +16,8 @@
   CI). Do NOT invent commands — if a verification command can't be found
   in a scriptfile (justfile/Makefile/package.json scripts/pyproject) or
   here, mark it [MISSING] and tell the human, per the Quality Gate rule in
-  constitution.md.
+  the constitutive memory's `quality-gate` concept (or `constitution.md
+  §6` in the legacy flat layout; `jaiba-contract.md` §1 resolves which).
 
   Remove these comments once filled.
 -->
@@ -59,7 +60,9 @@ cp .env.example .env   # then fill the values
 The verification commands that back the project's Quality Gate. These
 should live in the scriptfile (`justfile`, `Makefile`, `package.json`
 scripts, `pyproject.toml [tool.*]`); this section points at them so the
-Quality Gate in `.ai/memory/constitution.md` stays runnable.
+Quality Gate defined in the project's constitutive memory
+(`.ai/memory/` — resolved per `jaiba-contract.md` §1 once populated)
+stays runnable.
 
 | Task | Command |
 |---|---|
@@ -74,5 +77,6 @@ Quality Gate in `.ai/memory/constitution.md` stays runnable.
 ## Project Context (for AI agents)
 
 This repository follows the **JAIBA** framework. The agent's persistent
-context lives in `.ai/` — read `AGENTS.md` and
-`.ai/memory/constitution.md` before any substantive work.
+context lives in `.ai/` — read `AGENTS.md` and the constitutive memory
+in `.ai/memory/` (resolved per `jaiba-contract.md` §1 once populated)
+before any substantive work.

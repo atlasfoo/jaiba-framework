@@ -93,27 +93,51 @@ Before selecting a phase, confirm the project is JAIBA-instrumented:
    JAIBA behavioral contract** (or points to the global JAIBA contract
    installed in the agent's config). An `AGENTS.md` that exists but is
    unrelated doesn't count.
-2. **`.ai/memory/constitution.md`, `adr-log.md`, and
-   `reference-index.md` exist and hold real content** — not the bare
-   `[bracket]` templates.
+2. **`.ai/memory/` resolves to real content.** Determine which layout
+   the repo holds per the dual-resolution rule (`jaiba-contract.md` §1
+   Brain Map) — four cases, and "instrumented" means something
+   different in each:
+   - **Concept bundle** (`.ai/memory/index.md` exists) — the `identity`
+     concepts it links (`project`, `architecture`, `purpose`, `scope`,
+     `quality-gate`, `convention`, plus `sub-unit` files if the repo is
+     multi-unit), at least one `decision` concept, and at least one
+     `reference` concept are present and hold real content, not bare
+     `[bracket]` template residue.
+   - **Legacy flat** (`.ai/memory/constitution.md` exists, no
+     `index.md`) — `constitution.md`, `adr-log.md`, and
+     `reference-index.md` exist and hold real content, not the bare
+     `[bracket]` templates. This is a fully supported layout, not a
+     fallback: no warning either way.
+   - **Both present** — ambiguous. Content can't be checked because it
+     isn't clear which half to read; see below.
+   - **Neither present** — no brain.
 
-If either check fails, **stop here** — do not enter any phase or write
-to `.ai/work/`. An orphaned plan with no constitution to ground it
-helps no one. Route instead:
+If check 1 fails, or check 2 resolves to bare templates or no brain,
+**stop here** — do not enter any phase or write to `.ai/work/`. An
+orphaned plan with no constitution to ground it helps no one. Route:
 
-- No `.ai/` at all → `jaiba-init` (bootstrap).
-- `.ai/` exists but `.ai/memory/` is bare templates → `jaiba-init`,
-  which resumes at its `update-brain:initialize` mode.
+- No `.ai/` at all, or neither layout present → `jaiba-init` (bootstrap).
+- `.ai/` exists but the resolved layout — bundle or flat — is still
+  bare templates → `jaiba-init`, which resumes at its
+  `update-brain:initialize` mode.
 - `AGENTS.md` missing or not the JAIBA repo marker → `jaiba-init`
   (bootstrap; it drops the marker as part of the sequence).
 
-All three are repo-state failures, and repo instrumentation is
-`jaiba-init`'s job alone — its own "When NOT to bootstrap" table decides
-whether the run is a fresh bootstrap or a resume, so route there and let
-it pick. `jaiba-configure` is *not* an answer to any of these: it is a
-machine-level prerequisite (the global behavioral contract, the skillset,
-the subagent battery). Name it only when that global side is what's
-missing — a separate check, not a repo-state one.
+If check 2 finds **both** `index.md` and `constitution.md` present,
+that's the fourth case and a distinct failure from the three above:
+**stop and surface it to the human**, per the dual-resolution rule —
+don't silently pick a half to read, and don't auto-route to
+`jaiba-init` on your own. Name both paths present; the conversion
+itself is `jaiba-init:update-brain:migrate`, and it only runs when the
+human asks for it.
+
+The first three routes are repo-state failures, and repo instrumentation
+is `jaiba-init`'s job alone — its own "When NOT to bootstrap" table
+decides whether the run is a fresh bootstrap or a resume, so route there
+and let it pick. `jaiba-configure` is *not* an answer to any of these:
+it is a machine-level prerequisite (the global behavioral contract, the
+skillset, the subagent battery). Name it only when that global side is
+what's missing — a separate check, not a repo-state one.
 
 ## Triage: how deep does the chain run?
 
@@ -159,20 +183,36 @@ every phase has an inline sequential fallback.
 
 ## Context Loading
 
-Load per phase — not universally — to minimize tokens.
+Load per phase — not universally — to minimize tokens. By this point
+Brain Discovery has already resolved the layout (bundle or flat) and
+ruled out the ambiguous/no-brain cases, so what follows names, per
+phase, which **concepts** to load — with the legacy flat file each one
+maps to, since this repo itself is still flat (no `constitution.md` §6:
+see `tasks.md § Gate Commands`'s own comment, which names its concept
+source the same way).
 
 - **`propose` / `spec`** (full context): `AGENTS.md` (or global
-  contract), `constitution.md` (scope, Quality Gate §6, TDD mode §7,
-  sub-unit scope §5.1), `reference-index.md` (integrations touched),
-  `adr-log.md` (standing decisions), recent `.ai/memory/log/` entries
-  (what was tried before), and the code the requirement plausibly
-  touches.
+  contract); the `scope`, `quality-gate`, and `convention` (TDD mode)
+  concepts, plus `sub-unit` concepts if the repo is multi-unit —
+  `identity/scope.md`, `identity/quality-gate.md`,
+  `identity/conventions.md`, `identity/units/<slug>.md` in the bundle,
+  or `constitution.md` §5 / §6 / §7 / §5.1 in the legacy flat;
+  `reference` concepts touched by the requirement
+  (`references/<slug>.md`, or the matching `reference-index.md` rows);
+  `decision` concepts recording standing decisions
+  (`decisions/<NNN>-<slug>.md`, or `adr-log.md` entries); recent
+  `log-entry` concepts — what was tried before (`.ai/memory/log/`,
+  unchanged across both layouts); and the code the requirement
+  plausibly touches.
 - **`tasks`**: the approved `plan.md` (+ `PRD.md` if produced), plus
-  `constitution.md` §6/§7 to copy gate commands and TDD posture into
-  `tasks.md`.
+  the `quality-gate` and `convention` concepts to copy gate commands
+  and TDD posture into `tasks.md` (`identity/quality-gate.md` +
+  `identity/conventions.md` in the bundle, `constitution.md` §6/§7 in
+  the legacy flat).
 - **`execute`**: `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`
   only. Gate commands and TDD posture were already copied into
-  `tasks.md` — the constitution is not re-read.
+  `tasks.md` — no `quality-gate`/`convention` concept, and no
+  `constitution.md`, is re-read.
 - **`validate`**: `tasks.md § Gate Commands`, `PRD.md`'s acceptance
   criteria schema (if present), `walkthrough.md`.
 - **`summarize`**: everything in `.ai/work/`.

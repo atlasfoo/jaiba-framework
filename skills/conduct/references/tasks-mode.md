@@ -9,9 +9,18 @@ state: `.ai/work/tasks.md` exists (from `assets/tasks-template.md`),
 
 - `.ai/work/plan.md` exists with `status: approved`. No approved plan
   ⇒ back to `spec`. Never generate tasks for a draft.
-- `constitution.md` is readable — this is the phase that copies gate
-  commands and TDD posture into `tasks.md`, so `execute` never needs
-  the constitution again.
+- The **`quality-gate`** and **`convention`** concepts resolve and are
+  readable — this is the phase that copies gate commands and TDD
+  posture into `tasks.md`, so `execute` never needs the brain for
+  them again. Resolve them per the dual-resolution rule
+  (`AGENTS.md` §1): in a concept bundle, through `.ai/memory/index.md`
+  (`identity/quality-gate.md`, `identity/conventions.md`); in the
+  legacy flat layout, `constitution.md` §6 and §7–§8. Both layouts are
+  supported — do not assume a bundle.
+- If either concept is absent or empty in whichever layout you
+  resolved, **stop and surface it** — name the concept and the layout
+  — before writing `tasks.md`. Gate commands are copied, never
+  inferred from what the repo "probably" runs.
 
 ## What a task is
 
@@ -60,9 +69,11 @@ chronology. Each phase:
 ## Flow
 
 1. **Read `plan.md`** (and `PRD.md` if present).
-2. **Read constitution §6 and §7**; copy the Phase Gate and Plan Gate
-   commands **verbatim** into `tasks.md § Gate Commands` (the actual
-   CLI commands, not descriptions), and note the TDD posture.
+2. **Read the `quality-gate` and `convention` concepts** (resolved as
+   in the preconditions); copy the Phase Gate and Plan Gate commands
+   **verbatim** into `tasks.md § Gate Commands` (the actual CLI
+   commands, not descriptions), and note the TDD posture the
+   `convention` concept declares.
 3. **Decompose.** TDD `enabled` ⇒ red → green → refactor: every
    implementation task is preceded by a failing-test task in the same
    phase, and the tests come straight from the PRD's happy/sad
@@ -87,6 +98,11 @@ chronology. Each phase:
   need T-006, don't say it does — false edges destroy parallelism.
 - **`load: high` on everything.** If every task needs the top tier,
   the labels carry no information. Mechanical work is `low`; say so.
+- **Inventing gate commands.** If the `quality-gate` concept doesn't
+  resolve, or resolves empty, surface it (`spec-mode.md § A citation
+  that doesn't resolve is surfaced, never emitted`) — a plausible
+  `npm test` written into `tasks.md` becomes the gate every later
+  phase trusts.
 - **Uncovered criteria.** A PRD criterion no task covers will fail
   `validate` at the end — catch it here where it's cheap.
 - **Regenerating tasks for an amended plan from scratch.** Amend the

@@ -18,13 +18,18 @@ work. Read the state first, then pick the row.
 
 | The repo already has… | Meaning | Do this |
 |---|---|---|
-| `.ai/memory/*.md` with **real content** | Fully instrumented | Don't bootstrap. Route to `jaiba-init:update-brain` (drift/update), `conduct`, or `ask` |
-| `.ai/` skeleton but **empty/bare** `memory/` | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–3 and go straight to **step 4** (`update-brain:initialize`) |
+| `.ai/memory/index.md` (bundle) or flat `constitution.md` (legacy), either with **real content** | Fully instrumented | Don't bootstrap. Route to `jaiba-init:update-brain` (drift/update), `conduct`, or `ask` |
+| `.ai/` skeleton but `memory/` holds neither `index.md` nor `constitution.md` — or only bare, untouched templates | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–3 and go straight to **step 4** (`update-brain:initialize`) |
 | Nothing JAIBA under `.ai/` | Greenfield or legacy, not yet adopted | Continue with the full sequence below |
 
-If you're unsure which case you're in, read `.ai/memory/constitution.md`
-(if it exists): bare `[brackets]` = skeleton, real prose = instrumented.
-When still ambiguous, **ask the developer** rather than risk overwriting.
+If you're unsure which case you're in, check `.ai/memory/` for
+`index.md` (bundle layout) or `constitution.md` with no `index.md`
+(legacy flat layout) — resolve per the dual-resolution rule in
+`jaiba-contract.md` §1. Within whichever layout you find: bare
+`[brackets]` = skeleton, real prose = instrumented. If **both**
+`index.md` and `constitution.md` are present, that's the ambiguous case
+the contract calls out — **ask the developer** rather than risk
+overwriting.
 
 ## The bootstrap sequence
 
@@ -66,10 +71,13 @@ filling it; step 4 does that):
 
 ```
 .ai/
-├── memory/        (constitutive memory; step 4 fills this)
-│   └── log/       (append-only record: closed work + brain changelog)
-├── work/          (executive memory: PRD, plan, tasks, walkthrough; gitignored)
-└── vendored/      (local copies of external refs; starts empty)
+├── memory/          (constitutive memory; step 4 fills this)
+│   ├── identity/    (empty; step 4 fills this)
+│   ├── decisions/   (empty; step 4 fills this)
+│   ├── references/  (empty; step 4 fills this)
+│   └── log/         (append-only record: closed work + brain changelog)
+├── work/            (executive memory: PRD, plan, tasks, walkthrough; gitignored)
+└── vendored/        (local copies of external refs; starts empty)
 ```
 
 There is no `specs/` directory: when a change is deep enough to
@@ -78,8 +86,9 @@ until the work closes and its essence is archived into `memory/log/`.
 
 Then write `.ai/.gitignore` from `assets/ai.gitignore` — it ignores
 `work/` (per-developer executive memory).
-Add a `.gitkeep` to `memory/log/` and `vendored/` so the empty tracked
-dirs survive a commit (`work/` is gitignored, so it needs none).
+Add a `.gitkeep` to `memory/identity/`, `memory/decisions/`,
+`memory/references/`, `memory/log/` and `vendored/` so the empty
+tracked dirs survive a commit (`work/` is gitignored, so it needs none).
 
 Also, create the `.atl/` directory at the project root and write its
 `.gitignore` (from `assets/atl.gitignore`) containing `*` so that the
@@ -130,8 +139,9 @@ run `jaiba-configure`.
 The house is built; now fill it. Switch into this skill's
 `update-brain` mode, `initialize` sub-mode, and follow
 `references/initialize-mode.md`: it sweeps the repository and populates
-`constitution.md`, `adr-log.md` and `reference-index.md`, asking the
-developer for what it can't derive.
+the concept bundle — `index.md` plus one file per concept under
+`identity/`, `decisions/` and `references/` — asking the developer for
+what it can't derive.
 
 This is an **in-skill mode transition**, not a hand-off — `jaiba-init`
 owns the brain templates and the initialize logic itself. Don't stop and
@@ -162,7 +172,7 @@ End with a short, honest report:
    battery were found for *this agent*, and if not, an explicit "run
    `jaiba-configure`" recommendation naming what's missing.
 3. **Brain state** — what `initialize` created or filled, and every
-   `[MISSING]` / `[NEEDS CLARIFICATION]` that remains, per file
+   `[MISSING]` / `[NEEDS CLARIFICATION]` that remains, per concept
    (`AGENTS.md` §5.4).
 4. **Hand-off** — that control now passes to `jaiba-doctor` for the first
    checkup and the local `.atl/tool-layout.md` probe.

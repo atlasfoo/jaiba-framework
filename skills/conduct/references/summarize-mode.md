@@ -34,14 +34,31 @@ showing it.
      this is the record. Outcomes, not play-by-play.
    - Record criteria delivered (with corrective ones flagged),
      deviations vs the plan/PRD and why, and any waived checks.
-3. **Evaluate the ADR question.** For each non-trivial decision in
-   the walkthrough's checkpoint blocks: is it structural? Will future
-   work need the *why*? If yes, include the proposed ADR block
-   (status: Proposed) in the summary — **propose only**; enacting is
-   `jaiba-init:update-brain`'s right. If no: state "No ADR proposed; all
-   decisions were tactical." Same for reference-index entries (a NEW
-   integration the work introduced) and constitution changes (scope /
-   gate / sub-unit shifts) worth promoting.
+   - **Carry citations over as links, not prose.** A brain concept the
+     work consulted or touched is cited the same way the plan cited it
+     — a file-relative markdown link, resolved from the entry's home
+     in `.ai/memory/log/` (so `../identity/quality-gate.md`,
+     `../references/stripe.md`, `../decisions/004-event-bus.md` in a
+     bundle; `../constitution.md`, `../reference-index.md` in the
+     legacy flat layout). Never a section number. A citation that does
+     not resolve is surfaced to the human, never archived silently —
+     `spec-mode.md § A citation that doesn't resolve is surfaced,
+     never emitted` governs here too, and this is the last chance to
+     catch it before the executive memory is destroyed.
+3. **Evaluate the brain-change question.** For each non-trivial
+   decision in the walkthrough's checkpoint blocks: is it structural?
+   Will future work need the *why*? If yes, include the proposed
+   `decision` concept (status: Proposed) in the summary — **propose
+   only**; enacting is `jaiba-init:update-brain`'s right. If no: state
+   "No ADR proposed; all decisions were tactical." Same for a new
+   `reference` concept (an integration the work introduced that the
+   brain doesn't carry yet) and for changes to the `scope`,
+   `quality-gate` or `sub-unit` concepts worth promoting. Name what
+   the proposal *is* by `type:`; where it will land is
+   `update-brain`'s call, and it differs by layout (a `decision` file
+   in a bundle, an `adr-log.md` entry in the legacy flat layout).
+   Proposed text that cites an existing concept cites it as a link,
+   under the same rule as step 2.
 4. **Suggest the final commit message.** Conventional-commit type
    inferred from the work (`feat` / `fix` / `refactor` / `perf` /
    `chore` / `docs`) — the natural squash target for the phase-wise
@@ -82,15 +99,18 @@ delivered (ITIN-008 corrective, also delivered).
 
 1. Draft `collaborative-itineraries-summary.md`: outcome (invitation
    flow with role-based perms), 4 criteria delivered (1 corrective),
-   deviations (none structural), proposed ADR "Roles as CharField
-   choices, not a separate table", suggested commit
+   deviations (none structural), consulted concepts cited as links
+   (`[django-guardian](../references/django-guardian.md)`), proposed
+   `decision` "Roles as CharField choices, not a separate table",
+   suggested commit
    `feat(itineraries): collaborator invitations with role-based
    access`.
 2. Present; developer: *"go ahead"*.
 3. `bash scripts/archive.sh collaborative-itineraries` → entry at
    `.ai/memory/log/2026-07-03-collaborative-itineraries.md`, work
    cleaned.
-4. Report + point at `jaiba-init:update-brain` for the proposed ADR.
+4. Report + point at `jaiba-init:update-brain` for the proposed
+   `decision`.
 
 ## Common failure modes
 
@@ -102,7 +122,13 @@ delivered (ITIN-008 corrective, also delivered).
   walkthrough. Distill.
 - **ADR fatigue.** Tactical choices stay in the log entry. If it
   wouldn't matter to someone joining in six months, it's not an ADR.
-- **Writing to `adr-log.md` or the constitution directly.** Propose;
-  `jaiba-init:update-brain` enacts.
+- **Writing a `decision`, `scope` or `quality-gate` concept
+  directly** — under any layout, flat file or bundle. Propose;
+  `jaiba-init:update-brain` enacts. The `log/` append is the only
+  carve-out.
+- **Archiving a dead citation.** `.ai/work/` is about to be deleted;
+  a link into the brain that doesn't resolve becomes unfixable the
+  moment the plan is gone. Surface it while the evidence still
+  exists.
 - **Editing an archived entry later.** `.ai/memory/log/` is
   append-only — corrections are new entries referencing the old one.

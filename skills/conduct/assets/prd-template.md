@@ -1,4 +1,5 @@
 ---
+type: prd
 slug: <kebab-case-slug>                # e.g. collaborative-itineraries
 created: <YYYY-MM-DD>
 status: draft                          # draft | approved | delivered
@@ -37,8 +38,10 @@ behavior of the system, not a hypothetical one. 2–5 sentences.>
 ## Proposed solution
 
 <The agreed shape, high level. Cite the existing integration or
-pattern it reuses (`reference-index.md`) rather than inventing a new
-one. Not a design doc — no schemas, no sequence diagrams.>
+pattern it reuses — a `reference` concept (`references/<slug>.md` in
+a concept bundle, the matching `reference-index.md` row in the legacy
+flat layout) — rather than inventing a new one. Not a design doc — no
+schemas, no sequence diagrams.>
 
 ## Scope
 
@@ -55,10 +58,11 @@ one. Not a design doc — no schemas, no sequence diagrams.>
 
 ## Dependencies
 
-- <External integration or package, cited from
-  `.ai/memory/reference-index.md`. A NEW integration not yet indexed:
-  flag as "NEW — to be added" so it surfaces for
-  `jaiba-init:update-brain`.>
+- <External integration or package, cited as a `reference` concept
+  (`.ai/memory/references/<slug>.md` in a concept bundle,
+  `.ai/memory/reference-index.md` in the legacy flat layout). A NEW
+  integration not yet indexed: flag as "NEW — to be added" so it
+  surfaces for `jaiba-init:update-brain`.>
 
 ## Success metrics
 

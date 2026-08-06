@@ -9,8 +9,8 @@
       "context": {
         "work_state": "empty",
         "invocation": "implicit — routing rule classifies a small contained change; there is no /fast command",
-        "constitution_quality_gate": "present",
-        "reference_index_has": ["requests"]
+        "quality_gate_present": "present",
+        "references_include": ["requests"]
       },
       "expected_output": [
         "Routing triggered fast implicitly — the lane activated without any slash command",
@@ -31,7 +31,7 @@
       "context": {
         "work_state": "empty",
         "simulated_blast_radius": "23 call sites across 9 modules, a custom requests.Session subclass whose signature changes, adapter/retry config moves to a new API",
-        "constitution_quality_gate": "present"
+        "quality_gate_present": "present"
       },
       "expected_output": [
         "Agent investigated blast radius before editing (counted call sites, detected contract + migration impact)",
@@ -55,7 +55,7 @@
           "walkthrough.md": "Phase 1 entries present"
         },
         "git_status": "dirty-from-current-phase",
-        "constitution_tdd_mode": "enabled"
+        "convention_tdd_mode": "enabled"
       },
       "expected_output": [
         "Agent triaged the change as inline (one serializer + one test, contained)",
@@ -99,7 +99,7 @@
       "context": {
         "work_state": "empty",
         "simulated_blast_radius": "ambiguous — could be 2 files or could ripple through ~8 importers",
-        "constitution_quality_gate": "present"
+        "quality_gate_present": "present"
       },
       "expected_output": [
         "Agent investigated before deciding (located the pricing logic and counted importers)",
@@ -121,10 +121,10 @@
         "ci_facts": "package.json has a `test` script; CI workflow runs `npm test`"
       },
       "expected_output": [
-        "Agent ran the brain check, found no JAIBA marker / constitution, but did NOT block the change",
+        "Agent ran the brain check, found no JAIBA marker / brain (neither concept bundle nor legacy flat), but did NOT block the change",
         "Triaged scope normally (single dependency bump, contained)",
         "Treated the change as free-standing — did not look for an active plan",
-        "Quality Gate fallback used the repo's own package.json `test` script / CI command, not constitution.md §6 (which doesn't exist)",
+        "Quality Gate fallback used the repo's own package.json `test` script / CI command, not a brain-defined Phase Gate (no `quality-gate` concept or `constitution.md §6` exists — this project isn't instrumented)",
         "Change applied to package.json (and lockfile if present)",
         "Closing recap mentioned jaiba-init once as an opportunity, without making it a precondition for the change",
         "Nothing written to .ai/work/"

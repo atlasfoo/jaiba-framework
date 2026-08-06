@@ -9,8 +9,8 @@
       "context": {
         "work_state": "empty",
         "invocation": "implicit — routing rule classifies this as new work; no slash command used",
-        "constitution_tdd_mode": "enabled",
-        "reference_index_has": ["django-guardian"]
+        "convention_tdd_mode": "enabled",
+        "references_include": ["django-guardian"]
       },
       "expected_output": [
         "Triage ran before any artifact: cross-cutting blast radius scored as spec depth",
@@ -31,7 +31,7 @@
       "context": {
         "work_state": "empty",
         "invocation": "implicit — new work",
-        "constitution_tdd_mode": "enabled",
+        "convention_tdd_mode": "enabled",
         "note": "performance fix — one of the explicit no-PRD triage cases"
       },
       "expected_output": [
@@ -147,7 +147,7 @@
         "Final summary presented to the human in chat (short, distilled — not walkthrough narration)",
         "ONE confirmation gate for the whole close (summary + archive + cleanup are a single step, by design)",
         "On confirmation: entry appended to .ai/memory/log/<YYYY-MM-DD>-<slug>.md with kind: work-closure (via archive.sh)",
-        "ADR proposed (CharField vs roles table) as Proposed, routed to jaiba-init:update-brain — adr-log.md NOT written directly",
+        "ADR proposed (CharField vs roles table) as Proposed, routed to jaiba-init:update-brain — no memory concept (decision concept, or adr-log.md in legacy flat) written directly by conduct",
         ".ai/work/ cleaned (plan, tasks, walkthrough, PRD if present)",
         "A conventional-commit message suggested, not executed"
       ],
