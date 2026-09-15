@@ -15,6 +15,41 @@ tags:
 
 # jaiba-configure
 
+## What this skill touches
+
+`jaiba-configure` operates only within the host's global config root
+(`~/.claude/`, `~/.agents/`, etc.) and its own packaged assets. Its full
+read/write footprint:
+
+**Writes:**
+- `<global config root>/jaiba-contract.md` — installs/refreshes the contract
+- the vendor's global instructions file (e.g. `~/.claude/CLAUDE.md`) —
+  appends a one-line reference to the contract, if not already present
+- `<global config root>/skills/` — installs missing skillset entries
+  (global or project-local, per developer choice)
+- `<global config root>/agents/` — installs/refreshes the subagent battery
+- an installed subagent definition's own frontmatter — writes a `model:`
+  line per tier, if the developer opts in
+
+**Reads:**
+- its own packaged assets: `assets/jaiba-contract.md`,
+  `assets/skillset.txt`, `assets/agents/*.md`
+- `npx skills list -g` output
+- an installed skill's own
+  `<global config root>/skills/<name>/SKILL.md` `version:` field
+- the CLI's `.skill-lock.json` beside the global skills dir, if present
+- the existing `<global config root>/jaiba-contract.md` and
+  `<global config root>/agents/*.md`, to compare against the packaged
+  versions
+- the vendor's global instructions file, to check whether a contract
+  reference line is already present
+
+**Never reads:** chat/conversation history, credentials of any kind,
+`settings*.json` (or any other hook/permission config), or anything else
+in the global config folder beyond the paths listed above. Even though
+it has filesystem access to the whole global config root, its read/write
+surface is exactly what's enumerated here — nothing broader.
+
 The **machine setup** skill. `jaiba-configure` installs JAIBA into the
 *host agent itself* — the behavioral contract it reads, the skills it
 can call, the subagents it can fan out to. It is a *global* meta-skill:
@@ -55,7 +90,7 @@ What changes on a re-run is only the *posture toward existing files*:
 |---|---|
 | Contract / subagent definition absent | Install it |
 | Present and identical to the packaged version | Skip it, note "already current" |
-| Present but **different** (older version, or hand-edited) | **Ask** before overwriting — back up theirs, or keep theirs and note the drift |
+| Present but **different** (older version, or hand-edited) | **Ask** before overwriting — back up theirs to `<name>.bak-<YYYY-MM-DD>` (see step 2), or keep theirs and note the drift |
 | Skill already in `npx skills list -g` | Leave it; point at `npx skills update -g` |
 
 Never silently clobber a file the developer may have edited. Every
@@ -103,14 +138,27 @@ at it (installed by `jaiba-init`, not here).
 Copy `assets/jaiba-contract.md` into the global config root from step 1
 as `jaiba-contract.md`. Then make sure the agent actually loads it: if
 the vendor has a global instructions file (e.g. `~/.claude/CLAUDE.md`),
-append a one-line reference to `jaiba-contract.md` unless one is already
-present.
+a reference to `jaiba-contract.md` needs to land there. That file is the
+developer's, not JAIBA's, and this skill did not create it — never
+append to it silently. **Show the developer the diff** — the exact
+one-line reference being added, and where it lands (appended at the
+end, unless there's a clearer spot) — **and ask for explicit consent**
+before writing. Only append after they say yes. If they decline, skip
+the append, note the decline in the closing report, and say the agent
+may not auto-load the contract without it. A line already present needs
+no append and no ask.
 
 - **Already there and identical** → leave it, note "already current".
 - **Already there but different** (an older or hand-edited copy) — this
   is the one-per-machine file, so ask: **update** (back up theirs,
   install the packaged version) or **keep theirs** (note the drift;
-  `jaiba-doctor` will keep flagging it).
+  `jaiba-doctor` will keep flagging it). **Backing up theirs** means
+  copying the developer's existing file to
+  `<same-path>.bak-<YYYY-MM-DD>` (e.g. `jaiba-contract.md.bak-2026-09-15`)
+  using **today's date** at the moment of the backup, **before** the
+  packaged version overwrites the original. This is the one place this
+  convention is spelled out in full; every other "back up theirs" in
+  this file means exactly this.
 
 Never inline the behavioral rules anywhere else; this file is their only
 home.
@@ -285,8 +333,9 @@ the same reason the contract does: one battery serves every repo, and
 per-project.
 
 - A definition already present and identical → skip it.
-- Already present but different → ask before overwriting (back up
-  theirs), same policy as step 2.
+- Already present but different → ask before overwriting — back up
+  theirs to `<name>.bak-<YYYY-MM-DD>` (e.g.
+  `executor-high.md.bak-2026-09-15`), same policy and naming as step 2.
 - The host agent has no native subagent support → skip the copy, say so,
   and note that `conduct` will run its documented sequential fallback.
 
@@ -329,8 +378,11 @@ End with a short, honest report:
    and *how* (self-identification, corroborated or not; or "unknown →
    `~/.agents/`"), and the global config root that follows from it.
 2. **Contract** — installed / already current / kept theirs with drift
-   noted, plus whether a reference line was added to the vendor's global
-   instructions file.
+   noted; if a backup was made when the developer chose to update over a
+   differing file, name it (e.g. `jaiba-contract.md.bak-2026-09-15`).
+   For the vendor's global instructions file: whether the developer
+   consented and the reference line was added, or they declined and the
+   append was skipped.
 3. **Skills** — for each `skillset.txt` entry, whether it was already
    global (untouched), newly installed globally, or newly installed
    project-locally (and into which directory), each line naming the
@@ -341,10 +393,13 @@ End with a short, honest report:
    `skillset.txt` had no `ref:` line, report that the skillset step was
    **skipped as a packaging error** and that nothing was installed.
 4. **Subagent battery** — which definitions were installed, skipped as
-   current, or kept on the developer's request; or that the host lacks
-   subagent support and `conduct` will fall back to sequential execution.
-   Include the per-tier model result — pinned model or "inherits the
-   orchestrator's model" for each of high/medium/low.
+   current, or kept on the developer's request; name any backup file
+   created for a definition that was overwritten (e.g.
+   `executor-high.md.bak-2026-09-15`), so the developer can find their
+   prior copy; or that the host lacks subagent support and `conduct`
+   will fall back to sequential execution. Include the per-tier model
+   result — pinned model or "inherits the orchestrator's model" for each
+   of high/medium/low.
 5. **Next step** — if the developer's intent is to set up JAIBA for a
    *specific project*, tell them to run **`jaiba-init`** from inside that
    repo: it lays the `.ai/` brain skeleton and the `AGENTS.md` marker,

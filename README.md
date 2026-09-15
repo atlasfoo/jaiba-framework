@@ -21,6 +21,7 @@
   - [Installation modes](#installation-modes)
     - [Global installation (Recommended ✅)](#global-installation-recommended-)
     - [Project-scoped installation (Legacy)](#project-scoped-installation-legacy)
+  - [Uninstalling JAIBA from a machine](#uninstalling-jaiba-from-a-machine)
   - [What is JAIBA?](#what-is-jaiba)
     - [Core principles](#core-principles)
   - [System architecture](#system-architecture)
@@ -149,6 +150,69 @@ Skills are installed locally in each project under `.agents/` or `.claude/skills
 | **Disk footprint** | Each project has its own copy of skills |
 | **Updates** | Must re-run `jaiba-configure`, or update manually, per project |
 | **Recommended for** | Legacy setups, isolated environments |
+
+---
+
+## Uninstalling JAIBA from a machine
+
+To remove JAIBA from your machine, undo what `jaiba-configure` installed. Per-repository instrumentation (`.ai/`, `.atl/`, `AGENTS.md`) is separate and optional — this section covers machine-level uninstall only.
+
+### 1. Remove the global behavioral contract
+
+Delete `jaiba-contract.md` from your agent's global config folder:
+
+- `~/.claude/jaiba-contract.md` (Claude Code)
+- `~/.agents/jaiba-contract.md` (neutral default)
+- `~/.cursor/jaiba-contract.md` (Cursor)
+- Or equivalent for your agent vendor
+
+### 2. Uninstall the workflow/meta skillset
+
+Remove each skill using the skills CLI:
+
+```bash
+npx skills remove conduct -g
+npx skills remove ask -g
+npx skills remove fast -g
+npx skills remove jaiba-init -g
+npx skills remove create-knowledge -g
+npx skills remove jaiba-doctor -g
+```
+
+Or delete the skill folders directly from your agent's global config (e.g. `~/.claude/skills/`, `~/.agents/skills/`).
+
+### 3. Remove the subagent battery
+
+Delete the following files from your agent's global `agents/` folder:
+
+- `executor-high.md`
+- `executor-medium.md`
+- `executor-low.md`
+- `code-analyst.md`
+- `business-analyst.md`
+- `verify.md`
+
+For example, if using Claude Code, delete these files from `~/.claude/agents/`.
+
+### 4. Remove the contract reference from your global instructions
+
+Open your agent's global instructions file (e.g. `~/.claude/CLAUDE.md`, `~/.agents/CLAUDE.md`) and locate the line `jaiba-configure` added:
+
+```
+See jaiba-contract.md for the global JAIBA behavioral contract.
+```
+
+Remove that single line, leaving the rest of your own instructions intact.
+
+### Per-repository cleanup (optional)
+
+This uninstall removes only what `jaiba-configure` touched on your *machine*. If you want to remove JAIBA instrumentation from a specific repository, delete:
+
+- `.ai/` — the agent brain (memory, work, vendored)
+- `.atl/` — the machine-local toolchain layer
+- `AGENTS.md` — the repository marker
+
+These are optional; delete them per-project only if you want to fully decouple that repository from JAIBA.
 
 ---
 
