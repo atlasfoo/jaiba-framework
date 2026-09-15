@@ -1,7 +1,7 @@
 ---
 name: jaiba-init
 description: "Repo-scoped JAIBA setup and long-term memory. Bootstraps one repository — AGENTS.md marker, `.ai/` skeleton, constitutive memory, then hands to jaiba-doctor — and afterwards owns `.ai/memory/` maintenance via its update-brain mode (populate templates, apply ADRs, fix drift)."
-version: 1.0.0
+version: 2.1.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
