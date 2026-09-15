@@ -3,7 +3,7 @@ type: scope
 title: "Scope"
 description: "The JAIBA skillset, its memory model, and its subagent battery — not any one project built with it."
 tags: [identity, scope, boundaries]
-updated: "2026-08-03"
+updated: "2026-09-15"
 ---
 
 # Scope
@@ -32,6 +32,11 @@ updated: "2026-08-03"
     concurrency policy.
   - The templates every one of the above writes from (`assets/` under
     each skill).
+  - This repo's own release automation: commitizen's version
+    computation and the two GitHub Actions that bump/tag a release and
+    validate commit messages on PRs (see
+    [references/commitizen.md](../references/commitizen.md),
+    [references/github-actions.md](../references/github-actions.md)).
 - **Out of scope:**
   - Any specific software project built *using* JAIBA — this repo ships
     the framework, not an application. The `.ai/` brain shape described
@@ -40,13 +45,16 @@ updated: "2026-08-03"
   - Domain-specific "knowledge skills" (e.g. framework best-practice
     guides) — JAIBA defines how a knowledge skill plugs into the chain
     (`create-knowledge`), but does not ship any itself.
-  - Hosting, CI infrastructure, or a package registry for skills —
-    distribution is delegated to the external `npx skills` CLI (see
-    [references/skills-cli.md](../references/skills-cli.md)).
+  - Hosting a skill registry, or CI infrastructure for projects other
+    than this one — distribution to third parties is delegated to the
+    external `npx skills` CLI (see
+    [references/skills-cli.md](../references/skills-cli.md)); this
+    repo's *own* release automation (above) is in scope, a registry or
+    hosting service for skills in general is not.
 - **Cross-cutting packages:** None — single repository, no monorepo
-  package split. The two vendored external skills (`caveman`,
-  `skill-creator`, tracked in `skills-lock.json`) are used as-is, not
-  shared internal packages.
+  package split. The one vendored external skill (`skill-creator`,
+  tracked in `skills-lock.json`) is used as-is, not a shared internal
+  package.
 
 ## Sub-units
 

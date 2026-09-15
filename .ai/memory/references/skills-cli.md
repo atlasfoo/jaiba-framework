@@ -7,7 +7,7 @@ kind: tooling
 role: —
 resource: "CLI `npx skills`"
 tags: [tooling, distribution, skills]
-updated: "2026-08-03"
+updated: "2026-09-15"
 ---
 
 # `skills` CLI (`npx skills`)
@@ -25,16 +25,22 @@ repo; `skills-lock.json` is the CLI's own lockfile.
 
 Two directions:
 
-- **Inbound:** this repo vendors two external skills through it —
-  `caveman` (source `juliusbrussee/caveman`) and `skill-creator`
-  (source `anthropics/skills`) — tracked with their computed hashes in
-  [`skills-lock.json`](../../../skills-lock.json) at the repo root,
-  installed under `.agents/skills/`.
+- **Inbound:** this repo vendors one external skill through it —
+  `skill-creator` (source `anthropics/skills`) — tracked with its
+  computed hash in [`skills-lock.json`](../../../skills-lock.json) at
+  the repo root, installed under `.agents/skills/`. A second entry,
+  `caveman`, was removed
+  ([ADR-009](../decisions/009-first-party-pinned-skillset.md)): the
+  framework distributes only its own first-party skills.
 - **Outbound:** `README.md`'s "Getting Started" section documents this
-  as the literal install path for adopting JAIBA itself —
-  `npx skills add atlasfoo/jaiba-framework --skill jaiba-configure -g`
-  and `npx skills add -y atlasfoo/jaiba-framework -g` — and
-  `npx skills update` as the upgrade path.
+  as the literal install path for adopting JAIBA itself, always pinned
+  to the release tag commitizen maintains —
+  `npx skills add atlasfoo/jaiba-framework#v2.1.0 --skill
+  jaiba-configure -g` — and `npx skills update` as the upgrade path.
+  `jaiba-configure`'s own skillset install (`assets/skillset.txt`)
+  follows the same `#<ref>` pin (see
+  [ADR-009](../decisions/009-first-party-pinned-skillset.md),
+  [ADR-011](../decisions/011-commitizen-single-version-source.md)).
 
 ## How to consult it
 

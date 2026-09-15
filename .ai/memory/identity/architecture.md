@@ -3,7 +3,7 @@ type: architecture
 title: "Architecture"
 description: "Skill-based agentic framework: declarative Markdown skills, no traditional application layers or runtime service."
 tags: [identity, architecture, stack]
-updated: "2026-08-03"
+updated: "2026-09-15"
 ---
 
 # Architecture
@@ -34,13 +34,17 @@ updated: "2026-08-03"
   `.ai/memory/` (constitutive memory, this bundle, versioned) and
   `.ai/work/` (executive memory — PRD/plan/tasks/walkthrough,
   gitignored).
-- **Key packages:** None — no traditional package manifest. The two
-  external skill dependencies this repo vendors (`caveman`,
-  `skill-creator`) are tracked in `skills-lock.json` and installed via
-  the `npx skills` CLI — see
-  [references/skills-cli.md](../references/skills-cli.md). Neither
-  needs non-default configuration, so neither gets its own `package`
-  reference.
+- **Key packages:** None — no traditional package manifest. The one
+  external skill dependency this repo vendors (`skill-creator`) is
+  tracked in `skills-lock.json` and installed via the `npx skills`
+  CLI — see [references/skills-cli.md](../references/skills-cli.md).
+  It needs no non-default configuration, so it gets no `package`
+  reference of its own.
+- **Release tooling:** commitizen computes the framework's single
+  version from Conventional Commits, and two GitHub Actions bump/tag
+  a release and validate commit messages on PRs — see
+  [references/commitizen.md](../references/commitizen.md) and
+  [references/github-actions.md](../references/github-actions.md).
 
 > The **complete** dependency map lives in `skills-lock.json` and each
 > integration lives in its own `reference` concept. Do not duplicate
