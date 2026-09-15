@@ -125,7 +125,23 @@ Before fetching anything, find out what's already there — reinstalling
 something a developer already has globally duplicates it and fragments
 versions across repos.
 
-1. **List global skills for this agent:**
+1. **Read the packaged `ref:` pin — before anything else.**
+   `assets/skillset.txt` carries a single `ref:` line (e.g. `ref: v2.1.0`)
+   above the skill list, kept in lockstep with the framework's release
+   tag by commitizen. That tag is the version every install in this step
+   is pinned to. Read it **once**, here, and reuse that one value
+   everywhere below — this skill only *reads* `ref:`, it never writes it.
+
+   **If `skillset.txt` has no `ref:` line, stop this whole step.** Tell
+   the developer plainly that the packaged `skillset.txt` carries no
+   `ref:` pin, that this is a packaging error in `jaiba-configure`
+   itself, and that installing without a pin would fetch whatever happens
+   to be on the default branch at this moment. Do **not** fall back to an
+   unpinned `npx skills add`, and do not guess or infer a ref from
+   anywhere else. Skip the skillset entirely, continue to the subagent
+   battery below, and say so in the closing report.
+
+2. **List global skills for this agent:**
    ```bash
    npx skills list -g
    ```
@@ -136,58 +152,123 @@ versions across repos.
    jaiba-configure   ~/.agents/skills/jaiba-configure   Agents: ...
    conduct           ~/.agents/skills/conduct           Agents: ...
    ```
+   Note what this output does **not** carry: no ref, tag or version
+   column. It answers *"is it installed?"*, never *"at which ref?"* —
+   that second question is answered in Case A below.
 
-2. **Resolve the name to look for, per `assets/skillset.txt` entry:** every
+3. **Resolve the name to look for, per `assets/skillset.txt` entry:** every
    entry is a bare name (e.g. `conduct`); check that name directly against
-   the global list.
+   the global list. The `ref:` line is not an entry — it is the pin read
+   in substep 1, never a skill to install.
 
-3. **Split** the skillset into *already global* and *missing*.
+4. **Split** the skillset into *already global* and *missing*.
 
-**Case A — everything is already global.** Install **nothing**. Tell the
-developer their global skillset is complete, and point them at
-`npx skills update -g` (or `npx skills update <skill> -g` for one at a
-time) to keep it current. Then go straight to the subagent battery below.
+**Case A — everything is already global.** Install **nothing** — then
+check whether what *is* installed still matches the packaged `ref:`.
+Presence alone is not currency:
 
-**Case B — one or more entries are missing globally.** Before installing
-anything, ask the developer **once** how the missing skills should be set
-up:
+- **Preferred signal — the installed skill's own `version:`.** Every
+  JAIBA skill carries `version:` in its `SKILL.md` frontmatter, and it
+  moves in lockstep with the release tag, so an installed
+  `<global config root>/skills/<name>/SKILL.md` reading `version: 2.1.0`
+  matches `ref: v2.1.0`. Read the artifact on disk; it is the one signal
+  that doesn't depend on the CLI's output format.
+- **Corroborating signal — the CLI's lockfile, if present.** The skills
+  CLI may keep a `.skill-lock.json` beside the global skills directory
+  recording each skill's `source`. If that source carries a `#<ref>`
+  suffix, it names the pin the install was made from; a bare source with
+  no `#<ref>` means that skill was installed **unpinned**, which is worth
+  reporting on its own. Treat the file as best-effort: read it if it's
+  there, don't manufacture it, don't fail the step over its absence.
+- **Don't invent capabilities.** `npx skills list -g` shows no ref, so
+  don't try to parse one out of it and don't pass it flags you haven't
+  confirmed exist.
 
-- **Global** (recommended) — `npx skills add -y <source> --skill <skill> -g`.
+Then report accordingly:
+
+- **Every installed skill matches the packaged `ref:`** → tell the
+  developer their global skillset is complete and current at
+  `atlasfoo/jaiba-framework#<ref>`, and point at `npx skills update -g`
+  (or `npx skills update <skill> -g` for one at a time) as the upgrade
+  path for the future.
+- **One or more differ** → **name those skills specifically**, with what
+  you found against the packaged `ref:` (e.g. "`conduct` is at
+  `version: 2.0.1`, packaged ref is `v2.1.0`"), and point at
+  `npx skills update -g` to bring them current.
+- **The check was inconclusive** (no readable `version:`, no lockfile) →
+  say so and say why. "Installed, ref not verified" is an honest answer;
+  "everything is up to date" on the strength of presence alone is not.
+
+Then go straight to the subagent battery below.
+
+**Case B — one or more entries are missing globally.** Install nothing
+yet. First build the **pre-install manifest** — one row per missing
+entry, naming exactly what is about to land on this machine and from
+where:
+
+| skill | source#ref | scope |
+|---|---|---|
+| conduct | `atlasfoo/jaiba-framework#v2.1.0` | *(the choice below)* |
+| jaiba-init | `atlasfoo/jaiba-framework#v2.1.0` | *(the choice below)* |
+
+That table is illustrative: the rows are *this run's* missing entries,
+and `#v2.1.0` stands for the `ref:` read in substep 1 — instantiate it
+literally. Never show the developer a `<ref>` placeholder.
+
+Then ask **one** structured question that puts that manifest and the
+scope choice in the same breath. This is the confirmation gate: **no
+`npx skills add` runs — and `-y` is never passed — until the developer
+has answered it.**
+
+- **Install all of the above globally** (recommended) —
+  `npx skills add -y atlasfoo/jaiba-framework#<ref> --skill <skill> -g`.
   Available in every project on this machine from now on, and the scope
   that matches what `jaiba-configure` is for.
-- **Project-local** — the same command without `-g`. Choose this only if
-  the developer wants one project's skill versions pinned independently.
-  It needs a target directory: use the **current working directory** as
-  that project, resolving its agent folder the same way step 1 resolves
-  the global one (an existing vendor dir at that root, else `.agents/`),
-  and installing into its `skills/` subdirectory. If the current
-  directory clearly isn't the project the developer means, **ask** for
-  the path rather than guessing.
+- **Install all of the above project-locally** — the same command without
+  `-g`. Choose this only if the developer wants one project's skill
+  versions pinned independently. It needs a target directory: use the
+  **current working directory** as that project, resolving its agent
+  folder the same way step 1 (*Identify the host agent*) resolves the
+  global one (an existing vendor dir at that root, else `.agents/`), and
+  installing into its `skills/` subdirectory. If the current directory
+  clearly isn't the project the developer means, **ask** for the path
+  rather than guessing.
+- **Cancel** — install nothing and move on to the subagent battery,
+  noting the skipped skills in the closing report.
 
-A single structured question with these two options is enough — offer
-"decide per skill" only if the developer asks for it. Apply the choice to
-the **missing** entries only. Skills already global stay exactly where
-they are: don't reinstall them, and don't also copy them anywhere.
+One structured question with the manifest and these options is enough —
+offer "decide per skill" only if the developer asks for it. The answer
+applies to the **missing** entries only. Skills already global stay
+exactly where they are: don't reinstall them, and don't also copy them
+anywhere. If the developer changes the set (drops a skill, asks for a
+different scope), show the amended manifest and confirm again — the rule
+is that what runs is what they last saw.
 
 `skillset.txt` entries are bare names of JAIBA skills from
-`atlasfoo/jaiba-framework`: `npx skills add -y atlasfoo/jaiba-framework --skill <name> [-g]`.
+`atlasfoo/jaiba-framework`, always pinned to the `ref:` from substep 1:
+`npx skills add -y atlasfoo/jaiba-framework#<ref> --skill <name> [-g]`.
 
-`[-g]` means: append `-g` if the developer chose global, omit it for
+`#<ref>` is **not optional** — an unpinned source resolves to the default
+branch, which is exactly the transparency hole this pin closes. `[-g]`
+means: append `-g` if the developer chose global, omit it for
 project-local. Process `skillset.txt` top to bottom: skip blank lines,
-lines starting with `#`, and entries already confirmed global in substep
-2. For each remaining (missing) entry, run the appropriate command with
-the chosen scope flag. Install skills **one by one** to ensure each is
-correctly registered:
+the `ref:` line, lines starting with `#`, and entries already confirmed
+global in substep 3. For each remaining (missing) entry, run the
+appropriate command with the chosen scope flag. Install skills **one by
+one** to ensure each is correctly registered:
 
 ```bash
-# Example individual calls (global; drop -g for project-local)
-npx skills add -y atlasfoo/jaiba-framework --skill conduct -g
-npx skills add -y atlasfoo/jaiba-framework --skill jaiba-init -g
+# Example individual calls, with ref: v2.1.0 read in substep 1
+# (global; drop -g for project-local)
+npx skills add -y atlasfoo/jaiba-framework#v2.1.0 --skill conduct -g
+npx skills add -y atlasfoo/jaiba-framework#v2.1.0 --skill jaiba-init -g
 ```
 
 If no skills package manager is available, say so and fall back to
-cloning each source and copying the skill folders into the target — but
-prefer the package manager so versions/locks stay honest.
+cloning each source **at the same `ref:` tag** (`git clone --depth 1
+--branch <ref> …`) and copying the skill folders into the target — the
+pin survives the fallback. Still prefer the package manager so
+versions/locks stay honest.
 
 > `jaiba-configure` never installs *itself* (it's already global) or
 > unbuilt skills, and only installs entries from `assets/skillset.txt` —
@@ -252,9 +333,13 @@ End with a short, honest report:
    instructions file.
 3. **Skills** — for each `skillset.txt` entry, whether it was already
    global (untouched), newly installed globally, or newly installed
-   project-locally (and into which directory), with the source. If Case A
-   applied, say so plainly and repeat the `npx skills update -g`
-   reminder.
+   project-locally (and into which directory), each line naming the
+   `source#ref` it came from (e.g. `atlasfoo/jaiba-framework#v2.1.0`),
+   never a bare source. If Case A applied, say so plainly, report the ref
+   check per skill — matching, drifted (with what you found), or not
+   verifiable — and repeat the `npx skills update -g` reminder. If
+   `skillset.txt` had no `ref:` line, report that the skillset step was
+   **skipped as a packaging error** and that nothing was installed.
 4. **Subagent battery** — which definitions were installed, skipped as
    current, or kept on the developer's request; or that the host lacks
    subagent support and `conduct` will fall back to sequential execution.
