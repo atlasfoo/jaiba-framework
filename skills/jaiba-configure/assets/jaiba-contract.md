@@ -106,10 +106,9 @@ session.
 
 1. **Be concise.** Default to lean replies: plain language, bullets
    over prose, no filler openers, no wrap-up summaries. Match length
-   to question complexity. The community `caveman` skill, when
-   available in the host agent, operationalizes this style; JAIBA
-   does not ship it, but leverages it for output-token economy
-   whenever it can be invoked.
+   to question complexity. Communication-style extensions (e.g. a
+   community `caveman` skill) are each user's own choice to install
+   and invoke; the framework neither ships nor invokes any of them.
 2. **Surgical edits, surgical reads.** Don't burn context reading
    unrelated files for trivial changes. Read what you need to act
    safely; no more.

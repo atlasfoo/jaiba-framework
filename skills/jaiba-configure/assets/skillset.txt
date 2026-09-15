@@ -1,17 +1,12 @@
 # JAIBA workflow/meta skill set installed by jaiba-configure.
 #
-# Two entry formats:
+# Entry format:
 #
 #   bare name       → skill from atlasfoo/jaiba-framework
 #                     e.g.  conduct
 #
-#   owner/repo      → all skills from an external GitHub repo
-#   owner/repo#skill → specific skill from an external GitHub repo
-#                     e.g.  juliusbrussee/caveman
-#                           anthropics/skills#skill-creator
-#
 # Lines starting with '#' are comments. Keep this list current as the
-# framework grows or external dependencies are added/removed.
+# framework grows.
 
 # ── JAIBA skills ──────────────────────────────────────────────────────
 conduct
@@ -20,7 +15,3 @@ fast
 jaiba-init
 create-knowledge
 jaiba-doctor
-
-# ── External community skills ─────────────────────────────────────────
-# Add external skills below, e.g.:
-juliusbrussee/caveman#caveman

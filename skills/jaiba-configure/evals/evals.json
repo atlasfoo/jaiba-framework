@@ -39,7 +39,7 @@
       "name": "all-skillset-skills-already-global",
       "prompt": "Configure jaiba on this machine.",
       "context": {
-        "global_skills_state": "every skill listed in skills/jaiba-configure/assets/skillset.txt (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) is already present in `npx skills list -g` output",
+        "global_skills_state": "every skill listed in skills/jaiba-configure/assets/skillset.txt (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor) is already present in `npx skills list -g` output",
         "global_config_state": "no jaiba-contract.md, no agents/ definitions yet"
       },
       "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed no skills -- not globally, not project-locally. Told the developer their global skillset is complete and pointed them at `npx skills update -g` to stay current. Still performed the other global installs: the behavioral contract into the global config root and the subagent battery into its agents/ folder. Closing report explicitly notes Case A (already global, nothing installed).",
@@ -50,7 +50,7 @@
       "name": "missing-skills-offered-global-or-local",
       "prompt": "Install the jaiba skillset for me.",
       "context": {
-        "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- none of the skillset.txt entries (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) are global yet"
+        "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- none of the skillset.txt entries (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor) are global yet"
       },
       "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`, the recommended scope) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries one by one with the chosen scope, then installs the subagent battery.",
       "files": []
@@ -60,10 +60,10 @@
       "name": "project-local-choice-targets-current-directory",
       "prompt": "Yes, install the missing ones locally for the project I'm in.",
       "context": {
-        "prior_turn": "jaiba-configure already ran `npx skills list -g` and found conduct, ask already global, but fast, jaiba-init, create-knowledge, jaiba-doctor, and caveman missing -- and just asked the developer global vs. project-local for the missing ones",
+        "prior_turn": "jaiba-configure already ran `npx skills list -g` and found conduct, ask already global, but fast, jaiba-init, create-knowledge, and jaiba-doctor missing -- and just asked the developer global vs. project-local for the missing ones",
         "cwd": "a repo with a .claude/ directory at its root"
       },
-      "expected_output": "Resolved the project-local target from the current working directory: .claude/ exists at its root, so skills go to .claude/skills/. Installed only the previously-missing skills (fast, jaiba-init, create-knowledge, jaiba-doctor, caveman) without -g, one by one. Did not reinstall or duplicate conduct or ask, which were already global. Then installed the contract and the subagent battery GLOBALLY regardless of the project-local skills choice — those are never project-scoped. Created no .ai/, .atl/ or AGENTS.md in that repo. Closing report distinguishes which skills came from where.",
+      "expected_output": "Resolved the project-local target from the current working directory: .claude/ exists at its root, so skills go to .claude/skills/. Installed only the previously-missing skills (fast, jaiba-init, create-knowledge, jaiba-doctor) without -g, one by one. Did not reinstall or duplicate conduct or ask, which were already global. Then installed the contract and the subagent battery GLOBALLY regardless of the project-local skills choice — those are never project-scoped. Created no .ai/, .atl/ or AGENTS.md in that repo. Closing report distinguishes which skills came from where.",
       "files": []
     },
     {
