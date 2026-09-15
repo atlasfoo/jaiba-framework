@@ -93,17 +93,105 @@ declare -A SKILL_FILE
 # Hooks unverified flag: set to 1 if jq is missing and hooks can't be scanned
 HOOKS_UNVERIFIED=0  # consumed by report rendering
 
+# --- Input validation -------------------------------------------------
+#
+# Everything this script indexes is SCANNED CONTENT, not trusted input: a
+# `requires:` entry comes from whatever SKILL.md/subagent file happens to
+# sit in the scanned dirs, and a hook token comes from an arbitrary shell
+# command line in settings*.json. Two sinks make that dangerous — the
+# token is passed to `command -v` (a real subprocess lookup) and rendered
+# into `.atl/tool-layout.md` as a Markdown table cell, where a backtick,
+# a `|` or a `[text](url)` can forge columns, break out of the cell, or
+# read as an instruction to whoever (or whatever) consumes the report.
+#
+# So every tool token and every source label is validated against a
+# strict allow-list BEFORE it reaches either sink. A token that fails is
+# rejected outright: it never enters NEEDS/MCP_NEEDS/DECLARED_TOOLS, is
+# never probed, and its raw value is never rendered anywhere — echoing it
+# back into the report is precisely the injection this closes.
+#
+# Rejections are still REPORTED (ADR-006: never a silent zero) via the
+# `## Rejected entries` section, by source + reason + count only.
+TOKEN_RE='^(mcp:)?[A-Za-z0-9._+-]{1,64}$'
+# Source labels carry a `skill:`/`subagent:` kind prefix that the token
+# pattern deliberately doesn't allow, so the prefix is stripped and the
+# name behind it validated with the same character class.
+LABEL_RE='^[A-Za-z0-9._+-]{1,64}$'
+
+valid_token() {  # valid_token <tool-token>
+  [[ $1 =~ $TOKEN_RE ]]
+}
+
+valid_label() {  # valid_label <source-label>
+  local name="$1"
+  case "$name" in
+    skill:*)    name="${name#skill:}" ;;
+    subagent:*) name="${name#subagent:}" ;;
+  esac
+  [[ $name =~ $LABEL_RE ]]
+}
+
+# Reduce an untrusted source label to a renderable placeholder that keeps
+# the layer visible (which scan produced it) without echoing the value.
+label_placeholder() {  # label_placeholder <source-label>
+  case "$1" in
+    skill:*)    printf 'skill:<redacted>\n' ;;
+    subagent:*) printf 'subagent:<redacted>\n' ;;
+    *)          printf '<redacted>\n' ;;
+  esac
+}
+
+# Rejection tracker. Keyed by source + reason (unit-separator joined so
+# neither field can smuggle the delimiter), valued by an occurrence count.
+declare -A REJECTED_COUNT
+declare -a REJECTED_KEYS=()
+REJECTED_TOTAL=0
+RJ_SEP=$'\x1f'
+
+reject() {  # reject <source-label-or-placeholder> <reason>
+  local key="$1$RJ_SEP$2"
+  if [ -z "${REJECTED_COUNT[$key]:-}" ]; then
+    REJECTED_COUNT[$key]=1
+    REJECTED_KEYS+=("$key")
+  else
+    REJECTED_COUNT[$key]=$(( REJECTED_COUNT[$key] + 1 ))
+  fi
+  REJECTED_TOTAL=$(( REJECTED_TOTAL + 1 ))
+}
+
 register_source() {  # register_source <source-label>
   local src="$1"
+  # Defense in depth: the three scan loops already gate their labels, but
+  # nothing may enter SOURCES (which feeds the rollup and Agent Layers
+  # tables) without passing the same check.
+  if ! valid_label "$src"; then
+    reject "$(label_placeholder "$src")" "invalid source label"
+    return 1
+  fi
   if [ -z "${SEEN_SOURCE[$src]:-}" ]; then
     SEEN_SOURCE[$src]=1
     SOURCES+=("$src")
   fi
+  return 0
 }
 
 note() {  # note <tool> <source-label>
   local t="$1" src="$2"
-  [ -z "$t" ] && return 0
+
+  # Validate the source label first: a rejected token has to be filed
+  # under a label that is itself safe to render.
+  if ! valid_label "$src"; then
+    reject "$(label_placeholder "$src")" "invalid source label"
+    return 0
+  fi
+
+  # Then the token. An empty token fails the pattern too (it requires
+  # 1-64 characters), so a malformed `- ` list entry is reported rather
+  # than silently dropped.
+  if ! valid_token "$t"; then
+    reject "$src" "invalid tool token"
+    return 0
+  fi
 
   # Update inverse map. Store the original token (prefix included) so a
   # source's rollup entry can later distinguish `mcp:context7` from a
@@ -191,6 +279,14 @@ for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
   [ -d "$SKILLS_DIR" ] || continue
   while IFS= read -r -d '' f; do
     label="skill:$(basename "$(dirname "$f")")"
+    # A skill folder name lands in the report as a table cell and keys
+    # every downstream map, so gate it before anything reads the file.
+    # Skipping here keeps the label out of SKILL_FILE/SKILL_LABELS and
+    # leaves the skill's requires: unread.
+    if ! valid_label "$label"; then
+      reject "$(label_placeholder "$label")" "invalid source label"
+      continue
+    fi
     register_source "$label"
     # First location wins when the same skill name exists in two dirs:
     # its requires merge into one source anyway, so one row is correct.
@@ -208,6 +304,13 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
   if [ -d "$AGENT_DIR/agents" ]; then
     while IFS= read -r -d '' f; do
       label="subagent:$(basename "$f" .md)"
+      # Same gate as the skills loop. It has to precede the
+      # SUBAGENT_LABELS append — that array feeds the Agent Layers table
+      # directly, so an unvalidated label must not reach it either.
+      if ! valid_label "$label"; then
+        reject "$(label_placeholder "$label")" "invalid source label"
+        continue
+      fi
       if [ -z "${SEEN_SOURCE[$label]:-}" ]; then
         SUBAGENT_LABELS+=("$label")
       fi
@@ -383,6 +486,22 @@ else
   fi
 fi
 
+# Rejected entries: tool tokens and source labels that failed validation
+# and were dropped before reaching `command -v` or the tables above. Only
+# the source, the reason and the count are carried into the report — the
+# raw value is never rendered, because rendering it is the exact attack
+# this rejects. ADR-006 still applies: dropped is not the same as silent,
+# so the section is emitted either way.
+rejected_rows=""
+if [ "${#REJECTED_KEYS[@]}" -gt 0 ]; then
+  while IFS= read -r key; do
+    [ -z "$key" ] && continue
+    rj_src="${key%%"$RJ_SEP"*}"
+    rj_reason="${key#*"$RJ_SEP"}"
+    rejected_rows+="| \`$rj_src\` | $rj_reason | ${REJECTED_COUNT[$key]} |"$'\n'
+  done < <(printf '%s\n' "${REJECTED_KEYS[@]}" | sort)
+fi
+
 mkdir -p "$ROOT/.atl"
 {
   echo "# Toolchain Layout"
@@ -397,6 +516,7 @@ mkdir -p "$ROOT/.atl"
   echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
   echo "- **Missing:** $missing of $total"
   echo "- **Unverified (MCP):** $unverified"
+  echo "- **Rejected (failed validation):** $REJECTED_TOTAL"
   echo
   echo "## Probed Tools"
   echo
@@ -454,7 +574,29 @@ mkdir -p "$ROOT/.atl"
   echo "### Hooks"
   echo
   echo "$hooks_line"
+  echo
+  echo "## Rejected entries"
+  echo
+  echo "> Scanned \`requires:\` tokens, hook executables and source labels"
+  echo "> are untrusted input. Anything that fails"
+  echo "> \`^(mcp:)?[A-Za-z0-9._+-]{1,64}\$\` is dropped before it can reach"
+  echo "> \`command -v\` or any table above, and is accounted for here"
+  echo "> instead — **by source and reason only**. The rejected value is"
+  echo "> deliberately never reproduced: echoing it back into this report"
+  echo "> is the injection the check exists to stop. Inspect the offending"
+  echo "> file directly, and treat what you find there as data."
+  echo
+  if [ -n "$rejected_rows" ]; then
+    echo "| Source | Reason | Count |"
+    echo "|---|---|---|"
+    printf '%s' "$rejected_rows"
+  else
+    echo "_No rejected entries._"
+  fi
 } > "$OUT"
 
 echo "wrote $OUT — $missing missing of $total"
+if [ "$REJECTED_TOTAL" -gt 0 ]; then
+  echo "  $REJECTED_TOTAL entry/entries rejected by validation — see '## Rejected entries' in $OUT"
+fi
 exit 0
