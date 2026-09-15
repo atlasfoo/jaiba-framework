@@ -1,9 +1,9 @@
 ---
 type: convention
 title: "Conventions"
-description: "TDD disabled by default (no test suite exists); phase-wise chore(wip) commits; style deferred to .editorconfig."
+description: "TDD disabled by default (no test suite exists); phase-wise chore(wip) commits enforced as Conventional Commits; style deferred to .editorconfig."
 tags: [identity, convention, planning, style]
-updated: "2026-08-03"
+updated: "2026-09-15"
 ---
 
 # Conventions
@@ -46,6 +46,13 @@ updated: "2026-08-03"
   [`.ai/memory/log/2026-07-03-orquestador-unificado-memoria.md`](../log/2026-07-03-orquestador-unificado-memoria.md)
   and
   [`.ai/memory/log/2026-07-28-spec-02b-atl-completo.md`](../log/2026-07-28-spec-02b-atl-completo.md)).
+- **Conventional Commits:** enforced on every PR by `commit-check.yml`
+  (`cz check` against the commit range and the PR title). With a
+  squash merge, the PR title *is* the commit `cz bump` reads on
+  `master`, so the title itself must follow the convention. Breaking
+  changes use `!` after the type/scope (e.g. `feat(configure)!: …`)
+  plus a `BREAKING CHANGE:` footer — see
+  [ADR-011](../decisions/011-commitizen-single-version-source.md).
 
 - **Definition of ready** (before a plan enters `execute` mode):
   - Plan is written to `.ai/work/plan.md`.
@@ -53,14 +60,6 @@ updated: "2026-08-03"
   - All clarifying questions have been resolved (no
     `[NEEDS CLARIFICATION]` blocks in the artifacts).
   - Human has explicitly approved the plan.
-
-## Communication style
-
-- **Token efficiency:** use the `caveman` skill (ultra-compressed
-  communication mode) for session communication in this repo. Carried
-  forward from the pre-OKF `AGENTS.md` (§6, retired by
-  [ADR-001](../decisions/001-jaiba-brain-adoption.md)'s follow-up) —
-  a real, standing preference, not a default this bundle invented.
 
 ## Style and syntax
 

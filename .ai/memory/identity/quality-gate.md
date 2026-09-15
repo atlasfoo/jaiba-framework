@@ -1,9 +1,9 @@
 ---
 type: quality-gate
 title: "Quality Gate"
-description: "Evals/JSON validity, shell-script syntax, description-length, contract lockstep, and orphaned-citation review — no test suite; this is a Markdown-skills repo."
+description: "Evals/JSON validity, shell-script syntax, description-length, contract lockstep, version lockstep, actions-pinned-by-SHA, injection-fixture probe, and orphaned-citation review — no test suite; this is a Markdown-skills repo."
 tags: [identity, quality-gate, verification]
-updated: "2026-08-03"
+updated: "2026-09-15"
 ---
 
 # Quality Gate
@@ -32,9 +32,10 @@ atomically before moving on.
 - **Evals JSON validity:** `jq empty skills/*/evals/evals.json` — every
   skill's eval fixture file must be valid JSON.
 - **Shell script syntax:** `bash -n skills/conduct/scripts/archive.sh
-  skills/doctor/scripts/check-tools.sh
-  skills/jaiba-configure/scripts/greeting.sh` — every verification
-  script must parse.
+  skills/doctor/scripts/check-tools.sh` — every verification script
+  must parse. `greeting.sh` left this list when it was deleted
+  ([ADR-009](../decisions/009-first-party-pinned-skillset.md)'s plan,
+  Phase 2 — a cosmetic banner script, not a security decision itself).
 - **`SKILL.md` description length:** `awk '/^description: /{ if
   (length($0)-13 > 1024) print FILENAME": "length($0)-13 }'
   skills/*/SKILL.md` must produce no output (every frontmatter
@@ -44,6 +45,14 @@ atomically before moving on.
   skills/jaiba-configure/assets/jaiba-contract.md
   skills/doctor/assets/jaiba-contract.md` — the canonical contract copy
   and doctor's drift-check copy must stay byte-identical.
+- **Version lockstep:** every `^version:` in `skills/*/SKILL.md`, and
+  — once they exist — `skillset.txt`'s `ref:` and the pinned
+  `jaiba-framework#v` line in `README.md`, must equal `version` in
+  `.cz.toml` (see [ADR-011](../decisions/011-commitizen-single-version-source.md)).
+- **Actions pinned by SHA:** every `uses:` in
+  `.github/workflows/*.yml` must carry a 40-hex-char commit SHA, never
+  a tag or branch — `grep -hE '^\s*uses:' .github/workflows/*.yml |
+  grep -vE '@[0-9a-f]{40}'` must produce no output.
 
 ## Plan Gate (runs once at `conduct:validate` — may be slow)
 
@@ -63,6 +72,12 @@ summary and require corrective action before closing.
   the relevant skill directly) against both supported `.ai/memory/`
   layouts — a flat-legacy fixture and a concept-bundle fixture — with
   no false-positive breakage warning on the flat one.
+- **Injection fixture probe:** run `check-tools.sh` against
+  `skills/doctor/evals/fixtures/injected-skills/` into a temporary
+  root; the generated `.atl/tool-layout.md` must show a non-zero
+  `Rejected (failed validation)` count and must never render any of
+  the fixture's malicious values (see
+  [ADR-010](../decisions/010-repository-content-is-data.md)).
 - **No versioned executive artifacts:** `git status --short` shows
   nothing under `.ai/work/` (requires `.ai/.gitignore` to exist and
   cover it).
