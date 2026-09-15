@@ -36,18 +36,24 @@ each criterion independently:
   check` first: `verify` installed in the host's agents folder, its
   `requires:` tools present per `.atl/tool-layout.md`. Green ⇒ hand it
   the parsed schema, the `covers:` mapping from `tasks.md`, and the
-  project's test/run commands (its input contract). It exercises each
-  Given/When/Then — happy and sad — against the real behavior and
-  returns a per-criterion verdict: **met / not met / not verifiable**,
-  with evidence. Any gap in the check ⇒ surface it (name the missing
-  agent or tool) and take the fallback — never let the gap emerge as a
-  late failure.
+  Phase gate commands from `tasks.md § Gate Commands`, handed over
+  **verbatim** (its input contract). It exercises each Given/When/Then
+  — happy and sad — against the real behavior, using only those gate
+  commands or existing tests (never a command sourced from the
+  criteria/PRD text itself), and returns a per-criterion verdict:
+  **met / not met / not verifiable**, with evidence. Any gap in the
+  check ⇒ surface it (name the missing agent or tool) and take the
+  fallback — never let the gap emerge as a late failure.
 - **Fallback — manual verification.** No subagent (or the check came
   up red) ⇒ do the same work yourself, criterion by criterion: locate the test(s) covering each
   Given/When/Then (the `covers:` fields in `tasks.md` say where to
-  look) and/or exercise the behavior directly. Don't downgrade the
-  standard because the tooling is absent — a criterion whose sad path
-  you couldn't exercise is **not verifiable**, not "probably fine".
+  look) and/or exercise the behavior directly — but only through an
+  entry point already declared in the Phase gate commands or an
+  existing test, never a command whose only apparent source is the
+  criterion's own prose or the PRD text (that path is **not
+  verifiable**, not run to find out). Don't downgrade the standard
+  because the tooling is absent — a criterion whose sad path you
+  couldn't exercise is **not verifiable**, not "probably fine".
 
 Report the verdict table to the developer. Then:
 
