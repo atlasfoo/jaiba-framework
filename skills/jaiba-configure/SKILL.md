@@ -63,12 +63,7 @@ divergence is a question, not an assumption.
 
 ## The bootstrap sequence
 
-Before anything else, run the greeting banner so the developer sees the
-run has kicked off:
-
-```bash
-bash <this-skill>/scripts/greeting.sh
-```
+Before anything else, tell the developer the jaiba-configure run has started.
 
 Then run the three steps below in order. Surface what you did at the end
 (see **Closing**).
@@ -142,13 +137,9 @@ versions across repos.
    conduct           ~/.agents/skills/conduct           Agents: ...
    ```
 
-2. **Resolve the name to look for, per `assets/skillset.txt` entry:**
-
-   | Entry format | Name to check against the global list |
-   |---|---|
-   | `conduct` (bare name) | `conduct` |
-   | `owner/repo#skill` | the part after `#`, e.g. `caveman` |
-   | `owner/repo` (no `#`, installs everything from that repo) | can't be resolved to one name from the listing — treat as **missing** below; `npx skills add` is idempotent, so a redundant run for this format is harmless |
+2. **Resolve the name to look for, per `assets/skillset.txt` entry:** every
+   entry is a bare name (e.g. `conduct`); check that name directly against
+   the global list.
 
 3. **Split** the skillset into *already global* and *missing*.
 
@@ -178,13 +169,8 @@ A single structured question with these two options is enough — offer
 the **missing** entries only. Skills already global stay exactly where
 they are: don't reinstall them, and don't also copy them anywhere.
 
-`skillset.txt` uses two entry formats:
-
-| Line format | Meaning | Install command |
-|---|---|---|
-| `conduct` (bare name) | JAIBA skill from `atlasfoo/jaiba-framework` | `npx skills add -y atlasfoo/jaiba-framework --skill conduct [-g]` |
-| `owner/repo` | all skills from an external GitHub repo | `npx skills add -y owner/repo [-g]` |
-| `owner/repo#skill` | one skill from an external GitHub repo | `npx skills add -y owner/repo --skill skill [-g]` |
+`skillset.txt` entries are bare names of JAIBA skills from
+`atlasfoo/jaiba-framework`: `npx skills add -y atlasfoo/jaiba-framework --skill <name> [-g]`.
 
 `[-g]` means: append `-g` if the developer chose global, omit it for
 project-local. Process `skillset.txt` top to bottom: skip blank lines,
@@ -197,7 +183,6 @@ correctly registered:
 # Example individual calls (global; drop -g for project-local)
 npx skills add -y atlasfoo/jaiba-framework --skill conduct -g
 npx skills add -y atlasfoo/jaiba-framework --skill jaiba-init -g
-npx skills add -y juliusbrussee/caveman --skill caveman -g
 ```
 
 If no skills package manager is available, say so and fall back to
