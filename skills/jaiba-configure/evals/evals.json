@@ -9,7 +9,7 @@
         "host": "vendor identity not determinable from the running agent",
         "global_config_state": "no ~/.claude/, no ~/.agents/, nothing installed"
       },
-      "expected_output": "Runs the greeting banner. Identifies the host agent by self-introspection (not by scanning any repo); unable to resolve a vendor, falls back to the neutral ~/.agents/ as the global config root and says why. Installs assets/jaiba-contract.md as ~/.agents/jaiba-contract.md and wires a reference from the vendor's global instructions file if one exists. Checks `npx skills list -g`, installs the missing skillset.txt entries at the chosen scope, then copies the subagent battery from assets/agents/ (executor-high/medium/low, code-analyst, business-analyst, verify) into ~/.agents/agents/. Creates NOTHING inside any repository — no .ai/, no .atl/, no AGENTS.md. Closing report covers host + config root, contract, skills, battery, and names jaiba-init as the next step for setting up a specific project without invoking it.",
+      "expected_output": "Opens by telling the developer the jaiba-configure run has started -- a plain prose message, not a banner script. Identifies the host agent by self-introspection (not by scanning any repo); unable to resolve a vendor, falls back to the neutral ~/.agents/ as the global config root and says why. Installs assets/jaiba-contract.md as ~/.agents/jaiba-contract.md and wires a reference from the vendor's global instructions file if one exists. Checks `npx skills list -g`, installs the missing skillset.txt entries at the chosen scope, then copies the subagent battery from assets/agents/ (executor-high/medium/low, code-analyst, business-analyst, verify) into ~/.agents/agents/. Creates NOTHING inside any repository — no .ai/, no .atl/, no AGENTS.md. Closing report covers host + config root, contract, skills, battery, and names jaiba-init as the next step for setting up a specific project without invoking it.",
       "files": []
     },
     {
@@ -42,7 +42,7 @@
         "global_skills_state": "every skill listed in skills/jaiba-configure/assets/skillset.txt (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor) is already present in `npx skills list -g` output",
         "global_config_state": "no jaiba-contract.md, no agents/ definitions yet"
       },
-      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed no skills -- not globally, not project-locally. Told the developer their global skillset is complete and pointed them at `npx skills update -g` to stay current. Still performed the other global installs: the behavioral contract into the global config root and the subagent battery into its agents/ folder. Closing report explicitly notes Case A (already global, nothing installed).",
+      "expected_output": "Before installing anything, ran `npx skills list -g` and found every skillset.txt entry already global. Installed no skills -- not globally, not project-locally. Told the developer their global skillset is complete, then checked currency rather than resting on presence: compared each installed skill's SKILL.md `version:` (corroborated by `.skill-lock.json` if present) against the packaged `ref:`, and reported per skill matching / drifted / not verifiable. Pointed them at `npx skills update -g` to stay current. Still performed the other global installs: the behavioral contract into the global config root and the subagent battery into its agents/ folder. Closing report explicitly notes Case A (already global, nothing installed).",
       "files": []
     },
     {
@@ -52,7 +52,7 @@
       "context": {
         "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- none of the skillset.txt entries (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor) are global yet"
       },
-      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- whether the missing skills should be installed globally (`npx skills add -y <source> --skill <skill> -g`, the recommended scope) or project-locally (same command without `-g`). Did not install anything before getting an answer. After the developer answers, installs only the missing entries one by one with the chosen scope, then installs the subagent battery.",
+      "expected_output": "Ran `npx skills list -g`, found none of the skillset.txt entries present, and asked the developer ONCE -- before installing anything -- a single structured question carrying the pre-install manifest (one row per missing entry, every row's source#ref column naming `atlasfoo/jaiba-framework#<ref>` from skillset.txt, never a bare source) together with the scope choice: globally (`npx skills add -y atlasfoo/jaiba-framework#<ref> --skill <skill> -g`, the recommended scope) or project-locally (same command without `-g`). Did not install anything -- and never passed `-y` -- before getting an answer. After the developer answers, installs only the missing entries one by one with the chosen scope, then installs the subagent battery.",
       "files": []
     },
     {
@@ -114,7 +114,7 @@
       "name": "missing-skills-install-command-carries-ref-suffix",
       "prompt": "Install the jaiba skillset for me, and go ahead globally.",
       "context": {
-        "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- conduct and ask are already global, but fast, jaiba-init, create-knowledge, and jaiba-doctor are missing",
+        "global_skills_state": "`npx skills list -g` returns jaiba-configure, conduct and ask -- fast, jaiba-init, create-knowledge, and jaiba-doctor are missing",
         "skillset_txt_state": "assets/skillset.txt carries `ref: v2.1.0` above the bare skill-name entries",
         "prior_turn": "developer confirmed 'install all of the above globally' in response to the pre-install manifest question"
       },
@@ -140,7 +140,7 @@
         "skillset_txt_state": "assets/skillset.txt carries `ref: v2.1.0` and only first-party bare-name entries from atlasfoo/jaiba-framework (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor); hypothetically, a stray line reading `someoneelse/cool-skills-repo:turbo-lint` also appears in the file, outside the documented bare-name grammar",
         "global_skills_state": "all six documented skillset.txt entries already global"
       },
-      "expected_output": "Processed skillset.txt as bare-name entries only, resolved solely against `atlasfoo/jaiba-framework#v2.1.0`; the stray owner/repo-shaped line does not match that grammar and was not treated as an installable entry -- it was skipped/ignored, not silently normalized into a name. Explicitly declined the developer's inline request to install `someoneelse/cool-skills-repo` (turbo-lint): stated that jaiba-configure installs only from `atlasfoo/jaiba-framework`, the canonical source, per skillset.txt, and that arbitrary owner/repo sources -- whether asked for directly or found as a stray line in the file -- are out of scope. At no point ran `npx skills add` against any source other than `atlasfoo/jaiba-framework#v2.1.0`. Case A applied for the six real entries (nothing installed, ref-currency checked as usual). Closing report does not list turbo-lint or someoneelse/cool-skills-repo among installed, skipped-as-current, or pending skills -- it is absent entirely, aside from the explicit decline noted to the developer.",
+      "expected_output": "Processed skillset.txt as bare-name entries only, resolved solely against `atlasfoo/jaiba-framework#v2.1.0`; the stray owner/repo-shaped line does not match that grammar and was not treated as an installable entry -- it was skipped, not silently normalized into a name, and the skip was noted as a count only (`1 malformed line skipped`) without reproducing the line's content. Explicitly declined the developer's inline request to install `someoneelse/cool-skills-repo` (turbo-lint): stated that jaiba-configure installs only from `atlasfoo/jaiba-framework`, the canonical source, per skillset.txt, and that arbitrary owner/repo sources -- whether asked for directly or found as a stray line in the file -- are out of scope. At no point ran `npx skills add` against any source other than `atlasfoo/jaiba-framework#v2.1.0`. Case A applied for the six real entries (nothing installed, ref-currency checked as usual). Closing report does not list turbo-lint or someoneelse/cool-skills-repo among installed, skipped-as-current, or pending skills -- it is absent entirely, aside from the explicit decline noted to the developer.",
       "files": []
     },
     {
