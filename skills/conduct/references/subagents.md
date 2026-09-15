@@ -44,7 +44,9 @@ Four operations, each bounded to its phase:
    live in `execute-mode.md § Delegating to executors`.
 4. **Criteria verification** (`validate`) → `verify`. It consumes the
    PRD's parsed `criteria:` schema and returns a per-criterion verdict
-   with evidence (see `validate-mode.md`).
+   with evidence, running only the Phase gate commands handed to it
+   verbatim or tests that already exist — never a command sourced from
+   the criteria/PRD text itself (see `validate-mode.md`).
 
 **Never delegated**, no matter the host's capabilities: writing any
 `.ai/work/` artifact (plan, tasks, walkthrough, PRD — single-writer
