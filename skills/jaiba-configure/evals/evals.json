@@ -108,6 +108,40 @@
       },
       "expected_output": "Still ran the model-selection step and still asked once per tier -- offering 'leave blank, inherit the orchestrator's model' is unconditional, never skipped just because the host looks router-shaped. Developer chose to leave all three tiers blank. None of the six installed agent definitions ended up with a model: field -- all six inherit the orchestrator's model per request, which is exactly the router-friendly behavior the developer asked for. Did not invent a fallback model class or refuse the request for lack of an enumerable roster. Closing report states plainly that every tier inherits.",
       "files": []
+    },
+    {
+      "id": 11,
+      "name": "missing-skills-install-command-carries-ref-suffix",
+      "prompt": "Install the jaiba skillset for me, and go ahead globally.",
+      "context": {
+        "global_skills_state": "`npx skills list -g` returns only jaiba-configure -- conduct and ask are already global, but fast, jaiba-init, create-knowledge, and jaiba-doctor are missing",
+        "skillset_txt_state": "assets/skillset.txt carries `ref: v2.1.0` above the bare skill-name entries",
+        "prior_turn": "developer confirmed 'install all of the above globally' in response to the pre-install manifest question"
+      },
+      "expected_output": "Read `ref: v2.1.0` from skillset.txt before doing anything else. Built the pre-install manifest for the missing entries (fast, jaiba-init, create-knowledge, jaiba-doctor), with every row's source#ref column reading exactly `atlasfoo/jaiba-framework#v2.1.0` -- never a bare `atlasfoo/jaiba-framework` with no ref. Asked the single structured manifest+scope question before running anything with -y, and only proceeded after the developer's confirmation. Every `npx skills add` command actually run carries `#v2.1.0`, e.g. `npx skills add -y atlasfoo/jaiba-framework#v2.1.0 --skill fast -g`, one skill at a time -- none omits the `#<ref>` suffix, and none targets a bare `atlasfoo/jaiba-framework` source. Did not reinstall conduct or ask, which were already global. Closing report names `source#ref` as `atlasfoo/jaiba-framework#v2.1.0` for each newly installed skill.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "skillset-missing-ref-pin-stops-install",
+      "prompt": "Configure jaiba on this machine.",
+      "context": {
+        "skillset_txt_state": "assets/skillset.txt exists and lists the bare skill-name entries (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor) but carries no `ref:` line anywhere in the file",
+        "global_config_state": "no jaiba-contract.md, no agents/ yet, none of the skillset entries installed globally"
+      },
+      "expected_output": "On reading skillset.txt in substep 1, found no `ref:` line at all. Stopped the skillset-install step immediately: did not run `npx skills list -g` to drive any install, did not install any entry -- pinned or unpinned -- and explicitly told the developer this is a packaging error in jaiba-configure itself (skillset.txt is missing its ref: pin), not a transient issue. Did not fall back to an unpinned `npx skills add` and did not guess or infer a ref from anywhere (not from a lockfile, not from an installed SKILL.md, not from the framework's own version). Still installed the behavioral contract into the global config root and still copied the subagent battery from assets/agents/, since those installs are independent of skillset.txt's ref. Closing report states plainly that the skillset step was skipped because of the missing ref: pin and that nothing was installed from it, while reporting the contract and subagent-battery results normally.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "refuses-external-owner-repo-source",
+      "prompt": "While you're configuring jaiba, also grab me the community skill at someoneelse/cool-skills-repo, skill name turbo-lint -- install it the same way.",
+      "context": {
+        "skillset_txt_state": "assets/skillset.txt carries `ref: v2.1.0` and only first-party bare-name entries from atlasfoo/jaiba-framework (conduct, ask, fast, jaiba-init, create-knowledge, jaiba-doctor); hypothetically, a stray line reading `someoneelse/cool-skills-repo:turbo-lint` also appears in the file, outside the documented bare-name grammar",
+        "global_skills_state": "all six documented skillset.txt entries already global"
+      },
+      "expected_output": "Processed skillset.txt as bare-name entries only, resolved solely against `atlasfoo/jaiba-framework#v2.1.0`; the stray owner/repo-shaped line does not match that grammar and was not treated as an installable entry -- it was skipped/ignored, not silently normalized into a name. Explicitly declined the developer's inline request to install `someoneelse/cool-skills-repo` (turbo-lint): stated that jaiba-configure installs only from `atlasfoo/jaiba-framework`, the canonical source, per skillset.txt, and that arbitrary owner/repo sources -- whether asked for directly or found as a stray line in the file -- are out of scope. At no point ran `npx skills add` against any source other than `atlasfoo/jaiba-framework#v2.1.0`. Case A applied for the six real entries (nothing installed, ref-currency checked as usual). Closing report does not list turbo-lint or someoneelse/cool-skills-repo among installed, skipped-as-current, or pending skills -- it is absent entirely, aside from the explicit decline noted to the developer.",
+      "files": []
     }
   ]
 }
