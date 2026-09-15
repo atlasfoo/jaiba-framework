@@ -1,0 +1,13 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version_provider = "commitizen"
+version = "2.1.0"
+version_scheme = "semver2"
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+version_files = [
+    "skills/*/SKILL.md:^version:",
+    "skills/jaiba-configure/assets/skillset.txt:^ref:",
+    "README.md:jaiba-framework#v",
+]
