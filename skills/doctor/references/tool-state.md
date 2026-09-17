@@ -35,8 +35,9 @@ re-runs it, widened to cover subagents and hooks.
      (MCP)** counter in the file header, distinct from `missing`/`total`.
    - A **`## Rejected entries`** section captures any `requires:` tokens,
      hook executables, or source labels (skill/subagent names) that fail
-     validation against the allow-list regex
-     `^(mcp:)?[A-Za-z0-9._+-]{1,64}$`. These are dropped before they
+     validation against the allow-list regex — `TOKEN_RE` in
+     `check-tools.sh` (currently `^(mcp:)?[A-Za-z0-9._+-]{1,64}$`; treat
+     the script as authoritative if this drifts). These are dropped before they
      reach `command -v` or any table above, never probed, and never
      rendered into the report — only their source (or a `<redacted>`
      placeholder when even the source label itself failed), reason
