@@ -45,10 +45,13 @@ atomically before moving on.
   skills/jaiba-configure/assets/jaiba-contract.md
   skills/doctor/assets/jaiba-contract.md` — the canonical contract copy
   and doctor's drift-check copy must stay byte-identical.
-- **Version lockstep:** every `^version:` in `skills/*/SKILL.md`, and
-  — once they exist — `skillset.txt`'s `ref:` and the pinned
-  `jaiba-framework#v` line in `README.md`, must equal `version` in
-  `.cz.toml` (see [ADR-011](../decisions/011-commitizen-single-version-source.md)).
+- **Version lockstep:** every `^version:` in `skills/*/SKILL.md` must
+  equal the bare `version` in `.cz.toml`; `skillset.txt`'s `ref:` and
+  the pinned `jaiba-framework#v` line in `README.md` carry the
+  tag-formatted value instead (`tag_format = "v$version"` in
+  `.cz.toml`, e.g. `v2.1.0`), so compare those two against `v` +
+  `.cz.toml`'s `version`, not against the bare field directly (see
+  [ADR-011](../decisions/011-commitizen-single-version-source.md)).
 - **Actions pinned by SHA:** every `uses:` in
   `.github/workflows/*.yml` must carry a 40-hex-char commit SHA, never
   a tag or branch — `grep -hE '^\s*uses:' .github/workflows/*.yml |

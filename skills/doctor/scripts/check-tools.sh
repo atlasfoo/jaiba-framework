@@ -143,20 +143,35 @@ label_placeholder() {  # label_placeholder <source-label>
 
 # Rejection tracker. Keyed by source + reason (unit-separator joined so
 # neither field can smuggle the delimiter), valued by an occurrence count.
+# Iterated via its own keys at render time (sorted) — no separate array
+# needed just to remember insertion order.
 declare -A REJECTED_COUNT
-declare -a REJECTED_KEYS=()
 REJECTED_TOTAL=0
 RJ_SEP=$'\x1f'
 
+# Sources (valid labels only) that had at least one `requires:` token
+# rejected. Keeps a source with an entirely-rejected requires: list from
+# vanishing from the health rollup below — it must show up as broken,
+# not silently disappear alongside sources that legitimately declared
+# nothing.
+declare -A REJECTED_SRC
+
 reject() {  # reject <source-label-or-placeholder> <reason>
   local key="$1$RJ_SEP$2"
-  if [ -z "${REJECTED_COUNT[$key]:-}" ]; then
-    REJECTED_COUNT[$key]=1
-    REJECTED_KEYS+=("$key")
-  else
-    REJECTED_COUNT[$key]=$(( REJECTED_COUNT[$key] + 1 ))
-  fi
+  REJECTED_COUNT[$key]=$(( ${REJECTED_COUNT[$key]:-0} + 1 ))
   REJECTED_TOTAL=$(( REJECTED_TOTAL + 1 ))
+}
+
+# Shared gate for the four call sites that must validate a source label
+# before using it: reject()s an invalid label under its redacted
+# placeholder and reports failure, so each caller can bail out its own
+# way (`return`/`continue`) with one line.
+validate_source_label() {  # validate_source_label <source-label>
+  if ! valid_label "$1"; then
+    reject "$(label_placeholder "$1")" "invalid source label"
+    return 1
+  fi
+  return 0
 }
 
 register_source() {  # register_source <source-label>
@@ -164,10 +179,7 @@ register_source() {  # register_source <source-label>
   # Defense in depth: the three scan loops already gate their labels, but
   # nothing may enter SOURCES (which feeds the rollup and Agent Layers
   # tables) without passing the same check.
-  if ! valid_label "$src"; then
-    reject "$(label_placeholder "$src")" "invalid source label"
-    return 1
-  fi
+  validate_source_label "$src" || return 1
   if [ -z "${SEEN_SOURCE[$src]:-}" ]; then
     SEEN_SOURCE[$src]=1
     SOURCES+=("$src")
@@ -180,16 +192,14 @@ note() {  # note <tool> <source-label>
 
   # Validate the source label first: a rejected token has to be filed
   # under a label that is itself safe to render.
-  if ! valid_label "$src"; then
-    reject "$(label_placeholder "$src")" "invalid source label"
-    return 0
-  fi
+  validate_source_label "$src" || return 0
 
   # Then the token. An empty token fails the pattern too (it requires
   # 1-64 characters), so a malformed `- ` list entry is reported rather
   # than silently dropped.
   if ! valid_token "$t"; then
     reject "$src" "invalid tool token"
+    REJECTED_SRC[$src]=1
     return 0
   fi
 
@@ -227,9 +237,27 @@ note() {  # note <tool> <source-label>
 }
 
 # Pull every item out of a markdown file's `requires:` YAML list.
-# Works for SKILL.md and for subagent definition files alike.
+# Works for SKILL.md and for subagent definition files alike. Handles both
+# block style (`requires:` then `- item` lines) and flow style
+# (`requires: [item, item]` on one line) — a flow-style list that only the
+# block-style branch recognized would silently skip the whole validation
+# pipeline below, since its tokens would never reach `note()`.
 requires_of() {
   awk '
+    /^requires:[[:space:]]*\[/ {
+      line = $0
+      sub(/^requires:[[:space:]]*\[/, "", line)
+      sub(/\][[:space:]]*$/, "", line)
+      n = split(line, items, ",")
+      for (i = 1; i <= n; i++) {
+        item = items[i]
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", item)
+        gsub(/^"|"$/, "", item)
+        gsub(/^'"'"'|'"'"'$/, "", item)
+        if (item != "") print item
+      }
+      next
+    }
     /^requires:[[:space:]]*$/ { inblk=1; next }
     inblk && /^[[:space:]]*-[[:space:]]+/ {
       sub(/^[[:space:]]*-[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; next
@@ -283,10 +311,7 @@ for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
     # every downstream map, so gate it before anything reads the file.
     # Skipping here keeps the label out of SKILL_FILE/SKILL_LABELS and
     # leaves the skill's requires: unread.
-    if ! valid_label "$label"; then
-      reject "$(label_placeholder "$label")" "invalid source label"
-      continue
-    fi
+    validate_source_label "$label" || continue
     register_source "$label"
     # First location wins when the same skill name exists in two dirs:
     # its requires merge into one source anyway, so one row is correct.
@@ -307,10 +332,7 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
       # Same gate as the skills loop. It has to precede the
       # SUBAGENT_LABELS append — that array feeds the Agent Layers table
       # directly, so an unvalidated label must not reach it either.
-      if ! valid_label "$label"; then
-        reject "$(label_placeholder "$label")" "invalid source label"
-        continue
-      fi
+      validate_source_label "$label" || continue
       if [ -z "${SEEN_SOURCE[$label]:-}" ]; then
         SUBAGENT_LABELS+=("$label")
       fi
@@ -398,7 +420,15 @@ readarray -t sorted_sources < <(printf '%s\n' "${SOURCES[@]}" | sort -u)
 for src in "${sorted_sources[@]}"; do
   [ -z "$src" ] && continue
   src_tools="${DECLARED_TOOLS[$src]:-}"
-  [ -z "$src_tools" ] && continue
+  had_rejection="${REJECTED_SRC[$src]:-}"
+  # A source with nothing declared and nothing rejected has no rollup
+  # row to show (Agent Layers already covers "none declared"). A source
+  # whose only requires: entries were rejected still needs a row — it
+  # must read as broken, not disappear alongside the legitimately-empty
+  # ones.
+  if [ -z "$src_tools" ] && [ -z "$had_rejection" ]; then
+    continue
+  fi
 
   src_missing=""
   src_mcp=""
@@ -429,12 +459,17 @@ for src in "${sorted_sources[@]}"; do
       formatted_tools+=", \`$t\`"
     fi
   done
+  if [ -z "$formatted_tools" ]; then
+    formatted_tools="— (all rejected)"
+  fi
 
   if [ -n "$src_missing" ]; then
     verdict="❌ broken — missing: $src_missing"
     if [ -n "$src_mcp" ]; then
       verdict+="; unverified: $src_mcp"
     fi
+  elif [ -n "$had_rejection" ]; then
+    verdict="❌ broken — requires: entries rejected by validation (see Rejected entries)"
   elif [ -n "$src_mcp" ]; then
     verdict="❔ unverified — MCP: $src_mcp (verify via doctor diagnostic 3)"
   else
@@ -493,13 +528,13 @@ fi
 # this rejects. ADR-006 still applies: dropped is not the same as silent,
 # so the section is emitted either way.
 rejected_rows=""
-if [ "${#REJECTED_KEYS[@]}" -gt 0 ]; then
+if [ -n "${REJECTED_COUNT[*]+set}" ] && [ "${#REJECTED_COUNT[@]}" -gt 0 ]; then
   while IFS= read -r key; do
     [ -z "$key" ] && continue
     rj_src="${key%%"$RJ_SEP"*}"
     rj_reason="${key#*"$RJ_SEP"}"
     rejected_rows+="| \`$rj_src\` | $rj_reason | ${REJECTED_COUNT[$key]} |"$'\n'
-  done < <(printf '%s\n' "${REJECTED_KEYS[@]}" | sort)
+  done < <(printf '%s\n' "${!REJECTED_COUNT[@]}" | sort)
 fi
 
 mkdir -p "$ROOT/.atl"

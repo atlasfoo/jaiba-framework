@@ -11,7 +11,14 @@ concurrency: release
 
 jobs:
   bump:
-    if: ${{ !startsWith(github.event.head_commit.message, 'bump:') }}
+    # Guards against re-triggering this workflow on the bump commit it
+    # just pushed. Checked against the commit author's resolved GitHub
+    # account rather than the commit message: the message format comes
+    # from commitizen's default template (unpinned in .cz.toml) and can
+    # change, while every commit this job makes is authored as a GitHub
+    # App bot (see "Configure bot git identity" below), whose account
+    # name always ends in "[bot]".
+    if: ${{ !endsWith(github.event.head_commit.author.username, '[bot]') }}
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
@@ -31,6 +38,12 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
+
+      - name: Cache pip
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pip
+          key: pip-commitizen-4.18.1-${{ runner.os }}
 
       - name: Install commitizen
         run: pip install commitizen==4.18.1
