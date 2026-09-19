@@ -2,7 +2,7 @@
 name: conduct
 description: >-
   Unified Spec-Driven-Development chain of the JAIBA framework — the single entry point that routes any development request to the right depth and phase. SDD chain: propose (shape a fuzzy requirement) → spec (PRD only when triage demands it + design/plan.md, human approval gate) → tasks (T-NNN task graph) → execute (implicit, phase by phase) → validate (quality gate + acceptance criteria) → summarize (archive to `.ai/memory/log/`, clean `.ai/work/`). Trigger implicitly when the developer describes work to plan or build, formalizes a requirement ("let's plan", "let's spec this", "write a PRD", "we need a feature that…"), or sends a continuation cue ("continue", "next", "go") while `.ai/work/plan.md` exists. Trigger explicitly on "/conduct [phase]" as deterministic override when routing fails or to force a phase (e.g. "/conduct summarize"). NOT the host agent's native plan mode — it writes artifacts under `.ai/work/` and needs file-write access; never run it inside a read-only plan mode.
-version: 2.1.0
+version: 3.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

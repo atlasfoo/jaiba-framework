@@ -2,7 +2,7 @@
 name: fast
 description: >-
   Implicit direct-execution lane of the JAIBA framework for small, well-scoped, low-risk changes that don't justify entering the conduct chain. Not user-invocable — the routing rule triggers it whenever the developer asks for a quick, concrete change made now rather than planned. Trigger on phrases like "quick change", "make a quick adjustment", "update package X", "bump the version of Y", "small fix", "rename this", "quick fix", "just bump", "small change", "tweak this". Also trigger when the developer requests a change NOT contemplated by an active plan (e.g. "add a validation to the endpoint that was not in the plan"). Runs the shared triage (`conduct/references/triage.md`) with default and floor `inline`: atomic, low-blast-radius edits execute on the spot; anything that triages `design` or deeper is surfaced and routed into the `conduct` chain — with an active plan, offering to fold the work in as a new phase or park-and-replan, never silently building a second plan.
-version: 2.1.0
+version: 3.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 user-invocable: false
 requires:

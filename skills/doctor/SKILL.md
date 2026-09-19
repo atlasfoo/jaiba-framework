@@ -1,7 +1,7 @@
 ---
 name: jaiba-doctor
 description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence (incl. global behavioral-contract presence/drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
-version: 2.1.0
+version: 3.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

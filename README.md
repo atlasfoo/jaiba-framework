@@ -61,7 +61,7 @@ Adoption happens in **two independent runs**, because setup itself is split in t
 Install the machine-setup skill, then run it:
 
 ```bash
-npx skills add atlasfoo/jaiba-framework#v2.1.0 --skill jaiba-configure -g
+npx skills add atlasfoo/jaiba-framework#v3.0.0 --skill jaiba-configure -g
 ```
 
 The `#v2.1.0` suffix pins the install to that git tag — the tag *is* the framework's version, and `jaiba-configure`/commitizen keep it in lockstep on every release.
@@ -82,7 +82,7 @@ It is **safe to re-run**: that is how a machine gets refreshed after a framework
 Prefer to install the skillset yourself? This still works, and `jaiba-configure` will simply report everything as already current:
 
 ```bash
-npx skills add -y atlasfoo/jaiba-framework#v2.1.0 -g
+npx skills add -y atlasfoo/jaiba-framework#v3.0.0 -g
 ```
 
 **Benefits of the global skillset:**
@@ -124,7 +124,7 @@ Skills are installed globally using `npx skills add` and are available across al
 
 | Aspect | Global |
 |--------|--------|
-| **Command** | `npx skills add -y atlasfoo/jaiba-framework#v2.1.0 --skill <skill-name>` |
+| **Command** | `npx skills add -y atlasfoo/jaiba-framework#v3.0.0 --skill <skill-name>` |
 | **Location** | `~/.agents/skills/` (user home directory) |
 | **Availability** | All projects automatically have access |
 | **Setup per project** | Only instrument the repo with `/jaiba-init` |

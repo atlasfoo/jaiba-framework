@@ -1,7 +1,7 @@
 ---
 name: jaiba-configure
 description: Machine-level setup of JAIBA for the host agent. Installs or refreshes the global behavioral contract in the host's user-level config, installs the workflow/meta skillset (global, or project-local if the developer pins versions), and installs the subagent battery into the global agents folder. Not repo-scoped — instrumenting a specific project is jaiba-init's job. Safe to re-run to refresh a machine.
-version: 2.1.0
+version: 3.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

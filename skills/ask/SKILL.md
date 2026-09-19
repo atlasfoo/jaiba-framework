@@ -2,7 +2,7 @@
 name: ask
 description: >-
   Implicit read-only Q&A lane of the JAIBA framework. Not user-invocable — the routing rule triggers it whenever the developer asks a question instead of requesting a change: about the codebase, the active work in `.ai/work/` (plan.md, tasks.md, walkthrough.md, PRD.md), or recorded decisions in `.ai/memory/`. Trigger on interrogative or exploratory messages like "why does the plan do X before Y?", "what tasks are left?", "what does the PRD cover?", "is this already in the plan?", "what does this endpoint do?", "explain this module", "why did we decide to use Z?", "walk me through this". Strictly read-only: it reads, searches, and explains, but never edits code, writes artifacts, or runs the Quality Gate to change state. It yields to the action lanes per the routing rule: a continuation cue ("continue", "next", "go") belongs to conduct's execute phase, new work to spec or plan enters the conduct chain, and a small contained change routes to fast.
-version: 2.1.0
+version: 3.0.0
 author: atlasfoo<iscomejia15@outlook.com>
 user-invocable: false
 requires:
