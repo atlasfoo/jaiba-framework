@@ -1,7 +1,7 @@
 ---
 name: create-knowledge
 description: Meta-skill converting existing skills into JAIBA knowledge plugins that hook into the conduct workflow chain. Use for domain-knowledge skills (best practices, integrations, testing rules) to participate actively in spec/plan creation. Rewrites target skill's SKILL.md and tags only, never modifies workflows or knowledge itself.
-version: 3.0.0
+version: 3.0.1
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

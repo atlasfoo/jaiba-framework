@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.0.1 (2026-09-19)
+
+### Fix
+
+- **release**: create annotated tags so bump.yml can push them
+
 ## v3.0.0 (2026-09-19)
 
 ### BREAKING CHANGE

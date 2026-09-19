@@ -11,7 +11,7 @@
 # Framework version pinning (maintained by commitizen; do not edit by hand).
 # The jaiba-configure skill reads this ref value to pin GitHub sources:
 #   atlasfoo/jaiba-framework#<ref>
-ref: v3.0.0
+ref: v3.0.1
 
 # ── JAIBA skills ──────────────────────────────────────────────────────
 conduct
