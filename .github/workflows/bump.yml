@@ -19,7 +19,7 @@ jobs:
     # App bot (see "Configure bot git identity" below), whose account
     # name always ends in "[bot]".
     if: ${{ !endsWith(github.event.head_commit.author.username, '[bot]') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Generate GitHub App token
         id: app-token
@@ -34,19 +34,13 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-
-      - name: Cache pip
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/pip
-          key: pip-commitizen-4.18.1-${{ runner.os }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
 
       - name: Install commitizen
-        run: pip install commitizen==4.18.1
+        run: |
+          uv tool install commitizen==4.18.1
+          echo "$(uv tool dir --bin)" >> "$GITHUB_PATH"
 
       - name: Get GitHub App user ID
         id: get-user-id
