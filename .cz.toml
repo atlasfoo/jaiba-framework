@@ -4,6 +4,7 @@ version_provider = "commitizen"
 version = "3.0.0"
 version_scheme = "semver2"
 tag_format = "v$version"
+annotated_tag = true
 update_changelog_on_bump = true
 changelog_file = "CHANGELOG.md"
 version_files = [
