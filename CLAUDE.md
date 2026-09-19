@@ -1,1 +1,1 @@
-Follow general context at AGENTS.md
+AGENTS.md
