@@ -89,6 +89,7 @@ declare -A SEEN_SOURCE
 declare -a SKILL_LABELS=()
 declare -a SUBAGENT_LABELS=()
 declare -A SKILL_FILE
+declare -A SUBAGENT_FILE
 
 # Hooks unverified flag: set to 1 if jq is missing and hooks can't be scanned
 HOOKS_UNVERIFIED=0  # consumed by report rendering
@@ -302,6 +303,17 @@ format_requires() {  # format_requires <source-label>
   if [ -z "$out" ]; then printf 'none declared\n'; else printf '%s\n' "$out"; fi
 }
 
+format_path() {  # format_path <absolute-path>
+  local p="$1"
+  if [[ "$p" == "$ROOT"* ]]; then
+    printf './%s' "${p#"$ROOT"/}"
+  elif [[ "$p" == "$HOME"* ]]; then
+    printf '~%s' "${p#"$HOME"}"
+  else
+    printf '%s' "$p"
+  fi
+}
+
 # 1. Skills: <skills-dir>/**/SKILL.md  ->  labelled by skill folder name.
 for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
   [ -d "$SKILLS_DIR" ] || continue
@@ -335,6 +347,7 @@ for AGENT_DIR in "${AGENT_DIRS[@]}"; do
       validate_source_label "$label" || continue
       if [ -z "${SEEN_SOURCE[$label]:-}" ]; then
         SUBAGENT_LABELS+=("$label")
+        SUBAGENT_FILE[$label]="$f"
       fi
       register_source "$label"
       while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
@@ -498,12 +511,66 @@ if [ "${#SKILL_LABELS[@]}" -gt 0 ]; then
   done < <(printf '%s\n' "${SKILL_LABELS[@]}" | sort -u)
 fi
 
+# Check if JAIBA framework is in play
+HAS_FRAMEWORK=0
+for s in "${SKILL_LABELS[@]}"; do
+  if [ "$(origin_of "${SKILL_FILE[$s]}")" = "framework" ]; then
+    HAS_FRAMEWORK=1
+    break
+  fi
+done
+
+BATTERY=("executor-high" "executor-medium" "executor-low" "code-analyst" "business-analyst" "verify")
+declare -A BATTERY_MAP
+for b in "${BATTERY[@]}"; do BATTERY_MAP["subagent:$b"]=1; done
+
+declare -A BATTERY_REQ
+BATTERY_REQ["subagent:executor-high"]="git"
+BATTERY_REQ["subagent:executor-medium"]="git"
+BATTERY_REQ["subagent:executor-low"]="git"
+BATTERY_REQ["subagent:code-analyst"]="rg"
+BATTERY_REQ["subagent:business-analyst"]="rg"
+BATTERY_REQ["subagent:verify"]="git"
+
 subagent_rows=""
-if [ "${#SUBAGENT_LABELS[@]}" -gt 0 ]; then
+subagents_available=0
+subagents_missing=0
+subagent_notes=""
+
+declare -a ALL_SUBAGENT_LABELS=()
+for label in "${SUBAGENT_LABELS[@]}"; do
+  ALL_SUBAGENT_LABELS+=("$label")
+done
+
+if [ "$HAS_FRAMEWORK" -eq 1 ]; then
+  for b in "${BATTERY[@]}"; do
+    bl="subagent:$b"
+    if [ -z "${SEEN_SOURCE[$bl]:-}" ]; then
+      ALL_SUBAGENT_LABELS+=("$bl")
+    fi
+  done
+fi
+
+if [ "${#ALL_SUBAGENT_LABELS[@]}" -gt 0 ]; then
   while IFS= read -r label; do
     [ -z "$label" ] && continue
-    subagent_rows+="| \`${label#subagent:}\` | $(format_requires "$label") |"$'\n'
-  done < <(printf '%s\n' "${SUBAGENT_LABELS[@]}" | sort -u)
+    name="${label#subagent:}"
+    if [ -n "${SUBAGENT_FILE[$label]:-}" ]; then
+      subagents_available=$((subagents_available + 1))
+      subagent_rows+="| \`$name\` | ✅ available | \`$(format_path "${SUBAGENT_FILE[$label]}")\` | $(format_requires "$label") |"$'\n'
+    elif [ -n "${BATTERY_MAP[$label]:-}" ]; then
+      subagents_missing=$((subagents_missing + 1))
+      subagent_rows+="| \`$name\` | ❌ missing definition | — | \`${BATTERY_REQ[$label]:-git}\` (install via jaiba-configure) |"$'\n'
+    fi
+  done < <(printf '%s\n' "${ALL_SUBAGENT_LABELS[@]}" | sort -u)
+fi
+
+if [ "$HAS_FRAMEWORK" -eq 1 ]; then
+  if [ "$subagents_missing" -gt 0 ]; then
+    subagent_notes="> ⚠️ $subagents_missing core JAIBA battery definition(s) missing. Workflows delegating to them will fall back to sequential inline execution until installed via \`jaiba-configure\`."
+  else
+    subagent_notes="> ✅ All 6 core JAIBA battery subagent definitions detected and available for workflow delegation."
+  fi
 fi
 
 # Hook needs are only knowable when jq was available to parse settings*.json.
@@ -549,6 +616,7 @@ mkdir -p "$ROOT/.atl"
   echo "- **Shell host:** $SHELL_FLAVOR"
   echo "- **Skills scanned:** $(printf '`%s` ' "${SKILLS_DIRS[@]}")"
   echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
+  echo "- **Subagents:** $subagents_available available$([ "$subagents_missing" -gt 0 ] && echo ", $subagents_missing missing")"
   echo "- **Missing:** $missing of $total"
   echo "- **Unverified (MCP):** $unverified"
   echo "- **Rejected (failed validation):** $REJECTED_TOTAL"
@@ -599,11 +667,19 @@ mkdir -p "$ROOT/.atl"
   echo "### Subagents"
   echo
   if [ -n "$subagent_rows" ]; then
-    echo "| Subagent | Requires |"
-    echo "|---|---|"
+    echo "| Subagent | Availability | Definition Path | Requires |"
+    echo "|---|---|---|---|"
     printf '%s' "$subagent_rows"
+    if [ -n "$subagent_notes" ]; then
+      echo
+      echo "$subagent_notes"
+    fi
   else
     echo "_No subagents found under the scanned agent folder(s)._"
+    if [ -n "$subagent_notes" ]; then
+      echo
+      echo "$subagent_notes"
+    fi
   fi
   echo
   echo "### Hooks"
