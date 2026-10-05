@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.0.2 (2026-10-05)
+
+### Fix
+
+- **contract**: clarify authorized first-party JAIBA agent execution in §4.5
+
 ## v3.0.1 (2026-09-19)
 
 ### Fix
