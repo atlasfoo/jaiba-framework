@@ -54,25 +54,26 @@ re-runs it, widened to cover subagents and hooks.
    - The file also gets a full **`## Agent Layers`** section: every skill
      the probe scanned (name, origin — `framework` if its SKILL.md
      `tags:` carries `jaiba`, `external` otherwise — and its `requires:`
-     list or "none declared"), every subagent likewise, and a one-line
-     summary of what the hooks scan found. This is a straight inventory:
-     a skill or subagent shows up here even if it declares no tools at
-     all, so nothing scanned is invisible.
+     list or "none declared"), every subagent likewise with its **availability
+     status** (`✅ available` or `❌ missing definition`), definition path,
+     and required tools, plus a one-line summary of what the hooks scan
+     found. This is a straight inventory: a skill or subagent shows up here
+     even if it declares no tools at all, so nothing scanned is invisible.
 
    What it scans, across **each** skills directory given and its parent
    agent folder:
    - **Skills** — every `<skills-dir>/**/SKILL.md` `requires:` block.
-   - **Subagents** — every `<agent-folder>/agents/*.md` that carries a
-     `requires:` block. This includes the JAIBA battery
-     `jaiba-configure` installs into the **global** agents folder
-     (`executor-high/
-     medium/low`, `code-analyst`, `business-analyst`, `verify`) — the
-     global skills dir passed to the probe makes its parent's `agents/`
-     get scanned, so the battery's declared tools gain provenance rows
-     (`subagent:executor-high`, …) automatically. If the battery is
-     absent from a machine that has conduct installed, note it:
-     `execute` will fall back to sequential mode until `jaiba-configure`
-     reinstalls the definitions.
+   - **Subagents** — every `<agent-folder>/agents/*.md` definition file.
+     This includes the JAIBA battery `jaiba-configure` installs into the
+     **global** agents folder (`executor-high/medium/low`, `code-analyst`,
+     `business-analyst`, `verify`) — the global skills dir passed to the probe
+     makes its parent's `agents/` get scanned, so the battery's declared tools
+     gain provenance rows (`subagent:executor-high`, …) automatically, and
+     their definition paths and availability are recorded in `tool-layout.md`.
+     If the battery is absent or incomplete on a machine where framework skills
+     are detected, the missing definitions are flagged as `❌ missing definition`
+     and doctor notes that `execute` will fall back to sequential mode until
+     `jaiba-configure` installs them.
    - **Hooks** — the leading executable of each hook `command` in
      `<agent-folder>/settings.json` / `settings.local.json` (best-effort,
      `jq`-gated; hooks can run arbitrary shell, so only the invoked
