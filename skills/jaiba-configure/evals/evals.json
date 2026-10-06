@@ -164,6 +164,74 @@
       },
       "expected_output": "Over the full run -- host identification, contract check, skillset check, subagent battery check, model-selection step, closing report -- the only paths opened for read or write are exactly the ones '## What this skill touches' declares: its own packaged assets/jaiba-contract.md, assets/skillset.txt, assets/agents/*.md; `npx skills list -g` output; an installed skill's SKILL.md version: field; .skill-lock.json if present; ~/.claude/jaiba-contract.md and ~/.claude/agents/*.md (found current, so read for comparison only, never rewritten); and ~/.claude/CLAUDE.md (read once to confirm the contract reference is already present -- no ask, no write follows, since it's already there). settings.json is never opened, for read or write, at any point in the run -- it plays no part in the contract check, the skills check, or the subagent battery check. The session/chat-history file is never opened -- jaiba-configure has no reason to read conversation history and does not. The credentials file is never opened. Nothing in ~/.claude/ beyond the enumerated paths is touched even once, despite the skill's filesystem access covering the entire folder. Closing report reflects a fully current machine (Case A for skills, contract already current, battery already current) without any mention of settings.json, the history file, or the credentials file -- because they were never part of the run's surface to begin with.",
       "files": []
+    },
+    {
+      "id": 16,
+      "name": "opencode-installs-native-subagent-battery",
+      "prompt": "Configure JAIBA for OpenCode.",
+      "context": {
+        "host": "OpenCode",
+        "global_config_root": "~/.config/opencode/",
+        "global_config_state": "no JAIBA contract or subagent definitions installed"
+      },
+      "expected_output": "Identifies OpenCode by host introspection and corroborates ~/.config/opencode/ as the global config root. Installs all six agent definitions from assets/agents/opencode/ into ~/.config/opencode/agents/. Each definition uses mode: subagent and an OpenCode permission mapping, with read-only specialists denied edit access and executors allowed to edit. Does not install the shared assets/agents/*.md definitions for OpenCode. Continues the normal contract and skillset setup and does not write into a project repository.",
+      "files": []
+    },
+    {
+      "id": 17,
+      "name": "non-opencode-keeps-shared-subagent-battery",
+      "prompt": "Configure JAIBA for Claude Code.",
+      "context": {
+        "host": "Claude Code",
+        "global_config_root": "~/.claude/",
+        "global_config_state": "no JAIBA subagent definitions installed"
+      },
+      "expected_output": "Selects the existing shared assets/agents/*.md battery for Claude Code, installs its six definitions into ~/.claude/agents/, and does not install files from assets/agents/opencode/. Preserves the existing tool list and model-selection behavior for Claude Code.",
+      "files": []
+    },
+    {
+      "id": 18,
+      "name": "update-contract-only",
+      "prompt": "Run jaiba-configure:update and refresh only the contract.",
+      "context": {
+        "host": "Claude Code",
+        "global_config_state": "installed jaiba-contract.md differs from packaged source; subagents and skills are present"
+      },
+      "expected_output": "Enters update mode, selects only the contract target, shows the contract drift and asks before replacing it. After approval, creates the established dated backup and installs the packaged contract. Does not inspect or change skills, agent files, or the global instructions file.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "name": "update-battery-protects-customized-agent",
+      "prompt": "Run jaiba-configure:update and refresh the subagent battery.",
+      "context": {
+        "host": "OpenCode",
+        "global_config_state": "five OpenCode JAIBA agents are identical to packaged definitions; code-analyst.md has a hand edit"
+      },
+      "expected_output": "Selects the OpenCode-specific packaged battery and compares only the six JAIBA agent filenames. Reports the five current agents without rewriting them. Shows the code-analyst.md difference and asks before replacing it; if the developer declines, leaves it untouched. Does not update the contract, skills, unrelated agents, or global instructions file.",
+      "files": []
+    },
+    {
+      "id": 20,
+      "name": "migrate-exact-model-id-across-jaiba-agents",
+      "prompt": "In jaiba-configure:update, replace model provider/luna with provider/luna-6.1.",
+      "context": {
+        "host": "OpenCode",
+        "installed_agents": "JAIBA code-analyst.md and verify.md use model: provider/luna; JAIBA executor-low.md uses model: provider/luna-legacy; unrelated personal-review.md uses model: provider/luna"
+      },
+      "expected_output": "Inspects only the six known JAIBA agent filenames, reports code-analyst and verify as matches, and replaces their exact provider/luna model values with provider/luna-6.1. Leaves executor-low.md, personal-review.md, and all unrelated fields unchanged. Does not refresh the packaged battery, contract, or skills.",
+      "files": []
+    },
+    {
+      "id": 21,
+      "name": "model-migration-with-no-matches-is-a-no-op",
+      "prompt": "In jaiba-configure:update, replace model provider/old with provider/new.",
+      "context": {
+        "host": "Claude Code",
+        "installed_agents": "none of the six JAIBA agent files contains model: provider/old"
+      },
+      "expected_output": "Reports that no installed JAIBA subagent has the exact source model ID. Makes no changes and does not scan or alter unrelated agent files, the contract, or skills.",
+      "files": []
     }
   ]
 }
