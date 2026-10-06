@@ -1,7 +1,7 @@
 ---
 name: jaiba-configure
 description: Machine-level setup and targeted updates for JAIBA on the host agent. Installs or refreshes the global behavioral contract, workflow/meta skillset, and host-native subagent battery; update mode refreshes the contract or battery and migrates exact subagent model IDs. Not repo-scoped — instrumenting a specific project is jaiba-init's job.
-version: 3.0.2
+version: 3.1.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

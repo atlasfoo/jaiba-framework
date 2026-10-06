@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.1.0 (2026-10-06)
+
+### Feat
+
+- **configure**: add OpenCode agents and targeted updates (#14)
+
 ## v3.0.2 (2026-10-05)
 
 ### Fix
