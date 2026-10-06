@@ -49,11 +49,12 @@ Run in order; stop and ask on any failure.
 One plan-phase per invocation. Do not start the next phase in the
 same turn unless the developer explicitly asks.
 
-Two execution paths, same rules and same outputs. If the host agent
-supports subagents and the JAIBA executor battery is installed, prefer
-**delegated execution in waves** (next section). Otherwise — or when
-the pre-invocation check says otherwise — run this **sequential path**
-yourself:
+**Dispatch every task to its load-matched executor** when the current
+host permits it, that role is callable, and prerequisites are verified
+(`references/subagents.md`). Use delegated waves below even for a single
+runnable task. File overlap means sequential executor calls. Use this
+**inline sequential path only for affected tasks with a named actual
+blocker**, recorded in the walkthrough; keep delegating unaffected tasks:
 
 1. **Pick the next runnable task** — unchecked, with every
    `depends-on` ID checked. Implement it atomically. If it can't be
@@ -87,10 +88,12 @@ this section is the wave mechanics.
 
 **Preflight for delegation** (on top of the phase preflight): run the
 pre-invocation check from `subagents.md § Pre-invocation toolchain
-check` — battery installed, every needed executor's `requires:` tools
-present per `.atl/tool-layout.md`. Any gap ⇒ surface it now and fall
-back to the sequential path (or a partial one: an available tier can
-still take its tasks). Never discover a gap mid-wave.
+check` — host permission, exposed/callable roles, and verified tools.
+Detected definition files alone do not prove runtime support. Surface
+any gap with its role/task and record the reason for affected inline work;
+continue dispatching available tiers. An actual dispatch error requires
+review of child state and possible partial writes before safe retry or
+fallback (`subagents.md § Dispatch and fallback accounting`).
 
 1. **Build the wave.** From the active phase's unchecked tasks, take
    every task whose `depends-on` IDs are all checked. That set is the
@@ -99,11 +102,14 @@ still take its tasks). Never discover a gap mid-wave.
    its statement and the plan. Tasks whose footprints might overlap
    don't share a wave — keep the first, defer the rest. When in doubt,
    serialize (`subagents.md § Concurrency policy`).
-3. **Fan out, capped at 3 in flight.** Dispatch each task to the
-   executor tier its `load` names (`subagents.md § load → executor
-   tier`), each with the three-part envelope: the task verbatim,
-   minimal context, the Phase gate commands. A wave wider than the cap
-   runs in batches.
+3. **Fan out, capped at min(3, available host child slots).** Dispatch
+   each task to the executor tier its `load` names (`subagents.md § load
+   → executor tier`), with the task verbatim, minimal context, and Phase
+   gate commands. Name its owned files and other workers' ownership;
+   require accommodation of concurrent edits without reverting them.
+   Launch each independent batch before awaiting any result. Larger
+   waves run in batches; overlap and a one-slot host serialize through
+   executors. Dispatch a one-task wave too.
 4. **Reintegrate every result before the next wave.** Per returned
    report: review it against `git diff`; write the task's walkthrough
    entry yourself from the report (task ID, what changed, decisions —
@@ -117,10 +123,11 @@ still take its tasks). Never discover a gap mid-wave.
    runs don't substitute for the phase-close gate), append the
    phase-checkpoint block, suggest the commit, pause.
 
-**Fallback is sequential, not optional.** No subagent support, no
-battery, or a declined tool install ⇒ the sequential path above, in
-dependency order. Same rules, same walkthrough, same gate — delegation
-changes throughput, never the contract.
+**Fallback requires evidence.** Inline sequential execution is limited
+per role/task to the concrete blockers in `subagents.md § Dispatch and
+fallback accounting`. Record dispatched role or fallback reason beside
+each task's result. Convenience, task size, and overlapping files never
+justify bypassing an available executor. Same walkthrough and gate apply.
 
 ## Mid-phase deviations
 
@@ -142,16 +149,20 @@ ask.
 Phase 1 (Domain model), TDD enabled, tasks T-001…T-005 as in the
 tasks template's example. Developer: *"continue"*.
 
-1. Preflight: git clean, no prior phases, Phase 1 active.
-2. T-001 (failing test) → confirm it fails for the right reason →
-   walkthrough entry: `T-001 — collaborator model test red, as
-   expected`.
-3. T-002 (model) → test green → entry logged. T-003 (migration) →
-   entry. T-004, T-005 → entries (T-005 notes the decision to map
-   guardian perms per role via choices, matching the plan).
-4. Phase gate green. Checkboxes flipped as each task landed.
-5. Phase-checkpoint block appended; suggest `chore(wip): itinerary
-   collaborator domain model`; pause.
+1. Preflight: git clean, no prior phases, Phase 1 active; the runtime
+   executors are callable and their prerequisites are green.
+2. Dispatch T-001 and T-004 concurrently to their matching load
+   executors: they are independent tests with disjoint files. Review
+   both returned results, log each task in the walkthrough, and flip
+   each checkbox only when complete.
+3. Dispatch T-002 to its matching load executor once T-001 is checked.
+   After reviewing it, T-003 and T-005 are runnable (T-004 is already
+   checked): dispatch them concurrently if their file footprints are
+   disjoint, otherwise serialize them through their matching load
+   executors. Review and log each result, then update its checkbox.
+4. Run the Phase gate after the work is integrated and all results are
+   reviewed. Append the phase-checkpoint block; suggest
+   `chore(wip): itinerary collaborator domain model`; pause.
 
 ## Common failure modes
 

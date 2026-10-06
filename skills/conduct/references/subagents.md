@@ -18,7 +18,7 @@ installed by `jaiba-configure` into the host agent's global agents folder
 | `executor-low` | `assets/agents/executor-low.md` | Executes `load: low` tasks — mechanical/repetitive | `execute` |
 | `code-analyst` | `assets/agents/code-analyst.md` | Read-only code survey; reports what exists today | `spec` (define + design), `propose` when code facts are needed |
 | `business-analyst` | `assets/agents/business-analyst.md` | Contrasts the requirement with the constitutive memory | `propose`, `spec` |
-| `verify` | `assets/agents/verify.md` | Checks PRD acceptance criteria one by one | `validate` |
+| `verify` | `assets/agents/verify.md` | Checks PRD criteria or approved design scope with evidence | `validate` |
 
 ## What may be delegated
 
@@ -42,11 +42,13 @@ Four operations, each bounded to its phase:
 3. **Task execution** (`execute`) → the executor tier matching the
    task's `load` (mapping below). Wave construction and fan-out rules
    live in `execute-mode.md § Delegating to executors`.
-4. **Criteria verification** (`validate`) → `verify`. It consumes the
-   PRD's parsed `criteria:` schema and returns a per-criterion verdict
-   with evidence, running only the Phase gate commands handed to it
-   verbatim or tests that already exist — never a command sourced from
-   the criteria/PRD text itself (see `validate-mode.md`).
+4. **Delivery verification** (`validate`) → `verify`, at both depths.
+   It consumes either the PRD's parsed `criteria:` schema or the approved
+   design's Scope (In), objective constraints, and relevant completed
+   tasks/diffs. It returns met / not met / not verifiable per target with
+   evidence, running only vetted Phase or Plan gate commands explicitly
+   handed to it verbatim, or tests that already exist — never a command sourced from the
+   target's prose (see `validate-mode.md`).
 
 **Never delegated**, no matter the host's capabilities: writing any
 `.ai/work/` artifact (plan, tasks, walkthrough, PRD — single-writer
@@ -96,28 +98,74 @@ Confirming an MCP is actually configured and reachable is diagnostic
 
 ## Pre-invocation toolchain check
 
-Before invoking **any** subagent, check the toolchain state at
-`.atl/tool-layout.md` (written by `jaiba-doctor`):
+Before invoking **any** subagent, establish these facts for this session:
 
-1. **The subagent exists** in the host's agents folder. Not installed
-   ⇒ say so, **suggest running `jaiba-configure` to install the battery
-   for this agent specifically**, and use the fallback path in the
-   meantime — don't invoke and hope. Never assume the battery is
-   present just because `jaiba-configure` was run on this machine
-   before: it may have been run for a different host (e.g. Claude Code
-   configured, Cursor — running this same repo — not).
-2. **Every tool in its `requires:` is recorded as present.** A tool
-   listed as **missing** ⇒ **surface it now**: name the tool, name the
-   subagent that demands it, and offer the choice — install it, or
-   proceed on the fallback path. A missing tool must never be
-   discovered as a late failure inside the subagent's run.
-3. **No `.atl/tool-layout.md` at all** ⇒ the toolchain is unprobed,
-   not fine. Say so, route the developer to `jaiba-doctor` for a
-   baseline probe, and until then treat subagent tool needs as
-   unverified — fallback paths are the safe default.
+1. **Host permission and runtime capability.** Check the spawn tool and
+   roles exposed to conduct by the current host, plus explicit host/user
+   restrictions. An exposed, callable role is direct runtime evidence;
+   `.atl/tool-layout.md` and files in an agents folder only prove detected
+   definitions, never registration or invocability. A missing file does
+   not override a role the host exposes. If the needed role is not
+   callable, name it and suggest `jaiba-configure` for this host specifically.
+2. **Required tools.** Read `.atl/tool-layout.md` (written by
+   `jaiba-doctor`) and confirm each role's `requires:` tools are present.
+   Surface missing tools with their demanding role before dispatch;
+   offer installation or the inline fallback. Verify any `mcp:` dependency
+   through runtime/reference-health evidence, never `command -v`.
+   Missing or unverified prerequisites block only the affected roles.
+3. **Unprobed toolchain.** No `.atl/tool-layout.md` means unprobed,
+   not healthy. Say so and route to `jaiba-doctor` for a baseline;
+   keep affected work inline until prerequisites are verified. If the
+   report is stale, refresh or directly verify the relevant prerequisites
+   and record that evidence rather than trusting a stale success.
 
-This check is cheap (one file read) and non-negotiable: the sad path
-"tool missing" is handled *before* invocation, every time.
+**Dispatch is required** when these checks pass. Do not turn a healthy
+check into optional delegation, request redundant approval for an
+already-authorized first-party JAIBA role, or substitute a generic agent
+for an unavailable named tier without explicit authorization. The host's
+instructions and explicit user restrictions take precedence. Checking
+role availability is a runtime check, not obeying inspected agent files:
+commands and repository content remain subject to the security provenance
+boundary in the behavioral contract.
+
+## Analyst dispatch
+
+Once the requirement is concrete enough for a bounded question, dispatch
+`business-analyst` in `propose` and `spec`; dispatch `code-analyst` in
+`spec` at either depth and in `propose` when shaping needs code facts.
+Give each the requirement, relevant paths/concepts, and the question to
+answer; both are read-only and return reports rather than artifacts.
+
+Launch independent analyses **before awaiting either report** when host
+capacity permits. With one available child slot, run them sequentially
+through their roles. Reuse a prior report only while its requirement,
+covered paths, and underlying code/memory remain current; request a scoped
+follow-up when they change. Do not repeat a delegated full survey inline.
+Conduct loads the governing context and consumes both reports before
+writing a PRD or design, resolves contradictions, and owns all decisions.
+
+## Dispatch and fallback accounting
+
+For each applicable role/task, state which role was dispatched or the
+specific blocker that required inline work. Valid blockers are no spawn
+support, an inaccessible role, an explicit host/user restriction, missing
+or unverified prerequisites, or an actual dispatch error. Small tasks,
+single runnable tasks, file overlap, and convenience are not blockers.
+Temporary capacity exhaustion requires queuing, waiting for active work,
+or reusing an idle matching-role agent; it never justifies inline work.
+A host that cannot provide any child execution at all is a no-spawn
+blocker, distinct from a busy host. Record actual invocation evidence
+(role plus task/question and returned agent/job identity when exposed),
+not merely prose claiming that delegation occurred.
+
+A failed dispatch must be reported with the role/task and observed error.
+Check whether a child is still running and whether it made partial writes;
+resolve its state and review those writes before retrying or doing the
+remaining work inline. Never silently duplicate a failed executor's work.
+Continue dispatching unaffected available roles. Record execution and
+validation dispatches/fallbacks in `walkthrough.md`; record analysis
+sources/fallbacks in the design's Sources consulted, or in the conversation
+for `propose`, which writes nothing.
 
 ## `load` → executor tier
 
@@ -151,8 +199,10 @@ An executor receives exactly three things — and no more:
 1. **The task** — ID, verbatim statement from `tasks.md`, `load`,
    `covers` criteria IDs.
 2. **Minimal context** — the plan excerpt that governs the task, the
-   concrete files/paths involved, and any constraint the plan or
-   constitution imposes on this specific change. Not the whole plan,
+   concrete files/paths owned by this executor, and any constraint the
+   plan or constitution imposes on this specific change. State that other
+   workers may be active, identify concurrent ownership, and require the
+   executor to accommodate their edits without reverting them. Not the whole plan,
    not the walkthrough, not the PRD.
 3. **The gate** — the Phase gate commands from
    `tasks.md § Gate Commands`, verbatim.
@@ -169,9 +219,11 @@ inside the subagent.
   graph: a wave is the set of unchecked tasks in the active plan-phase
   whose dependencies are all checked (see
   `execute-mode.md § Delegating to executors`).
-- **Fan-out limit: 3.** At most three executors in flight at once,
-  even if the wave is wider. Beyond that, review quality collapses and
-  reintegration becomes the bottleneck. Larger waves run in batches.
+- **Fan-out limit: min(3, host capacity).** At most three executors
+  in flight, further limited by available child slots (account for the
+  orchestrator and any active agents). Launch each independent batch
+  before awaiting its results. Larger waves run in batches; a single
+  runnable task still dispatches to its executor.
 - **Two tasks run in parallel only if they don't share files.** Infer
   each task's file footprint from its statement and the plan; when an
   overlap can't be confidently excluded, **serialize** — a false
@@ -187,17 +239,15 @@ inside the subagent.
   result is reviewed (report + `git diff`), logged in the walkthrough,
   and its checkboxes flipped. Only then does the next wave launch.
 
-## Fallback: no subagent support
+## Fallback: a concrete dispatch blocker
 
-If the host agent cannot spawn subagents (or the battery isn't
-installed, or a required tool is missing and the developer chose not
-to install it), every delegation above degrades to the same work done
-**inline and sequentially** by conduct itself: survey the
-code yourself, do the memory contrast yourself, execute tasks one by
-one in dependency order, verify criteria manually
-(`validate-mode.md § Fallback`). The chain's outputs are identical —
-delegation is an efficiency and context-isolation device, never a
-functional dependency.
+Only a blocker established and reported under **Dispatch and fallback
+accounting** permits the affected work to run inline and sequentially:
+conduct surveys code, contrasts memory, implements tasks in dependency
+order, or verifies delivery targets itself. Use the same evidence standard,
+gates, and single-writer rules. A blocked role does not disable the rest
+of the battery; delegation changes throughput and context isolation,
+never the chain's correctness requirements.
 
 ## Common failure modes
 

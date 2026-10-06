@@ -1,6 +1,6 @@
 ---
 name: jaiba-configure
-description: Machine-level setup of JAIBA for the host agent. Installs or refreshes the global behavioral contract in the host's user-level config, installs the workflow/meta skillset (global, or project-local if the developer pins versions), and installs the subagent battery into the global agents folder. Not repo-scoped — instrumenting a specific project is jaiba-init's job. Safe to re-run to refresh a machine.
+description: Machine-level setup and targeted updates for JAIBA on the host agent. Installs or refreshes the global behavioral contract, workflow/meta skillset, and host-native subagent battery; update mode refreshes the contract or battery and migrates exact subagent model IDs. Not repo-scoped — instrumenting a specific project is jaiba-init's job.
 version: 3.0.2
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -30,10 +30,13 @@ read/write footprint:
 - `<global config root>/agents/` — installs/refreshes the subagent battery
 - an installed subagent definition's own frontmatter — writes a `model:`
   line per tier, if the developer opts in
+- installed JAIBA subagent `model:` values — replaces exact model IDs
+  when the developer invokes model migration in update mode
 
 **Reads:**
 - its own packaged assets: `assets/jaiba-contract.md`,
-  `assets/skillset.txt`, `assets/agents/*.md`
+  `assets/skillset.txt`, `assets/agents/*.md`, and host-specific agent
+  assets such as `assets/agents/opencode/*.md`
 - `npx skills list -g` output
 - an installed skill's own
   `<global config root>/skills/<name>/SKILL.md` `version:` field
@@ -63,8 +66,8 @@ Its scope is exactly three installs:
 1. the **global JAIBA Behavioral Contract**, in the host's user-level
    config folder;
 2. the **workflow/meta skillset** from `assets/skillset.txt`;
-3. the **subagent battery** from `assets/agents/`, in the host's global
-   agents folder.
+3. the **subagent battery** from the host's packaged agent set, in the
+   host's global agents folder.
 
 Everything scoped to *one repository* — the `AGENTS.md` marker, the
 `.ai/` brain skeleton, the `.atl/` machine-local state, the constitutive
@@ -76,6 +79,37 @@ The boundary in one line: **`jaiba-configure` sets up the agent;
 `jaiba-init` sets up a project.** They share no file paths and no
 templates — `jaiba-configure` owns **no brain templates** whatsoever
 (`AGENTS.md` §1, the framework hierarchy).
+
+## Update mode
+
+Invoke `jaiba-configure:update` to update only the installed JAIBA
+contract or subagent battery. Begin by identifying the host and its
+global config root as in the full configure flow. Offer two targets:
+
+1. **Contract** — compare `<global config root>/jaiba-contract.md` with
+   `assets/jaiba-contract.md`. If identical, report it as current. If
+   absent, install it. If different, ask before replacing it and create
+   the established dated backup first. This target does not update the
+   global instructions file, skills, or agents.
+2. **Subagents** — offer either a packaged battery refresh or an exact
+   model-ID migration. A refresh uses the detected host's agent set and
+   the same identical/absent/different handling as the full configure
+   flow; a divergent file requires confirmation and a dated backup.
+   This target does not update the contract, global instructions file,
+   or skills.
+
+   For a model-ID migration, ask for the exact current ID and its
+   replacement. Inspect only the six JAIBA subagent filenames in the
+   detected host's `agents/` folder; do not scan or modify other agent
+   files. Show the matching JAIBA agent names, then replace only
+   `model:` values exactly equal to the requested current ID. Preserve
+   all other content and model assignments. If the source and
+   replacement IDs are identical, or there are no matches, make no
+   changes and report that result.
+
+Update mode never installs or updates workflow skills; use the skills
+CLI flow for those. It does not read or write unrelated files in the
+global config root.
 
 ## Re-running is fine
 
@@ -115,6 +149,9 @@ directory:
   `.opencode`, GitHub Copilot → `.github/copilot`). Use it.
 - Corroborate — don't replace — that identity with the config folder you
   actually read from at the user level (e.g. an existing `~/.claude/`).
+- For OpenCode, use its global config root (normally
+  `~/.config/opencode/`) and select the OpenCode-native agent definitions
+  from `assets/agents/opencode/`.
 - **Can't determine it, or you resolve to more than one plausible
   vendor** → use the neutral `~/.agents/`. Don't guess a vendor.
 
@@ -334,9 +371,11 @@ versions/locks stay honest.
 > unbuilt skills, and only installs entries from `assets/skillset.txt` —
 > keep that list current, not hardcoded in prose.
 
-**Then install the subagent battery.** Copy every definition in
-`assets/agents/` (the three executors `executor-high/medium/low` plus the
-specialists `code-analyst`, `business-analyst`, `verify` — the battery
+**Then install the subagent battery.** Select the packaged agent set for
+the detected host: OpenCode uses `assets/agents/opencode/`; other hosts
+use `assets/agents/`. Copy every definition in that set (the three
+executors `executor-high/medium/low` plus the specialists `code-analyst`,
+`business-analyst`, `verify` — the battery
 `conduct/references/subagents.md` invokes) into the `agents/`
 subdirectory of the **global** config root from step 1 (e.g.
 `~/.claude/agents/`), creating it if absent. They install globally for

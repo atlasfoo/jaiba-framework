@@ -379,8 +379,8 @@ The unified workflow (it absorbed the former `planning` and `specification` skil
 | **`propose`** *(optional)* | — (conversational) | Shape a fuzzy requirement: questions, ambiguities, scope. Persists nothing; flows into `spec`. |
 | **`spec`** | `PRD.md` (spec depth only) + `plan.md` (always) | *Define*: PRD with numbered, parseable acceptance criteria — only when triage demands it. *Design*: the plan. Ends at **explicit human approval** of the design. |
 | **`tasks`** | `tasks.md` | Decompose the design into a task graph: `T-NNN`, `depends-on`, `load`, covered criteria. Phases act as multi-session checkpoints with their own gate. |
-| **`execute`** *(implicit)* | `walkthrough.md` | Advance the work — directly or by delegating task waves to the executor subagents. Triggered by continuation cues; no command needed. |
-| **`validate`** | — | Run the plan's quality gate and check acceptance criteria one by one (delegating to the `verify` subagent when available), reporting met/unmet per criterion. |
+| **`execute`** *(implicit)* | `walkthrough.md` | Advance the work through load-matched executor task waves when callable; inline work requires a named dispatch blocker. Triggered by continuation cues; no command needed. |
+| **`validate`** | — | Run the plan's quality gate and dispatch `verify` for PRD criteria or approved design scope when callable, reporting met / not met / not verifiable with evidence. |
 | **`summarize`** | log entry in `.ai/memory/log/` | Single closing step: present the final summary, propose ADRs/constitution changes for `jaiba-init:update-brain`, archive the essence, clean `work/` — one confirmation. |
 
 > **Golden rules:** the human approves the design before anything executes; execution pauses at phase boundaries; the plan never silently drifts — structural deviations amend `plan.md` explicitly.
@@ -429,18 +429,20 @@ The framework health check — a pre-flight before entering the conduct chain. *
 
 ## 🤖 The subagent battery
 
-`jaiba-configure` installs six native subagent definitions into the agent's global `agents/` folder. The invocation contract (`conduct/references/subagents.md`) governs delegation: which operations delegate, the `requires:` tool convention, a **pre-invocation toolchain check** against `.atl/tool-layout.md` (a missing tool surfaces *before* invocation, never as a mid-run failure), and the concurrency policy.
+`jaiba-configure` installs six native subagent definitions into the agent's global `agents/` folder. Conduct **must dispatch applicable roles** when the host permits it, the roles are runtime-callable, and prerequisites are verified. The invocation contract (`conduct/references/subagents.md`) governs runtime and toolchain checks, concurrency, and fallback accounting. An exposed role is runtime evidence; doctor's detected files alone do not prove invocation support. Authorized first-party role calls need no separate approval.
 
 | Subagent | Role | Used in phase |
 |---|---|---|
 | `executor-high` | Design-heavy, multi-file tasks (`load: high`) | `execute` |
 | `executor-medium` | Bounded implementation tasks (`load: medium`) | `execute` |
 | `executor-low` | Mechanical, repetitive tasks (`load: low`) | `execute` |
-| `code-analyst` | Code survey without loading conduct's context | `spec` (define/design) |
+| `code-analyst` | Code survey without loading conduct's context | `spec` (both depths), `propose` when code facts are needed |
 | `business-analyst` | Contrasts the requirement against the identity/decision/reference concepts (or constitution / adr-log / reference-index, legacy flat) | `propose`, `spec` |
-| `verify` | Consumes the PRD's criteria schema; reports met/unmet per criterion | `validate` |
+| `verify` | Checks PRD criteria or approved design scope; reports met / not met / not verifiable with evidence | `validate` (both depths) |
 
-**Parallelism:** `execute` builds **waves** from the `tasks.md` `depends-on` graph — fan-out capped at 3, two tasks run in parallel only if they don't share files, subagents write source only (conduct is the single writer of `.ai/work/`), and results reintegrate into the walkthrough before the next wave. Hosts without subagent support fall back to sequential execution under the same contract.
+**Parallelism:** independent read-only business and code analyses launch before either is awaited, within host capacity; current reports can be reused. `execute` launches file-disjoint tasks in **waves** from the `depends-on` graph, capped at min(3, available host child slots). A single task still uses its executor; overlapping tasks serialize through executors. Each invocation names file ownership and concurrent workers. Conduct alone writes `.ai/work/` and reintegrates results before the next wave.
+
+**Fallback:** name and record a concrete blocker per role/task: no spawn support, inaccessible role, explicit host/user restriction, missing/unverified prerequisites, or an actual dispatch error. Review child state and partial writes before retrying or safe inline work. Continue delegating unaffected roles; convenience never justifies fallback. Verification retains the Plan gate and command provenance safeguards at both depths.
 
 ---
 
@@ -516,7 +518,7 @@ The following examples are based on **TripNest**, a travel planning application 
 
 > 👤 *"I want users to be able to create itineraries and share them with other people so they can edit them together."*
 
-The routing rule reads this as **new work**; the triage scores a cross-cutting blast radius → **spec depth**. The chain enters at `propose`: the agent (optionally delegating a memory contrast to `business-analyst`) asks the narrowing questions — real-time or asynchronous editing? roles? conflict policy?
+The routing rule reads this as **new work**; the triage scores a cross-cutting blast radius → **spec depth**. The chain enters at `propose`: the agent dispatches a memory contrast to `business-analyst` when callable and asks the narrowing questions — real-time or asynchronous editing? roles? conflict policy?
 
 In `spec`, it drafts `.ai/work/PRD.md` with numbered, parseable criteria:
 

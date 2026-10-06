@@ -23,15 +23,29 @@ criteria it carries. This phase writes no source code and no tasks —
 - Full context loaded (`SKILL.md § Context Loading`), including the
   landed requirement if `propose` ran in this conversation.
 
+## Analysis before either depth
+
+Run `references/subagents.md § Pre-invocation toolchain check`, then
+**dispatch `code-analyst` and `business-analyst`** for the requirement's
+code survey and memory contrast at both `design` and `spec` depth. Launch
+independent read-only work before awaiting either, within host capacity.
+Reuse valid reports from `propose`; request scoped follow-ups for changed
+requirements or stale facts. Consume both reports before writing artifacts,
+resolve their contradictions, and record their provenance in Sources
+consulted. Conduct retains routing, design judgment, and artifact writing;
+it does not duplicate their full surveys. An actual blocked role uses the
+same inline analysis with its named fallback reason recorded.
+
 ## Step 1 — define (PRD; `spec` depth only)
 
 At `design` depth, **skip this step entirely** — no PRD, no
 apologies; the plan's Objective section carries the why. At `spec`
 depth:
 
-1. **Survey the code the requirement touches.** Not everything — the
-   modules, models, and endpoints the criteria will plausibly involve,
-   plus their tests. The PRD's "what exists today" must be true.
+1. **Consume the analyst reports.** The code survey covers modules,
+   models, endpoints, and tests the criteria plausibly involve; the memory
+   contrast covers scope, decisions, and integrations. Request targeted
+   follow-ups for gaps. The PRD's "what exists today" must be true.
 2. **Detect gaps and contradictions** between the requirement and
    reality: assumed models/endpoints/integrations that don't exist
    (gaps — fine, name them), conflicts with an existing model, a
@@ -70,9 +84,9 @@ depth:
 
 ## Step 2 — design (`plan.md`, always)
 
-1. **Survey the code** (if define ran, you've already done most of
-   this) and decide the *how*: approach, boundaries, integration
-   points, what is explicitly out.
+1. **Use the current analyst reports** (shared with define when it ran)
+   and decide the *how*: approach, boundaries, integration points, what
+   is explicitly out. Request only the follow-ups needed to decide.
 2. **Clarify remaining design-level questions** the same way — ask,
    resolve, then write.
 3. **Write `.ai/work/plan.md`** from `assets/plan-template.md`:
@@ -165,8 +179,13 @@ Do not write source code. If the developer amends, apply and re-ask.
 *"Let users co-edit itineraries with roles"* — triage: `spec` depth
 (new capability, new actors).
 
-1. Define: survey `Itinerary` (has `created_by`, no collaborator
-   model); the `reference` concept for django-guardian resolves, so
+1. Run the pre-invocation check and dispatch `code-analyst` and
+   `business-analyst` concurrently. Consume both reports before
+   defining or designing: the code report confirms `Itinerary` has
+   `created_by` and no collaborator model; the memory report confirms
+   the scope, decisions, and django-guardian reference. Record their
+   provenance in Sources consulted.
+2. Define: the `reference` concept for django-guardian resolves, so
    the PRD's Dependencies cite
    `[django-guardian](../memory/references/django-guardian.md)`. One
    clarification: "owner" maps to `created_by`? → yes, role concept.
@@ -174,10 +193,10 @@ Do not write source code. If the developer amends, apply and re-ask.
    (invite by email, happy + already-invited/no-permission sad paths),
    `ITIN-002` (editor adds activity), `ITIN-003` (reader is
    read-only).
-2. Design: plan.md — invitations + django-guardian object
+3. Design: plan.md — invitations + django-guardian object
    permissions, roles as `CharField` choices; out: real-time editing,
    conflict merge.
-3. Gate: developer approves → next phase is `tasks`.
+4. Gate: developer approves → next phase is `tasks`.
 
 Counter-example: *"update requests to v5"* — triage: `design`. No
 PRD; plan.md's Objective summarizes the breaking changes and the

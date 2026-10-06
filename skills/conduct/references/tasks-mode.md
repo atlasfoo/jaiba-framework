@@ -42,8 +42,8 @@ not "work on the collaborator model". Each task carries:
   - `low` — mechanical/repetitive work (renames, boilerplate, config
     echoes).
   Label honestly by *judgment required*, not by effort or prestige —
-  the label maps one-to-one onto the executor battery when `execute`
-  delegates (`references/subagents.md § load → executor tier`), so a
+  the label maps one-to-one onto the executor battery that `execute`
+  must dispatch when callable (`references/subagents.md § load → executor tier`), so a
   dishonest label sends the task to the wrong tier. When genuinely in
   doubt between two labels, take the higher one.
 - **`covers`** — the acceptance criteria IDs (`<PREFIX>-NNN`) this
@@ -80,9 +80,13 @@ chronology. Each phase:
    criteria — they're already written, in prose, in the schema. TDD
    `disabled` ⇒ tests scheduled at the team's discretion; criteria
    still define "done".
-4. **Wire the graph.** Assign IDs in reading order, declare
-   `depends-on` per task, label `load`, map `covers`. Check every
-   criterion is covered.
+4. **Wire the graph.** Assign IDs in reading order, declare only real
+   `depends-on` edges, label `load`, map `covers`. Identify each task's
+   concrete file ownership in its statement or plan context so execute
+   can partition disjoint tasks safely; do not invent dependency edges
+   solely to avoid executor concurrency. Check every criterion is covered.
+   At design depth, check every Scope (In) deliverable has task coverage
+   without inventing PRD criteria or changing the `covers: —` convention.
 5. **Write `tasks.md`** from the template; **write the walkthrough
    stub** from its template.
 6. **Show the graph summary** (phases, task count, any long
