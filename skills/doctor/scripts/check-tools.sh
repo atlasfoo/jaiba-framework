@@ -533,8 +533,8 @@ BATTERY_REQ["subagent:business-analyst"]="rg"
 BATTERY_REQ["subagent:verify"]="git"
 
 subagent_rows=""
-subagents_available=0
-subagents_missing=0
+subagents_detected=0
+subagents_definition_missing=0
 subagent_notes=""
 
 declare -a ALL_SUBAGENT_LABELS=()
@@ -556,20 +556,20 @@ if [ "${#ALL_SUBAGENT_LABELS[@]}" -gt 0 ]; then
     [ -z "$label" ] && continue
     name="${label#subagent:}"
     if [ -n "${SUBAGENT_FILE[$label]:-}" ]; then
-      subagents_available=$((subagents_available + 1))
-      subagent_rows+="| \`$name\` | ✅ available | \`$(format_path "${SUBAGENT_FILE[$label]}")\` | $(format_requires "$label") |"$'\n'
+      subagents_detected=$((subagents_detected + 1))
+      subagent_rows+="| \`$name\` | ✅ detected | ❔ UNVERIFIED | \`$(format_path "${SUBAGENT_FILE[$label]}")\` | $(format_requires "$label") |"$'\n'
     elif [ -n "${BATTERY_MAP[$label]:-}" ]; then
-      subagents_missing=$((subagents_missing + 1))
-      subagent_rows+="| \`$name\` | ❌ missing definition | — | \`${BATTERY_REQ[$label]:-git}\` (install via jaiba-configure) |"$'\n'
+      subagents_definition_missing=$((subagents_definition_missing + 1))
+      subagent_rows+="| \`$name\` | ❌ missing from scanned folders | ❔ UNVERIFIED | — | \`${BATTERY_REQ[$label]:-git}\` (definition not detected) |"$'\n'
     fi
   done < <(printf '%s\n' "${ALL_SUBAGENT_LABELS[@]}" | sort -u)
 fi
 
 if [ "$HAS_FRAMEWORK" -eq 1 ]; then
-  if [ "$subagents_missing" -gt 0 ]; then
-    subagent_notes="> ⚠️ $subagents_missing core JAIBA battery definition(s) missing. Workflows delegating to them will fall back to sequential inline execution until installed via \`jaiba-configure\`."
+  if [ "$subagents_definition_missing" -gt 0 ]; then
+    subagent_notes="> ⚠️ $subagents_definition_missing core JAIBA battery definition(s) were not detected in scanned folders. This does not establish whether the corresponding runtime roles are registered or callable. Conduct must check its currently exposed roles/tools; if a needed role is not callable, verify its registration and installation with \`jaiba-configure\`."
   else
-    subagent_notes="> ✅ All 6 core JAIBA battery subagent definitions detected and available for workflow delegation."
+    subagent_notes="> ✅ All 6 core JAIBA battery subagent definitions were detected in scanned folders. Runtime role registration and invocation are unverified; conduct must check its currently exposed roles/tools."
   fi
 fi
 
@@ -616,7 +616,7 @@ mkdir -p "$ROOT/.atl"
   echo "- **Shell host:** $SHELL_FLAVOR"
   echo "- **Skills scanned:** $(printf '`%s` ' "${SKILLS_DIRS[@]}")"
   echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
-  echo "- **Subagents:** $subagents_available available$([ "$subagents_missing" -gt 0 ] && echo ", $subagents_missing missing")"
+  echo "- **Subagent definitions:** $subagents_detected detected$([ "$subagents_definition_missing" -gt 0 ] && echo ", $subagents_definition_missing missing from scanned folders")"
   echo "- **Missing:** $missing of $total"
   echo "- **Unverified (MCP):** $unverified"
   echo "- **Rejected (failed validation):** $REJECTED_TOTAL"
@@ -667,8 +667,8 @@ mkdir -p "$ROOT/.atl"
   echo "### Subagents"
   echo
   if [ -n "$subagent_rows" ]; then
-    echo "| Subagent | Availability | Definition Path | Requires |"
-    echo "|---|---|---|---|"
+    echo "| Subagent | Definition | Runtime invocation | Definition Path | Requires |"
+    echo "|---|---|---|---|---|"
     printf '%s' "$subagent_rows"
     if [ -n "$subagent_notes" ]; then
       echo

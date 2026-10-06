@@ -29,10 +29,14 @@ time.
 
 ## Flow
 
-1. **Load the full context** (see `SKILL.md § Context Loading`). You
-   can't shape a requirement well without the project's scope, stack,
-   integrations, standing decisions, and what past `.ai/memory/log/`
-   entries say was already tried.
+1. **Load governing context and dispatch analysis** (see `SKILL.md
+   § Context Loading` and `references/subagents.md`). Once enough of the
+   requirement is known, dispatch `business-analyst` for the memory
+   contrast and `code-analyst` when shaping needs code facts. Start
+   independent read-only analyses before awaiting either, within host
+   capacity. Consume their reports to ground the options; do not repeat
+   their full surveys inline. Reuse current reports in `spec`, and name
+   any actual dispatch blocker in the conversation.
 2. **Mirror back the core.** State, in one or two sentences, the
    problem you think the developer is describing — *the problem, not a
    solution*. Confirm before going further.

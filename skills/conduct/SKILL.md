@@ -177,19 +177,23 @@ battery — the code survey in `spec` (`code-analyst`), the memory
 contrast in `propose`/`spec` (`business-analyst`), task execution in
 `execute` (the executor tiers), criteria verification in `validate`
 (`verify`) — the invocation contract in `references/subagents.md`
-governs it: delegable operations, the pre-invocation toolchain check,
-and the concurrency policy. Delegation is optional by construction:
-every phase has an inline sequential fallback.
+governs it: required dispatch, runtime capability and prerequisite checks,
+and concurrency. **Dispatch every applicable role when the host permits
+it, the role is callable, and its prerequisites are verified.** A single
+task still uses an executor; file overlap serializes executor work.
+Independent analysts and disjoint runnable executor tasks launch
+concurrently within host capacity. Inline work requires a concrete
+blocker recorded per role/task; convenience is never a fallback reason.
+Authorized first-party JAIBA role invocation needs no separate approval;
+the design approval gate and command provenance boundary still apply.
 
 ## Context Loading
 
 Load per phase — not universally — to minimize tokens. By this point
 Brain Discovery has already resolved the layout (bundle or flat) and
 ruled out the ambiguous/no-brain cases, so what follows names, per
-phase, which **concepts** to load — with the legacy flat file each one
-maps to, since this repo itself is still flat (no `constitution.md` §6:
-see `tasks.md § Gate Commands`'s own comment, which names its concept
-source the same way).
+phase, which **concepts** to load and where they resolve in each
+supported layout.
 
 - **`propose` / `spec`** (full context): `AGENTS.md` (or global
   contract); the `scope`, `quality-gate`, and `convention` (TDD mode)
@@ -203,7 +207,10 @@ source the same way).
   (`decisions/<NNN>-<slug>.md`, or `adr-log.md` entries); recent
   `log-entry` concepts — what was tried before (`.ai/memory/log/`,
   unchanged across both layouts); and the code the requirement
-  plausibly touches.
+  plausibly touches, through the applicable analyst reports. Load the
+  governing context needed for routing and decisions; dispatch the full
+  code survey and memory contrast rather than duplicating them inline
+  (`references/subagents.md § Analyst dispatch`).
 - **`tasks`**: the approved `plan.md` (+ `PRD.md` if produced), plus
   the `quality-gate` and `convention` concepts to copy gate commands
   and TDD posture into `tasks.md` (`identity/quality-gate.md` +
@@ -214,7 +221,8 @@ source the same way).
   `tasks.md` — no `quality-gate`/`convention` concept, and no
   `constitution.md`, is re-read.
 - **`validate`**: `tasks.md § Gate Commands`, `PRD.md`'s acceptance
-  criteria schema (if present), `walkthrough.md`.
+  criteria schema (if present), approved `plan.md` objective and Scope
+  (In) at design depth, `walkthrough.md`, and relevant task diffs.
 - **`summarize`**: everything in `.ai/work/`.
 
 If any read reveals a conflict between the request and recorded
