@@ -128,11 +128,19 @@ jobs:
           set -euo pipefail
           # A successful listing distinguishes absence from authentication/API
           # errors. Do not turn an arbitrary failing `release view` into create.
-          release_tags=$(gh api --paginate "repos/$GH_REPO/releases" --jq '.[].tag_name')
-          while IFS= read -r tag; do
+          releases=$(gh api --paginate "repos/$GH_REPO/releases" --jq '.[] | "\(.tag_name)\t\(.draft)"')
+          while IFS=$'\t' read -r tag draft; do
             if [[ "$tag" == "$RELEASE_TAG" ]]; then
+              if [[ "$draft" == 'true' ]]; then
+                echo "A draft release already exists for $RELEASE_TAG; refusing to report it as published." >&2
+                exit 1
+              fi
+              if [[ "$draft" != 'false' ]]; then
+                echo "Could not determine whether the existing release for $RELEASE_TAG is published." >&2
+                exit 1
+              fi
               echo "Release already exists for $RELEASE_TAG."
               exit 0
             fi
-          done <<< "$release_tags"
+          done <<< "$releases"
           gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --generate-notes
