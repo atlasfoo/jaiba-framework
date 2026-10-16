@@ -3,7 +3,7 @@ type: index
 title: "JAIBA Framework — memory index"
 description: "Entry point to this repository's constitutive memory."
 tags: [index]
-updated: "2026-10-05"
+updated: "2026-10-15"
 ---
 
 # JAIBA Framework — Memory Index
@@ -66,10 +66,11 @@ story.
 
 One file per external surface.
 
+- [Agent model discovery (CLI and ACP)](references/model-discovery.md) — Versioned host CLI docs and ACP schemas guide safe model catalog discovery for `jaiba-configure`; catalogs do not prove inference success.
 - [OKF v0.1 (Open Knowledge Format)](references/okf-v0-1.md) — Draft spec this framework's concept-bundle memory layout borrows its shape from — not a runtime dependency.
 - [`skills` CLI (`npx skills`)](references/skills-cli.md) — Package manager for Agent Skills; installs/updates this repo's vendored external skills and is how downstream repos adopt JAIBA itself.
 - [commitizen](references/commitizen.md) — Computes the framework's single version from Conventional Commits and keeps skills/*/SKILL.md, skillset.txt's ref:, and README.md in lockstep via .cz.toml's version_files.
-- [GitHub Actions (release automation)](references/github-actions.md) — Two workflows — bump.yml (push to master, computes and pushes the version bump/tag via a GitHub App) and commit-check.yml (PR, validates Conventional Commits) — both with every `uses:` pinned by full commit SHA.
+- [GitHub Actions (release automation)](references/github-actions.md) — Two workflows — bump.yml (push to master, creates a version tag and generated-notes GitHub Release via a GitHub App) and commit-check.yml (PR, validates Conventional Commits) — both with every `uses:` pinned by full commit SHA.
 
 ## `log-entry`
 
