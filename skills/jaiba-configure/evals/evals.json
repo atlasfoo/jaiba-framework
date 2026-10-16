@@ -232,6 +232,87 @@
       },
       "expected_output": "Reports that no installed JAIBA subagent has the exact source model ID. Makes no changes and does not scan or alter unrelated agent files, the contract, or skills.",
       "files": []
+    },
+    {
+      "id": 22,
+      "name": "model-discovery-supported-host-cli-takes-precedence",
+      "prompt": "Configure jaiba on this machine and let me choose models for the subagents.",
+      "context": {
+        "host": "OpenCode; its documented models CLI is available and supported",
+        "cli_catalog": "Returns a valid catalog of model IDs available to this host",
+        "acp_catalog": "Would return a different valid catalog if queried"
+      },
+      "expected_output": "Verifies the host CLI command is supported before running it, applies a bounded timeout, and uses its valid host-available catalog as the primary source. Does not query ACP after successful CLI discovery and does not combine or substitute the provider's broader catalog. Preserves returned IDs literally with source/limitations; offers inheritance for each tier.",
+      "files": []
+    },
+    {
+      "id": 23,
+      "name": "model-discovery-unsupported-cli-falls-back-to-confirmed-acp",
+      "prompt": "Configure jaiba on this machine and let me choose models for the subagents.",
+      "context": {
+        "host": "A host whose CLI model command is not documented as supported",
+        "acp": "A documented, already-available transport/launcher for this host; initialized protocol and documented returned model data provide a valid host-availability catalog"
+      },
+      "expected_output": "Does not run an unsupported CLI command. Uses ACP as fallback only through the confirmed existing host transport, with a bounded timeout and documented initialization/data shape. Does not invent a models/list method or use provider-wide models as evidence of host availability; no prompts, remote tools, adapter installation, authentication, or private-config reads. Closes the connection and offers inheritance.",
+      "files": []
+    },
+    {
+      "id": 24,
+      "name": "model-discovery-cli-failure-and-unusable-catalog-use-acp",
+      "prompt": "Configure jaiba on this machine and let me choose models for the subagents.",
+      "context": {
+        "host": "Host CLI is supported",
+        "cli_outcomes": "CLI times out, errors, returns an empty catalog, or returns output that cannot be interpreted as a catalog",
+        "acp": "Confirmed existing host transport returns a valid documented host catalog"
+      },
+      "expected_output": "Bounds the CLI call by timeout and records its timeout/error/empty/uninterpretable result as unavailable, without inventing IDs. Falls back to ACP only because CLI did not produce a valid catalog; validates ACP's documented response, preserves provenance, and closes the connection. Offers inheritance; does not read private configuration or treat a vendor catalog as host availability.",
+      "files": []
+    },
+    {
+      "id": 25,
+      "name": "model-discovery-no-valid-catalog-preserves-inheritance",
+      "prompt": "Configure jaiba on this machine; if model discovery fails, keep the agents inheriting my model.",
+      "context": {
+        "host_cli": "Missing, unsupported, failing, timed out, or returns empty/uninterpretable output",
+        "acp": "Unavailable or unsupported, times out/errors, or returns empty/uninterpretable model data"
+      },
+      "expected_output": "States that no verifiable host-available model catalog could be obtained and does not write or suggest invented model IDs. Leaves model: absent from all installed agent definitions so every tier inherits the orchestrator model. Does not invent models/list, read private settings/credentials/history, install or authenticate a transport, or send prompts.",
+      "files": []
+    },
+    {
+      "id": 26,
+      "name": "model-selection-rejects-id-outside-valid-catalog",
+      "prompt": "Pin executor-medium to provider/model-not-listed.",
+      "context": {
+        "host_cli": "Produced a valid catalog that does not contain provider/model-not-listed",
+        "acp": "Would return provider/model-not-listed in a separate catalog"
+      },
+      "expected_output": "Rejects the requested ID against the valid primary catalog and asks for a listed choice or inheritance. Does not query ACP to evade that rejection, accept the provider-known ID as host-available, or write any model pin until a valid listed choice is selected.",
+      "files": []
+    },
+    {
+      "id": 27,
+      "name": "model-migration-validates-destination-before-exact-replacement",
+      "prompt": "In jaiba-configure:update, replace model provider/old with provider/new.",
+      "context": {
+        "host": "OpenCode",
+        "installed_agents": "Two of the six JAIBA agent files use the exact model: provider/old; another uses provider/old-suffix; an unrelated agent also uses provider/old",
+        "destination": "provider/new appears in a valid catalog proving availability to this host"
+      },
+      "expected_output": "Validates provider/new against the host-available catalog before migration, then offers/obtains the required migration consent and applies the exact replacement only to matching fields in the six JAIBA agent files. Preserves near matches, unrelated agents, all other fields, and backup safeguards. Reports the source and limitations of the validating catalog; does not equate provider catalog membership with host availability.",
+      "files": []
+    },
+    {
+      "id": 28,
+      "name": "model-migration-invalid-destination-does-not-mutate",
+      "prompt": "In jaiba-configure:update, replace model provider/old with provider/new.",
+      "context": {
+        "host": "OpenCode",
+        "installed_agents": "JAIBA agent files contain exact source model pins",
+        "catalog": "Valid host catalog does not contain provider/new; ACP has no separate authority to override this valid catalog result"
+      },
+      "expected_output": "Refuses the destination as unlisted and makes no changes or backups to any agent file. Does not use ACP to evade rejection or infer availability from the provider. Offers the developer a valid listed destination or cancellation; removing a pin is a separate explicit-consent choice, never silent. Does not inspect unrelated files or private configuration.",
+      "files": []
     }
   ]
 }
