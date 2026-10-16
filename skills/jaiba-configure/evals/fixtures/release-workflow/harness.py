@@ -59,7 +59,9 @@ if name=='gh':
     log('gh '+' '.join(a))
     if a[:2]==['api','--paginate']:
         if mode in ('api-error','auth-error'): print('API failure',file=sys.stderr); sys.exit(1)
-        print('\n'.join(d['releases'])); sys.exit()
+        for tag in d['releases']:
+            print(tag+'\t'+('true' if mode=='existing-draft' else 'false'))
+        sys.exit()
     if a[:2]==['release','create']:
         if mode=='create-failure' and not d.get('failed_once'):
             d['failed_once']=True; save(); sys.exit(1)
@@ -77,7 +79,7 @@ def run_case(name, b, retry=False):
             (binpath / cmd).symlink_to(dispatcher)
         marker = "JAIBA release run 7 (sha)"
         state = {"head": "sha", "tags": {}, "remote": [], "releases": []}
-        if name == "existing-release": state.update(head="bumped", tags={"v2.0.0":{"subject":marker,"commit":"bumped"}}, remote=["v2.0.0"], releases=["v2.0.0"])
+        if name in ("existing-release", "existing-draft"): state.update(head="bumped", tags={"v2.0.0":{"subject":marker,"commit":"bumped"}}, remote=["v2.0.0"], releases=["v2.0.0"])
         if name == "missing-remote": state.update(head="bumped", tags={"v2.0.0":{"subject":marker,"commit":"bumped"}})
         if retry: state.update(head="bumped", tags={"v2.0.0":{"subject":marker,"commit":"bumped"}}, remote=["v2.0.0"])
         sf=p/'state'; sf.write_text(__import__('json').dumps(state)); calls=p/'calls'; calls.write_text('')
@@ -95,6 +97,10 @@ def run_case(name, b, retry=False):
         release=execute(b['Publish GitHub Release'])
         if name in ('api-error','auth-error','missing-remote'):
             assert release.returncode != 0, name; return
+        if name=='existing-draft':
+            assert release.returncode != 0, name
+            assert 'gh release create' not in calls.read_text(), name
+            return
         if name=='create-failure':
             assert release.returncode != 0
             # Re-run the actual bump block as a workflow rerun, then publish again.
@@ -112,7 +118,7 @@ def run_case(name, b, retry=False):
 
 def main():
     b=blocks()
-    for case in ('new-bump','no-bump','existing-release','missing-remote','push-failure','api-error','auth-error','create-failure'):
+    for case in ('new-bump','no-bump','existing-release','existing-draft','missing-remote','push-failure','api-error','auth-error','create-failure'):
         run_case(case,b)
         print(f"PASS {case}")
 
