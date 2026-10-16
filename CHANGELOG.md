@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v3.2.0 (2026-10-16)
+
+### Feat
+
+- **jaiba-configure**: validate discovered models
+
+### Fix
+
+- **release**: reject existing draft releases
+
 ## v3.1.0 (2026-10-06)
 
 ### Feat
