@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Generate GitHub App token
+        # The App installation needs Contents: write (including its existing
+        # branch-protection bypass). GITHUB_TOKEN permissions above do not
+        # grant permissions to this separate token.
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
@@ -54,7 +57,82 @@ jobs:
           git config user.email "${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
       - name: Bump version
-        run: cz --no-raise 21 bump --yes
+        id: bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The annotation survives a successful push and identifies this run,
+          # not just the latest version. GITHUB_RUN_ID stays stable on reruns.
+          marker="JAIBA release run ${GITHUB_RUN_ID} (${GITHUB_SHA})"
+          find_run_tags() {
+            git for-each-ref --format='%(refname:strip=2) %(objecttype) %(contents:subject)' refs/tags |
+              while read -r tag type subject; do
+                if [[ "$type" == tag && "$subject" == "$marker" ]]; then
+                  printf '%s\n' "$tag"
+                fi
+              done
+          }
+          find_run_tags > "$RUNNER_TEMP/run-tags"
+          mapfile -t run_tags < "$RUNNER_TEMP/run-tags"
+          if (( ${#run_tags[@]} > 1 )); then
+            echo 'Multiple tags identify this run; refusing to publish.' >&2
+            exit 1
+          fi
+          if (( ${#run_tags[@]} == 1 )); then
+            tag="${run_tags[0]}"
+            # Only a bump directly from the triggering commit is recoverable.
+            test "$(git rev-parse "refs/tags/$tag^{}^")" = "$GITHUB_SHA"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            echo 'push=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          before=$(git rev-parse HEAD)
+          git tag --list | LC_ALL=C sort > "$RUNNER_TEMP/tags-before"
+          cz --no-raise 21 bump --yes --annotated-tag --annotated-tag-message "$marker"
+          if [[ "$(git rev-parse HEAD)" == "$before" ]]; then
+            echo 'No version bump; no release to publish.'
+            exit 0
+          fi
+          git tag --list | LC_ALL=C sort > "$RUNNER_TEMP/tags-after"
+          LC_ALL=C comm -13 "$RUNNER_TEMP/tags-before" "$RUNNER_TEMP/tags-after" > "$RUNNER_TEMP/new-tags"
+          mapfile -t new_tags < "$RUNNER_TEMP/new-tags"
+          find_run_tags > "$RUNNER_TEMP/run-tags"
+          mapfile -t run_tags < "$RUNNER_TEMP/run-tags"
+          if (( ${#new_tags[@]} != 1 || ${#run_tags[@]} != 1 )) ||
+             [[ "${new_tags[0]}" != "${run_tags[0]}" ]]; then
+            echo 'Expected exactly one new tag belonging to this run.' >&2
+            exit 1
+          fi
+          tag="${new_tags[0]}"
+          test "$(git rev-parse "refs/tags/$tag^{}")" = "$(git rev-parse HEAD)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo 'push=true' >> "$GITHUB_OUTPUT"
 
       - name: Push commit and tags
-        run: git push --follow-tags
+        if: steps.bump.outputs.push == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.bump.outputs.tag }}
+        # Push only the tag created here, together with its commit. A recovered
+        # tag is already remote, so a retry must not push the original checkout.
+        run: git push --atomic origin HEAD:refs/heads/master "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG"
+
+      - name: Publish GitHub Release
+        if: steps.bump.outputs.tag != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.bump.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # A successful listing distinguishes absence from authentication/API
+          # errors. Do not turn an arbitrary failing `release view` into create.
+          release_tags=$(gh api --paginate "repos/$GH_REPO/releases" --jq '.[].tag_name')
+          while IFS= read -r tag; do
+            if [[ "$tag" == "$RELEASE_TAG" ]]; then
+              echo "Release already exists for $RELEASE_TAG."
+              exit 0
+            fi
+          done <<< "$release_tags"
+          gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --generate-notes
