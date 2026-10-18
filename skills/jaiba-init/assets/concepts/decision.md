@@ -159,6 +159,14 @@ itself. Set its `date` to the day the framework was initialized here,
 and leave the series at this entry plus whatever the developer
 explicitly asks to record **now**.
 
+The worked payload below describes the **filesystem binding**. For a new
+external brain, retain the same ADR structure but state the actual selected
+adapter, owned constitutive scope, logical index/relations and independent
+executive context. Do not assert `.ai/` or an AGENTS marker exists. Record
+the Phase3 consumer capability pending Phase4, not fictitious working
+external conduct/archive support. This is template content adaptation, not
+permission to migrate a populated brain or rewrite an existing seed ADR.
+
 ```markdown
 ---
 type: decision

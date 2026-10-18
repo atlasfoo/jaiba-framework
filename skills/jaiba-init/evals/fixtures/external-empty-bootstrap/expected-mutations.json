@@ -1,0 +1,12 @@
+{
+  "fixture_kind": "synthetic-expected-adapter-trace-not-live-conformance-evidence",
+  "sequence": [
+    {"step": 1, "owner": "jaiba-init", "operation": "verify exact project identity and complete catalogue absence", "writes": []},
+    {"step": 2, "owner": "jaiba-init", "operation": "authorized project association and empty context identity", "writes": ["registry project-id prj-payments", "context-id ctx-payments-work with no executive content"]},
+    {"step": 3, "owner": "jaiba-init", "operation": "create/readback each fixture project concept, preserving full payload and receipt", "writes": ["identity/project.md", "identity/architecture.md", "identity/purpose.md", "identity/scope.md", "identity/quality-gate.md", "identity/conventions.md", "decisions/001-adoption.md", "references/payments-api.md"]},
+    {"step": 4, "owner": "jaiba-init", "operation": "create index after concepts; full readback verifies all targets", "writes": ["index.md"]},
+    {"step": 5, "owner": "jaiba-init", "operation": "persist and read back routing-only binding", "writes": ["host-agent + /work/payments => adapter acme-memory, prj-payments, ctx-payments-work"]}
+  ],
+  "required_per_write": ["pre-read exact absence or full object and revision", "authorization", "single-writer/CAS guarantee", "readback full exact object", "canonical receipt"],
+  "forbidden": ["fallback to filesystem", "create .ai/ or mirror/cache", "write executive PRD/plan/tasks/walkthrough", "invoke Phase4 consumers", "transfer populated stores", "install or invoke draft Engram"]
+}

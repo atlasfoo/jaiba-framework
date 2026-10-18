@@ -45,13 +45,15 @@ doctor is a *maintenance* action — it presumes a brain to inspect.
 
 | Situation | Meaning | Route to |
 |---|---|---|
-| No `.ai/` at all, or `.ai/memory/` is empty | Project was never instrumented | `jaiba-init` (bootstrap) |
+| Selected, readable scope authoritatively has no constitutive brain | Project is not instrumented on that surface | `jaiba-init` (bootstrap, with authorization) |
 | Brain exists but the developer wants it *rebuilt/reconciled* | That's the fix, not the diagnosis | `jaiba-init:update-brain` |
-| Developer just wants to *know what the brain says* | Read-only question | `ask` |
+| Developer just wants to *know what the brain says* | Read-only question | `ask` (external calls pending Phase4; stop rather than fall back) |
 | Brain exists and the developer wants a *health check* | — | **Continue here** |
 
-If `.ai/memory/*.md` is missing entirely, stop and route to `jaiba-init`;
-there is nothing to diagnose. (A brain full of bare `[brackets]` is a
+Resolve the surface before deciding whether a brain exists. External mode
+needs neither `AGENTS.md` nor `.ai/`; a binding, ordinary backend note,
+search hit, probe success or empty catalogue is not a brain. Failed access
+is not absence. (A brain full of bare `[brackets]` is a
 *finding*, not a stop condition — that's exactly the kind of incoherence
 this skill reports.)
 
@@ -60,16 +62,19 @@ this skill reports.)
 Run these reads once, before any diagnostic. doctor's verdicts must
 reflect the repository, not the prompt's assumptions.
 
-1. **The behavioral contract** — the repo's minimal `AGENTS.md` marker
-   plus the global `jaiba-contract.md` in the agent's user-level config
+1. **The behavioral contract** — the global `jaiba-contract.md` in the agent's user-level config
    (where the rules actually live since the global split). Note its
    drift-&-gaps and toolchain-awareness sections: doctor
    operationalizes both as checks — and the contract's own
    presence/drift is itself part of diagnostic 1.
-2. **`.ai/` exists and has a brain.** Confirm `.ai/memory/` holds real
-   content — the concept bundle (`index.md` plus its concepts) or the
-   three legacy flat artifacts (`constitution.md`, `adr-log.md`,
-   `reference-index.md`). If not, see "When NOT to run doctor".
+2. **Resolve selection, identity and readable memory.** Follow diagnostic 1's
+   resolution preflight before brain-dependent checks. Read the effective
+   host-visible `create-memory` canonical contract, resolution and filesystem
+   mapping, and resolve `jaiba-init`'s OKF reference independently. Missing,
+   ambiguous or incompatible definitions block dependent checks; never assume
+   sibling installation paths. Filesystem is built in, not an adapter/MCP
+   installation requirement. Verify the selected owned catalogue and full
+   constitutive entry reads; filesystem alone uses the supported dual layout.
 3. **Locate every skills directory in play.** JAIBA skills can be
    installed project-locally, globally (e.g. `~/.claude/skills/`,
    `~/.agents/skills/`), or split across both — `jaiba-configure` step 3
@@ -77,15 +82,13 @@ reflect the repository, not the prompt's assumptions.
    left there. doctor's tool-state and reference checks need to scan
    *all* of them, not just the project's:
 
-   - **Project-local:** detect the agent folder the same way `jaiba-init`
-     does (bootstrap step 1) — a single vendor dir (`.claude/`,
-     `.cursor/`, `.gemini/`, …)
-     if exactly one exists at the project root; otherwise the neutral
-     `.agents/`. Its `skills/` subdir is the project-local skills dir, if
-     it exists.
-   - **Global:** the same vendor folder name, rooted at the user's home
-     directory (e.g. `~/.claude/skills`), if it exists. `npx skills list
-     -g` confirms whether any JAIBA skills are installed there.
+   Use the current host's actual project-local/global skill resolution and
+   exposed skill list, including its real global config location. Do not infer
+   visibility from a vendor directory, another agent's installation or a
+   checkout on disk. Record effective dependency paths and separately any
+   additional physical directories scanned for inventory. Resolve same-ID
+   local/global copies using host precedence, not version order. Ambiguous
+   effective installations block their dependent checks.
 
    Hold both paths (either may be absent — that's fine, a project that
    only used local or only used global is a normal configuration). The
@@ -97,14 +100,17 @@ reflect the repository, not the prompt's assumptions.
 
 ## The three diagnostics
 
-Run all three, in this order. Each has its own reference file with the
+Run all three, in this order, when their inputs are resolved. A blocking
+selection/layout/read failure stops affected brain checks and diagnostic 3;
+the independent physical ATL probe can still run. Never inspect another
+surface as a fallback. Each has its own reference file with the
 detailed procedure — **read the reference before running that check**;
 this page conducts, it doesn't narrate. Collect every finding
 into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Is the behavioral contract present and drift-free (repo marker + global copy), and are the identity, decision, and reference concepts (or constitution / adr-log / reference-index in the legacy flat layout) complete and consistent with each other and the repo? | `references/memory-coherence.md` | No — routes to `jaiba-init:update-brain` (brain, repo marker) / `jaiba-configure` (global contract) |
+| 1 | **Memory coherence** | Are selection, binding, project/context ownership, catalogue and full reads verified, and is the brain coherent with the repo? Filesystem also checks its marker and dual layout. | `references/memory-coherence.md` | No — routes to `jaiba-init` (repo/brain) / `jaiba-configure` (machine) |
 | 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference` concept (or `reference-index.md` entry in the legacy flat layout) reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
@@ -149,9 +155,12 @@ structure:
 
 **Verdict:** <✅ healthy | ⚠️ degraded | ❌ needs attention>
 **Checked:** <UTC timestamp>  ·  **Agent folder:** <path>
+**Surface:** <adapter/contract versions, selection evidence>
+**Scope:** <sanitized work root, namespace, project-id, context-id or unresolved>
+**Coverage:** <catalogue completion, full reads, blocked/unverified capabilities>
 
 ## 1. Memory coherence — <status>
-<findings: file, what's wrong, why it matters>
+<findings: logical address + safe physical locator, evidence, why it matters>
 
 ## 2. Tool state — <status>
 <findings: tool, needed by which skill/subagent/hook, present/missing/[UNVERIFIED]>
@@ -177,6 +186,18 @@ Rules for the report:
   package install, or a re-vendor.
 - **Be honest about what you couldn't check.** List `[UNVERIFIED]` items
   explicitly with the reason (no web access, no MCP introspection, etc.).
+- Distinguish `unsupported-version`, `missing-capability`, `unavailable`,
+  `permission-denied`, `ambiguous`, ownership `conflict`, partial/truncated
+  reads and authoritative `not-found`; these are not interchangeable.
+- Report consumer capability separately from surface health: in **Phase3**,
+  setup/init/configure/doctor may resolve/probe external surfaces, but
+  `conduct`, `ask`, `fast` and subagents remain **pending Phase4**. Stop
+  those external calls, even after a green probe; never create `.ai/` or
+  use filesystem consumers as a fallback.
+- Populated-store transitions remain **pending Phase5** migration. Explain
+  the barrier and offer an explicit filesystem exception (normally
+  `jaiba-memory-surface: filesystem`) for existing local work; doctor does
+  not edit that override, bindings, activate, transfer, merge or retire stores.
 - **If everything is green, say so plainly** and note doctor is a good
   pre-flight before the `conduct` chain. Don't manufacture
   findings to look busy.
@@ -185,10 +206,11 @@ Rules for the report:
 
 - **Diagnose and route — don't fix.** doctor proposes; the owning skill
   enacts. The one thing it writes is `.atl/tool-layout.md` (machine
-  state, §6), never `.ai/memory/` (that's `jaiba-init:update-brain`'s
-  sole right, §2.9) and never a vendored file.
-- **Maintenance, not bootstrap.** A repo with no `.ai/` is `jaiba-init`'s
-  job, not a finding to repair here.
+  state, §6), never selected memory, routing bindings or vendored files.
+  Constitutive changes belong to `jaiba-init`; executive writes belong to
+  `conduct`, subject to the transition gates.
+- **Maintenance, not bootstrap.** An authoritatively absent selected brain
+  is `jaiba-init`'s job. Missing `.ai/` alone says nothing in external mode.
 - **Carry your own tools.** Skills package independently — doctor's
   probe (`scripts/check-tools.sh`) is its own copy, not a runtime call
   into `jaiba-configure`'s folder.
@@ -203,8 +225,8 @@ Rules for the report:
   at `jaiba-init:update-brain`.
 - **Passing an unchecked dependency as healthy.** No web tools doesn't
   mean a URL is reachable — mark it `[UNVERIFIED]`, don't green-light it.
-- **Running on an un-instrumented repo.** No `.ai/` means nothing to
-  diagnose; route to `jaiba-init` rather than inventing findings.
+- **Confusing path absence with brain absence.** Resolve the selected
+  surface first; external memory does not need local markers or a cache.
 - **A wall of equal-weight findings.** Without severity ordering the
   developer can't tell a missing required tool from a month-old vendored
   spec. Always lead with ❌.

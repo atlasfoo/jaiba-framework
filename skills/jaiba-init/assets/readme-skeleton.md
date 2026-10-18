@@ -20,6 +20,14 @@
   §6` in the legacy flat layout; `jaiba-contract.md` §1 resolves which).
 
   Remove these comments once filled.
+
+  The Project Context paragraph below is the filesystem variant. When
+  initializing an external brain, replace it with the actual selected
+  adapter and safe project/registry locator, resolved through the host's
+  effective create-memory definitions and jaiba-contract section 1.
+  Do not claim AGENTS.md or .ai/ exists, expose credentials, embed memory
+  payloads, or create a mirror. Explain external consumers are pending
+  Phase4 during the Phase3 transition rather than promising conduct use.
 -->
 
 # [Project Name]

@@ -95,6 +95,29 @@
       },
       "expected_output": "Doctor reports the missing executor-medium definition as missing from scanned folders and marks runtime invocation UNVERIFIED in its inventory because the shell probe cannot inspect registration. It does not claim executor-medium is unavailable, recommend inline fallback solely from the missing file, or let the filesystem result override the explicit current-runtime evidence supplied in context. It explains that conduct checks callable roles directly and advises investigating jaiba-configure only if conduct cannot invoke a needed role. CLI health remains based on CLI tool findings, independently of runtime-role evidence.",
       "files": []
+    },
+    {
+      "id": 11,
+      "name": "external-brain-no-marker-mcp-absent-atl-local",
+      "prompt": "Run a JAIBA health check for this project.",
+      "context": {
+        "repo_state": "no AGENTS.md and no .ai/; explicitly selected external acme-memory 1.0.0",
+        "binding_and_catalogue": "valid owned project/context binding; complete catalogue and full reads prove real index and required concepts; selected MCP transport is now unavailable",
+        "atl": "physical work root is writable; .atl/tool-layout.md refresh is independently permitted",
+        "other": "optional Engram MCP absent; conduct/ask/fast/battery are Phase4 pending"
+      },
+      "expected_output": "Doctor resolves the external selection before classifying brain state; no local marker/.ai/ is not a failure and does not trigger filesystem fallback. Reports selected adapter unavailable distinctly from absence, blocks dependent memory/reference checks, and performs only the independent physical-local .atl/tool-layout.md probe. Optional Engram absence is not a core-health failure; doctor does not repair binding/backend or create .ai/. States external consumers pending Phase4."
+    },
+    {
+      "id": 12,
+      "name": "external-brain-insufficient-catalogue-blocks-memory-checks",
+      "prompt": "Check this project's JAIBA health.",
+      "context": {
+        "selection": "external surface selected; binding exists but catalogue is partial, index cannot be fully read and context root mismatches current work root",
+        "local": "no .ai/; physical ATL write remains possible",
+        "surface_variants": "also exercise both index.md and constitution.md present (ambiguous), and a supported legacy-flat-only layout"
+      },
+      "expected_output": "Does not call binding or partial listing a brain; distinguishes partial/unreadable, context mismatch and authoritative absence. Blocks dependent diagnostics without falling back, while independently refreshing local .atl/tool-layout.md. Filesystem dual markers are ambiguous and never auto-selected; supported legacy-flat-only layout is not degraded or converted. Doctor diagnoses only, does not repair backend, binding or memory."
     }
   ]
 }

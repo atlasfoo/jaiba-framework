@@ -1,6 +1,6 @@
 ---
 name: jaiba-configure
-description: Machine-level setup and targeted updates for JAIBA on the host agent. Installs or refreshes the global behavioral contract, workflow/meta skillset, and host-native subagent battery; update mode refreshes the contract or battery and migrates exact subagent model IDs. Not repo-scoped — instrumenting a specific project is jaiba-init's job.
+description: Machine-level setup and targeted updates for JAIBA on the host agent. Installs or refreshes the global behavioral contract, core skillset and host-native subagent battery; discovers host-visible memory surfaces and offers optional pinned first-party Engram installation without activation. Preserves explicit user configuration. Update mode refreshes the contract or battery and migrates exact model IDs. Project instrumentation belongs to jaiba-init.
 version: 3.2.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -17,9 +17,10 @@ tags:
 
 ## What this skill touches
 
-`jaiba-configure` operates only within the host's global config root
-(`~/.claude/`, `~/.agents/`, etc.) and its own packaged assets. Its full
-read/write footprint:
+`jaiba-configure` configures the host agent, not a project's brain. It
+operates within the host's global config root (`~/.claude/`, `~/.agents/`,
+etc.), its own packaged assets, and explicitly chosen skill destinations.
+Its full read/write footprint:
 
 **Writes:**
 - `<global config root>/jaiba-contract.md` — installs/refreshes the contract
@@ -32,6 +33,8 @@ read/write footprint:
   line per tier, if the developer opts in
 - installed JAIBA subagent `model:` values — replaces exact model IDs
   when the developer invokes model migration in update mode
+- the explicitly approved host-visible local/global destination files for
+  the optional first-party `jaiba-engram-memory` package (step 4)
 
 **Reads:**
 - its own packaged assets: `assets/jaiba-contract.md`,
@@ -49,6 +52,12 @@ read/write footprint:
   versions
 - the vendor's global instructions file, to check whether a contract
   reference line is already present
+- host-visible installed memory-surface declarations and their package-local
+  references/evidence; the effective `create-memory` canonical references
+- when inspecting a named project: its explicit `AGENTS.md` selection field,
+  local Git root/identity metadata, local `.atl/tool-layout.md` if present,
+  existing routing-only binding under `~/.jaiba/memory/`, and authorized
+  read-only surface evidence needed to report identity/authority conflicts
 
 **Never reads:** chat/conversation history, credentials of any kind,
 `settings*.json` (or any other hook/permission config), or anything else
@@ -64,13 +73,19 @@ installed once into your agent (e.g.
 run once per machine, from anywhere. It does not need — and does not
 assume — a target repository.
 
-Its scope is exactly three installs:
+Its core scope is exactly three installs, plus the separate opt-in in step 4:
 
 1. the **global JAIBA Behavioral Contract**, in the host's user-level
    config folder;
 2. the **workflow/meta skillset** from `assets/skillset.txt`;
 3. the **subagent battery** from the host's packaged agent set, in the
    host's global agents folder.
+
+`create-memory` belongs to the pinned core skillset: it owns the canonical
+surface contract, not an MCP backend dependency. `jaiba-engram-memory` does
+**not** belong to the core manifest. Its absence, or an absent optional
+Engram MCP, is not a core setup error. User-approved generated adapters are
+explicit extensions, never automatically distributed third-party skills.
 
 Everything scoped to *one repository* — the `AGENTS.md` marker, the
 `.ai/` brain skeleton, the `.atl/` machine-local state, the constitutive
@@ -149,7 +164,7 @@ divergence is a question, not an assumption.
 
 Before anything else, tell the developer the jaiba-configure run has started.
 
-Then run the three steps below in order. Surface what you did at the end
+Then run the four steps below in order. Surface what you did at the end
 (see **Closing**).
 
 ### 1. Identify the host agent
@@ -240,6 +255,15 @@ versions across repos.
    unpinned `npx skills add`, and do not guess or infer a ref from
    anywhere else. Skip the skillset entirely, continue to the subagent
    battery below, and say so in the closing report.
+
+   Require exactly one nonempty release-tag value consistent with this
+   skill's packaged `version:` frontmatter; reject duplicate, malformed or
+   inconsistent pins as the same packaging error. Treat the value as data,
+   never shell syntax. Reuse this **same validated value** for the optional
+   first-party adapter in step 4; never repin, infer a different release, or
+   substitute a branch. A valid pin is not proof the release contains a new
+   feature: if a requested package is absent there, report unavailable at
+   that ref and leave it pending, without an unpinned fallback or manual bump.
 
 2. **List global skills for this agent:**
    ```bash
@@ -383,8 +407,9 @@ pin survives the fallback. Still prefer the package manager so
 versions/locks stay honest.
 
 > `jaiba-configure` never installs *itself* (it's already global) or
-> unbuilt skills, and only installs entries from `assets/skillset.txt` —
-> keep that list current, not hardcoded in prose.
+> unbuilt skills. Core installs come only from `assets/skillset.txt`; the
+> sole optional first-party install is `jaiba-engram-memory` in step 4.
+> Never add optional adapters or third-party sources to the core manifest.
 
 **Then install the subagent battery.** Select the packaged agent set for
 the detected host: OpenCode uses `assets/agents/opencode/`; other hosts
@@ -432,6 +457,29 @@ selection isn't meaningful. Offer to pin one instead:
    step on an already-configured machine (§ Re-running is fine) shows the
    current per-tier state and asks again rather than silently preserving
    or silently overwriting it.
+
+### 4. Discover memory surfaces; offer optional installation
+
+Read [Memory surface setup](references/memory-surfaces.md) before this step.
+Resolve the host's effective `create-memory` installation and its canonical
+`references/memory-surface-contract.md`, `resolution.md` and
+`filesystem-surface.md` independently through host resolution, never through
+sibling paths or this checkout. Missing, ambiguous or incompatible definitions
+block dependent discovery/selection claims; finish reporting independent core
+setup without improvising the contract. Update mode does not run this step.
+
+Inventory only this host's actually visible installed adapters, distinguish
+conforming candidates from drafts, and preserve explicit user selections.
+Offer the optional first-party Engram package separately with the exact same
+validated release pin from step 3, explicit host, local/global scope, destination
+and file-change consent. Declining is a successful core-only configuration.
+Installation is not activation, instrumentation, migration or MCP verification.
+
+Do not change a binding during inspection, create/register a project, choose
+an executive context, or invoke consumers to test setup. In this Phase3 stage,
+external `conduct`/`ask`/`fast` and battery consumers must **stop pending Phase4**;
+populated-store migration remains blocked pending Phase5. Never create `.ai/`
+as a mirror/cache or a compatibility workaround.
 
 ## Shared model discovery and validation
 
@@ -503,10 +551,19 @@ End with a short, honest report:
    (CLI command or ACP launcher/field), host/version, fallback reason if
    any, and availability limits; distinguish rejected IDs, unverifiable
    discovery, cancellation and no-op from a successful pin change.
-5. **Next step** — if the developer's intent is to set up JAIBA for a
+5. **Memory surfaces** — host-visible candidates and drafts, effective
+   canonical dependency, explicit selection (or unresolved choice), optional
+   Engram declined / already installed / installed for inspection / unavailable
+   at the pinned ref, exact host/scope/files and source#ref, drift retained,
+   and actual tool/permission evidence versus unverified requirements. Missing
+   optional MCP affects its demander only, not core health. Report identity,
+   context or populated-store conflicts without changing bindings; state the
+   Phase4 consumer and Phase5 migration barriers and that no activation occurred.
+6. **Next step** — if the developer's intent is to set up JAIBA for a
    *specific project*, tell them to run **`jaiba-init`** from inside that
-   repo: it lays the `.ai/` brain skeleton and the `AGENTS.md` marker,
-   initializes constitutive memory, and hands off to `jaiba-doctor` for
+   repo: it resolves the selected surface, owns authorized registration and
+   constitutive instrumentation (the `.ai/` skeleton and `AGENTS.md` marker
+   in filesystem mode), and hands off to `jaiba-doctor` for
    the first checkup. Mention it; **do not invoke it** — this machine is
    now configured, and that is where `jaiba-configure` ends.
 
@@ -527,8 +584,8 @@ End with a short, honest report:
   the hand-off. Invoking it, or doing its work inline, would violate the
   split this skill exists to enforce.
 - **Install from source, not siblings.** Fetch the skill set from the
-  canonical repo via the package manager. No runtime path into another
-  skill's folder.
+  canonical repo via the package manager. Resolve canonical dependencies
+  through the host's effective installations, never assumed sibling paths.
 - **Don't duplicate global skills.** If `npx skills list -g` already
   covers a `skillset.txt` entry, leave it there — don't reinstall it
   globally and don't also copy it into a project.

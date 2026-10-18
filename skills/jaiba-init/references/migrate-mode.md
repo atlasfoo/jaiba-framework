@@ -1,5 +1,26 @@
 # `jaiba-init:update-brain:migrate`
 
+## Scope gate — existing filesystem layout conversion only
+
+Resolve the selected surface and canonical definitions using SKILL.md's
+Universal Preconditions before this mode. This is the existing optional
+**filesystem legacy → concept-bundle layout conversion**, not a
+surface-to-surface migration or external registry bootstrap. On external
+selection, or any requested transition involving populated filesystem or
+external stores, stop with **surface migration capability pending Phase5**
+and offer an explicit filesystem exception to retain local memory. Selection
+or binding approval is not import/activation authority. Do not implement
+staging/import, transfer, merge, dual-write, retirement or T022 here.
+
+For a selected filesystem brain the procedure below remains supported,
+including backup, literal gap carry-over, log-frontmatter backfill and the
+temporary dual-layout ambiguity until separately confirmed removal. Do not
+offer this conversion unprompted or warn merely because historical legacy
+entries lack modern frontmatter. Apply full-source revision comparisons,
+serialized writes and verified full readback/receipts after each write;
+changed/unknown outcomes stop dependent work, never claim atomic CAS.
+Keep original/unknown source material and approved identity mappings intact.
+
 Convert a populated **flat** brain into the **concept bundle**. End
 state: `.ai/memory/` holds `index.md` plus one file per concept, every
 fact carried over from `constitution.md`, `adr-log.md` and

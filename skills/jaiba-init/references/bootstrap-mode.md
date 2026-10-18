@@ -1,6 +1,7 @@
 # `jaiba-init` — bootstrap mode
 
-Adopt **this repository** into JAIBA. End state: the repo carries the
+Adopt **this project** into JAIBA on its resolved surface. In filesystem
+mode the end state is unchanged: the repo carries the
 `AGENTS.md` marker, the `.ai/` brain skeleton and the `.atl/`
 machine-state directory exist, the constitutive memory is populated, and
 `jaiba-doctor` has run the first checkup.
@@ -11,7 +12,64 @@ installs **nothing** at the machine level. That half of the setup
 (behavioral contract, skillset, subagent battery) belongs to
 `jaiba-configure` and is only ever *checked for* here, never performed.
 
-## When NOT to bootstrap
+## Resolve first — external registration/linking
+
+Apply SKILL.md's Universal Preconditions, binding/identity procedure,
+mutation discipline and Phase3 gates **before** the filesystem sequence.
+Resolve canonical definitions from the host-effective `create-memory`
+installation, not a checkout or assumed sibling directory. These are
+declarative operations using already available tools, not service setup.
+
+For an **external** selection, run this branch instead of filesystem
+steps 1–3 below:
+
+1. Validate real callable tools, contract/version, all required guarantees
+   and exact owned namespace/registry. A draft or unverified mutable adapter
+   cannot be used to bootstrap. Failure is not an empty brain.
+2. Resolve the sanitized origin/full namespace identity (absolute-root +
+   host fallback only without origin). Inspect existing local memory/work
+   without changing it. A populated-store transition is **blocked pending
+   Phase5**, not a fresh initialization; offer the explicit filesystem
+   exception. Do not transfer, ignore, merge or dual-write existing stores.
+3. Look up the exact identity in the owned registry. If it already resolves
+   a real external brain, verify the complete catalogue, full index and
+   entry concepts, then **link**, do not seed/overwrite. Obtain explicit
+   approval for a new alias or root association and check collisions first.
+   Ordinary backend notes/search hits are never a brain to adopt.
+4. If the registry identity is unknown, ask whether to associate an exact
+   existing project or create a new project. New creation needs an
+   authoritatively empty scope and explicit namespace/project approval;
+   an empty catalogue alone is not instrumentation. Multiple matches,
+   partial/template state or unknown ownership require reconciliation.
+5. Confirm a fresh per-root context identity, or exact existing context
+   with single-writer handoff. Only authorized registry identities may be
+   created here; initial executive content stays empty. Persist and read
+   back the routing-only host/root binding under `~/.jaiba/memory/`, or
+   obtain explicit session-only consent. Verify registry writes individually
+   with pre-read revision, full readback and receipt before proceeding.
+6. Do **not** write the filesystem marker template, `.ai/` skeleton,
+   `.ai/.gitignore`, `.gitkeep` files or any cache. External `AGENTS.md`
+   override is optional selection data, written only if requested/approved,
+   preserving existing content. Verify instrumentation from registry and
+   real constitutive objects, never from that override.
+7. For a new empty brain transition internally to `initialize`'s external
+   branch. A verified existing brain needs no initialization; use `update`
+   only for an approved content change. Hand off to `jaiba-doctor` for the
+   checkup and local ATL probe, then report **consumer capability pending
+   Phase4** and stop, not `conduct`/`ask`/`fast` or the battery.
+
+ATL always lives at `<work-root>/.atl/tool-layout.md`, even with no local
+brain. If ignore is needed without tracked repo changes, add the narrow
+ATL exclusion to the Git-resolved local exclusion file, preserving existing
+entries; do not create `.ai/` to hold machine state. The existing filesystem
+bootstrap's self-ignoring `.atl/.gitignore` remains supported.
+
+Report selected adapter/version, namespace/project/context IDs, sanitized
+identity, verified catalogue/entry reads, binding persistence or session-only
+status, mutation receipts/partial effects, gaps and pending capability.
+Never report a mere binding/probe as completed instrumentation.
+
+## When NOT to bootstrap — filesystem
 
 If the repo is already instrumented, bootstrapping would clobber real
 work. Read the state first, then pick the row.
@@ -31,7 +89,7 @@ If you're unsure which case you're in, check `.ai/memory/` for
 the contract calls out — **ask the developer** rather than risk
 overwriting.
 
-## The bootstrap sequence
+## The bootstrap sequence — filesystem only
 
 Run the steps below in order. Each has a precondition or an edge case;
 don't barrel through them. Surface what you did at the end (see
@@ -39,9 +97,10 @@ don't barrel through them. Surface what you did at the end (see
 
 ### 0. Confirm you're at the project root
 
-You should be at the top of the repo the developer wants to adopt —
-where `.git/` lives. If you can't tell, ask. Everything below is written
-relative to this root.
+Use the exact checkout/worktree root established in Universal Preconditions,
+not the common Git directory or the skill installation; without Git use
+the absolute host workspace root. If ambiguous, ask. Everything below is
+written relative to this root.
 
 ### 1. Detect this repo's agent folder
 
@@ -163,7 +222,8 @@ responsibility ends.
 
 End with a short, honest report:
 
-1. **Where things landed** — the agent folder detected for this repo and
+1. **Where things landed** — selected surface and verified identity/binding;
+   for filesystem, the agent folder detected for this repo and
    *why* (zero/one/many vendor dirs), the `.ai/` tree created, the
    `.atl/` directory, and where the repo `AGENTS.md` marker went (and how
    an existing one was handled).

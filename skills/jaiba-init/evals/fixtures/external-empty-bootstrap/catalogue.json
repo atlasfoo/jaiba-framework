@@ -1,0 +1,33 @@
+{
+  "fixture_kind": "synthetic-scenario-data-not-live-conformance-evidence",
+  "scenario": "authorized-empty-scope-bootstrap",
+  "identity": {
+    "project_id": "prj-payments",
+    "namespace": "acme/payments",
+    "origin_normalized": "git.example/acme/payments",
+    "work_root": "/work/payments",
+    "context_id": "ctx-payments-work"
+  },
+  "enumeration_before_write": {
+    "complete": true,
+    "consistent": true,
+    "unfiltered": true,
+    "authoritative_absence": true,
+    "objects": [],
+    "revision": "catalogue-r0"
+  },
+  "authorization": {"create_project_association": true, "create_empty_context_identity": true, "bootstrap_constitutive": true},
+  "project_concepts": [
+    {"logical_id": "identity/project.md", "type": "project", "revision": "expected-r1", "body": "Project identity from repository evidence."},
+    {"logical_id": "identity/architecture.md", "type": "architecture", "revision": "expected-r1", "body": "Architecture from inspected source."},
+    {"logical_id": "identity/purpose.md", "type": "purpose", "revision": "expected-r1", "body": "Purpose from repository evidence; unknowns remain marked."},
+    {"logical_id": "identity/scope.md", "type": "scope", "revision": "expected-r1", "body": "Project scope from repository evidence."},
+    {"logical_id": "identity/quality-gate.md", "type": "quality-gate", "revision": "expected-r1", "body": "Commands from CI: dotnet test."},
+    {"logical_id": "identity/conventions.md", "type": "convention", "revision": "expected-r1", "body": "Conventions from repository evidence."},
+    {"logical_id": "decisions/001-adoption.md", "type": "decision", "revision": "expected-r1", "body": "ADR-001: adopt the JAIBA brain."},
+    {"logical_id": "references/payments-api.md", "type": "reference", "revision": "expected-r1", "body": "External Payments API; resource grounded in docs/openapi/payments-v2.yaml."}
+  ],
+  "index_last": {"logical_id": "index.md", "type": "index", "revision": "expected-r1", "links_to_all_project_concepts": true, "must_be_last_create": true},
+  "context_registry": {"context_id": "ctx-payments-work", "state": "empty identity only", "executive_objects": []},
+  "local_state": {"agents_marker": false, "ai_directory": false, "atl_remains_physical_local": true}
+}

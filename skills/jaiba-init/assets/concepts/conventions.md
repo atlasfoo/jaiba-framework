@@ -52,11 +52,14 @@ updated: "[YYYY-MM-DD]"                           # recommended — last substan
     options at close and the developer picks.]
 
 - **Definition of ready** (before a plan enters `execute` mode):
-  - Plan is written to `.ai/work/plan.md`
-  - Tasks are decomposed in `.ai/work/tasks.md`
+  - Plan is written to the resolved executive context (`.ai/work/plan.md`
+    on filesystem)
+  - Tasks are decomposed in that context (`.ai/work/tasks.md` on filesystem)
   - All clarifying questions have been resolved (no
     `[NEEDS CLARIFICATION]` blocks in the artifacts)
   - Human has explicitly approved the plan
+  - The consumer supports the selected surface; external `conduct` and
+    battery use remain capability pending Phase4 during the Phase3 transition
 
 ## Style and syntax
 
