@@ -1,0 +1,11 @@
+{
+  "layout": "concept-bundle",
+  "markers": [".ai/memory/index.md"],
+  "documents": [
+    {"path": ".ai/memory/index.md", "logical_id": "memory-index", "full_content": "# Memory index\n- purpose: purpose.md\n- scope: concepts/scope.md\n", "metadata": {"type": "index", "owner": "jaiba", "future_extension": {"keep": true}}, "relations": [{"source": "memory-index", "target": "purpose", "representation": "purpose.md", "future_relation_field": "keep"}]},
+    {"path": ".ai/memory/purpose.md", "logical_id": "purpose", "full_content": "---\ntype: purpose\ncustom: preserve-me\n---\n# Purpose\nComplete text.\n", "metadata": {"type": "purpose", "custom": "preserve-me"}, "relations": []},
+    {"path": ".ai/memory/concepts/scope.md", "logical_id": "scope", "full_content": "---\ntype: scope\n---\n# Scope\nNested locator.\n", "metadata": {"type": "scope"}, "relations": [{"source": "scope", "target": "https://example.invalid/external", "representation": "external markdown link", "external": true}]},
+    {"path": ".ai/memory/log/2026-01-01-close.md", "logical_id": "log-2026-01-01-close", "full_content": "# Closed work\nFull historical payload.\n", "metadata": {"type": "log-entry", "unknown": 17}, "relations": []}
+  ],
+  "expected_inventory_ids": ["memory-index", "purpose", "scope", "log-2026-01-01-close"]
+}

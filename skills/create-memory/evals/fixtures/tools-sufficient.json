@@ -1,0 +1,17 @@
+{
+  "fixture_kind": "synthetic-tool-schemas",
+  "live_tools": false,
+  "tools": [
+    {"name": "surface_probe", "input": ["contract", "namespace", "project_id"], "output": ["version", "ownership", "capabilities", "limits", "permissions"]},
+    {"name": "list_projects_and_contexts", "input": ["namespace", "page_token"], "output": ["complete_items", "next_page", "completion"]},
+    {"name": "catalog_exact", "input": ["namespace", "project_id", "category", "context_id", "type", "page_token"], "output": ["addresses", "types", "revisions", "locators", "next_page", "completion"]},
+    {"name": "read_full", "input": ["logical_address"], "output": ["full_content", "all_metadata", "all_relations", "revision", "complete"]},
+    {"name": "create_if_absent", "input": ["logical_address", "expected_absence", "complete_object"], "output": ["receipt", "revision"]},
+    {"name": "update_if_revision", "input": ["logical_address", "expected_revision", "complete_object"], "output": ["receipt", "revision"]},
+    {"name": "append_immutable", "input": ["logical_address", "close_id", "complete_payload"], "output": ["receipt", "revision", "idempotency_result"]},
+    {"name": "archive_and_clear_exact", "input": ["context_id", "verified_archive_receipt", "frozen_inventory"], "output": ["completed", "residual_addresses", "receipt"]},
+    {"name": "export_complete", "input": ["exact_scope"], "output": ["manifest", "full_objects", "relations", "source_revisions", "complete"]},
+    {"name": "import_staging", "input": ["staging_scope", "manifest", "full_objects"], "output": ["receipts", "readback_manifest", "complete"]}
+  ],
+  "assertion_note": "Schema presence is not proof of callable availability, authorization, serialization, or successful verification."
+}

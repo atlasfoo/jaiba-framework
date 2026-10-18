@@ -1,0 +1,7 @@
+{
+  "cases": [
+    {"id": "both-entry-files", "markers": ["index.md", "constitution.md"], "expected": "ambiguous:stop-no-access-export-or-mutation"},
+    {"id": "no-entry-file", "markers": [], "expected": "no-resolved-brain:do-not-manufacture"}
+  ],
+  "excluded_paths": [".atl/tool-layout.md", ".ai/vendored/", "other-checkout/.ai/memory/"]
+}

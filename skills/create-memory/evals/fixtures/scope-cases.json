@@ -1,0 +1,14 @@
+{
+  "selected_scope": {"namespace": "jaiba:fixture", "project_id": "project-a", "category": "executive", "context_id": "ctx-a"},
+  "records": [
+    {"id": "exact-owned", "address": ["jaiba:fixture", "project-a", "executive", "ctx-a", "plan"], "title": "Plan", "expected": "include"},
+    {"id": "ordinary-memory-matching-title", "address": ["ordinary", "personal", "executive", "ctx-a", "plan"], "title": "Plan", "tags": ["jaiba", "plan"], "expected": "exclude"},
+    {"id": "other-context", "address": ["jaiba:fixture", "project-a", "executive", "ctx-b", "tasks"], "expected": "exclude"}
+  ],
+  "failure_results": ["partial", "permission-denied", "unavailable", "truncated"],
+  "expected_failure_rule": "none is not-found or proof of empty scope; block dependent operation",
+  "coordination": [
+    {"id": "supported", "capability": "supported", "consumer_coordination_id": "mission-42", "expected": "separate-optional-boundary-not-a-project-or-context-id"},
+    {"id": "unsupported", "capability": "unsupported", "consumer_coordination_id": null, "expected": "coordination-unavailable-but-memory-contract-remains-usable"}
+  ]
+}

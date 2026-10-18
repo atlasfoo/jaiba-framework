@@ -1,0 +1,15 @@
+{
+  "cases": [
+    {"id": "override-filesystem", "override": "filesystem", "local": ["team"], "global": ["global"], "expected": "filesystem"},
+    {"id": "no-candidates-default-filesystem", "override": null, "local": [], "global": [], "expected": "filesystem"},
+    {"id": "global-only-adapter", "override": null, "local": [], "global": ["global-team"], "expected": "global:global-team:validate-tools-before-use"},
+    {"id": "local-global-same-id", "override": null, "local": [{"id": "team", "version": 1}], "global": [{"id": "team", "version": 9}], "expected": "local:team@1"},
+    {"id": "local-level-different-ids", "override": null, "local": ["alpha", "beta"], "global": ["gamma"], "expected": "human-choice:alpha|beta"},
+    {"id": "conflicting-override-lines", "override": ["alpha", "beta"], "local": ["alpha"], "global": [], "expected": "stop:ambiguous-override"},
+    {"id": "unknown-explicit-id", "override": "missing", "local": ["team"], "global": [], "expected": "stop:unknown-selected-id-no-fallback"},
+    {"id": "failed-selected-tool", "override": "team", "local": ["team"], "global": ["other"], "tool_probe": "permission-denied", "expected": "stop:selected-adapter-failed-no-fallback"},
+    {"id": "failed-remembered-binding", "binding": "alpha", "visible": [], "expected": "stop:unresolved-binding-no-filesystem-fallback"},
+    {"id": "new-explicit-override", "binding": "alpha", "override": "beta", "local": [], "global": ["alpha", "beta"], "expected": "beta:revalidate-authority-before-use"},
+    {"id": "same-id-ambiguous-copies", "override": null, "local": [{"id": "team", "copy": "one"}, {"id": "team", "copy": "two"}], "global": [], "expected": "stop:disambiguate-same-level-copies"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "layout": "legacy-flat",
+  "markers": [".ai/memory/constitution.md"],
+  "documents": [
+    {"path": ".ai/memory/constitution.md", "logical_id": "legacy-constitution-document", "full_content": "# Constitution\nPurpose and identity.\n\n## Unknown section\nKeep this full section.\n", "frontmatter": null, "unknown_sections": ["Unknown section"], "relations": [{"source": "legacy-constitution-document", "target": "legacy-adr-document", "representation": "adr-log.md", "unknown_relation_metadata": "preserve"}]},
+    {"path": ".ai/memory/adr-log.md", "logical_id": "legacy-adr-document", "full_content": "# Decisions\n\n## ADR 1\nDecision details and unknown fields.\n", "frontmatter": null, "mutable": false},
+    {"path": ".ai/memory/reference-index.md", "logical_id": "legacy-reference-document", "full_content": "# References\nUnknown reference section remains whole.\n", "frontmatter": null},
+    {"path": ".ai/memory/log/close-1.md", "logical_id": "legacy-log-close-1", "full_content": "# Historical entry\nUntyped complete payload.\n", "frontmatter": null, "mutable": false}
+  ],
+  "expected_inventory_ids": ["legacy-constitution-document", "legacy-adr-document", "legacy-reference-document", "legacy-log-close-1"],
+  "expected_mapping_rule": "Each legacy document is one complete source object; section views map into it and do not create duplicate writable objects."
+}
