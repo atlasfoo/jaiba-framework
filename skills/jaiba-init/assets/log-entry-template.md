@@ -37,6 +37,16 @@ adr: <ADR-NNN or "none">
 > decision lives there; the closure of the work that produced it lives
 > here, pointing at the ADR by ID.
 
+The paths above are the filesystem representation. On external surfaces
+this template supplies the same **logical content**, addressed in the owned
+constitutive scope without a local log file/mirror. Retain a stable change
+or close ID across retries and verify complete readback plus canonical
+receipt before proceeding; the same ID with a different payload conflicts.
+Unknown metadata/relations survive updates and portability. `jaiba-init`
+may append `brain-change`; `conduct` owns `work-closure`, with external
+consumer capability pending Phase4 during Phase3. This template does not
+grant archive/cleanup authority or implement surface migration.
+
 ---
 
 ```markdown

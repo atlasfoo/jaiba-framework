@@ -11,10 +11,20 @@ doctor owns this probe outright: `jaiba-init` defers the first run here
 (bootstrap step 5) rather than probing itself, and every later checkup
 re-runs it, widened to cover subagents and hooks.
 
+**Surface-independent boundary.** The destination is always the physical
+`<work-root>/.atl/tool-layout.md`, including external-memory projects without
+`AGENTS.md` or `.ai/`. Resolve the exact checkout/worktree root (or absolute
+host workspace root) first; never use the common Git directory, backend
+namespace or executive context as the destination. Do not create a marker,
+brain/cache or binding to run the probe. The existing `check-tools.sh` stays
+unchanged and does not resolve or validate memory surfaces.
+
 ## Procedure
 
 1. **Run the bundled probe** against every skills directory you located in
-   the preconditions — project-local, global, or both, joined with `:`:
+   the preconditions — project-local, global, or both, joined with `:`.
+   Use actual current-host install paths, not assumed sibling/vendor paths;
+   distinguish additional disk-only inventory from effective visible skills:
 
    ```bash
    bash <this-skill>/scripts/check-tools.sh "<local-skills-dir>:<global-skills-dir>" <project-root>
@@ -91,6 +101,9 @@ re-runs it, widened to cover subagents and hooks.
 
 2. **Read the result back.** Open the refreshed `.atl/tool-layout.md` and
    turn its rows into findings:
+   - Verify the physical destination and successful complete readback before
+     claiming refresh. Inaccessible output or probe failure is a tool-state
+     failure, not an absent brain, and does not justify writing elsewhere.
    - The **Subagents** inventory reports whether definitions were detected
      in the scanned folders and marks runtime invocation `❔ UNVERIFIED`.
      Neither a detected file nor its declared CLI requirements establishes
@@ -156,6 +169,12 @@ re-runs it, widened to cover subagents and hooks.
   doctor doesn't install it for them.
 - Mention that `.atl/tool-layout.md` was refreshed, so the developer knows
   the §6 session warning now reflects reality.
+- Keep CLI/disk detection separate from current callable tools, permissions
+  and selected-surface capability evidence. A green ATL row cannot certify
+  an adapter, namespace, project binding, full catalogue or executive context.
+  Missing optional MCP/search is not a mandatory-core defect; identify its
+  actual demander. Machine setup defects route to `jaiba-configure`, repo
+  identity/brain defects to `jaiba-init`; doctor installs or repairs neither.
 
 ## Boundary
 
@@ -186,3 +205,13 @@ health rollup (`❔ unverified — jq missing, hooks not scanned`). The fix ther
 narrower than MCP's: install `jq` and re-run this same probe, since
 hooks are a CLI-tool fact this diagnostic is equipped to check once it
 can parse the config.
+
+Selected memory access is verified separately by diagnostic 1's canonical
+resolution preflight and diagnostic 3's exact reference probes. Inspect the
+current runtime's actual backend tools and permissions without writes; do
+not infer child-session namespace/context access from the parent or ATL.
+Unavailable, unsupported-version, missing-capability and ownership conflict
+are distinct outcomes, not an empty store. Do not create test records to
+certify revision/receipt/CAS guarantees. External consumers/subagents remain
+pending Phase4 and populated-store migration pending Phase5; this independent
+physical probe neither activates an adapter nor bypasses those barriers.

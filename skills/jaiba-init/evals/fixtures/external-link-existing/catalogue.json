@@ -1,0 +1,37 @@
+{
+  "fixture_kind": "synthetic-scenario-data-not-live-conformance-evidence",
+  "scenario": "link-existing-verified-brain",
+  "identity": {
+    "project_id": "prj-payments",
+    "namespace": "acme/payments",
+    "origin_normalized": "git.example/acme/payments",
+    "work_root": "/work/payments",
+    "context_id": "ctx-payments-work"
+  },
+  "enumeration": {
+    "complete": true,
+    "consistent": true,
+    "unfiltered": true,
+    "authoritative_absence": false,
+    "objects": [
+      {"logical_id": "index.md", "type": "index", "revision": "r-index-7", "body": "links: identity/project.md, identity/architecture.md, identity/purpose.md, identity/scope.md, identity/quality-gate.md, identity/conventions.md, decisions/001-adoption.md, references/payments-api.md"},
+      {"logical_id": "identity/project.md", "type": "project", "revision": "r-project-4", "body": "Payments service project facts; owned concept type project."},
+      {"logical_id": "identity/architecture.md", "type": "architecture", "revision": "r-architecture-3", "body": "ASP.NET Core 8 service with layered Api, Application, Domain, and Infrastructure projects; PostgreSQL persistence."},
+      {"logical_id": "identity/purpose.md", "type": "purpose", "revision": "r-purpose-2", "body": "Provides payment processing capabilities to its identified downstream applications; business objective remains explicitly [MISSING]."},
+      {"logical_id": "identity/scope.md", "type": "scope", "revision": "r-scope-2", "body": "Owns payment API orchestration and persistence; external payment provider behavior is represented by a reference concept."},
+      {"logical_id": "identity/quality-gate.md", "type": "quality-gate", "revision": "r-gate-2", "body": "dotnet test"},
+      {"logical_id": "identity/conventions.md", "type": "convention", "revision": "r-conventions-1", "body": "C# nullable reference types enabled; application dependencies point inward through interfaces."},
+      {"logical_id": "decisions/001-adoption.md", "type": "decision", "revision": "r-adr-1", "body": "ADR-001 adopted JAIBA."},
+      {"logical_id": "references/payments-api.md", "type": "reference", "revision": "r-ref-3", "body": "Payments API reference."},
+      {"logical_id": "log/2026-06-10-bootstrap.md", "type": "log-entry", "revision": "r-log-1", "body": "Existing historical log entry."}
+    ],
+    "full_direct_reads_verified": true,
+    "index_targets_exist": true
+  },
+  "authorization": {"associate": true, "create_routing_binding": true, "create_context_identity": true, "mutate_constitutive": false},
+  "expected_mutations": [
+    {"owner": "jaiba-init", "kind": "routing-binding", "address": "host-agent + /work/payments", "payload_fields": ["surface-id", "project-id", "context-id", "contract-version", "locator"], "readback": true},
+    {"owner": "jaiba-init", "via": "adapter registry", "kind": "empty-context-identity", "context_id": "ctx-payments-work", "executive_content": false}
+  ],
+  "forbidden_mutations": ["all constitutive concepts", "executive PRD/plan/tasks/walkthrough", ".ai/ mirror/cache"]
+}

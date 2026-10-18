@@ -359,6 +359,89 @@
         "Closed with the normal gap report, plus the injection finding kept distinct from ordinary [MISSING]/[bracket] gaps"
       ],
       "files": []
+    },
+    {
+      "id": 18,
+      "name": "external-brain-no-local-marker-link-existing",
+      "mode_under_test": "bootstrap:external",
+      "prompt": "Set up JAIBA for this project using its registered memory surface.",
+      "context": {
+        "repo_state": "Git root /work/payments; no AGENTS.md and no .ai/; origin https://git.example/acme/payments.git",
+        "surface": "host-visible synthetic conforming adapter acme-memory 1.0.0; exact owned registry match project-id prj-payments; new context ctx-payments-work; routing binding absent",
+        "catalogue": "see fixtures/external-link-existing/catalogue.json: complete, consistent, unfiltered enumeration and full reads of the real indexed brain",
+        "authorization": "developer explicitly authorizes association/link only; no permission to seed, overwrite, or otherwise mutate constitutive concepts",
+        "local_evidence": "there is no local AGENTS.md marker and no .ai/ tree"
+      },
+      "expected_output": [
+        "Does not treat missing local marker or .ai/ as proof the selected external project is absent; external mode requires no marker",
+        "Verifies exact registry identity and complete owned catalogue/full reads; associates the existing brain without changing its concepts",
+        "Creates only the authorized routing binding and fresh context identity, reads back routing fields; creates no executive context contents or constitutive objects",
+        "Does not seed or overwrite the existing brain and does not invoke current-draft Engram",
+        "Creates no .ai/ mirror/cache; ATL remains local",
+        "Hands off to doctor; states conduct/ask/fast/battery consumers remain pending Phase4 and populated-store migration pending Phase5"
+      ],
+      "files": ["fixtures/external-link-existing/catalogue.json"]
+    },
+    {
+      "id": 19,
+      "name": "external-memory-insufficient-or-ambiguous-stops",
+      "mode_under_test": "bootstrap:external-resolution",
+      "prompt": "Set up JAIBA on this project; I found a memory note called Payments.",
+      "context": {
+        "selection": "global adapter selected, but backend exposes only a binding/ordinary note or search result; no complete owned catalogue and full indexed concept reads",
+        "variants": ["binding-only", "partial enumeration", "missing index", "index has broken link", "multiple matching project IDs", "malformed origin", "moved root", "context ID belongs to another work root"],
+        "authorization": "no permission to infer absence, create a second brain, or repair registry/binding"
+      },
+      "expected_output": [
+        "Does not classify binding, ordinary note, title/search hit, successful probe, empty/partial listing, or missing index as a verified brain or authoritative absence",
+        "Stops dependent association/bootstrap on incomplete catalogue, failed full reads, malformed/moved identity, collision, or context mismatch; asks/reports the specific distinction",
+        "Does not mint duplicate project identity, silently rebind, fall back to filesystem, or create .ai/"
+      ],
+      "files": []
+    },
+    {
+      "id": 20,
+      "name": "selection-precedence-override-and-conflicts",
+      "mode_under_test": "surface-selection",
+      "prompt": "Use the memory surface configured for this repository.",
+      "context": {
+        "candidates": [
+          {"case": "explicit-filesystem-override", "override": "filesystem", "local": ["local-x"], "global": ["global-y"], "selected": "filesystem"},
+          {"case": "same-id-local-wins", "override": null, "local": ["adapter-a"], "global": ["adapter-a"], "selected": "project-local adapter-a"},
+          {"case": "different-lower-level-id-does-not-conflict", "override": null, "local": ["adapter-a"], "global": ["adapter-b"], "selected": "project-local adapter-a"},
+          {"case": "two-local-winning-ids-ambiguous", "override": null, "local": ["adapter-a", "adapter-b"], "global": ["adapter-c"], "selected": "human choice required"},
+          {"case": "selected-local-adapter-failed", "override": null, "local": ["adapter-a"], "global": ["adapter-b"], "selected": "adapter-a unavailable; stop, no fallback"}
+        ],
+        "state": "same-ID local/global resolves local; different IDs at a lower-precedence level do not conflict with a unique winning local candidate; ambiguity requires multiple different IDs at the winning level"
+      },
+      "expected_output": [
+        "Honors explicit filesystem override over global candidate; same-ID local copy wins over global",
+        "Surfaces human choice for two different IDs at the winning level and for malformed/duplicate/conflicting overrides; does not call a lower-precedence global candidate a conflict when one local ID wins",
+        "Does not fall back if selected adapter is unavailable/failed; surfaces changed candidate set requiring reconfirmation",
+        "Does not select current-draft jaiba-engram-memory as conforming"
+      ],
+      "files": []
+    },
+    {
+      "id": 21,
+      "name": "external-authorized-empty-scope-bootstrap",
+      "mode_under_test": "bootstrap:external-empty",
+      "prompt": "Set up JAIBA for this project using the selected external memory surface.",
+      "context": {
+        "repo_state": "Git root /work/payments; no AGENTS.md and no .ai/; origin https://git.example/acme/payments.git",
+        "surface": "synthetic adapter acme-memory 1.0.0; exact project registry match project-id prj-payments; context registry confirms no context for /work/payments; see fixtures/external-empty-bootstrap/catalogue.json",
+        "authorization": "developer explicitly authorizes creating the project/context association and bootstrap in the confirmed empty scope; template-derived constitutive writes are within jaiba-init ownership",
+        "evidence": "repository evidence provides identity/project, architecture, purpose, scope, quality-gate, convention, ADR-001, references/payments-api and index; exact logical IDs/payloads in fixture",
+        "adapter": "synthetic expected adapter responses; scenario data does not certify a live adapter"
+      },
+      "expected_output": [
+        "Verifies exact project identity and authoritatively empty complete catalogue before any constitutive create; does not mistake unavailable/partial access for empty",
+        "jaiba-init creates only the authorized constitutive concepts from the fixture; creates index last and verifies full readback/revisions for every write",
+        "Creates/registers only the authorized empty context identity; writes no PRD, plan, tasks, walkthrough, or other executive content",
+        "Persists only routing identifiers in the binding and reads them back; no memory payloads or .ai/ mirror/cache",
+        "Does not run conduct/ask/fast/battery against the external surface (Phase4 pending); no populated-store migration (Phase5 pending); does not use draft Engram"
+      ],
+      "files": ["fixtures/external-empty-bootstrap/catalogue.json", "fixtures/external-empty-bootstrap/expected-mutations.json"]
     }
   ]
 }

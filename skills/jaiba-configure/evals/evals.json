@@ -313,6 +313,17 @@
       },
       "expected_output": "Refuses the destination as unlisted and makes no changes or backups to any agent file. Does not use ACP to evade rejection or infer availability from the provider. Offers the developer a valid listed destination or cancellation; removing a pin is a separate explicit-consent choice, never silent. Does not inspect unrelated files or private configuration.",
       "files": []
+    },
+    {
+      "id": 29,
+      "name": "core-without-engram-opt-in-is-install-not-activation",
+      "prompt": "Configure JAIBA and tell me whether Engram is required.",
+      "context": {
+        "skillset": "valid pinned core manifest includes create-memory; does not include jaiba-engram-memory",
+        "host_surfaces": "filesystem built-in; optional first-party Engram package offered at same release pin; optional MCP is absent",
+        "consent": "developer declines optional Engram installation; no project binding or activation authorized"
+      },
+      "expected_output": "Installs/configures core independently: create-memory is in the pinned core manifest, Engram adapter is optional and not added to core. Missing optional MCP does not make core unhealthy. Declining is a successful core-only setup. Does not claim install equals MCP availability, activation, project association, binding write or instrumentation; does not launch jaiba-init or write a project."
     }
   ]
 }
