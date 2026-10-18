@@ -1,0 +1,43 @@
+{
+  "skill_name": "jaiba-engram-memory",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Using the supplied synthetic Engram schema and record fixtures, assess whether these records may be adopted into the JAIBA namespace. Give the exact safe next step; analysis only, no backend calls.",
+      "expected_output": "Reject all unverified ownership claims. Only the record satisfying physical Project/Scope, trusted locator, and full envelope/address checks is owned. Ordinary notes stay unrelated; same namespace labels in another scope/project do not confer ownership. Explain that mem_get_observation's project argument is not an ownership filter and actual mem_update requires expected_project.",
+      "files": ["evals/fixtures/mixed-namespaces-and-schemas.json"],
+      "assertions": [
+        "Separates unrelated ordinary notes and the second executive context from the selected inventory.",
+        "Rejects records whose physical Project or Scope differs even when their envelope claims the expected namespace.",
+        "Does not assume mem_get_observation project filters ownership or that native topic_key is returned.",
+        "Uses required mem_update expected_project; does not invoke or depend on upstream mem_delete, which is absent from the callable schema.",
+        "Does not perform a live tool call or mutation."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Evaluate the synthetic object/chunk scenarios. State which reads are complete and which must fail closed, including the exact verification work needed. Do not invent byte counts or digests.",
+      "expected_output": "Only a complete, ordered, contiguous chunk reconstruction with exact computed length/digest and canonical decode/re-encode comparison is complete. Missing, reordered, transformed, or truncated data, incorrect declared counts/digests, or root revision change yields incomplete/verification-failed and cannot authorize absence or publication. Oversized individual objects are rejected before mutation unless all required records fit measured bounds.",
+      "files": ["evals/fixtures/chunk-and-large-object-cases.json"],
+      "assertions": [
+        "Requires indexes 0..chunk_count-1, contiguous offsets, explicit terminal page, and verified byte reconstruction.",
+        "Treats text transformation, truncation, missing/out-of-order chunks, bad counts/digests, and root revision race as failures.",
+        "Does not assert fictional digest values or infer a universal size limit from a large fixture.",
+        "Retains the prior live publication on pre-publication failure and never reports a partial object as complete."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Walk the synthetic catalogue and archive retry fixtures. Report completeness and whether cleanup is permitted in each case; analysis only.",
+      "expected_output": "Catalogue completeness requires all linked pages through explicit null, exact declared counts, uniqueness and a stable root re-read. Archive retries reuse the same close ID: identical full payload returns the existing immutable log, different payload conflicts. Partial retirement may retry only unchanged residuals for the same verified archive; new or changed work, unknown save IDs, or an unverifiable log blocks cleanup.",
+      "files": ["evals/fixtures/catalogue-and-retirement-cases.json"],
+      "assertions": [
+        "Detects missing pages, count mismatch, duplicate addresses and root revision races rather than claiming complete inventory.",
+        "Does not treat unknown/unlinked log entries or malformed objects as omittable.",
+        "Same close ID and identical payload is idempotent; same ID with different payload conflicts without editing the old log.",
+        "Preserves already verified tombstones and retires only unchanged known residuals; unexpected/new work blocks cleanup.",
+        "No physical deletion, bulk purge, backend mutation, or conformance certification is claimed."
+      ]
+    }
+  ]
+}

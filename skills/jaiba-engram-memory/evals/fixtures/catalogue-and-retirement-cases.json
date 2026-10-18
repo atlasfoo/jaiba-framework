@@ -1,0 +1,34 @@
+{
+  "fixture_kind": "synthetic protocol-analysis cases; no live records or tool invocations",
+  "catalogue": {
+    "valid_pages": [{"index": 0, "entries": ["exec-a", "log-unlinked"], "entry_count": 2, "remaining_count": 2, "next": "page-1"}, {"index": 1, "entries": ["exec-b", "malformed-entry-visible"], "entry_count": 2, "remaining_count": 0, "next": null}],
+    "required_inventory": ["exec-a", "exec-b", "log-unlinked", "malformed-entry-visible"],
+    "failure_cases": [
+      {"name": "missing-page", "patch": [{"op": "remove-page", "index": 1}, {"op": "set-next", "page": 0, "value": "page-1"}], "expected": "incomplete; referenced page unavailable; no absence claims"},
+      {"name": "wrong-declared-count", "patch": [{"op": "set", "page": 0, "field": "entry_count", "value": 99}], "expected": "verification-failed"},
+      {"name": "duplicate-logical-address", "patch": [{"op": "replace-entry", "page": 1, "index": 0, "value": "exec-a"}], "expected": "invalid/incomplete inventory"},
+      {"name": "cycle", "patch": [{"op": "set-next", "page": 1, "value": "page-0"}], "expected": "incomplete; cycle detected"},
+      {"name": "changed-root-revision", "patch": [{"op": "change-final-root-revision", "value": "synthetic-root-race-r2"}], "expected": "conflict/restart; no complete snapshot"}
+    ]
+  },
+  "close_retry": [
+    {"case": "same-close-id-same-full-payload", "expected": "full-read existing immutable log and return same receipt; do not append another"},
+    {"case": "same-close-id-different-payload", "expected": "conflict; never edit the existing log"},
+    {"case": "attempted-save-lost-returned-id", "expected": "stop for exact reconciliation; bounded search or fresh save cannot establish safe retry"},
+    {"case": "unknown-log-readback", "expected": "retain all work; no retirement"}
+  ],
+  "retirement_retry": {
+    "frozen_inventory": ["task-a@rev1", "plan-b@rev4"],
+    "first_attempt_verified_tombstones": ["task-a"],
+    "unchanged_residual": ["plan-b@rev4"],
+    "scenarios": [
+      {"case": "same-archive-and-residual-unchanged", "expected": "retain task-a tombstone; retire only plan-b against same verified archive"},
+      {"case": "new-object-added", "expected": "block cleanup, do not silently include or discard new work"},
+      {"case": "residual-revision-changed", "expected": "block retirement of changed object"},
+      {"case": "different-close-tombstone", "expected": "conflict"},
+      {"case": "unknown-save-id-or-publication", "expected": "stop and reconcile exact known IDs/root; no fresh retry"}
+    ],
+    "invariant": "Never physically delete observations; retain old immutable publication and payload versions; report completed, failed, unknown and residual addresses separately."
+  },
+  "limitations": ["Fixtures model protocol outcomes and do not demonstrate adapter behavior.", "T009 authorized live checks remain required; no mutable conformance is claimed."]
+}
