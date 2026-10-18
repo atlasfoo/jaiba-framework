@@ -1,0 +1,77 @@
+{
+  "skill_name": "create-memory",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Make a memory adapter for the selected team's store using only the callable tools I provide. The tool catalogue includes exact project/context listing, full reads with revisions, guarded create/update, immutable append with idempotency, archive/clear receipts, complete export/import and readback. Ask me to confirm the namespace, host, output location, and whether I want a draft or installation before making changes. Use only the synthetic schemas in the supplied fixture; do not contact or mutate any real backend.",
+      "expected_output": "A metadata-safe inactive adapter package specification based on the discovered schemas, with no invented tools, real installation, or backend access. It reports capabilities as unverified because the schemas are synthetic and no real isolated roundtrip was run.",
+      "files": ["evals/fixtures/tools-sufficient.json"],
+      "assertions": [
+        "The output distinguishes synthetic schema inspection from successful live tool calls and does not certify conformance.",
+        "The proposed inactive configuration contains routing identifiers only and no payloads, credentials, or raw credential-bearing endpoints.",
+        "The output requires confirmed output destination and installation choice before copying or installation.",
+        "No real backend call, install, or mutation is performed."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our MCP tools only offer search and save. Can you certify an adapter using them? Use the provided tool inventory; don't assume other tools exist.",
+      "expected_output": "A refusal to certify a mutable adapter: identifies missing exact catalogue/full reads, revision-safe create/update and readback, immutable log/closure, and portability capabilities; search/save are not substitutes. No fallback, fake tool, backend write, or install.",
+      "files": ["evals/fixtures/tools-insufficient.json"],
+      "assertions": [
+        "The output marks the adapter nonconforming or blocked and does not certify it.",
+        "Search is not treated as authoritative catalogue, absence, or uniqueness evidence.",
+        "The output does not invent missing tools or claim a probe/write ACK proves conformance.",
+        "No backend write or installation is performed."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Using the selection-state fixture, tell me exactly which memory surface is selected in each scenario and which cases must stop for a human decision. Do not activate anything or move data.",
+      "expected_output": "Scenario-by-scenario selection matching the declared precedence, same-ID collapse/local win, exact-ID override, explicit choice for different IDs at the winning level, and fail-closed behavior for ambiguous overrides, unavailable selections and failed prior bindings. No fallback is treated as recovery from a selected adapter failure.",
+      "files": ["evals/fixtures/selection-cases.json"],
+      "assertions": [
+        "The local same-ID copy wins over a newer global copy.",
+        "Different IDs at the winning level and conflicting overrides are surfaced as ambiguous rather than sorted or selected by readiness.",
+        "An explicit unknown/unavailable ID and failed prior binding stop without falling back to filesystem.",
+        "A saved binding does not override fresh precedence or a new explicit override."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "From the origin and work-root fixtures, identify equivalent and distinct project identities, and state the context behavior for two branches, two roots, and an explicit resume. Do this as analysis only; never read network origins or change bindings.",
+      "expected_output": "Sanitized SSH/HTTPS forms of the same host/path compare equal; DNS host case and transport syntax normalize, while path case and different hosts remain distinct. Missing origin uses a root-based nonportable fallback; malformed/changed/moved origin requires clarification. Context IDs are stable per work root across branches; another root gets an independent context unless the human explicitly selects a context and establishes writer handoff.",
+      "files": ["evals/fixtures/identity-cases.json"],
+      "assertions": [
+        "The SSH and HTTPS same-repository cases normalize to the same sanitized identity without retaining credentials or raw URLs.",
+        "Different hosts and path-case variants are kept distinct.",
+        "Origin change or moved-root fallback does not silently reuse a former binding.",
+        "Branch changes preserve one root's context; separate roots remain independent absent explicit resume and writer handoff."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Inventory the two synthetic .ai/memory fixtures as filesystem surfaces. Report layout, explicit ambiguity/no-brain outcomes, and what must remain byte-for-byte or logically preserved. No migration or write is authorized.",
+      "expected_output": "The bundle fixture resolves via index and includes all indexed files plus every log entry; the legacy fixture is supported without inventing frontmatter, preserving raw documents and unknown sections. Dual markers are ambiguous; neither marker is no resolved brain. Full content, unknown metadata and relation representations are retained; no migration is performed.",
+      "files": ["evals/fixtures/layout-bundle.json", "evals/fixtures/layout-legacy.json", "evals/fixtures/layout-boundaries.json"],
+      "assertions": [
+        "Every bundle inventory entry, including the unlinked log entry, is included with its full payload, unknown metadata, and relation data.",
+        "Legacy raw documents, including absent frontmatter and unknown sections, are preserved without coercion or splitting into duplicate writable objects.",
+        "Both entry markers produce an ambiguous result and neither produces no resolved brain; neither is silently selected or manufactured.",
+        "The output keeps .atl and .ai/vendored outside memory ownership and performs no migration."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Use the scope fixture to classify records, contexts, coordination, and failure results. Show which records are JAIBA-owned and which operations must stop. Do not write or clear anything.",
+      "expected_output": "Only exact namespace/project/category/context addresses are owned; title/tag similarity does not adopt ordinary memory. Executive contexts remain isolated. Optional coordination is separate and needs a consumer-supplied coordination-id; lack of coordination support is not a memory failure and no lifecycle is invented. Partial, permission-denied, unavailable, or truncated results are not absence and block dependent operations.",
+      "files": ["evals/fixtures/scope-cases.json"],
+      "assertions": [
+        "The ordinary backend record is excluded despite matching title/tags, and the exact JAIBA address is included.",
+        "Executive records from another context are excluded from the selected context inventory.",
+        "Supported coordination uses a separate consumer-supplied ID and does not conflate project identity; unsupported coordination is explicitly optional.",
+        "Partial, permission-denied, unavailable, and truncated outcomes are not reported as not-found or empty."
+      ]
+    }
+  ]
+}

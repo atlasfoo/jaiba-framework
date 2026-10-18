@@ -1,0 +1,9 @@
+{
+  "fixture_kind": "synthetic-tool-inventory",
+  "live_tools": false,
+  "tools": [
+    {"name": "search_memory", "input": ["query"], "output": ["ranked_snippets"]},
+    {"name": "save_memory", "input": ["text"], "output": ["accepted"]}
+  ],
+  "missing_guarantees": ["complete exact catalogue", "full read and revision evidence", "guarded create/update and full readback", "immutable idempotent append", "archive then selective clear", "complete staged export/import and verification"]
+}

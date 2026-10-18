@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {"id": "ssh-https-equal", "inputs": ["git@Code.Example:Team/App.git", "https://code.example/Team/App/"], "expected_identity": {"kind": "git-remote", "host": "code.example", "path": "Team/App"}},
+    {"id": "ssh-url-separators", "inputs": ["ssh://git@code.example/Team//App.git"], "expected_identity": {"kind": "git-remote", "host": "code.example", "path": "Team/App"}},
+    {"id": "different-host", "inputs": ["https://code.example/Team/App.git", "https://other.example/Team/App.git"], "expected": "distinct"},
+    {"id": "path-case", "inputs": ["https://code.example/Team/App", "https://code.example/team/app"], "expected": "distinct"},
+    {"id": "ssh-alias", "inputs": ["work-git:Team/App.git", "code.example/Team/App"], "expected": "not-equivalent-without-confirmed-alias"},
+    {"id": "no-origin-fallback", "work_root": "/srv/checkouts/App", "origin": null, "expected_identity": {"kind": "git-root", "path": "/srv/checkouts/App", "portable": false}},
+    {"id": "changed-origin", "old": "code.example/Team/App", "new": "code.example/Platform/App", "expected": "stop:explicit-reconciliation"},
+    {"id": "moved-root", "old_root": "/srv/a/App", "new_root": "/srv/b/App", "origin": null, "expected": "new-fallback-requires-association"}
+  ],
+  "context_cases": [
+    {"id": "same-root-branch-change", "root": "/work/app", "branches": ["main", "feature"], "expected": "same-stable-context-id"},
+    {"id": "distinct-roots-same-remote", "roots": ["/work/app", "/work/app-wt"], "expected": "shared-constitutive-project-independent-executive-contexts"},
+    {"id": "explicit-resume", "root": "/work/app-wt", "selected_context": "ctx-existing", "writer_handoff": false, "expected": "do-not-write-until-single-writer-handoff"}
+  ],
+  "secrets": {"must_not_persist": ["raw_origin", "userinfo", "query", "fragment", "credentials"]}
+}
