@@ -1,5 +1,7 @@
 {
   "skill_name": "fast",
+  "filesystem_scoped_eval_ids": [1, 2, 3, 4, 5, 6],
+  "surface_scope_note": "The listed pre-surface cases explicitly select built-in filesystem and retain their stated layout fixtures. Case 7 uses an independent simulated external transport. See README.md for actual code/test/confirmation/handoff evidence.",
   "evals": [
     {
       "id": 1,
@@ -128,6 +130,27 @@
         "Change applied to package.json (and lockfile if present)",
         "Closing recap mentioned jaiba-init once as an opportunity, without making it a precondition for the change",
         "Nothing written to .ai/work/"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "external-inline-code-change-hands-off-after-confirmation",
+      "context_under_test": "surface-aware-fast",
+      "prompt": "Change the inline tax calculation to round to two decimal places.",
+      "context": {
+        "selected_surface": "simulated external owned object store",
+        "ownership": "exact project ID and context ID resolved; one authorized writer",
+        "plan": "approved, executing; tax calculation is adjacent to its scope",
+        "developer_protocol": "after the tested code change, developer first refuses confirmation in one run; confirms in another",
+        "failure_scenario": "simulated executive revision conflict on conduct handoff"
+      },
+      "expected_output": [
+        "Triage classifies the contained code change inline; fast edits code and exercises its test/Quality Gate before seeking confirmation",
+        "On refusal it makes no executive memory write; on confirmation it hands proposed task/amendment/walkthrough updates and captured full-read revisions to conduct",
+        "Fast never writes JAIBA executive objects itself; conduct compares revisions and verifies full readback",
+        "On simulated revision conflict, conduct stops and does not claim a successful update or retry blindly",
+        "The fake backend trace is simulation, not proof of actual Engram or unseen library behavior"
       ],
       "files": []
     }

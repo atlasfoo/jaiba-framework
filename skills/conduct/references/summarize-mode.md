@@ -1,134 +1,184 @@
 # `conduct:summarize`
 
-Close the work in **one step**: distill the essence, show it to the
-human, propose what the brain should learn, then — on one explicit
-confirmation — archive to `.ai/memory/log/` and clean `.ai/work/`.
-End state: `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` exists, ADR/brain
-proposals are on the table for `jaiba-init:update-brain`, a final
-conventional-commit message is suggested, and `.ai/work/` is empty.
+Close the selected work context: distill its essence, present it, propose
+what the brain should learn, then obtain **one explicit confirmation** to
+append the closing log and selectively clear verified executive memory.
+Presenting first is mandatory; drafting and archiving unseen is not a
+shortcut. Amendments require re-presentation and renewed confirmation.
 
-There is deliberately **one confirmation, not two ceremonies**: the
-summary is presented and the developer's single "go ahead" both
-accepts it and authorizes the archive. What is *not* negotiable is
-that the human reads the summary before the executive memory is
-destroyed — never chain draft-and-archive in one breath without
-showing it.
+## Preconditions and scope
 
-## Preconditions
+- `validate` passed (gate green; criteria delivered or waivers recorded).
+  Otherwise return to validate; summarize never substitutes for it.
+- Use conduct's resolved surface, namespace, stable project ID and exact
+  executive context. Resolve the effective `create-memory` installation
+  through host skill resolution and read its canonical
+  `references/memory-surface-contract.md` (§7 governs closure) and the
+  selected binding instructions. Never assume sibling installations.
+- Require complete catalogue, full reads, revisions, immutable idempotent
+  append-log, archive evidence and selective clear-work. Establish actual
+  serialized executive and shared constitutive writers. Missing capability,
+  ambiguous ownership/context, inaccessible or partial data blocks closure;
+  it is not an empty context or permission to fall back to filesystem.
+- A plan and completed task evidence must be available, except on recovery
+  from an already verified log with partially cleared work. Recover the
+  original frozen inventory and close ID, not a new summary or close ID.
 
-1. `validate` has passed (gate green; criteria delivered or waivers
-   documented). If validate hasn't run, run it first — summarize
-   never substitutes for it.
-2. `.ai/work/plan.md` exists; tasks are checked.
+Filesystem keeps both supported layouts: resolve the concept bundle
+through `index.md`, or the legacy flat brain when only `constitution.md`
+exists. Both markers or neither block mutation. Do not migrate to close.
+Filesystem locators below are examples, not logical addresses for external
+surfaces. No constitutive editing is authorized beyond append-log.
 
 ## Flow
 
-1. **Read everything in `.ai/work/`** — plan, tasks, walkthrough, PRD
-   if present.
-2. **Draft the summary** as `.ai/work/<slug>-summary.md` from
-   `assets/plan-summary-template.md`. Hard rules:
-   - **English, always** — it becomes a long-term memory artifact,
-     even when the session (and the work artifacts) were in another
-     language. Translate the essence.
-   - **Concise** — one screen. The walkthrough was the narrative;
-     this is the record. Outcomes, not play-by-play.
-   - Record criteria delivered (with corrective ones flagged),
-     deviations vs the plan/PRD and why, and any waived checks.
-   - **Carry citations over as links, not prose.** A brain concept the
-     work consulted or touched is cited the same way the plan cited it
-     — a file-relative markdown link, resolved from the entry's home
-     in `.ai/memory/log/` (so `../identity/quality-gate.md`,
-     `../references/stripe.md`, `../decisions/004-event-bus.md` in a
-     bundle; `../constitution.md`, `../reference-index.md` in the
-     legacy flat layout). Never a section number. A citation that does
-     not resolve is surfaced to the human, never archived silently —
-     `spec-mode.md § A citation that doesn't resolve is surfaced,
-     never emitted` governs here too, and this is the last chance to
-     catch it before the executive memory is destroyed.
-3. **Evaluate the brain-change question.** For each non-trivial
-   decision in the walkthrough's checkpoint blocks: is it structural?
-   Will future work need the *why*? If yes, include the proposed
-   `decision` concept (status: Proposed) in the summary — **propose
-   only**; enacting is `jaiba-init:update-brain`'s right. If no: state
-   "No ADR proposed; all decisions were tactical." Same for a new
-   `reference` concept (an integration the work introduced that the
-   brain doesn't carry yet) and for changes to the `scope`,
-   `quality-gate` or `sub-unit` concepts worth promoting. Name what
-   the proposal *is* by `type:`; where it will land is
-   `update-brain`'s call, and it differs by layout (a `decision` file
-   in a bundle, an `adr-log.md` entry in the legacy flat layout).
-   Proposed text that cites an existing concept cites it as a link,
-   under the same rule as step 2.
-4. **Suggest the final commit message.** Conventional-commit type
-   inferred from the work (`feat` / `fix` / `refactor` / `perf` /
-   `chore` / `docs`) — the natural squash target for the phase-wise
-   `chore(wip)` commits. Don't run git unasked.
-5. **Present and confirm.** Show the summary (or its essence) and ask
-   one clear question: *"This will be archived to `.ai/memory/log/`
-   and `.ai/work/` will be cleaned. Proceed?"* Amendments welcome —
-   apply, re-show, re-ask.
-6. **Archive.** On the yes, run:
-   ```bash
-   bash scripts/archive.sh <slug>
-   ```
-   The script is the source of truth for the layout: it verifies the
-   summary exists and no task is left unchecked, moves it to
-   `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` (date from `plan.md`'s
-   `created:`, else today), removes `plan.md` / `tasks.md` /
-   `walkthrough.md` / `PRD.md` from `.ai/work/`, and aborts on
-   unexpected files so the developer decides about them. **Read the
-   script before running it** — it is short by design.
-7. **Report and hand off.** Where the log entry lives; that
-   `.ai/work/` is ready for the next piece of work; and — if ADRs or
-   brain changes were proposed — that `jaiba-init:update-brain` is the
-   next stop to enact them.
+1. **Catalogue and fully read the exact executive context.** Read the
+   entire plan, tasks, walkthrough and PRD when present, with completion
+   evidence; `cat`/complete reads on filesystem, not search snippets or a
+   truncated preview. Include malformed/unexpected objects in enumeration;
+   surface them and stop cleanup. Freeze known addresses, full source
+   payload/revision evidence, and the scope. Filesystem `.gitignore` is a
+   preserved control file, not an executive concept.
+2. **Draft the closing summary** using conduct's
+   `assets/plan-summary-template.md`. A filesystem draft is
+   `.ai/work/<slug>-summary.md`; an external draft may remain in the
+   conversation until append, not a fabricated executive type or local
+   durable mirror. Hard rules:
+   - **English, always**, even when executive artifacts use another language.
+   - **Concise**: one screen of outcomes, not the walkthrough's narrative.
+   - Record delivered criteria (flag corrective ones), deviations and why,
+     and waived checks.
+   - **Preserve citations as verifiable links** under conduct's *Citing the
+     brain* rules, retaining logical identity and the selected surface's
+     direct locator. Filesystem links resolve from the eventual log home:
+     `../identity/quality-gate.md` or `../decisions/004-event-bus.md` in a
+     bundle; `../constitution.md` or `../reference-index.md` in legacy.
+     Never replace links with prose, section numbers, fuzzy search or a
+     local path for an external concept. Resolve dead links before archive;
+     surface unresolved targets while the work evidence still exists.
+3. **Evaluate brain changes.** For each non-trivial walkthrough decision,
+   ask whether future work needs its structural *why*. If yes, include a
+   proposed `decision` (status: Proposed). Otherwise state "No ADR proposed;
+   all decisions were tactical." Likewise propose missing `reference`
+   concepts and changes to `scope`, `quality-gate` or `sub-unit` when
+   warranted. Name the concept by `type:` and preserve citations; only
+   `jaiba-init:update-brain` enacts these proposals, under either layout.
+4. **Suggest a final conventional-commit message**, inferred from the work
+   (`feat` / `fix` / `refactor` / `perf` / `chore` / `docs`). Do not run git
+   unasked. Assign a stable close ID before the first append attempt and
+   bind the prepared payload to the exact project/context and inventory.
+5. **Present and confirm.** Show the summary and its recoverable proposed
+   log address, close ID, scope and exact cleanup inventory. Ask:
+   *"Append this closing entry to <resolved log address>, verify its full
+   readback, then clear only this unchanged work inventory in <context>?
+   Proceed?"* One yes authorizes that payload and inventory only. After
+   changes, freeze again and re-present; never reuse a previously appended
+   close ID for a changed payload.
+6. **Append, verify, then clear-work**, in that order:
+   - Append-log uses the stable close ID as idempotency key. Same ID and
+     identical complete payload reuses the verified receipt. Different
+     payload is a conflict, never overwrite or automatic `-2` suffix.
+   - Read the log **in full by exact address**, verifying the entire
+     payload, close ID, scope and revision against the intended object.
+     A write acknowledgement, search hit or preview is insufficient.
+     Missing/mismatched readback leaves all executive work intact.
+   - Retain the recoverable receipt: binding/version, project/context,
+     close ID, log address/revision and exact frozen inventory/revisions.
+     Evidence may be in the log and tool/conversation results; do not add
+     a hidden durable cache or second memory copy.
+   - Re-enumerate the complete context and reread known revisions before
+     clear-work. Unexpected files/objects, directories, symlinks, changed
+     revisions or ownership block cleanup **even if the log exists**.
+   - Delete only those known, unchanged objects under serialized access,
+     checking revisions at deletion. Verify absence with exact reads and
+     complete enumeration, not search. No project/category-wide purge.
+7. **Report and hand off.** Give the verified log's recoverable address,
+   close ID/revision and exact cleanup outcome. Work is ready for the next
+   task only after verified clearing; preserved control files are fine.
+   If brain changes were proposed, hand off to `jaiba-init:update-brain`.
 
-## When *not* to run the script
+## Filesystem helper (only the resolved default filesystem context)
 
-Do the operation manually (or stop and ask) if the repo's `.ai/`
-layout is non-default (mounted/symlinked), the slug contains unusual
-characters, or the developer asked to keep one of the work files.
-The script is a convenience; the contract is *"essence lives in
-`.ai/memory/log/`, `.ai/work/` is empty"* — achieve it however the
-repo allows.
+Resolve conduct's effective installation and read `scripts/archive.sh`
+before use. It is a bounded local implementation, **not** a resolver or a
+general memory backend. Never run it for external memory, another context,
+mounted/symlinked scopes or another selected root. Do not create local
+`.ai/work/` just to run it. Unsupported identifiers or a request to keep
+executive objects require an explicitly reviewed surface operation (or a
+stop), not an improvised recursive removal.
 
-## Worked example (TripNest)
+From the selected repository root, after resolving the stable IDs and
+establishing serialized writers, prepare **before presenting**:
 
-Plan `collaborative-itineraries` validated: gate green, ITIN-001…003
-delivered (ITIN-008 corrective, also delivered).
+```bash
+JAIBA_ARCHIVE_FILESYSTEM=1 JAIBA_ARCHIVE_SERIALIZED=1 \
+  bash "<effective-conduct>/scripts/archive.sh" prepare "<slug>" "<project-id>" "<context-id>"
+```
 
-1. Draft `collaborative-itineraries-summary.md`: outcome (invitation
-   flow with role-based perms), 4 criteria delivered (1 corrective),
-   deviations (none structural), consulted concepts cited as links
-   (`[django-guardian](../references/django-guardian.md)`), proposed
-   `decision` "Roles as CharField choices, not a separate table",
-   suggested commit
-   `feat(itineraries): collaborator invitations with role-based
-   access`.
-2. Present; developer: *"go ahead"*.
-3. `bash scripts/archive.sh collaborative-itineraries` → entry at
-   `.ai/memory/log/2026-07-03-collaborative-itineraries.md`, work
-   cleaned.
-4. Report + point at `jaiba-init:update-brain` for the proposed
-   `decision`.
+These flags attest caller-verified filesystem binding and single-writer
+discipline; they are not locks, CAS or permission to guess identity. The
+script checks Bash 4+ and each additional CLI dependency before mutation
+(`git`, `grep`, `sed`, `tail`, `cat`, `cmp`, `date`, `mkdir`, `rm`). It
+requires a safe nonempty **slug** containing letters/digits/dot/underscore/
+hyphen and beginning with a letter or digit, because the slug enters paths.
+Project/context IDs are opaque, exact, quoted single-line values: colon,
+slash, spaces (including trailing spaces) and Unicode are preserved without
+sanitizing, trimming or using them in paths. For example, a resolved project
+ID may be `git:github.com/team/repo` or `path:/selected/project root`.
+Empty IDs and any CR/LF are rejected before mutation. Shell arguments cannot
+carry NUL. Pass the same exact IDs on retries; do not normalize identity in
+this helper. The old single-slug invocation fails safely.
 
-## Common failure modes
+Prepare appends a visible, versioned receipt to the draft, naming the
+contract/version, filesystem binding and project/context IDs, and freezing
+the root/project/context fingerprint, close ID, full summary body fingerprint,
+and byte fingerprints/absence for the four executive files and preserved
+`.gitignore`. Git blob fingerprints use all bytes without filters, including
+serialized metadata/relations; OS attributes are not logical revisions.
+The close ID is `<YYYY-MM-DD>-<slug>` using plan `created:` (else UTC today).
+The draft filename stays `<slug>-summary.md`; the eventual log is
+`.ai/memory/log/<close-id>.md`. This receipt is closure evidence in the
+visible draft/log, not a hidden store or a duplicate of executive contents.
 
-- **Archiving unseen.** The single-step design removes ceremony, not
-  the human's read. Present first, always.
-- **A non-English log entry.** `.ai/memory/` is English-only; the
-  work artifacts' language doesn't carry over.
-- **Long summaries.** Past one screen you're duplicating the
-  walkthrough. Distill.
-- **ADR fatigue.** Tactical choices stay in the log entry. If it
-  wouldn't matter to someone joining in six months, it's not an ADR.
-- **Writing a `decision`, `scope` or `quality-gate` concept
-  directly** — under any layout, flat file or bundle. Propose;
-  `jaiba-init:update-brain` enacts. The `log/` append is the only
-  carve-out.
-- **Archiving a dead citation.** `.ai/work/` is about to be deleted;
-  a link into the brain that doesn't resolve becomes unfixable the
-  moment the plan is gone. Surface it while the evidence still
-  exists.
-- **Editing an archived entry later.** `.ai/memory/log/` is
-  append-only — corrections are new entries referencing the old one.
+Read the complete prepared summary back, present it, and obtain explicit
+confirmation. Only then:
+
+```bash
+JAIBA_ARCHIVE_FILESYSTEM=1 JAIBA_ARCHIVE_SERIALIZED=1 \
+  bash "<effective-conduct>/scripts/archive.sh" archive "<slug>" "<project-id>" "<context-id>"
+```
+
+Archive copies without overwrite, verifies the complete log against the
+prepared payload, rechecks the frozen inventory, and removes only unchanged
+`plan.md`, `tasks.md`, `walkthrough.md`, `PRD.md`, then the draft. It preserves
+`.gitignore`. Any other entry (including a directory or symlink under a
+known name) blocks the operation. It supports bundle and legacy markers
+without editing either. It does not establish portable logical identity,
+resolve backend declarations, validate acceptance criteria, or replace
+conduct's full catalogue/read/confirmation obligations.
+
+## Recovery and limits
+
+- **Verified log, work retained:** recoverable, not failed archiving to
+  redo with a new ID. Keep the log and original receipt. Reconcile exact
+  reads, then retry `archive` with the same slug/project/context under
+  serialization; do not `prepare` again. The log payload must match in
+  full. Only unchanged residual executive files may be cleared.
+- **Partial cleanup:** report removed and remaining objects exactly. The
+  helper prints each verified deletion and retained inventory on failure.
+  If the draft is gone, it requires the unique existing date/slug log and
+  verifies its embedded scope, close ID and frozen evidence. It never
+  recomputes a date from a missing plan or the retry day's clock.
+- **Changed/new data:** stop and reconcile with the human. A prior log
+  does not authorize deleting a new plan, modified work or new context.
+  Do not edit old evidence or discard unexpected data to force a retry.
+- **Append interrupted or readback unavailable:** work stays intact;
+  report the candidate log address and unknown/partial outcome. An existing
+  different/truncated entry is a conflict requiring reconciliation, not
+  overwrite or a fresh append. Corrections are new entries referencing the
+  old one, explicitly authorized, never historical edits.
+- **No atomic transaction/CAS:** the helper uses compare/read/write/read
+  under the caller's real serialization. It cannot police uncontrolled
+  human/external writers. Without that discipline, block mutation. No
+  archive/cleanup transaction is assumed; cleared work without a verified
+  log is never an acceptable state.

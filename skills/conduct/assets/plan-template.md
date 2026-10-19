@@ -3,7 +3,7 @@ type: plan
 slug: <kebab-case-identifier>          # e.g. collaborative-itineraries
 created: <YYYY-MM-DD>
 depth: design                          # design | spec (what triage decided)
-prd: <.ai/work/PRD.md or empty>        # local PRD, only at spec depth
+prd: <verified PRD citation or empty>  # only at spec depth; filesystem: .ai/work/PRD.md
 criteria: []                           # acceptance criteria IDs this plan delivers, e.g. [ITIN-001, ITIN-002]. Empty at design depth.
 status: draft                          # draft | approved | executing | validated | summarized
 ---
@@ -57,12 +57,18 @@ write "None.">
 
 ## Sources consulted
 
-- `[<concept file>](../memory/<path-to-concept>.md)` — the constitutive concept(s) consulted, e.g. `[identity/architecture.md](../memory/identity/architecture.md)`
-- `[<reference label>](../memory/references/<slug>.md)` — the `reference` concept(s) consulted for external integrations, e.g. `[Stripe](../memory/references/stripe.md)`
-- `.ai/work/PRD.md` (if spec depth)
-- `.ai/memory/log/<entry>` (prior related work, if any)
+- <Verified constitutive concept citation and revision; filesystem: `[<concept file>](../memory/<path-to-concept>.md)`, e.g. `[identity/architecture.md](../memory/identity/architecture.md)`>
+- <Verified `reference` citation and revision; filesystem: `[Stripe](../memory/references/stripe.md)`>
+- <Verified PRD citation in this executive context, if spec depth; filesystem: `.ai/work/PRD.md`>
+- <Verified prior `log-entry` citation, if any; filesystem: `.ai/memory/log/<entry>`>
 - <Knowledge skill name> (if applicable)
 - <External docs / web sources, with URLs>
+
+<External memory citations carry the complete logical address and source
+revision; executive addresses include context ID. Use only verified
+adapter-provided locators, never guessed URIs or local shadow links.
+Filesystem citations remain file-relative Markdown, including legacy flat
+document links. Follow spec-mode's citation verification rules.>
 
 ## Plan amendments
 

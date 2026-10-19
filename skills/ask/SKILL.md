@@ -1,7 +1,7 @@
 ---
 name: ask
 description: >-
-  Implicit read-only Q&A lane of the JAIBA framework. Not user-invocable — the routing rule triggers it whenever the developer asks a question instead of requesting a change: about the codebase, the active work in `.ai/work/` (plan.md, tasks.md, walkthrough.md, PRD.md), or recorded decisions in `.ai/memory/`. Trigger on interrogative or exploratory messages like "why does the plan do X before Y?", "what tasks are left?", "what does the PRD cover?", "is this already in the plan?", "what does this endpoint do?", "explain this module", "why did we decide to use Z?", "walk me through this". Strictly read-only: it reads, searches, and explains, but never edits code, writes artifacts, or runs the Quality Gate to change state. It yields to the action lanes per the routing rule: a continuation cue ("continue", "next", "go") belongs to conduct's execute phase, new work to spec or plan enters the conduct chain, and a small contained change routes to fast.
+  Implicit read-only Q&A lane for questions about code, active work, or decisions; not user-invocable. Triggers on interrogative/exploratory requests ("why…?", "what's left?", "explain…", "is this covered?"). Never mutates JAIBA-owned data or persists JAIBA bindings; independent host-required bookkeeping is not JAIBA evidence. Continuations route to conduct:execute, new work to conduct, small changes to fast. Never executes changes or runs the Quality Gate.
 version: 3.2.0
 author: atlasfoo<iscomejia15@outlook.com>
 user-invocable: false
@@ -58,31 +58,45 @@ Only `conduct` keeps an explicit override (`/conduct
 
 `ask` can be installed per-project (`.claude/skills/`,
 `.agents/skills/`) or **globally** (e.g. `~/.claude/skills/`), shared
-across every repository you work in. Either way, "the brain" means
-`.ai/` and `AGENTS.md` at the root of the **current project** — where
-`.git/` lives — never a path relative to this skill's own installation
-location.
+across every repository you work in. Resolve memory through the effective
+`create-memory` installation's `references/resolution.md` and
+`references/memory-surface-contract.md`, never relative to this skill's installation.
+The built-in filesystem surface maps to the selected checkout; external
+surfaces use their resolved binding and owned catalogue and need not have
+local `.ai/` files or an `AGENTS.md` marker.
 
-Orienting cold (see `references/orientation.md`) includes checking
-whether this project is JAIBA-instrumented at all — `AGENTS.md` exists,
-is non-empty, and is the JAIBA behavioral contract (or points to the
-global JAIBA contract installed in the agent's config), and
-`.ai/memory/` holds real content, not bare `[bracket]` templates. Two
-outcomes:
+Orienting cold (see `references/orientation.md`) includes resolving the
+current project's memory surface. Resolve the effective `create-memory`
+installation's `references/resolution.md` and
+`references/memory-surface-contract.md`. On filesystem, resolve its
+supported concept-bundle or legacy layout. On an external surface, require
+a valid binding, readable owned catalogue, exact project/context scope and
+required full reads; a marker, probe, search result or empty catalogue alone
+is not authoritative. `ask` is read-only for JAIBA-owned data: it must not
+persist a JAIBA binding/namespace change or perform JAIBA adapter or memory
+operations that mutate owned data. Ordinary host-required memory/session
+bookkeeping remains independent, is not JAIBA evidence, and is not used as
+a JAIBA read source.
 
-- **Not instrumented at all** (no `.ai/`, or `AGENTS.md` missing/empty/
-  not the JAIBA contract) — say so plainly. Code questions still work
-  from the repository directly; plan/PRD/decision questions get "there
-  is no active work — this project has no JAIBA brain yet." Offer
-  `jaiba-init` (bootstrap) as the next step, then wait — `ask` doesn't
-  instrument anything. If the *global* contract is also missing, name
-  `jaiba-configure` as its machine-level prerequisite; still don't run
-  either.
-- **Partially instrumented** (`.ai/` exists but `.ai/memory/` is bare
-  templates) — questions about active work still function (`.ai/work/`
-  doesn't depend on the long-term brain); decision questions ("why did
-  we choose X?") get "the ADR log hasn't been initialized yet." Offer
-  `jaiba-init`, which resumes at its `update-brain:initialize` mode.
+- **No authoritative brain** — say so plainly when the filesystem has no
+  resolved brain or an authoritative external catalogue confirms absence.
+  If an external binding, catalogue, or required read is unavailable,
+  ambiguous, or permission-denied, report that failure instead; do not
+  call it an empty brain or route to bootstrap as though absence were proven.
+  Code questions still work from source. For a plan or PRD, report no
+  active work only after authoritative scoped enumeration confirms the
+  executive catalogue is empty. For decisions, report missing constitutive
+  memory only after the corresponding authoritative catalogue/read proves
+  absence. Offer `jaiba-init` only for confirmed absence, never for an
+  unavailable/ambiguous/permission-denied surface; `ask` never initializes
+  or instruments anything. If the global contract is missing, name
+  `jaiba-configure` as prerequisite, but do not run it.
+- **Incomplete or malformed view** — distinguish missing concepts/artifacts
+  established by authoritative full reads from unreadable, partial, stale,
+  truncated or incomplete catalogue/read results. The latter are failures,
+  not absence; explain what could not be verified and stop claims that
+  depend on it. This applies to both filesystem layouts and external
+  surfaces.
 
 ## What `ask` answers
 
@@ -92,9 +106,9 @@ prior session or pre-training (`AGENTS.md` §2.1):
 | Domain | Typical questions | Primary sources |
 |---|---|---|
 | **Code** | "what does this endpoint do?", "explain this module", "where is X handled?", "why does this break?" | The source files, their tests, `git log`/`git blame` for the *why-historical*. |
-| **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`. |
-| **Active PRD** | "what does the PRD cover?", "which criteria are still unmet?", "what's out of scope?" | `.ai/work/PRD.md` (exists only at `spec` depth). |
-| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | The `decision` concept via `.ai/memory/index.md` (`.ai/memory/adr-log.md` in the legacy flat layout), `.ai/memory/log/` (closed work, chronological), then `walkthrough.md` for tactical calls in flight. |
+| **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | Filesystem: `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`. External: exact executive context catalogue and full reads of the relevant logical objects. |
+| **Active PRD** | "what does the PRD cover?", "which criteria are still unmet?", "what's out of scope?" | Filesystem: `.ai/work/PRD.md` (exists only at `spec` depth). External: exact executive context catalogue and full read of the PRD object, when present. |
+| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | Filesystem: `decision` via `.ai/memory/index.md` or legacy `.ai/memory/adr-log.md`, `.ai/memory/log/`, then `walkthrough.md`. External: exact constitutive catalogue/full reads for decisions and log entries, plus the resolved executive context for walkthrough. |
 
 A question can span domains ("does the plan cover criterion AUTH-002
 from the PRD?") — read what the question needs from each, no more.
@@ -108,9 +122,16 @@ the question drive the reads:
 
 - **Pure code question** → go straight to the relevant source; you may
   not need the brain at all.
-- **Plan / PRD / decision question** → read the corresponding
-  artifacts (table above). For these you *must* read the actual files
-  — never answer "what's in the plan" from assumption.
+- **Plan / PRD / decision question** → read the corresponding artifacts
+  (table above). Filesystem requires the actual selected files. External
+  memory requires complete enumeration of the exact owned scope, then exact
+  full reads of relevant logical objects; search previews, summaries and
+  snippets are not authoritative content. Respect relation targets and
+  unresolved-relation findings rather than inventing links. Cite external
+  facts by stable logical address and available revision/receipt evidence,
+  not a transient record ID or a local `.ai/` path. If the needed catalogue,
+  read, relation target or provenance is partial/unavailable, state that
+  limitation and do not claim absence or completeness.
 
 The one cross-cutting rule: **ground every claim in something you
 actually read.** If you didn't open it, don't assert it.
@@ -123,9 +144,12 @@ plan or PRD exists at all — read `references/orientation.md`.
 - **Snippets, not dumps** (`AGENTS.md` §3.3). Quote the minimal lines,
   reference by `path:line`, use a small diff to illustrate. Never paste
   whole files into chat.
-- **Say when something is missing or empty.** If the developer asks
-  about "the plan" and `.ai/work/plan.md` doesn't exist, say so
-  plainly — don't invent one (`AGENTS.md` §1, last line).
+- **Say when something is missing or empty.** On filesystem, an exact
+  selected file's absence may establish absence within that layout. On an
+  external surface, only authoritative complete enumeration or exact
+  `not-found` in the fully resolved readable owned scope establishes
+  absence; partial views, failures and search misses do not (`AGENTS.md`
+  §1, last line). Never invent an artifact.
 - **Surface drift, don't patch it.** If, while answering, you notice
   the brain contradicts the code (the plan references a field the model
   renamed, the PRD assumes a flow the code dropped), point out the
@@ -205,5 +229,7 @@ applies here.
 - **Dumping files.** "Explain this module" is not an invitation to
   paste 300 lines. Summarize, quote the load-bearing parts, link by
   line.
-- **Inventing what isn't there.** No active plan? Say "there is no
-  active plan". Don't reconstruct a hypothetical one to be helpful.
+- **Inventing what isn't there.** No active plan established by a complete
+  filesystem check or authoritative external enumeration? Say so, scoped
+  to that checkout/context. On external access failure, report the failure;
+  don't reconstruct a hypothetical plan or claim absence.

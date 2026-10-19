@@ -3,9 +3,11 @@
 Turn a clear requirement into the approved contract for execution. Two
 internal steps — **define** (PRD, only at `spec` depth) and **design**
 (`plan.md`, always) — closing with the **human approval gate**. End
-state: `.ai/work/plan.md` (and `.ai/work/PRD.md` when depth demanded
-it) exists, is grounded in the codebase, and the developer has
-**explicitly approved** the design.
+state: the resolved executive context holds a full `plan` (and `prd`
+when depth demanded it), grounded in the codebase, with the developer's
+explicit approval persisted and verified by full readback. Names such as
+`plan.md` below are logical artifact shorthand per `SKILL.md § Executive
+addressing and persistence`, not unconditional local paths.
 
 One plan per **change**, not per story: the unit of work is the
 requirement that triaged into the chain, however many acceptance
@@ -16,12 +18,18 @@ criteria it carries. This phase writes no source code and no tasks —
 
 - Triage has run (`references/triage.md`) and returned `design` or
   `spec` depth. If it returned `inline`, this work belongs to `fast`.
-- No active `plan.md` in `.ai/work/`. If one exists, stop and ask:
+- No active `plan` in the selected context, established by complete
+  catalogue/exact authoritative reads, not search or a local file check.
+  If one exists, stop and ask:
   fold this into the active plan (via `fast`'s plan-adjustment path),
   finish and close the active work first, or explicitly park it.
   Never silently overwrite an active plan.
 - Full context loaded (`SKILL.md § Context Loading`), including the
   landed requirement if `propose` ran in this conversation.
+- Binding, required capabilities and single executive writer verified.
+  Apply the canonical create/update revision, receipt and full-readback
+  rules to every artifact mutation; never upsert over existing work or
+  write a local shadow of an external artifact.
 
 ## Analysis before either depth
 
@@ -58,10 +66,10 @@ depth:
 4. **Choose the criteria prefix.** A short UPPERCASE token (≈3–6
    chars) derived from the requirement, confirmed with the developer,
    recorded in `PRD.md` frontmatter (`prefix:`). Check recent
-   `.ai/memory/log/` entries for prefix collisions — criteria IDs are
+   constitutive `log-entry` objects for prefix collisions — criteria IDs are
    referenced from tasks and the final summary, so they must stay
    unambiguous.
-5. **Write `.ai/work/PRD.md`** from `assets/prd-template.md`. One to
+5. **Create the context's `prd`** from `assets/prd-template.md`. One to
    two screens: problem, goals/non-goals, users, proposed solution,
    scope, assumptions, dependencies (one `reference` concept per
    external surface, cited as a link per **Citing the brain** below;
@@ -89,7 +97,7 @@ depth:
    is explicitly out. Request only the follow-ups needed to decide.
 2. **Clarify remaining design-level questions** the same way — ask,
    resolve, then write.
-3. **Write `.ai/work/plan.md`** from `assets/plan-template.md`:
+3. **Create the context's `plan`** from `assets/plan-template.md`:
    - **Objective** — what and why, 2–4 sentences. At `design` depth
      this section carries the whole motivation (perf target,
      breaking-changes summary of the bump, refactor rationale).
@@ -112,33 +120,32 @@ depth:
 references to long-term memory, so it owns the citation shape. Three
 steps, in order:
 
-1. **Resolve the concept, never a path.** Ask for the `type:` you need
-   — `architecture`, `convention`, `quality-gate`, `scope`,
-   `sub-unit`, `decision`, `reference` — and let the layout tell you
-   where it lives, per the dual-resolution rule (`AGENTS.md` §1). In a
-   **concept bundle** (`.ai/memory/index.md` present) `index.md` maps
-   the `type:` to its file. In the **legacy flat layout**
-   (`constitution.md`, no `index.md`) the same concept is the matching
-   section of the flat file — `quality-gate` and `convention` are
-   `constitution.md` §6 and §7–§8, a `decision` is an `adr-log.md`
-   entry, a `reference` a `reference-index.md` row. Both layouts are
-   supported; never assume the bundle exists.
-2. **Write the citation as a file-relative markdown link**, resolved
-   from the artifact that carries it. `.ai/work/` sits beside
-   `.ai/memory/`, so the prefix is `../memory/`:
-   - bundle — `[identity/architecture.md](../memory/identity/architecture.md)`,
-     `[Stripe](../memory/references/stripe.md)`,
-     `[ADR-004 event bus](../memory/decisions/004-event-bus.md)`;
-   - legacy flat — `[constitution.md](../memory/constitution.md)`,
-     `[Stripe (reference-index.md)](../memory/reference-index.md)`.
-     The link still navigates; the section name belongs in the label,
-     never in the target.
-   Never a bare section citation (`constitution.md §6`), never an
-   absolute or repo-rooted path. `plan-template.md § Sources
-   consulted` shows the shape it expects.
-3. **Verify the target exists before you emit the link.** A citation
-   is a claim about the brain, and an unverified claim is the thing
-   the next rule forbids.
+1. **Resolve the concept, never a guessed path or title.** Request the
+   needed type (`architecture`, `convention`, `quality-gate`, `scope`,
+   `sub-unit`, `decision`, `reference`) from the resolved constitutive
+   catalogue, consume all pages, select its exact logical address and
+   full-read it. Ambiguous matches require clarification. Analyst reports
+   retain the scope, address and revision provenance of cited sources.
+2. **Serialize a verifiable citation for the selected surface.**
+   - **Filesystem only:** resolve bundle concepts through the index, or
+     legacy concepts through the preserved flat document/entry mapping.
+     Use file-relative Markdown from the artifact: e.g.
+     `[Stripe](../memory/references/stripe.md)` in a bundle or
+     `[Stripe (reference-index.md)](../memory/reference-index.md)` in
+     legacy. Section names belong in labels, not guessed link targets.
+     No absolute/repo-rooted path or bare section citation.
+   - **External:** include the complete logical address (namespace,
+     project ID, constitutive category, logical ID) and source revision
+     in the citation/relations. A direct-read locator returned by the
+     adapter may accompany it, but never invent a URI, use a bare record
+     ID, or turn it into a `../memory/` link. Executive cross-references
+     additionally identify the selected context ID. Preserve the surface's
+     relation representation and unknown metadata for lossless round trips.
+3. **Verify by exact full read before emitting.** A target's presence in
+   search, an inaccessible object or truncated preview does not verify a
+   citation. Report failures as failures, not missing concepts. The
+   template's Sources consulted examples illustrate filesystem syntax;
+   external citations use addresses without changing section/schema shape.
 
 ### A citation that doesn't resolve is surfaced, never emitted
 
@@ -148,11 +155,11 @@ here, in `tasks`, or in `summarize`, and reading one back in a later
 phase or in `ask`.
 
 **When a citation would point at a brain concept that does not exist —
-wrong slug, wrong path, a `type:` never created, a flat file that isn't
-there — stop and tell the human.** Name the artifact, the citation as
+wrong logical ID, wrong scope, a `type:` never created, or (filesystem)
+a flat file that isn't there — stop and tell the human.** Name the artifact, the citation as
 written, and the concept it fails to reach. Then, and only then:
 
-- the concept exists under another name or path ⇒ fix the link and
+- the concept exists at a verified different locator ⇒ fix the citation and
   continue;
 - the concept genuinely does not exist yet ⇒ leave `[MISSING] <what
   was needed>` in the artifact where the reviewer will see it, and
@@ -168,11 +175,17 @@ gap, because the next reader trusts it.
 
 ## The approval gate
 
-Stop. Present the design (and PRD, if produced) and ask for explicit
-approval. The artifacts are drafts until the developer says
-`"approved"` / `"go ahead"` / `"looks good"` — only then set
-`status: approved` in the frontmatter. Do not transition into `tasks`.
-Do not write source code. If the developer amends, apply and re-ask.
+Stop. Present the full design (and PRD, if produced), identify their
+context/addresses and reviewed revisions, and ask for explicit approval.
+They remain drafts until the developer says `"approved"` / `"go ahead"` /
+`"looks good"`. Re-read and compare those revisions before updating
+`status: approved` in the existing template frontmatter; preserve all other
+content/metadata, obtain receipts and full-read back each approved object.
+Approval is persisted in the selected context, not merely a chat claim,
+local cache or backend tag detached from the artifact. A changed revision,
+partial write or failed verification blocks handoff; reconcile and seek
+approval again if the design changed. Do not transition into `tasks` in
+this phase or write source code. If the developer amends, apply and re-ask.
 
 ## Worked example (TripNest)
 
@@ -185,7 +198,7 @@ Do not write source code. If the developer amends, apply and re-ask.
    `created_by` and no collaborator model; the memory report confirms
    the scope, decisions, and django-guardian reference. Record their
    provenance in Sources consulted.
-2. Define: the `reference` concept for django-guardian resolves, so
+2. Define (filesystem example): the `reference` concept for django-guardian resolves, so
    the PRD's Dependencies cite
    `[django-guardian](../memory/references/django-guardian.md)`. One
    clarification: "owner" maps to `created_by`? → yes, role concept.

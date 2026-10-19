@@ -33,10 +33,9 @@ Four operations, each bounded to its phase:
 2. **Business analysis** (`propose`, `spec`) → `business-analyst`. The
    requirement contrasted against the constitutive memory — the
    `identity` concepts (`scope` above all), the `decision` concepts,
-   the `reference` concepts, and recent `.ai/memory/log/` entries
-   (`identity/scope.md`, `decisions/`, `references/` in a concept
-   bundle; `constitution.md`, `adr-log.md`, `reference-index.md` in
-   the legacy flat layout): conflicts with standing decisions, scope
+   the `reference` concepts, and recent `log-entry` objects in the
+   resolved constitutive scope (filesystem only: concept bundle or
+   supported legacy flat layout): conflicts with standing decisions, scope
    violations, integrations not yet indexed (NEW — for
    `jaiba-init:update-brain`).
 3. **Task execution** (`execute`) → the executor tier matching the
@@ -51,11 +50,66 @@ Four operations, each bounded to its phase:
    target's prose (see `validate-mode.md`).
 
 **Never delegated**, no matter the host's capabilities: writing any
-`.ai/work/` artifact (plan, tasks, walkthrough, PRD — single-writer
+executive object (plan, tasks, walkthrough, PRD — single-writer
 rule below), the human approval gate, anything that writes
-`.ai/memory/`, git commits, and the routing/triage decisions
+constitutive memory, git commits, and the routing/triage decisions
 themselves. Subagents inform and implement; conduct decides
-and records.
+and records. This applies to every surface, not just `.ai/` files.
+
+## Memory scope and role access
+
+Resolve the effective `create-memory` installation through the host's skill
+resolution and use its `references/memory-surface-contract.md` and
+`references/resolution.md` (`jaiba-memory-surface` 1.0.0). Conduct passes
+the selected binding, not permission for a child to select another backend.
+Every memory-bearing invocation identifies:
+
+- Contract/version, adapter ID/version (or built-in filesystem), sanitized
+  binding locator, namespace, stable `project-id`, absolute work root and
+  resolved `context-id` when executive memory is involved. Constitutive
+  addresses omit context; executive addresses require it.
+- Required concepts/objects by exact logical address, category/type,
+  direct-read locator, revision evidence and completeness status; the
+  bounded question or task explains why each is needed.
+- Available operation mappings, relevant tool schemas and non-destructive
+  probes, permissions/limits, and the provenance of supplied content and
+  gate commands. No credentials or raw secret-bearing responses.
+
+The child checks **its own** exposed tools, schemas, callable probes and
+permissions against the selected scope before using the backend. Parent
+MCP availability, an installed definition, ATL inventory, or a successful
+parent probe does not prove child inheritance or access. Use actual
+non-destructive scoped catalogue/read calls where direct access is needed;
+consume all pages and reconstruct chunks to their explicit end. Summaries,
+search hits and truncated previews are not full reads or absence evidence.
+Report access errors as errors, not an empty brain. Never create test
+memory to probe, change binding, or fall back to another surface.
+
+**Analysts and verifier:** read the exact JAIBA-owned external references
+assigned to their question/target in full, with complete metadata,
+relations and revisions. Discover additional needed concepts through the
+scoped catalogue, not fuzzy project/context selection. Own-tool or
+permission failure blocks the affected analysis/verification; return the
+specific operation, scope and observed error for conduct's role-local
+fallback. A parent summary is not a substitute for these direct reads.
+
+**Executors:** conduct supplies minimal **full excerpts** of governing
+objects, with source addresses, revisions, excerpt boundaries and
+provenance, plus the vetted gates. Excerpts are task context, not a claim
+to have read a whole object. An executor need not access the backend when
+that envelope suffices; explicitly report backend access as not required,
+not verified. If more memory is needed, request a scoped follow-up from
+conduct; if direct reads are authorized, first check its own tools/probes
+and permissions. Never write executive or constitutive JAIBA memory.
+
+**Filesystem branch only:** resolve the bundle through `.ai/memory/index.md`
+or, without that index, the legacy `constitution.md`, `adr-log.md`,
+`reference-index.md` and `log/` mapping. Both entry layouts present means
+ambiguous; neither present means uninstrumented. `.ai/work/` remains per checkout. External
+mode requires neither `.ai/` nor a local cache/marker. In all modes,
+`.atl/tool-layout.md` stays local machine evidence. Host session memory or
+bookkeeping is separate: it is not a JAIBA adapter, catalogue, readback,
+receipt or proof of backend access.
 
 ## The `requires:` convention
 
@@ -118,6 +172,13 @@ Before invoking **any** subagent, establish these facts for this session:
    keep affected work inline until prerequisites are verified. If the
    report is stale, refresh or directly verify the relevant prerequisites
    and record that evidence rather than trusting a stale success.
+4. **Role-local memory access.** Include the scope/access envelope above.
+   If host capability inspection cannot establish child backend access,
+   use the child's first non-destructive preflight to establish it before
+   substantive memory-dependent work; an initial dispatch is not proof of
+   a healthy backend. Record its actual calls/results. A role lacking the
+   needed tools/schema, probe or permission blocks only that role/task;
+   source-only executors with sufficient excerpts need no backend access.
 
 **Dispatch is required** when these checks pass. Do not turn a healthy
 check into optional delegation, request redundant approval for an
@@ -134,7 +195,11 @@ Once the requirement is concrete enough for a bounded question, dispatch
 `business-analyst` in `propose` and `spec`; dispatch `code-analyst` in
 `spec` at either depth and in `propose` when shaping needs code facts.
 Give each the requirement, relevant paths/concepts, and the question to
-answer; both are read-only and return reports rather than artifacts.
+answer, together with the memory scope/access envelope above; both are
+read-only and return reports rather than artifacts. Give `verify` that
+same scope/access envelope with its target and vetted gates. Reports cite
+exact source addresses/revisions (filesystem: mapped paths/entries) and
+actual access/completeness evidence, including any unread references.
 
 Launch independent analyses **before awaiting either report** when host
 capacity permits. With one available child slot, run them sequentially
@@ -200,7 +265,9 @@ An executor receives exactly three things — and no more:
    `covers` criteria IDs.
 2. **Minimal context** — the plan excerpt that governs the task, the
    concrete files/paths owned by this executor, and any constraint the
-   plan or constitution imposes on this specific change. State that other
+   plan or governing concepts impose on this specific change. Include the
+   surface/project/context identifiers and task-relevant full excerpts,
+   revisions and provenance under Memory scope and role access. State that other
    workers may be active, identify concurrent ownership, and require the
    executor to accommodate their edits without reverting them. Not the whole plan,
    not the walkthrough, not the PRD.
@@ -230,11 +297,14 @@ inside the subagent.
   "independent" costs a merge mess, a false "dependent" costs only
   time.
 - **Single-writer rule.** Subagents write source code only. Every
-  `.ai/work/` artifact has exactly one writer — conduct:
+  executive object, on any surface, has exactly one writer — conduct:
   it flips the checkboxes, writes one walkthrough entry per completed
   task from the executor's report, and records decisions the report
   surfaced. Parallel executors appending to the walkthrough themselves
-  would interleave garbage.
+  would interleave garbage. Backend write permission never overrides this
+  rule or permits constitutive writes by a subagent. Conduct rechecks
+  source revisions before integrating a report; changed governing context
+  requires reconciliation or a scoped follow-up, not stale blind writes.
 - **Reintegration before the next wave.** A wave is closed when every
   result is reviewed (report + `git diff`), logged in the walkthrough,
   and its checkboxes flipped. Only then does the next wave launch.
@@ -257,7 +327,7 @@ never the chain's correctness requirements.
 - **Fat envelopes.** Handing an executor the whole plan, PRD and
   walkthrough defeats the purpose — conduct's context stays
   small precisely because the subagent's inputs are minimal.
-- **Letting subagents write `.ai/work/`.** One writer. Reports flow
+- **Letting subagents write executive or constitutive memory.** One writer. Reports flow
   up; conduct records.
 - **Parallelizing on hope.** "They're probably different files" is not
   a partition. Confidently disjoint or serialized.

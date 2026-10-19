@@ -1,7 +1,10 @@
 # `fast`: out-of-band changes while a plan is active
 
-When a change request arrives while `.ai/work/plan.md` is active and
-the work wasn't contemplated by the plan, it is **out-of-band**. What
+When a change request arrives while an approved plan is active in the
+selected executive context and the work wasn't contemplated by the plan,
+it is **out-of-band**. For filesystem this plan is `.ai/work/plan.md`; for
+an external surface, resolve its exact binding/context and use the complete
+owned executive catalogue and full logical reads. What
 happens next depends on the size the shared triage measured
 (`conduct/references/triage.md`, consumed with default/floor
 `inline`):
@@ -35,11 +38,28 @@ expanding — the human stays in the loop on every scope change
 
 ### Preconditions
 
-- `.ai/work/plan.md` exists and is approved/executing.
+- The selected context's plan exists and is approved/executing, established
+  by authoritative reads (filesystem: `.ai/work/plan.md`; external:
+  resolved exact binding/context, complete executive catalogue, and exact
+  full reads of plan/tasks and relevant walkthrough objects).
 - The change triaged `inline` (shared triage).
 - The change falls inside or adjacent to the plan's scope. If it's
   unrelated to the plan, treat it as **free-standing** instead — don't
   record it into a plan it doesn't belong to.
+
+For an external surface, do not interpret an unavailable binding, incomplete
+catalogue, partial/truncated read, permission failure, ambiguous context or
+missing revision evidence as an absent plan. Stop plan-dependent work; make
+no memory changes and do not route around the selected surface. Before an
+approved adjustment is recorded, retain full-read revision evidence for the
+plan, tasks and walkthrough objects to be changed. `fast` is not the
+executive writer: after the developer confirms the completed change,
+handoff the proposed amendment and evidence to `conduct`. Conduct must
+establish its single-writer authority/handoff, compare current revisions to
+the recorded pre-read revisions, perform the authorized write, then exact-
+read and verify complete content, relations and receipt/revision evidence.
+If any check or verification fails, stop with no further memory writes and
+report the known outcome; never claim an unverified update succeeded.
 
 ### Procedure
 
@@ -53,8 +73,11 @@ expanding — the human stays in the loop on every scope change
    > I added the email validation to `InvitationSerializer` and its
    > test passes. Shall I confirm it in the plan (tasks + amendment + walkthrough)?
 
-3. **On confirmation, update the three artifacts.** Keep edits
-   surgical — you're annotating, not rewriting.
+3. **On confirmation, record the amendment.** Keep edits surgical —
+   you're annotating, not rewriting. The filesystem procedure below is for
+   its local work artifacts. For an external context, hand off the proposed
+   updates to conduct under the preceding revision-check and verification
+   requirements; `fast` does not write executive memory.
 
    - **`tasks.md`** — append the new task to the phase it belongs to,
      already checked, with the next free `T-NNN` ID (never renumber

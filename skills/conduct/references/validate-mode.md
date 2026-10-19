@@ -1,22 +1,32 @@
 # `conduct:validate`
 
-Prove the work is done — not "tasks checked" but *gate green and
-acceptance criteria demonstrably met*. End state: the Plan gate has
-passed, every PRD criterion or approved design scope deliverable has an
-evidence-backed verdict, PRD criteria statuses are flipped when applicable,
-and the work is cleared (or blocked) for `summarize`.
+Prove the work in the resolved executive context is done — not "tasks
+checked" but *gate green and acceptance criteria demonstrably met*. End
+state: the Plan gate has passed, every PRD criterion or approved design
+scope deliverable has an evidence-backed verdict, PRD criteria statuses
+are updated and verified when applicable, and the work is cleared (or
+blocked) for `summarize`.
 
 ## Preconditions
 
-1. `.ai/work/plan.md` exists and is approved.
-2. Every task in `.ai/work/tasks.md` is checked. Unchecked tasks ⇒
+1. Catalogue the resolved executive context completely and resolve
+   `plan` and `tasks` by exact logical address. Full-read both artifacts,
+   including their revision evidence; a preview, summary or search result
+   is not a read. Only in the explicit filesystem branch do these names
+   map to `.ai/work/plan.md` and `tasks.md`. Unavailable, partial,
+   truncated, permission-filtered or ambiguous results are failures, not
+   absence: stop and surface them without fallback to another context or
+   surface.
+2. The verified plan is approved. Every task in the fully read `tasks`
+   artifact is checked. Unchecked tasks ⇒
    surface the gap and offer: finish them first, move them to a new
    plan, or drop them (recorded in the summary). Never silently
    validate incomplete work.
 
 ## Step 1 — the Plan gate
 
-Run the **Plan gate** commands from `tasks.md § Gate Commands` — the
+Run the **Plan gate** commands from the fully read `tasks` artifact
+(`Gate Commands`) — the
 heavyweight tier: full test suite, coverage, build, security scan. It
 runs **once**, here, not at phase boundaries.
 
@@ -27,6 +37,14 @@ check with a documented reason — waivers are recorded in the summary,
 never assumed.
 
 ## Step 2 — delivery verification (both depths)
+
+Resolve `prd` (when present) and `walkthrough` by exact address in the
+same context and full-read the required content and revisions before
+building the verification input. At spec depth, the PRD is required;
+absence or unavailable reads must be established by authoritative scoped
+catalogue evidence, not inferred from a local filename. At design depth,
+use the approved plan. Filesystem logical names map to `.ai/work/` only in
+the explicit filesystem branch.
 
 Build the verification input from the approved contract:
 
@@ -61,8 +79,14 @@ possible partial writes before retrying or fallback. Missing tools or roles
 do not lower the evidence standard. Record dispatch or fallback and the
 verdicts in the walkthrough, then report the verdict table to the developer.
 
-- **All met:** conduct alone flips PRD criteria `status: open` →
-  `status: delivered`, when a PRD exists. At design depth, record scope
+- **All met:** conduct alone updates PRD criteria `status: open` →
+  `status: delivered`, when a PRD exists. Before updating, compare its
+  current full revision with the pre-read revision and preserve unknown
+  metadata and relations. Retain the mutation receipt and verify the
+  complete intended PRD by exact full readback, including resulting
+  revision, before claiming delivery or allowing dependent progress. A
+  conflict, missing receipt/readback, unknown outcome or mismatch blocks
+  completion and requires reconciliation. At design depth, record scope
   verdicts without inventing criterion statuses.
 - **Any not met or not verifiable:** name the gap and return to `execute`
   for corrective work or request the developer's explicit documented
@@ -76,6 +100,14 @@ met (or its explicit waiver documented):
 > "Validation passed: gate green, N/N criteria delivered [or scope
 > deliverables met at design depth]. Ready to close — shall I summarize
 > and archive?"
+
+Conduct is the single executive writer for the context; verifier reports
+are evidence, not artifact writes or authority to change criteria. Any
+walkthrough verdict/update follows the same exact-address, revision,
+receipt and full-readback requirements. Do not use local filesystem paths
+outside the explicit filesystem branch. These persistence checks do not
+replace or modify the Plan gate, verification rules, approval policy or
+criterion-status authority.
 
 `summarize` may follow in the same conversation on the developer's
 yes, but never uninvited.

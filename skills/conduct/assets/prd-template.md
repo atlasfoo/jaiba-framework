@@ -13,7 +13,8 @@ source-ref: <path-or-ticket-id-or-empty>
 > Product Requirements Document — produced by `conduct:spec`
 > (define step) only when triage lands at `spec` depth. Concise by
 > design: one to two screens. It states the *what* and the *why*; the
-> *how* belongs to the design (`plan.md`). Lives in `.ai/work/` until
+> *how* belongs to the design (`plan.md`). Lives in the selected executive
+> context (filesystem: `.ai/work/`) until
 > `summarize` archives its essence.
 
 ## Problem & context
@@ -38,9 +39,9 @@ behavior of the system, not a hypothetical one. 2–5 sentences.>
 ## Proposed solution
 
 <The agreed shape, high level. Cite the existing integration or
-pattern it reuses — a `reference` concept (`references/<slug>.md` in
-a concept bundle, the matching `reference-index.md` row in the legacy
-flat layout) — rather than inventing a new one. Not a design doc — no
+pattern it reuses — a verified `reference` concept citation (filesystem:
+bundle file or supported legacy flat document link; external: complete
+logical address and revision) — rather than inventing a new one. Not a design doc — no
 schemas, no sequence diagrams.>
 
 ## Scope
@@ -58,9 +59,9 @@ schemas, no sequence diagrams.>
 
 ## Dependencies
 
-- <External integration or package, cited as a `reference` concept
-  (`.ai/memory/references/<slug>.md` in a concept bundle,
-  `.ai/memory/reference-index.md` in the legacy flat layout). A NEW
+- <External integration or package, cited as a verified `reference` concept
+  with address and revision (filesystem only: relative bundle or legacy
+  flat document link). A NEW
   integration not yet indexed: flag as "NEW — to be added" so it
   surfaces for `jaiba-init:update-brain`.>
 

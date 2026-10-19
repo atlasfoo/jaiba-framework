@@ -1,5 +1,7 @@
 {
   "skill_name": "ask",
+  "filesystem_scoped_eval_ids": [1, 2, 3, 4, 5, 6, 7, 8],
+  "surface_scope_note": "The listed pre-surface cases explicitly select built-in filesystem and retain their stated layout fixtures. They impose no local marker/mirror requirement on case 9 external memory. See README.md for the actual source-guided rehearsal.",
   "evals": [
     {
       "id": 1,
@@ -159,6 +161,25 @@
         "Did not invent a plausible-sounding rationale to fill the gap",
         "Fell back to git log/blame on the relevant code as a read-only secondary source, if useful, and labeled it as inference vs. recorded fact",
         "Offered jaiba-init, resuming at its update-brain:initialize mode, as a next step and waited"
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "selected-surface-context-isolation-and-failure",
+      "domain_under_test": "surface-aware-orientation",
+      "prompt": "what work is active in this context?",
+      "context": {
+        "selected_surface": "simulated external owned object store",
+        "contexts": "current context has plan A; another owned context has plan B; both are enumerable only by exact context ID",
+        "failure_scenario": "current-context full-read returns simulated transport failure"
+      },
+      "expected_output": [
+        "Resolves and reads only the exact selected external project/context; reports plan A, never plan B",
+        "Uses complete full-read evidence rather than search snippets or filesystem assumptions",
+        "On the simulated transport failure, reports access unavailable and does not claim empty, fall back to .ai/, or create a local mirror",
+        "Read-only: performs no mutation and does not run Quality Gate",
+        "Evidence is a controlled simulation, not an actual Engram or unseen adapter behavioral run"
       ],
       "files": []
     }

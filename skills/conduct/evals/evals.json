@@ -1,5 +1,7 @@
 {
   "skill_name": "conduct",
+  "filesystem_scoped_eval_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+  "surface_scope_note": "The listed pre-surface cases explicitly select built-in filesystem. Retain their stated bundle or legacy fixtures; path expectations do not apply to external adapters. Cases 24–26 cover surface integration. See README.md for actual exercised evidence and its limits.",
   "evals": [
     {
       "id": 1,
@@ -486,6 +488,69 @@
         "Makes no subagent spawn/dispatch call despite callable roles and healthy prerequisites",
         "Does not bypass, work around, or reinterpret the host prohibition",
         "Records the fallback reason and continues within the approved task envelope"
+      ],
+      "files": []
+    },
+    {
+      "id": 24,
+      "name": "surface-aware-close-bundle-legacy-and-external",
+      "phase_under_test": "summarize (surface integration)",
+      "prompt": "close this work",
+      "context": {
+        "work_state": "active, validation passed; run as three controlled scenarios",
+        "scenarios": [
+          "filesystem concept bundle with index.md and all executive objects",
+          "filesystem legacy flat brain with constitution.md and all executive objects",
+          "simulated external owned object store with exact project/context, complete enumeration, full reads, revisions, append-log and selective clear-work"
+        ],
+        "external_fixture": "controlled test adapter only; not an actual Engram or library certification"
+      },
+      "expected_output": [
+        "Bundle and legacy scenarios resolve distinctly and neither layout is migrated or rewritten",
+        "Filesystem archive prepare/archive are exercised only in isolated scratch roots with explicit project and context IDs; exercise approval stop before archive, verified append/readback, changed inventory blocking cleanup, and interrupted archive recovery",
+        "External scenario performs logical full retrieval, cat/context, revision readback and exact owned-scope archive operations through simulated tools; asks approval before append/cleanup and stops on refusal",
+        "External scenario never invokes path-based archive helper, creates .ai/ mirror, or falls back on simulated access/transport failure",
+        "External claims are labeled simulation, not proof of actual Engram or an unseen adapter",
+        "Migration remains blocked pending Phase5: no import, merge, dual-write or source retirement"
+      ],
+      "files": []
+    },
+    {
+      "id": 25,
+      "name": "surface-workflow-gates-through-validation",
+      "phase_under_test": "propose+spec+tasks+execute+validate",
+      "prompt": "Help me shape a small project; then let's spec it.",
+      "context": {
+        "selected_surface": "controlled fake owned object store; complete catalogue and full-read revisions available",
+        "protocol": "synthetic developer messages include clarify, reject first approval, then approve; no real backend",
+        "runtime_variant": "verify child role is callable in one run and missing in a separate run"
+      },
+      "expected_output": [
+        "Propose mirrors the requirement and clarifies it conversationally; no executive object is written before handoff",
+        "Spec creates draft PRD when spec depth applies and draft plan, each full-read-back with revisions; approval rejection leaves drafts and no approved status, approval is a separate exact-revision update and readback",
+        "Tasks reads approved plan and PRD plus quality-gate/convention concepts in full, creates schema-valid task graph and walkthrough with copied gate provenance, then verifies both exact objects",
+        "Execute uses full task/walkthrough reads, dispatches only callable required child roles, and stops on write/readback divergence before checkbox progress",
+        "Validate full-reads source criteria and tasks mapping; callable verify gets dispatched, while missing verify is recorded as not-verifiable with named blocker and no fabricated pass",
+        "Every external write is recorded under exact project/context and a single conduct writer; fake-store execution is not live Engram or LLM compliance certification"
+      ],
+      "files": []
+    },
+    {
+      "id": 26,
+      "name": "external-execute-divergence-stops-checkbox",
+      "phase_under_test": "execute (external revision divergence)",
+      "prompt": "continue",
+      "context": {
+        "selected_surface": "controlled fake owned store",
+        "plan": "approved, exact context; all executive objects completely catalogued and full-read",
+        "executor": "callable child reports source task done",
+        "write_trace": "conduct task write acknowledged but exact full readback contains a changed task body/revision"
+      },
+      "expected_output": [
+        "Conduct remains the only executive writer; child does not write tasks or walkthrough",
+        "Detected exact post-write divergence and stopped dependent checkbox/phase progress",
+        "Reconciles via exact full reads; does not trust acknowledgement, retry blindly, switch context, or claim task complete",
+        "Fake trace records scoped reads/writes and result revisions, not actual adapter guarantees"
       ],
       "files": []
     }
