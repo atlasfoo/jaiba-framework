@@ -148,22 +148,20 @@ changed objects block cleanup. The existing filesystem archive script alone does
 not establish these complete surface guarantees. No namespace-wide purge or
 side effects outside the resolved ownership and authorized operation are allowed.
 
-### PHASE3 TRANSITION — consumer and migration capability gates
+### Transition — migration capability gate
 
-Setup, `jaiba-init`, `jaiba-doctor` and `jaiba-configure` may resolve/probe external
-surfaces within their approved scope; selection/probing is not activation or
-mutation authority. `conduct`, `ask`, `fast` and the remaining consumers/subagent
-battery are **not adapted until Phase4**. If an external surface is selected,
-a call to an unadapted consumer must **stop with capability pending**. Never
-fall back to filesystem, invoke path-based consumer operations against external
-memory, or create `.ai/` to make the call appear supported.
+Setup, `jaiba-init`, `jaiba-doctor` and `jaiba-configure` may resolve/probe
+external surfaces within their approved scope; selection/probing is not
+activation or mutation authority. Never fall back to filesystem, invoke
+path-based consumer operations
+against external memory, or create `.ai/` to make the call appear supported.
 
 Surface migration is **not implemented until Phase5**. A transition involving
-existing populated stores is blocked pending that capability: explain the
+existing populated stores remains blocked pending that capability: explain the
 obstacle and offer an explicit filesystem exception (normally the `filesystem`
 override) to keep using existing local memory. Do not ignore, transfer, merge,
 dual-write or retire populated stores implicitly. Selection, an override or a
-saved binding never approves migration. Future activation requires complete
+saved binding never approves migration. Activation requires complete
 inventories, separately staged lossless import, verified full readback and
 source revisions, explicit human approval and retained source authority until
 activation; source retirement remains a separate explicit decision.

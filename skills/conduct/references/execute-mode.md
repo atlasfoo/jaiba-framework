@@ -1,15 +1,17 @@
 # `conduct:execute`
 
-Advance the approved work, one plan-phase at a time. End state per
-invocation: one phase fully done, `tasks.md` updated, the walkthrough
-carrying one entry per change, the Phase gate green, a commit message
-suggested.
+Advance the approved work, one plan-phase at a time, in the resolved
+executive context. End state per invocation: one phase fully done,
+`tasks` and `walkthrough` updated and verified, the Phase gate green, a
+commit message suggested.
 
 This phase is **implicit by default** — the routing rule sends
 continuation cues here. Activation conditions:
 
-1. `.ai/work/plan.md` exists with `status: approved` (or later).
-2. `.ai/work/tasks.md` has at least one unchecked task.
+1. A fully read `plan` exists in the resolved executive context with
+   `status: approved` (or later).
+2. The context's fully read `tasks` artifact has at least one unchecked
+   task.
 3. The developer's message is a continuation cue: `continue`, `next`,
    `go`, `proceed`, `keep going`, or a direct answer to the question
    you asked at the previous phase boundary.
@@ -22,27 +24,53 @@ execute for them.
 
 Run in order; stop and ask on any failure.
 
-1. **Read `plan.md` and `tasks.md`.** Confirm approval and that tasks
-   still reflect the plan's scope. Manual developer edits to either
-   are final directives — re-align the other file to match before
-   doing anything else. Note the gate commands in
-   `tasks.md § Gate Commands`.
-2. **Read `walkthrough.md`.** It is the memory of prior phases *and
-   prior sessions* — `.ai/work/` is multisession, and the walkthrough
-   plus the checkboxes are how a fresh session reconstructs where
-   work stands without re-deriving it.
-3. **Check `git status`.** A dirty worktree means uncommitted work
+1. **Resolve and read the context's executive artifacts.** Catalogue the
+   selected context completely; resolve `plan`, `tasks` and `walkthrough`
+   by exact logical address and full-read their content and revision
+   evidence. Read the entire artifacts, not previews or summaries. Only
+   in the explicit filesystem branch do these names mean
+   `.ai/work/plan.md`, `tasks.md` and `walkthrough.md`. An unavailable,
+   partial, truncated, ambiguous or permission-filtered result is not
+   absence: stop and surface it; never switch surfaces or contexts.
+2. **Confirm approval, scope and resume point.** Check the verified plan
+   approval, reconcile tasks against its scope, and use walkthrough
+   entries together with task checkboxes to resume actual progress across
+   sessions. Manual developer edits are final directives; re-align the
+   artifacts before continuing. Note the gate commands in the fully read
+   `tasks` artifact (`Gate Commands`).
+3. **Check `git status`** whenever the selected work root is a Git
+   checkout/worktree, regardless of the selected memory surface. A dirty
+   worktree means uncommitted work
    from another session or manual edits. Stop and report; suggest
    commit/stash/discard. Proceed only on an explicit "go anyway" —
    or when the dirt is exactly the uncommitted output of this plan's
    previous phase (compare against the walkthrough) and the developer
-   has chosen to carry WIP forward.
+    has chosen to carry WIP forward. An external workspace with no Git
+    root has no Git status to check; this alone is not a failure.
 4. **Identify the active phase.** The first phase with any unchecked
    task, provided its `depends on:` phases are fully checked;
    otherwise surface the broken ordering and ask.
 
 > The constitution is **not** re-read here. Gate commands and TDD
 > posture were copied into `tasks.md` at the `tasks` phase.
+
+### Executive artifact writes and recovery
+
+Conduct is the only executive writer for this context. Establish
+serialized access and retain each object's exact address and full
+pre-read revision before updating it. Update existing `tasks` and
+`walkthrough` objects (never implicitly create or upsert); preserve
+unknown metadata and relations. Record each completed task's walkthrough
+entry and checkbox changes as authorized updates. Before any dependent
+checkbox or Phase-gate progress, retain the mutation receipt and verify
+the complete intended artifact by exact full readback, including its
+resulting revision. Acknowledgement without verified readback is not
+completion. On conflict, unknown outcome, missing receipt/readback, or
+mismatch, stop dependent progress and reconcile by exact reads before
+retrying. Filesystem names map to local paths only in the filesystem
+branch; elsewhere use logical addresses, never guessed paths or backend
+record IDs. These checks do not alter the existing Phase gate or task
+authority rules.
 
 ## Executing a phase
 

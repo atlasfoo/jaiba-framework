@@ -53,7 +53,7 @@ an explanation *and* a fix, and they're owed both, in that order.
 
 | Developer's intent | Owner | Notes |
 |---|---|---|
-| Advance the approved, active plan | `conduct` — `execute` phase | Only if `.ai/work/plan.md` exists *and* is approved *and* the message is a continuation cue. If no plan is active, a continuation cue is meaningless — ask what they mean. |
+| Advance the approved, active plan | `conduct` — `execute` phase | Only if the selected context's plan is authoritatively resolved and approved and the message is a continuation cue. Filesystem uses `.ai/work/plan.md`; external surfaces require the exact binding/context, complete executive catalogue, and full plan read. If authoritative enumeration confirms no plan, ask what they mean; lookup failures are not absence and must be surfaced. |
 | Spec / design / plan new work | `conduct` — chain entry | "let's plan this", a fuzzy requirement to shape (`propose`), or work too big for `fast`. The chain's triage decides the depth (design vs. spec — PRD only when warranted). |
 | Small, contained change now | `fast` | `fast` runs the shared triage; if the change is bigger than it looks, `fast` itself escalates into the conduct chain (or, with a plan active, offers fold-as-phase / park-and-replan). Don't pre-judge size in `ask` beyond a rough offer. |
 | Reconcile / update the brain | `jaiba-init:update-brain` | For drift you surfaced while answering. Propose it; don't edit memory from `ask`. |

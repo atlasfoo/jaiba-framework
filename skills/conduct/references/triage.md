@@ -37,6 +37,16 @@ Before deciding, do a few **surgical** reads/searches — enough to size
 the change, not to do it. Tools serve discovery here, not bulk content
 delivery.
 
+Resolve the current memory surface/project/context through conduct's
+discovery (or the calling consumer's canonical resolution) before using
+brain facts or deciding whether work is active. Concepts come from the
+complete owned constitutive catalogue and exact full reads; a search miss
+never proves absence. An active plan belongs to the resolved executive
+context, not the latest search result, branch or another checkout. Names
+such as `plan.md`/`PRD.md` below denote full executive artifacts, not
+mandatory filesystem paths. Local `.ai/` checks apply only when filesystem
+is selected; external triage creates no local cache or mirror.
+
 1. **Find the change site(s).** Grep for the symbol, file, dependency,
    or config you'd modify.
 2. **Count call sites / dependents.** A handful is contained; dozens
@@ -44,11 +54,10 @@ delivery.
 3. **Check contract impact.** Function signatures, API shapes,
    serialized formats, DB schemas, public types — and internal
    cross-component contracts, recorded as `reference` concepts of
-   `kind: internal-contract` (`references/<slug>.md` in a concept
-   bundle, the matching `reference-index.md` §3 row in the legacy flat
-   layout): a change that crosses a boundary declared by a `sub-unit`
-   concept (`identity/units/<slug>.md`, or `constitution.md` §5.1 in
-   the legacy flat layout) ripples by definition.
+   `kind: internal-contract`, resolved by exact constitutive address:
+   a change crossing a declared `sub-unit` boundary ripples by definition.
+   Only filesystem resolves these through bundle paths or legacy flat
+   document/entry mappings; preserve both layouts without migration.
 4. **Check migration / breaking-change ripple.** For dependency
    upgrades, skim the changelog for the target version.
 5. **Check verifiability.** One focused pass against the Quality Gate,
@@ -122,7 +131,7 @@ beats a coin flip.
   route to `fast`.
 - **Depth discovered wrong mid-flight** (a "design" change turns out
   to alter user-visible behavior): stop, surface, and add the missing
-  artifact (a PRD can be added to `.ai/work/` at any point before
+  artifact (a full `prd` can be added to the selected executive context before
   `execute` resumes) rather than pretending the depth was right.
 
 ## Worked examples

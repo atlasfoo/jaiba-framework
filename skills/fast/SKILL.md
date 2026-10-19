@@ -29,10 +29,11 @@ Two things make `fast` safe rather than reckless:
    routes the developer into the `conduct` chain — better to hand
    off early than to half-apply a change that needed a design.
 2. **It keeps the brain honest.** When the change is an unplanned
-   adjustment to an *active* plan, `fast` records it into the
-   executive artifacts in `.ai/work/` — but only after the developer
-   confirms the change is correct, so the plan never drifts ahead of
-   reality.
+   adjustment to an *active* plan, `fast` records it only after the
+   developer confirms the change is correct. On filesystem it updates
+   local executive artifacts; on an external surface it hands the
+   confirmed amendment and read evidence to `conduct` for its authorized
+   executive write, so the plan never drifts ahead of reality.
 
 ## Invocation: implicit only
 
@@ -79,49 +80,75 @@ ask the developer; don't silently over- or under-scope
 
 > **Brain check first.** `fast` can be installed per-project or
 > **globally** (e.g. `~/.claude/skills/`), shared across every
-> repository. Either way, "the brain" means `.ai/` and `AGENTS.md` at
-> the root of *this* project — where `.git/` lives — never a path
-> relative to this skill's own installation location.
+> repository. Resolve memory via the effective `create-memory`
+> installation's `references/resolution.md` and
+> `references/memory-surface-contract.md`, never
+> relative to this skill's installation. The built-in filesystem surface
+> maps to the selected checkout; an external surface uses its exact
+> binding and owned catalogue and may omit local `.ai/` and `AGENTS.md`.
 >
-> If `AGENTS.md` is missing/empty/not JAIBA's (neither the minimal
-> marker pointing at the global JAIBA contract nor a legacy full
-> protocol), or
-> `.ai/memory/` is incomplete (neither concept bundle at `index.md` nor
-> legacy flat at `constitution.md`), this project isn't (fully)
-> JAIBA-instrumented. `fast` doesn't block on this — small, atomic
-> changes are still in scope — but: fall back to whatever verification
-> commands the repo itself defines for the Phase Gate (in the concept
-> bundle, the `quality-gate` concept; in legacy flat, `constitution.md
-> §6`; see `jaiba-contract.md §1` if unsure which) — README, CI config,
-> or failing those, the package manager's own scripts (`package.json`,
-> `Makefile`, `justfile`, …). Treat the change as free-standing (skip
-> "plan adjustment" entirely), and mention `jaiba-init` once, in the
-> closing recap, as an opportunity rather than a blocker.
+> A missing/unavailable binding, catalogue, page, or required read is a
+> failure, not proof of missing instrumentation or an empty plan. Stop any
+> plan-dependent work on ambiguity, permission failure, partial/truncated
+> reads, or unavailable surface; never bypass the selected external surface
+> by calling it free-standing. Only authoritative complete enumeration or
+> exact not-found in the fully resolved readable scope can establish no
+> active artifact. If the surface is authoritatively absent, apply the
+> free-standing policy and use the repository's applicable Quality Gate
+> (quality-gate concept for a bundle; `constitution.md §6` for legacy; see
+> `jaiba-contract.md` §1) or documented repository fallback.
 
 Context loaded depends on execution context — detect which applies (see
 "Two contexts" below) before reading.
 
-**Free-standing** (no active plan or change unrelated to it):
-1. **`AGENTS.md`** — behavioral contract.
+**Free-standing** (authoritatively no active plan, or change unrelated to it):
+1. **Project instructions** — read applicable `AGENTS.md` when present; an
+   external surface may be valid without a local marker. Do not use marker
+   presence as evidence for external memory.
 2. **Phase Gate commands and TDD mode flag:**
-   - Concept bundle (when `.ai/memory/index.md` exists): the `quality-gate` concept
-   - Legacy flat (when `constitution.md` exists, no `index.md`): `constitution.md §6`
-   Read the applicable section only; skip the rest of your brain.
+   - Filesystem concept bundle: resolve `quality-gate` through
+     `.ai/memory/index.md`.
+   - Filesystem legacy flat: `constitution.md §6`.
+    - External: resolve `quality-gate` from the complete constitutive
+      catalogue and exact full-read it. Use only gate commands and TDD
+      posture explicitly declared by that concept, preserving their stated
+      provenance and repository validation context; arbitrary unrelated
+      memory text is not executable gate authority.
+   Read only applicable gate material; do not treat failed/partial reads as
+   absence or fall back to a different selected surface.
 3. **External integrations the change touches:**
-   - Concept bundle: `reference` concepts, mapped through `.ai/memory/index.md`
-   - Legacy flat: `.ai/memory/reference-index.md`
+   - Filesystem concept bundle: `reference` concepts through index.
+   - Filesystem legacy flat: `.ai/memory/reference-index.md`.
+   - External: exact catalogue and full reads of relevant `reference` objects.
    Skip entirely if the change touches no indexed integrations.
    
-   Use `jaiba-contract.md §1` (Brain Map) to determine your brain layout.
+   Resolve the effective `create-memory` installation's
+   `references/resolution.md` and `references/memory-surface-contract.md`;
+   use exact binding/project/context and complete authoritative catalogues,
+   never previews or guessed paths.
 
-**Plan adjustment** (`.ai/work/plan.md` exists and the change falls
-within its scope):
-1. **`AGENTS.md`** — behavioral contract.
-2. **`.ai/work/plan.md`** and **`tasks.md`** — plan context and
-   Phase Gate commands (already embedded in `tasks.md § Gate Commands`).
+**Plan adjustment** (an approved plan exists in the selected executive
+context and the change falls within its scope):
+1. **Project instructions** — read `AGENTS.md` when present; external
+   surfaces need not have one.
+2. **Resolve and catalogue** — revalidate the selected binding and exact
+   project/context, completely enumerate its executive catalogue, then
+   exact full-read the plan, tasks, walkthrough and gate instructions that
+   exist. On filesystem, this maps to `.ai/work/plan.md` and companion
+   files; on external surfaces, use logical objects, never local-path
+   assumptions. Confirm the plan is approved/executing and establish its
+   scope from these reads.
+3. **Record the read baseline** — retain revision evidence for every
+   executive object that may be amended. Before any authorized write,
+   re-read and compare those revisions; after the write, exact-read and
+   verify complete intended content and relations. On external memory,
+   `conduct` owns executive writes and the single-writer handoff; fast
+   reports the confirmed adjustment and evidence to conduct instead of
+   writing the backend or its executive objects itself.
 
-> For plan adjustments, the brain is not re-read. Gate commands and TDD
-> posture are available in the work files (`tasks.md`).
+> For plan adjustments, the selected executive context is re-resolved and
+> fully read; gate commands and TDD posture come from the exact tasks
+> object (or local `tasks.md`) in that context.
 
 Skip nothing within your applicable context — a "trivial" change
 against the wrong assumptions isn't trivial.
@@ -131,12 +158,14 @@ against the wrong assumptions isn't trivial.
 `fast` behaves slightly differently depending on whether it's
 free-standing or adjusting a live plan. Detect which one applies:
 
-- **Free-standing** — no `.ai/work/plan.md` exists, **or** one
-  exists but the requested change is unrelated to its scope. Example:
+- **Free-standing** — authoritative resolution confirms no active plan in
+  the selected context, **or** a fully read plan exists but the request is
+  unrelated to its scope. A failed/partial lookup is never free-standing.
+  Filesystem example:
   *"bump requests to 2.32"* with no plan active. The change stands on
   its own.
 
-- **Plan adjustment** — `.ai/work/plan.md` exists, is approved/
+- **Plan adjustment** — the selected context's fully read plan exists, is approved/
   executing, **and** the requested change falls inside or adjacent to
   the plan's scope but wasn't contemplated by it. Example, mid-plan:
   *"add a validation to the endpoint that was not in the plan"*.
@@ -151,12 +180,14 @@ pollute an unrelated plan or silently expand its approved scope.
    If the change is not `inline`, refuse and route: no active plan →
    "Refusing gracefully" below; active plan → the **big out-of-band
    change** procedure in `references/plan-adjustment.md`. Stop here.
-2. **Determine context.** Free-standing vs. plan adjustment (check
-   whether `.ai/work/plan.md` exists and the change is in scope).
+2. **Determine context.** Free-standing vs. plan adjustment, using
+   authoritative complete catalogue/full reads in the selected context;
+   for filesystem this is `.ai/work/plan.md`.
 3. **Read preconditions** per context (see "Universal preconditions"
    above). Gate commands come from `tasks.md § Gate Commands` for plan
-   adjustments, and from the brain (either `quality-gate` concept or
-   `constitution.md §6` per layout) for free-standing changes.
+   adjustments, and from the selected surface's full-read gate concept (or
+   filesystem `quality-gate` / legacy `constitution.md §6`) for
+   free-standing changes.
 4. **For a plan adjustment, check the worktree.** A dirty worktree is
    *expected* if you're mid-phase — read `tasks.md` / `walkthrough.md`
    to confirm the dirt is the in-progress phase, not a surprise from
@@ -175,16 +206,20 @@ pollute an unrelated plan or silently expand its approved scope.
    `tasks.md § Gate Commands`; for free-standing changes use the Phase
    Gate commands from the brain (`quality-gate` concept or `constitution.md §6`
    per layout). If it fails and the fix isn't itself atomic, stop and surface it.
-7. **Record, per context:**
-   - **Free-standing:** write nothing to `.ai/work/`. The change
-     plus git history is the record; give the developer a one-line
-     recap in chat. (Executive artifacts belong to `conduct`;
-     creating an orphan `walkthrough.md` with no plan would be cleaned
-     up by nothing.)
-   - **Plan adjustment:** execute first, then **ask the developer to
-     confirm the change is correct**. Only on confirmation, update the
-     work artifacts (`tasks.md`, `plan.md`, `walkthrough.md`). The
-     full procedure is in `references/plan-adjustment.md`.
+ 7. **Record, per context:**
+    - **Free-standing:** write no executive artifact. The change
+      plus git history is the record; give the developer a one-line
+      recap in chat. (Executive artifacts belong to `conduct`;
+      creating an orphan `walkthrough.md` with no plan would be cleaned
+      up by nothing.)
+    - **Plan adjustment:** execute first, then **ask the developer to
+      confirm the change is correct**. For filesystem, only then update
+      local work artifacts per `references/plan-adjustment.md`. For an
+      external context, after confirmation hand off the evidence and
+      approved amendment to `conduct`, which alone performs serialized,
+      revision-checked, fully verified executive writes. On any backend
+      access or verification failure, make no JAIBA-owned memory changes
+      and report the failure.
 8. **Suggest a commit, don't run it.** Propose a conventional-commit
    message (`fix`, `chore`, `refactor`, `perf`, `docs`, …) inferred
    from the change. Run git only if the developer asks (`AGENTS.md`
@@ -249,7 +284,7 @@ using in the session.
   plan adjustment, the confirmation gates the write — that's what
   keeps the plan from drifting ahead of approved reality.
 - **Orphaning a `walkthrough.md` on a free-standing change.** Free
-  `fast` writes nothing to `.ai/work/`.
+  `fast` writes no executive artifact (on filesystem, nothing to `.ai/work/`).
 - **Building a second plan around out-of-band work.** With a plan
   active, big out-of-band work has exactly two honest exits — fold it
   in as a phase, or park-and-replan — both chosen by the developer,

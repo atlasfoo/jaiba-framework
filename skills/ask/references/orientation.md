@@ -16,37 +16,55 @@ brain reflexively (`AGENTS.md` §3.2).
 Decide which domain(s) the question touches. This tells you what to
 look for.
 
-Three rows below touch `.ai/memory/` itself, which comes in two supported
-shapes. Resolve which one the repo holds exactly as `jaiba-contract.md`
-§1 (Brain Map, *Dual resolution*) prescribes — this file doesn't restate
-that rule, only points each question at its OKF and legacy targets. The
-`type:` vocabulary behind the OKF column is the closed set in
-`jaiba-init/references/okf-pattern.md`.
+Three rows below touch constitutive memory. First resolve the effective
+`create-memory` installation and follow its `references/resolution.md` and
+`references/memory-surface-contract.md`; do not assume filesystem or discover a
+surface from this skill's location. For filesystem, apply the dual-layout
+rule in `jaiba-contract.md` §1 and use the appropriate column below. For
+an external surface, use its exact binding, owned catalogue and full reads
+as the authoritative source; search previews are discovery only. The
+`type:` vocabulary is the closed set in `jaiba-init/references/okf-pattern.md`.
 
-| Question is about… | Orient by (OKF bundle — `index.md` present) | Orient by (legacy flat — no `index.md`) |
-|---|---|---|
-| A piece of code, a symbol, a behavior | Locating it in source (grep / glob). No brain read needed unless the *why* is historical. | Same — the memory layout doesn't apply. |
-| "The plan" (tasks left, ordering, scope) | Finding the active work in `.ai/work/`. | Same — `.ai/work/` sits outside the constitutive bundle and isn't affected by which layout `.ai/memory/` uses. |
-| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` — it exists only when triage ran the chain at `spec` depth. | Same. |
-| A past decision ("why did we…") | The `decision` concept, found by `type: decision` via `.ai/memory/index.md`. | `.ai/memory/adr-log.md` (standing decisions). |
-| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` — append-only, one entry per closed piece of work, newest by date prefix. Unchanged by layout: `log/` lives at the same path either way. | Same. |
-| The project in general (stack, conventions) | The relevant concept by `type:` — `project`, `architecture`, or `convention` — via `.ai/memory/index.md`. | `.ai/memory/constitution.md`. |
+| Question is about… | Filesystem: concept bundle | Filesystem: legacy flat | External surface |
+|---|---|---|---|
+| A piece of code, a symbol, a behavior | Locate source. No brain read unless the *why* is historical. | Same. | Same; external memory is not a source-code substitute. |
+| "The plan" (tasks left, ordering, scope) | `.ai/work/` executive artifacts. | Same; `.ai/work/` is separate from constitutive layout. | Resolve exact executive context; completely enumerate its owned catalogue, then full-read the plan/tasks/walkthrough objects that exist. |
+| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` when present. | Same. | Exact executive context catalogue/full read of PRD object when present; verify linked logical objects as needed. |
+| A past decision ("why did we…") | `decision` by type via `.ai/memory/index.md`. | `.ai/memory/adr-log.md`. | Complete constitutive catalogue and full-read matching decision objects. |
+| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` entries. | Same. | Complete constitutive catalogue and full reads of relevant `log-entry` objects. |
+| The project in general (stack, conventions) | Relevant `project`, `architecture`, or `convention` concept via index. | `.ai/memory/constitution.md`. | Complete constitutive catalogue and full reads of relevant concepts. |
 
 Either branch, a decision question that needs the tactical *why* behind
 a still-open call also reads `walkthrough.md`, not just the standing
 decision.
 
-## Step 2 — locate the active artifact
+## Step 2 — resolve and locate the active artifact
+
+For filesystem, use the selected checkout's physical paths below after
+resolving the supported layout. For an external surface, resolve the exact
+binding, project ID and executive context through the canonical references
+above. Enumerate the complete owned executive catalogue for that context
+(consume all pages and confirm completion/consistency); then exact-read the
+full logical objects needed for this question. Preserve relation targets
+and revision/receipt evidence for citations. A search result or preview may
+help discover candidates but cannot prove completeness or absence. If
+binding, catalogue, page, exact read, or required relation is unavailable,
+ambiguous, partial, truncated, or permission-denied, report the failure and
+stop; none is evidence that the context or artifact is empty. `ask` must
+not persist JAIBA bindings, alter JAIBA namespace/ownership, or perform
+JAIBA adapter/memory operations that mutate JAIBA-owned data. Ordinary
+host-required memory/session bookkeeping remains independent and is not
+JAIBA evidence or a source for JAIBA reads.
 
 ### Active plan
 
-The active work lives in `.ai/work/`. Check, in order:
+On the filesystem surface, active work lives in `.ai/work/`. Check, in order:
 
 1. **`.ai/work/plan.md` exists?** If yes, that *is* the active plan —
    there is only ever one. Read its frontmatter for the slug, the
    depth, and whether a local PRD exists (`prd:`). Read `tasks.md` for
    progress and `walkthrough.md` for what already happened.
-2. **No `plan.md`?** There is no active plan. Say so: *"There is no
+2. **No `plan.md`?** There is no active plan in this checkout. Say so: *"There is no
    active plan in `.ai/work/`."* Don't reconstruct one from a summary or
    from git. If a `<slug>-summary.md` is present, the work was finished
    but not yet archived — mention that, it's the honest answer.
@@ -56,9 +74,20 @@ The active work lives in `.ai/work/`. Check, in order:
 > Answer from the files that exist, note the drift, and suggest
 > `jaiba-doctor` — don't migrate anything from `ask`.
 
+On an external surface, use the authoritative full catalogue and exact
+reads described above. The unique logical `plan` object in the selected
+context is the active plan; read its related `tasks` and `walkthrough`
+objects as needed. Report an absent plan only after complete authoritative
+enumeration (or exact not-found in that fully resolved readable scope),
+never from a search miss. Check the plan's declared PRD relation/logical ID;
+read its full content and needed criteria relations. Cite stable logical
+addresses and available revision/receipt evidence, not local `.ai/` paths
+or ephemeral backend record IDs. Ambiguous duplicates or unresolved
+relations block confident claims; surface them as such.
+
 ### Active PRD
 
-The PRD, when it exists, is an executive artifact next to the plan:
+On filesystem, the PRD, when it exists, is an executive artifact next to the plan:
 
 1. **`.ai/work/PRD.md` exists?** Read it — its acceptance criteria
    schema (`<PREFIX>-NNN`, happy/sad) is what "coverage" questions are
@@ -67,8 +96,12 @@ The PRD, when it exists, is an executive artifact next to the plan:
    covered?".
 2. **No `PRD.md` but a plan exists?** The work is at `design` depth —
    deliberately no PRD. Say so; the plan's Objective carries the why.
-3. **Neither?** There is no active work. For *past* work, the
-   `.ai/memory/log/` entries are the record.
+3. **Neither?** There is no active work in this checkout. For *past* work, the
+    `.ai/memory/log/` entries are the record.
+
+On an external surface, report no PRD only when a complete catalogue/read
+of the exact context and the plan's full relation data establishes that no
+PRD is present. A partial catalogue or failed read is not a no-PRD result.
 
 ## Step 3 — answer from what you read
 

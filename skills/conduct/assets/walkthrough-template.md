@@ -8,7 +8,8 @@ created: <YYYY-MM-DD>
 
 > Change-by-change log of the work's execution, written **as you go**
 > — one compact entry per completed task, plus a checkpoint block at
-> each phase boundary. `.ai/work/` is multisession: this file (with
+> each phase boundary. The selected executive context is multisession
+> (filesystem: `.ai/work/`): this artifact (with
 > the `tasks.md` checkboxes) is how a fresh session reconstructs
 > exactly where work stands, even mid-phase.
 >

@@ -8,9 +8,10 @@ created: <YYYY-MM-DD>
 
 ## Gate Commands
 
-<!-- Populated by conduct:tasks from the quality-gate concept
-     (identity/quality-gate.md in a concept bundle, constitution.md §6
-     in the legacy flat layout). Do not edit manually. -->
+<!-- Populated by conduct:tasks from a full read of the resolved
+     quality-gate concept. Record verified source address/revision here;
+     commands are copied verbatim. Filesystem only: bundle index or
+     supported legacy flat mapping. Do not edit manually. -->
 
 **Phase gate** (run at each phase close):
 - `<affected tests command>`

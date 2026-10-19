@@ -1,7 +1,7 @@
 ---
 name: conduct
 description: >-
-  Unified Spec-Driven-Development chain of the JAIBA framework — the single entry point that routes any development request to the right depth and phase. SDD chain: propose (shape a fuzzy requirement) → spec (PRD only when triage demands it + design/plan.md, human approval gate) → tasks (T-NNN task graph) → execute (implicit, phase by phase) → validate (quality gate + acceptance criteria) → summarize (archive to `.ai/memory/log/`, clean `.ai/work/`). Trigger implicitly when the developer describes work to plan or build, formalizes a requirement ("let's plan", "let's spec this", "write a PRD", "we need a feature that…"), or sends a continuation cue ("continue", "next", "go") while `.ai/work/plan.md` exists. Trigger explicitly on "/conduct [phase]" as deterministic override when routing fails or to force a phase (e.g. "/conduct summarize"). NOT the host agent's native plan mode — it writes artifacts under `.ai/work/` and needs file-write access; never run it inside a read-only plan mode.
+  Unified Spec-Driven-Development chain of JAIBA: propose → spec (PRD when depth demands it + design, human approval) → tasks → execute (phase by phase) → validate → summarize. Trigger when the developer describes work to shape or build, requests a PRD/design, or sends a continuation cue ("continue", "next", "go") with an active plan in the resolved executive context. Resolve logical constitutive/executive memory through the selected memory surface; filesystem retains .ai/memory/ and .ai/work/. Explicit override: /conduct [phase]. Not the host agent's native read-only plan mode: this workflow must persist full executive artifacts and approval before execution.
 version: 3.2.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -49,7 +49,7 @@ fulfills it.
 Host agents (Claude Code, Cursor, …) ship a native "plan mode" that
 freezes file writes while the model thinks. That is **not** this
 skill, and this skill must not run inside it: the `spec` phase writes
-`PRD.md` and `plan.md` to `.ai/work/`, which a read-only native mode
+full `prd` and `plan` objects to the selected executive context, which a read-only native mode
 would block. If the host is in its native plan mode, ask the developer
 to exit it before entering the chain.
 
@@ -66,7 +66,7 @@ to exit it before entering the chain.
 
 ## Routing rule (when work is active)
 
-While `.ai/work/plan.md` exists, every developer message routes down
+While a fully read `plan` exists in the resolved executive context, every developer message routes down
 one of three lanes:
 
 | The message is… | Lane |
@@ -78,66 +78,75 @@ one of three lanes:
 When no work is active, a question still goes to `ask`; a change
 request enters this chain through triage.
 
+A continuation cue never grants design approval. A draft plan stays in
+`spec`; only verified persisted approval permits `tasks`/`execute`.
+
 ## Brain Discovery and Validation
 
-This skill can be installed per-project (`.claude/skills/`,
-`.agents/skills/`) or **globally** (e.g. `~/.claude/skills/`), shared
-across every repository you work in. Either way, "the brain" means
-`.ai/` and `AGENTS.md` at the root of the **project you're currently
-in** — where `.git/` lives — never a path relative to this skill's own
-installation location.
+Resolve the effective `create-memory` installation through host skill
+resolution, then read its canonical `references/memory-surface-contract.md`
+and `references/resolution.md` (contract `jaiba-memory-surface` 1.0.0).
+An unavailable or ambiguous dependency blocks use; do not assume sibling
+installation paths. Resolve the exact work root, selected adapter,
+namespace, stable project ID and executive context ID before phase selection.
+Follow canonical precedence, callable-tool probes, binding validation,
+authority checks and explicit context selection; never pick a latest plan,
+branch-named context or another checkout's work. A changed binding is not
+migration permission. No silent fallback, dual-write or local memory cache.
 
-Before selecting a phase, confirm the project is JAIBA-instrumented:
+**External surface branch:** validate the selected owned scope and obtain
+the complete constitutive catalogue (all pages), then full-read required
+entry concepts. A binding, probe, marker or search hit is not instrumentation.
+Require real project/architecture/purpose/scope/quality-gate/convention
+content, applicable sub-units, and the standing decision/reference records.
+An empty authoritative scope routes to `jaiba-init`; incomplete templates
+route to its initialize path. Missing concepts are surfaced, not invented.
+External instrumentation needs neither a local marker nor local memory/work
+files: do not test `.ai/` paths to decide its state.
 
-1. **`AGENTS.md` exists at the project root, is non-empty, and is the
-   JAIBA behavioral contract** (or points to the global JAIBA contract
-   installed in the agent's config). An `AGENTS.md` that exists but is
-   unrelated doesn't count.
-2. **`.ai/memory/` resolves to real content.** Determine which layout
-   the repo holds per the dual-resolution rule (`jaiba-contract.md` §1
-   Brain Map) — four cases, and "instrumented" means something
-   different in each:
-   - **Concept bundle** (`.ai/memory/index.md` exists) — the `identity`
-     concepts it links (`project`, `architecture`, `purpose`, `scope`,
-     `quality-gate`, `convention`, plus `sub-unit` files if the repo is
-     multi-unit), at least one `decision` concept, and at least one
-     `reference` concept are present and hold real content, not bare
-     `[bracket]` template residue.
-   - **Legacy flat** (`.ai/memory/constitution.md` exists, no
-     `index.md`) — `constitution.md`, `adr-log.md`, and
-     `reference-index.md` exist and hold real content, not the bare
-     `[bracket]` templates. This is a fully supported layout, not a
-     fallback: no warning either way.
-   - **Both present** — ambiguous. Content can't be checked because it
-     isn't clear which half to read; see below.
-   - **Neither present** — no brain.
+**Filesystem branch only:** read the effective `create-memory`
+`references/filesystem-surface.md`. Require a non-empty JAIBA `AGENTS.md`
+marker at the selected work root and resolve `.ai/memory/` there, never
+relative to the skill installation. With `index.md` only, resolve the entry
+concepts above through that index; with `constitution.md` only, retain the
+supported legacy `constitution.md`, `adr-log.md`, `reference-index.md` and
+`log/` sources without migration. Both entry files block access pending
+human resolution. Neither entry file or a missing marker routes to
+`jaiba-init`; bare templates route to initialize. Neither supported layout
+is a warning. `.ai/work/` remains per checkout, without new context folders.
 
-If check 1 fails, or check 2 resolves to bare templates or no brain,
-**stop here** — do not enter any phase or write to `.ai/work/`. An
-orphaned plan with no constitution to ground it helps no one. Route:
+For either surface, permission errors, partial catalogues, unavailable
+tools, unsupported versions and truncated reads are failures, not absence.
+Stop affected work and surface the scope/error; do not bootstrap over it.
+Only exact authoritative not-found or complete scoped enumeration proves
+absence. `jaiba-configure` handles missing machine prerequisites, not an
+empty project. `.atl/tool-layout.md` remains local toolchain evidence.
 
-- No `.ai/` at all, or neither layout present → `jaiba-init` (bootstrap).
-- `.ai/` exists but the resolved layout — bundle or flat — is still
-  bare templates → `jaiba-init`, which resumes at its
-  `update-brain:initialize` mode.
-- `AGENTS.md` missing or not the JAIBA repo marker → `jaiba-init`
-  (bootstrap; it drops the marker as part of the sequence).
+### Executive addressing and persistence
 
-If check 2 finds **both** `index.md` and `constitution.md` present,
-that's the fourth case and a distinct failure from the three above:
-**stop and surface it to the human**, per the dual-resolution rule —
-don't silently pick a half to read, and don't auto-route to
-`jaiba-init` on your own. Name both paths present; the conversion
-itself is `jaiba-init:update-brain:migrate`, and it only runs when the
-human asks for it.
+Use `(namespace, project-id, executive, context-id, logical-id)` for work,
+and `(namespace, project-id, constitutive, logical-id)` for brain concepts.
+Catalogue the selected executive context completely before deciding what
+is active; resolve `prd`, `plan`, `tasks` and `walkthrough` by type and exact
+address, then full-read the objects needed for routing. Multiple candidate
+plans or conflicting identities block selection. Search results, summaries,
+catalogue previews and truncated content are never a plan or PRD read.
 
-The first three routes are repo-state failures, and repo instrumentation
-is `jaiba-init`'s job alone — its own "When NOT to bootstrap" table
-decides whether the run is a fresh bootstrap or a resume, so route there
-and let it pick. `jaiba-configure` is *not* an answer to any of these:
-it is a machine-level prerequisite (the global behavioral contract, the
-skillset, the subagent battery). Name it only when that global side is
-what's missing — a separate check, not a repo-state one.
+Artifact names below are logical shorthand, **not file-existence tests**.
+Only in the filesystem branch do `PRD.md`, `plan.md`, `tasks.md` and
+`walkthrough.md` map to `.ai/work/` filenames. Constitutive concepts resolve
+through the selected catalogue (through the index/legacy mapping on
+filesystem). No backend record ID or guessed URI substitutes for an address.
+
+Conduct is the single executive writer per context. Analysts/executors
+receive exact scope, addresses, full necessary content and revision
+provenance, and return reports; they do not write executive memory.
+Establish serialized access before writes. For every create/update, check
+authoritative absence/current full revision, preserve unknown metadata and
+relations, retain the mutation receipt, and verify the complete intended
+object by exact readback. A conflict or unknown/unverified outcome blocks
+dependent writes; reconcile before retrying. Do not claim atomic CAS unless
+the adapter supplies it. Persisted approval is subject to these same rules.
 
 ## Triage: how deep does the chain run?
 
@@ -159,13 +168,15 @@ step. At `spec` depth the chain runs whole.
 
 ## Phase Selection
 
-Decide the phase **before** reading anything else. If the message is
+After discovery and executive catalogue/full reads, decide the phase
+**before loading phase-specific context**. If the message is
 ambiguous, ask the developer instead of guessing.
 
 | Situation | Phase | Read |
 |---|---|---|
 | Requirement is fuzzy/exploratory; developer wants help shaping it ("help me think through…", "I'm not sure how this should work") | `propose` | `references/propose-mode.md` |
 | Requirement is clear (or just landed in `propose`), no active `plan.md`, developer wants it specced/planned | `spec` | `references/triage.md`, then `references/spec-mode.md` |
+| The context's plan is still draft, or approval was not persisted/verified | `spec` (approval/reconciliation) | `references/spec-mode.md` |
 | `plan.md` exists and is approved, but `tasks.md` doesn't exist yet | `tasks` | `references/tasks-mode.md` |
 | `plan.md` + `tasks.md` exist with unchecked tasks; message is a continuation cue | `execute` *(implicit)* | `references/execute-mode.md` |
 | All tasks checked; acceptance criteria not yet verified (or developer asks to validate) | `validate` | `references/validate-mode.md` |
@@ -190,10 +201,10 @@ the design approval gate and command provenance boundary still apply.
 ## Context Loading
 
 Load per phase — not universally — to minimize tokens. By this point
-Brain Discovery has already resolved the layout (bundle or flat) and
-ruled out the ambiguous/no-brain cases, so what follows names, per
-phase, which **concepts** to load and where they resolve in each
-supported layout.
+Brain Discovery has already resolved the surface, project and context.
+Load concepts by type from its constitutive catalogue and full-read them.
+The physical examples below apply **only to the filesystem branch**;
+they are never external discovery prerequisites.
 
 - **`propose` / `spec`** (full context): `AGENTS.md` (or global
   contract); the `scope`, `quality-gate`, and `convention` (TDD mode)
@@ -216,22 +227,24 @@ supported layout.
   and TDD posture into `tasks.md` (`identity/quality-gate.md` +
   `identity/conventions.md` in the bundle, `constitution.md` §6/§7 in
   the legacy flat).
-- **`execute`**: `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`
+- **`execute`**: the selected context's `plan`, `tasks`, `walkthrough`
   only. Gate commands and TDD posture were already copied into
   `tasks.md` — no `quality-gate`/`convention` concept, and no
   `constitution.md`, is re-read.
 - **`validate`**: `tasks.md § Gate Commands`, `PRD.md`'s acceptance
   criteria schema (if present), approved `plan.md` objective and Scope
   (In) at design depth, `walkthrough.md`, and relevant task diffs.
-- **`summarize`**: everything in `.ai/work/`.
+- **`summarize`**: the complete selected executive context.
 
 If any read reveals a conflict between the request and recorded
 project facts, **flag it before producing artifacts**.
 
 ## Artifacts at a Glance
 
-All executive artifacts live in `.ai/work/` (gitignored — phases are
-the durable checkpoints, commits carry the code):
+Executive artifacts live in the resolved context. The following physical
+paths and `archive.sh` apply **only to filesystem**; external objects use
+logical addresses and contract operations, never local shadow files or
+the filesystem archive script:
 
 | File | Produced by | Lives until |
 |---|---|---|
@@ -247,7 +260,7 @@ structure is what keeps work legible across sessions:
 `prd-template.md`, `plan-template.md`, `tasks-template.md`,
 `walkthrough-template.md`, `plan-summary-template.md`.
 
-**Multisession by design.** `.ai/work/` survives between sessions; a
+**Multisession by design.** The selected context survives between sessions; a
 fresh session picks the chain up from wherever `tasks.md` says it is.
 Phase boundaries are the safe checkpoints.
 
@@ -287,9 +300,9 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 ## Language
 
 - **This skill's source** (SKILL.md, references, templates) — English.
-- **`.ai/work/` artifacts** (PRD, plan, tasks, walkthrough) — the
+- **Executive artifacts** (PRD, plan, tasks, walkthrough) — the
   language the developer is using in the session.
-- **The `.ai/memory/log/` entry** written at `summarize` — **English,
+- **The constitutive `log-entry`** written at `summarize` — **English,
   always** (long-term memory). Translate the essence; don't paste a
   non-English summary into the brain.
 
@@ -304,10 +317,10 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - `validate` gates `summarize`: criteria unmet ⇒ back to `execute`
   (or the developer explicitly waives, recorded in the summary).
 - `summarize` is one step: present the summary, propose ADRs (enacting
-  them is `jaiba-init:update-brain`'s job), archive to
-  `.ai/memory/log/`, clean
-  `.ai/work/` — with one explicit confirmation before the destructive
-  part.
+  them is `jaiba-init:update-brain`'s job), verify archive, then selectively
+  clear the resolved context — with explicit confirmation before cleanup.
+  Filesystem paths/scripts are not external operations; contract closure
+  guarantees must be established before claiming safe cleanup.
 
 ## Common failure modes
 
@@ -318,7 +331,6 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - **Skipping the approval gate.** "Files written" is not "approved".
 - **Stacking plan phases in one turn**, or chaining
   validate + summarize + archive without the human seeing the summary.
-- **Writing to `.ai/memory/` directly.** Only the `summarize` step's
-  log entry (via `scripts/archive.sh`) touches memory, and only
-  `log/`. Constitution/ADR/reference changes are proposals for
+- **Writing constitutive memory directly.** Only `summarize` has the
+  append-log exception for closure. Constitution/ADR/reference changes are proposals for
   `jaiba-init:update-brain`.

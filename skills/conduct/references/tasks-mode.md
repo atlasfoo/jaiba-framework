@@ -1,25 +1,31 @@
 # `conduct:tasks`
 
 Decompose the approved design into an executable work graph. End
-state: `.ai/work/tasks.md` exists (from `assets/tasks-template.md`),
-`.ai/work/walkthrough.md` exists as a stub (from
-`assets/walkthrough-template.md`), and `execute` can start.
+state: the selected executive context holds full `tasks` and a
+`walkthrough` stub from `assets/tasks-template.md` and
+`assets/walkthrough-template.md`, and `execute` can start. Filenames below
+are shorthand for those logical objects; only filesystem maps them into
+`.ai/work/`.
 
 ## Preconditions
 
-- `.ai/work/plan.md` exists with `status: approved`. No approved plan
-  ⇒ back to `spec`. Never generate tasks for a draft.
+- Resolve the binding and complete executive catalogue, then exact full-read
+  the selected `plan` with persisted `status: approved` (and full `prd` at
+  spec depth, with its original criteria YAML). No approved plan ⇒ back to
+  `spec`. A search hit, summary, truncated preview or chat approval is not
+  an approved plan. Ambiguity, failed reads or an unresolved context block
+  this phase; do not inspect a local plan as external fallback.
 - The **`quality-gate`** and **`convention`** concepts resolve and are
   readable — this is the phase that copies gate commands and TDD
   posture into `tasks.md`, so `execute` never needs the brain for
-  them again. Resolve them per the dual-resolution rule
-  (`AGENTS.md` §1): in a concept bundle, through `.ai/memory/index.md`
-  (`identity/quality-gate.md`, `identity/conventions.md`); in the
-  legacy flat layout, `constitution.md` §6 and §7–§8. Both layouts are
-  supported — do not assume a bundle.
-- If either concept is absent or empty in whichever layout you
-  resolved, **stop and surface it** — name the concept and the layout
-  — before writing `tasks.md`. Gate commands are copied, never
+  them again. Resolve exact addresses from the selected constitutive
+  catalogue and full-read the concepts. **Filesystem only:** use the
+  bundle index or supported legacy flat mapping per the effective
+  `create-memory` filesystem reference, without migration.
+- If either concept is authoritatively absent or empty in the selected
+  scope, **stop and surface it** — name the concept and surface
+  — before writing `tasks.md`. Access/availability/truncation failures
+  are not absence and block work too. Gate commands are copied, never
   inferred from what the repo "probably" runs.
 
 ## What a task is
@@ -61,14 +67,16 @@ chronology. Each phase:
   and leaves the codebase reversible, buildable, and gate-passing —
   a safe `chore(wip)` commit point.
 - Is the unit of human review and the unit of session recovery:
-  `.ai/work/` is gitignored and multisession, so a fresh session
+  the selected executive context is durable and multisession, so a fresh session
   resumes from the first phase with unchecked tasks.
 - Ends with the **Phase gate** (commands in `tasks.md § Gate
   Commands`).
 
 ## Flow
 
-1. **Read `plan.md`** (and `PRD.md` if present).
+1. **Full-read `plan`** (and `prd` when present) by exact address and
+   retain revisions. Verify approval and citation targets using
+   `spec-mode.md § Citing the brain`; no preview substitutes for content.
 2. **Read the `quality-gate` and `convention` concepts** (resolved as
    in the preconditions); copy the Phase Gate and Plan Gate commands
    **verbatim** into `tasks.md § Gate Commands` (the actual CLI
@@ -87,8 +95,17 @@ chronology. Each phase:
    solely to avoid executor concurrency. Check every criterion is covered.
    At design depth, check every Scope (In) deliverable has task coverage
    without inventing PRD criteria or changing the `covers: —` convention.
-5. **Write `tasks.md`** from the template; **write the walkthrough
-   stub** from its template.
+5. **Create `tasks`** from the template; **create the walkthrough stub**
+   from its template in this context only. Check exact authoritative
+   absence first; existing work is not overwritten or regenerated. Conduct
+   remains the single executive writer; delegates only report. Apply
+   canonical pre-read/revision checks, mutation receipts and exact complete
+   readback, preserving unknown metadata/relations. Partial or unknown
+   outcomes block handoff: reconcile exact addresses before retrying, never
+   recreate an already-created object or switch contexts to bypass a clash.
+   Keep the complete template body, frontmatter and task/criteria schemas;
+   only citations/locators vary by surface. Record gate source addresses
+   and revisions alongside copied commands without altering the commands.
 6. **Show the graph summary** (phases, task count, any long
    dependency chains) and confirm the developer is ready to execute.
    This is a light confirmation, not a second approval gate — the
