@@ -5,12 +5,12 @@
 Resolve the selected surface and canonical definitions using SKILL.md's
 Universal Preconditions before this mode. This is the existing optional
 **filesystem legacy → concept-bundle layout conversion**, not a
-surface-to-surface migration or external registry bootstrap. On external
-selection, or any requested transition involving populated filesystem or
-external stores, stop with **surface migration capability pending Phase5**
-and offer an explicit filesystem exception to retain local memory. Selection
-or binding approval is not import/activation authority. Do not implement
-staging/import, transfer, merge, dual-write, retirement or T022 here.
+surface-to-surface migration or external registry bootstrap. For an explicit
+surface transfer request, use `jaiba-init:migrate-surface` and
+`references/surface-migration.md` instead; on external selection without such
+a request, stop and clarify intent. Selection or binding approval is not
+import/activation authority. Do not combine layout conversion with surface
+transfer: a legacy source can migrate losslessly as legacy without conversion.
 
 For a selected filesystem brain the procedure below remains supported,
 including backup, literal gap carry-over, log-frontmatter backfill and the

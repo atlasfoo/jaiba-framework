@@ -378,7 +378,7 @@
         "Creates only the authorized routing binding and fresh context identity, reads back routing fields; creates no executive context contents or constitutive objects",
         "Does not seed or overwrite the existing brain and does not invoke current-draft Engram",
         "Creates no .ai/ mirror/cache; ATL remains local",
-        "Hands off to doctor; states conduct/ask/fast/battery consumers remain pending Phase4 and populated-store migration pending Phase5"
+        "Hands off to doctor; for later transfer, requires the effective init migrate-surface workflow, complete inventory, staged full readback and separate activation approval; does not claim live adapter conformance"
       ],
       "files": ["fixtures/external-link-existing/catalogue.json"]
     },
@@ -439,9 +439,30 @@
         "jaiba-init creates only the authorized constitutive concepts from the fixture; creates index last and verifies full readback/revisions for every write",
         "Creates/registers only the authorized empty context identity; writes no PRD, plan, tasks, walkthrough, or other executive content",
         "Persists only routing identifiers in the binding and reads them back; no memory payloads or .ai/ mirror/cache",
-        "Does not run conduct/ask/fast/battery against the external surface (Phase4 pending); no populated-store migration (Phase5 pending); does not use draft Engram"
+        "Does not execute a populated-store migration in this bootstrap scenario; any later migration must use init's effective migrate-surface procedure, retain source through verified activation, and obtain separate activation approval; does not use draft Engram"
       ],
       "files": ["fixtures/external-empty-bootstrap/catalogue.json", "fixtures/external-empty-bootstrap/expected-mutations.json"]
+    },
+    {
+      "id": 22,
+      "name": "migration-fixture-authority-and-recovery-boundaries",
+      "mode_under_test": "migrate-surface fixture review",
+      "prompt": "Review the valid synthetic transfer-recovery fixture and run its structural validator. Explain what interrupted create/unknown ACK, source change, collision, partial catalogue, failed activation, and closure retry require. Analysis/fixture validation only: do not execute migration or claim backend evidence.",
+      "context": {
+        "fixture": "../../create-memory/evals/fixtures/transfer-recovery-cases.json",
+        "validator": "../../create-memory/evals/fixtures/run_transfer_recovery.py",
+        "source": "complete synthetic object payloads, context registry, raw legacy representations, and an immutable historical close ID",
+        "authority": "no actual migration or activation approval"
+      },
+      "expected_output": [
+        "Uses distinct source/target authority and treats fixture validator results as structural evidence only, not adapter conformance.",
+        "Unknown create ACK/lost ID is reconciled by exact request ownership and complete readback; no blind fresh request or collision overwrite.",
+        "Changed source revisions invalidate dependent verification even when inventory counts are unchanged; partial catalogue is not absence.",
+        "Failed or partial activation pauses dependent writers and reconciles exact routing/effects; no assumed rollback or empty fallback.",
+        "Keeps approved scope/context separation, full bodies/relations/raw legacy data, and immutable close identity; activation needs separate approval and source retention.",
+        "Does not perform transfer, cleanup, or real migration; no actual adapter/Engram conformance is asserted."
+      ],
+      "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"]
     }
   ]
 }

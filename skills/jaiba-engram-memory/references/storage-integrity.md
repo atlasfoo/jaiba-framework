@@ -362,9 +362,10 @@ Export unwraps this storage into the canonical neutral interchange manifest;
 physical chunk/shard IDs are representation/provenance, not portable logical
 identities. Preserve complete logical values, source forms/revisions, relation
 order and unknown fields; explicitly declare scope, histories/tombstones and
-exclusions. Import remains separately staged and explicitly approved before
-activation, retaining source authority. This reference implements neither the
-Phase 5 migration workflow nor a binding switch, merge, dual writer or cleanup.
+exclusions. Import follows §9's separately staged mapping and init's explicit
+approval workflow before activation, retaining source authority. This is
+declarative guidance, not an executed migration, binding switch, merge, dual
+writer or cleanup.
 
 ## 8. Scoped T009 execution evidence — 2026-10-17
 
@@ -464,3 +465,120 @@ export/import, migration/activation, all executive templates and installed
 workflow-consumer integration remain later-phase obligations. These scoped
 results advance evidence for MEM-005/008/011 but do not certify their complete
 acceptance paths or weaken any protocol requirement above.
+
+## 9. Transfer staging and cross-surface recovery
+
+This is the physical mapping for the neutral transfer profile, not a native
+Engram transaction/import/export API. Use only the known `mem_get_observation`,
+`mem_save` and guarded `mem_update` operations from `engram-mapping.md`; schema
+discovery and applicable computation/size/owner-profile evidence remain required.
+Do not infer new tool names, CAS, locks or multi-record atomic publication.
+No transfer/activation execution evidence is added by this section.
+
+### Stable namespace, roles and journals
+
+Init's external migration journal records one stable transaction ID and the
+explicitly authorized **physical staging prefix**, backend project, registry
+identity, intended root record key and logical address/remap table before
+provisioning. The root numeric ID is initially unknown: capture the returned
+ID in the external receipt before another effect, then fully read/verify and
+bind it. Never invent a preallocated numeric ID.
+The prefix is a storage allocation, not a new portable logical namespace or
+project ID. Envelope `namespace`/`backend_project`/`registry_id` identify the
+physical chain but prove nothing alone: require physical owner verification
+and the trusted locator/registry chain. The approved registry/binding maps that
+physical scope to the preserved logical scope. `address` and catalogue logical
+addresses retain the source namespace/project/context/logical-id unless
+explicitly remapped. Check both independently. Never silently rewrite logical
+identity to match a backend project name or staging prefix.
+
+Keep the same staging prefix/root for this transaction, wholly outside all
+effective consumer bindings. Independently establish exclusive allocation;
+search cannot prove it absent. Bootstrap a verified empty root only with
+explicit authorization, retaining intent, full intended wire and numeric-ID
+receipt externally before there is any backend journal. Unknown bootstrap
+save IDs stop the transfer. No backend project/session registration hack.
+
+Use **existing protocol-1 roles** rather than a parallel import store:
+
+| Transfer evidence | Existing physical realization |
+|---|---|
+| Pending transfer | Owned `journal` bound through the staging root's `pending`; external migration journal binds its exact locator/current revision to the stable transaction, manifest revision and per-operation request IDs. |
+| Large journal intents/receipts | Immutable `descriptor-page` event collections under §3's count/digest/end rules. Entries retain transaction/manifest revision, full address, phase, request/version/key, complete intended wire/payload artifact reference, prior absence/revision, known returned ID, result/evidence and unknown status. Verify any referenced external bytes before reuse; a hash alone cannot reconstruct an uncertain update. |
+| Full neutral objects | `payload-chunk` → `descriptor-page` → immutable `object-manifest`, retaining all logical fields, opaque extensions and raw representation. Backend `type:manual` is transport, not a replacement for type as found. |
+| Candidate inventory and registry | Immutable `catalogue-shard` and registry descriptor collections, including project/alias and empty-context inventory. Preserve close IDs/index and declare history/tombstone scope; imported log payloads stay immutable, not new summarize events. |
+| Every physical attempt | `allocation-page` collections plus journal event receipts, including failed/staged/superseded allocations. Root/journal bootstrap and allocation-page self IDs use external/journal receipts, not circular invented references. |
+| Verified whole staging generation | One immutable `publication-manifest` referencing all complete collections. The exact owned root publishes it only after full candidate verification; it remains a non-effective staging root until init verifies binding activation. |
+
+The backend journal handles storage recovery; it never replaces the external
+cross-surface journal that must survive source/target outages. Record intent
+durably before **each** mutation, not after a batch. After each returned ID,
+persist/verify its receipt before another save. All save keys remain independently
+allocated under the one staging prefix (§2/§5), not address-derived upserts.
+Journals themselves obey tested bounded encoding/page rules; oversized evidence
+requires verified referenced pages/artifacts or blocks before dispatch.
+
+### Whole-candidate verification and publication
+
+1. Keep source read-only and authoritative. Export uses §4's full traversal and
+   reconstruction plus neutral snapshot readback, with no source-side pending
+   journal or writes. Capture/recheck source root, registry, complete inventory
+   and every full logical revision, not just object count or recent context.
+2. Apply §5's allocation/journal sequence to all imported objects under the
+   same migration transaction. Leave `root.live` at its verified empty baseline
+   during the first import; on an explicitly reconciled refreshed candidate,
+   retain the prior verified staging publication. Every new payload, page and
+   manifest is immutable and journaled; no per-object live generations while
+   the candidate inventory is partial. No in-place live catalogue edits.
+3. Reconstruct **every** candidate object and compare complete intended neutral
+   values, unknown fields/extensions, ordered relations and original bytes.
+   Traverse the candidate publication directly through its trusted journal
+   locator even while it is not live. Check all counts/digests/ends, no duplicate
+   addresses/locators, exact registry/context equality and close-ID uniqueness;
+   internal targets resolve after approved remaps. Source-unresolved links
+   remain explicitly unresolved. Source versions are retained provenance;
+   target wire/object/publication revisions are independently computed evidence.
+4. Recheck full source and staged target/registry evidence under actual shared
+   writer serialization. Only a complete verified candidate may pass §5's exact
+   old-root comparison and `mem_update({id, expected_project, content})` live
+   pointer update, retaining pending until full root/publication/object readback
+   verifies the result. This is one guarded record update, **not atomic CAS**
+   or an authority switch. Unknown root updates follow §6, never automatic
+   rollback. Finish backend journal/pending cleanup without repeating import.
+5. External journal `staging-verified` additionally requires all neutral barrier
+   checks. Init separately obtains activation approval for that manifest
+   revision, immediately repeats both inventories/revision checks, changes only
+   approved routing, re-resolves precedence and reads back the complete selected
+   surface. Only this verified binding change can become `active-verified`.
+   Retain source, snapshot, all known staging/previous versions and journals.
+
+### Resume, invalidation and exact residuals
+
+On interruption reopen **both journals for the same transaction**, establish
+ownership/writer handoff and read the exact root/pending/publication chain.
+Partition each planned logical object and physical attempt into never attempted,
+known matching staged, verified published, failed-no-effect, conflicting or
+unknown. Full-read known IDs and compare exact intended wire and request/key/
+version, not just logical content; verify their trusted journal lineage.
+Reuse matching records without `mem_save`, including historical logs/close
+index entries. Candidate already published by this request means verify/reuse,
+not repeat create or append. Different payload under the same request conflicts.
+
+For uncertain root/journal updates, retain full old and intended new wire and
+directly compare owned readback: old permits continuation under serialization,
+intended new permits verification; any other value blocks dependent operations.
+For an attempted save without a recoverable numeric ID, **stop** for exact-request
+reconciliation. Do not upsert the same topic, allocate a fresh UUID/namespace,
+search unrelated memory or use bounded absence as a retry test. Only proven
+never-attempted or conclusively reconciled no-effect attempts may proceed.
+
+If source or staging changed, invalidate dependent barrier/activation evidence
+and retain the last verified state, exact effects and prior snapshot revisions.
+A reconciled new snapshot revision keeps the transaction and staging namespace;
+changed intended payloads receive explicitly journaled new child request/version
+IDs, never reuse an old request for different bytes. Preserve old immutable
+records and require renewed scope/remap approval where affected; a source change
+does not itself authorize additional writes. Report completed/failed/unknown/
+residual logical addresses and all known physical allocations separately.
+Abandonment/activation implies no delete, namespace purge, source retirement,
+dual-write or fallback; cleanup requires separate exact-scope authorization.

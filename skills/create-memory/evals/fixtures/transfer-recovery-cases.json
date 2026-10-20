@@ -1,0 +1,388 @@
+{
+  "fixture_kind": "synthetic transfer payloads; no adapter conformance claim",
+  "contract": {
+    "id": "jaiba-memory-surface",
+    "version": "1.0.0"
+  },
+  "fingerprint": {
+    "method": "sha256",
+    "version": "1",
+    "covers": [
+      "address",
+      "type",
+      "content",
+      "metadata",
+      "relations"
+    ],
+    "normalization": "UTF-8 JSON canonical keys; content preserved byte-for-byte as UTF-8"
+  },
+  "registry": {
+    "namespace": "jaiba",
+    "project_id": "prj-fixture-a",
+    "contexts": [
+      {
+        "id": "ctx-alpha",
+        "included": true
+      },
+      {
+        "id": "ctx-beta",
+        "included": true
+      },
+      {
+        "id": "ctx-empty",
+        "included": true
+      }
+    ],
+    "revision_evidence": {
+      "kind": "computed-fingerprint",
+      "covers": "complete registry record"
+    }
+  },
+  "envelope_extensions": {
+    "vendor.optional": {
+      "opaque": [
+        1,
+        null,
+        "retained"
+      ]
+    }
+  },
+  "relation_findings": [
+    {
+      "kind": "unresolved-external",
+      "source": ["jaiba", "prj-fixture-a", "constitutive", null, "decision-001"],
+      "target": "https://example.invalid/resource",
+      "expected": "preserve-and-report"
+    }
+  ],
+  "required_extension_negative": {
+    "name": "vendor.required.v9",
+    "required": true,
+    "expected": "block"
+  },
+  "objects": [
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "constitutive",
+        null,
+        "identity-project"
+      ],
+      "type": "project",
+      "content": "---\ntype: project\nname: Fixture Transfer Project\ndescription: Synthetic project identity for transfer validation.\nstatus: active\n---\n\n# Fixture Transfer Project\n\nA project used only to validate lossless interchange fixtures.\n",
+      "metadata": {
+        "title": "Fixture Transfer Project",
+        "vendor": {
+          "opaque": true
+        }
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "constitutive",
+        null,
+        "reference-memory-contract"
+      ],
+      "type": "reference",
+      "content": "---\ntype: reference\nid: REF-001\ntitle: Fixture memory contract\ndescription: Contract reference retained for logical relation validation.\ntier: code-scope\nkind: internal-contract\nrole: upstream\n---\n\n# Fixture memory contract\n\n## Surface\n\nThe synthetic fixture models the jaiba-memory-surface contract.\n\n## Consumption\n\nUsed only by the transfer fixture validator.\n",
+      "metadata": {
+        "title": "Fixture memory contract",
+        "unknown_key": {
+          "x": "preserve"
+        }
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "constitutive",
+        null,
+        "decision-001"
+      ],
+      "type": "decision",
+      "content": "---\ntype: decision\nid: ADR-001\ntitle: \"Preserve logical addresses\"\ndescription: Keep source addresses stable during transfer.\nstatus: accepted\ndate: \"2026-01-10\"\ntags: [transfer, fixture]\nupdated: \"2026-01-10\"\n---\n\n# ADR-001: Preserve logical addresses\n\n## Context\n\nTransfer must not conflate a logical identity with a physical locator.\n\n## Decision\n\nRetain the exact logical address while allowing destination locators to differ.\n\n## Alternatives Considered\n\n- Derive new IDs at import — rejected because relations and provenance would break.\n\n## Consequences\n\n- *Positive:* logical relations remain stable.\n- *Negative / Risks:* destinations must detect collisions.\n- *Follow-ups:* verify target inventory before activation.\n",
+      "metadata": {
+        "status": "accepted",
+        "history": {
+          "source": "synthetic"
+        }
+      },
+      "relations": [
+        {
+          "source": [
+            "jaiba",
+            "prj-fixture-a",
+            "constitutive",
+            null,
+            "decision-001"
+          ],
+          "target": [
+            "jaiba",
+            "prj-fixture-a",
+            "constitutive",
+            null,
+            "reference-memory-contract"
+          ],
+          "kind": "references",
+          "original": "[Fixture memory contract](../references/memory-contract.md)",
+          "vendor_relation": {
+            "opaque": 9
+          }
+        }
+      ],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "constitutive",
+        null,
+        "close-immutable-7"
+      ],
+      "type": "log-entry",
+      "content": "---\ntype: log-entry\ndate: \"2025-12-15\"\nkind: work-closure\nclose-id: close-immutable-7\n---\n\n# Historical close\n\nA synthetic immutable historical archive record.\n",
+      "metadata": {
+        "close_id": "close-immutable-7",
+        "immutable": true
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "executive",
+        "ctx-alpha",
+        "PRD"
+      ],
+      "type": "prd",
+      "content": "---\ntype: prd\nslug: fixture-transfer\ncreated: 2026-01-10\nstatus: approved\nprefix: XFER\nsource: manual\nsource-ref: fixture\n---\n\n# PRD: Transfer fixture\n\n## Problem & context\nComplete memory transfer needs realistic, schema-valid payloads.\n\n## Goals / Non-goals\n**Goals:**\n- Preserve full objects and logical relations.\n**Non-goals:**\n- Exercise a live adapter.\n\n## Users\n- Maintainer — checks transfer payload integrity.\n\n## Proposed solution\nUse a self-contained synthetic inventory.\n\n## Scope\n**In:** complete transfer records.\n**Out:** actual migration.\n\n## Assumptions & constraints\n- Fixture data is inert.\n\n## Dependencies\n- None.\n\n## Success metrics\n- Every fixture validates against the declared structural constraints.\n\n## Acceptance criteria\n```yaml\ncriteria:\n  - id: XFER-001\n    title: Preserve payloads\n    story: As a maintainer, I want full payloads preserved so that transfer can be checked.\n    happy:\n      - given: a complete object inventory\n        when: it is validated\n        then: every object and relation is retained\n    sad:\n      - given: a required extension is unknown\n        when: validation runs\n        then: the transfer is blocked\n    status: open\n```\n\n## Open questions\nNone.\n",
+      "metadata": {
+        "status": "approved",
+        "criteria": [
+          "XFER-001"
+        ]
+      },
+      "relations": [
+        {
+          "source": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "PRD"
+          ],
+          "target": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "plan"
+          ],
+          "kind": "governed-by",
+          "opaque": null
+        }
+      ],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "executive",
+        "ctx-alpha",
+        "plan"
+      ],
+      "type": "plan",
+      "content": "---\ntype: plan\nslug: fixture-transfer\ncreated: 2026-01-10\ndepth: spec\nprd: .ai/work/PRD.md\ncriteria: [XFER-001]\nstatus: approved\n---\n\n# Plan: Transfer fixture\n\n## Objective\nProvide a schema-complete approved plan payload for transfer tests.\n\n## Covered criteria\n- XFER-001 — Preserve payloads\n\n## Scope\n**In:** complete fixture records.\n**Out:** live backend operations.\n\n## Technical approach\nRetain full logical object records and verify relation targets.\n\n## Discrepancies vs PRD\nNone.\n\n## Sources consulted\n- [Reference](../memory/references/memory-contract.md) — source-r-reference-1\n- .ai/work/PRD.md — source-r-prd-1\n\n## Plan amendments\nNone.\n",
+      "metadata": {
+        "status": "approved",
+        "related_prd": [
+          "jaiba",
+          "prj-fixture-a",
+          "executive",
+          "ctx-alpha",
+          "PRD"
+        ]
+      },
+      "relations": [
+        {
+          "source": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "plan"
+          ],
+          "target": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "PRD"
+          ],
+          "kind": "related-prd"
+        }
+      ],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "executive",
+        "ctx-alpha",
+        "tasks"
+      ],
+      "type": "tasks",
+      "content": "---\ntype: tasks\nslug: fixture-transfer\ncreated: 2026-01-10\n---\n\n# Tasks: fixture-transfer\n\n## Gate Commands\n**Phase gate** (verified fixture provenance):\n- python3 run_fixture_checks.py\n\n**Plan gate** (verified fixture provenance):\n- python3 run_fixture_checks.py\n\n## Phase 1 — Fixture validation\n- **Depends on:** none\n- **Reversible:** yes\n- **Suggested commit:** `chore(wip): validate transfer fixtures`\n\n- [ ] **T-001** — Validate transfer fixture schemas\n  `load: medium` · `depends-on: none` · `covers: XFER-001`\n",
+      "metadata": {
+        "gate_commands": [
+          "python3 run_fixture_checks.py"
+        ],
+        "task_ids": [
+          "T-001"
+        ]
+      },
+      "relations": [
+        {
+          "source": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "tasks"
+          ],
+          "target": [
+            "jaiba",
+            "prj-fixture-a",
+            "executive",
+            "ctx-alpha",
+            "plan"
+          ],
+          "kind": "implements-plan"
+        }
+      ],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "executive",
+        "ctx-alpha",
+        "walkthrough"
+      ],
+      "type": "walkthrough",
+      "content": "---\ntype: walkthrough\nslug: fixture-transfer\ncreated: 2026-01-10\n---\n\n# Walkthrough: fixture-transfer\n\n## Phase 1 — Fixture validation\n\n- `T-001` — Fixture records created; only structural validation is represented.\n\n### Checkpoint — Phase 1 2026-01-10\n\n**Outcome.** Synthetic payloads prepared.\n\n**Decisions.**\n- none\n\n**Deviations from plan.**\n- none\n\n**ADR candidates.**\n- none\n\n**Gate.** Not run in fixture narrative.\n",
+      "metadata": {
+        "phase": 1,
+        "task_ids": [
+          "T-001"
+        ]
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "jaiba",
+        "prj-fixture-a",
+        "executive",
+        "ctx-beta",
+        "plan"
+      ],
+      "type": "plan",
+      "content": "---\ntype: plan\nslug: independent-context\ncreated: 2026-01-10\ndepth: design\nprd: \ncriteria: []\nstatus: approved\n---\n\n# Plan: Independent context\n\n## Objective\nA second independent work context remains separately addressed.\n\n## Covered criteria\nNone — design depth.\n\n## Scope\n**In:** context identity preservation.\n**Out:** shared work inventory.\n\n## Technical approach\nKeep the context identifier in the executive address.\n\n## Discrepancies vs PRD\nNone.\n\n## Sources consulted\n- [Reference](../memory/references/memory-contract.md) — source-r-reference-1\n\n## Plan amendments\nNone.\n",
+      "metadata": {
+        "status": "approved",
+        "related_prd": null
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    },
+    {
+      "address": [
+        "ordinary",
+        "unrelated-project",
+        "constitutive",
+        null,
+        "witness"
+      ],
+      "type": "snippet",
+      "content": "ordinary non-JAIBA witness",
+      "metadata": {
+        "title": "JAIBA",
+        "tags": [
+          "JAIBA"
+        ]
+      },
+      "relations": [],
+      "revision_evidence": "computed-by-validator"
+    }
+  ],
+  "legacy_representation": {
+    "format": "filesystem-legacy-flat",
+    "documents": {
+      "constitution.md": "# Constitution\n\n## Identity\nLegacy raw constitution document.\n",
+      "adr-log.md": "# ADR Log\n\n## ADR-001\nLegacy historical decision text.\n",
+      "reference-index.md": "# Reference Index\n\n## Internal contracts\nLegacy raw reference listing.\n"
+    },
+    "frontmatter": "absent",
+    "mapping": [
+      {
+        "document": "constitution.md",
+        "logical_id": "legacy-constitution",
+        "type": null
+      },
+      {
+        "document": "adr-log.md",
+        "logical_id": "legacy-adr-log",
+        "type": null
+      },
+      {
+        "document": "reference-index.md",
+        "logical_id": "legacy-reference-index",
+        "type": null
+      }
+    ],
+    "must_preserve_unknown_sections": true
+  },
+  "transfer_pairs": [
+    "bundle-to-external",
+    "legacy-to-external",
+    "external-to-filesystem-distinct-context-roots",
+    "external-a-to-external-b",
+    "external-b-to-external-a"
+  ],
+  "faults": [
+    "before-snapshot",
+    "after-snapshot",
+    "staging-create-unknown-ack-lost-id",
+    "corrupt-chunk",
+    "missing-object",
+    "changed-source-same-count",
+    "foreign-identical-payload-collision",
+    "catalogue-absent-vs-partial",
+    "activation-failed",
+    "activation-partial",
+    "unknown-routing-no-rollback",
+    "duplicate-close-id",
+    "changed-close-id",
+    "archive-interrupted-selective-clear-log-verified",
+    "permission-denied",
+    "outage",
+    "qualified-stale-snapshot-recovery",
+    "symlink-unexpected-root"
+  ]
+}

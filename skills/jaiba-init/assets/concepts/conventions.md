@@ -58,8 +58,11 @@ updated: "[YYYY-MM-DD]"                           # recommended — last substan
   - All clarifying questions have been resolved (no
     `[NEEDS CLARIFICATION]` blocks in the artifacts)
   - Human has explicitly approved the plan
-  - The consumer supports the selected surface; external `conduct` and
-    battery use remain capability pending Phase4 during the Phase3 transition
+  - The effective consumer procedure supports the selected surface and this
+    operation; actual callable tools, exact ownership and required capabilities
+    are verified in the current runtime (including each delegated worker),
+    with operation-specific approval. Missing/unverified requirements block
+    dependent use, not permission for silent filesystem fallback.
 
 ## Style and syntax
 

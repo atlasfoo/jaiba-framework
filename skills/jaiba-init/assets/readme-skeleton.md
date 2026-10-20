@@ -26,8 +26,11 @@
   adapter and safe project/registry locator, resolved through the host's
   effective create-memory definitions and jaiba-contract section 1.
   Do not claim AGENTS.md or .ai/ exists, expose credentials, embed memory
-  payloads, or create a mirror. Explain external consumers are pending
-  Phase4 during the Phase3 transition rather than promising conduct use.
+  payloads, or create a mirror. Explain that external consumers require their
+  effective selected-surface procedures, actual callable tools, exact ownership,
+  verified operation-specific capabilities and required approval. Block dependent
+  use when requirements are absent or unverified; installation, probes, authoring
+  or fixtures never automatically promote support or a draft adapter.
 -->
 
 # [Project Name]

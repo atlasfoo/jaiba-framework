@@ -21,7 +21,7 @@ template is the authority on its own fields. This file is the
 ## External initialization — no local skeleton
 
 First apply SKILL.md's canonical resolution, binding/identity, mutation and
-Phase3 gates. On an **external** surface use this branch, not the
+effective capability checks. On an **external** surface use this branch, not the
 filesystem preconditions/directory creation below:
 
 1. Resolve the approved registry association and context; verify exact
@@ -29,8 +29,10 @@ filesystem preconditions/directory creation below:
    reads. Authoritative absence permits creation; errors, search misses or
    truncated results do not. Existing real content routes to `update`;
    partially populated content needs an explicit resume scope, never a
-   blanket overwrite. Populated-store transitions remain blocked pending
-   Phase5; this branch is not migration. Draft Engram remains nonselectable.
+   blanket overwrite. Populated-store transitions require the separate explicit
+   `migrate-surface` operation (`references/surface-migration.md`) and its
+   verified capabilities and approvals; this branch is not migration.
+   Draft Engram remains nonselectable until required operational conformance.
 2. Use **The evidence sweep**, concept mapping and filling rules below as
    content guidance. Treat their paths as filesystem examples only. Ask for
    unknowable facts; preserve and report all gaps by logical address. New
@@ -42,8 +44,9 @@ filesystem preconditions/directory creation below:
    `decision` ADR-001 and applicable `sub-unit`/`reference` concepts. Do not
    invent past decisions or optional placeholder concepts. Adapt the seed
    decision's filesystem worked example to name the **actual selected
-   surface**, ownership and pending consumer capability, not a fictitious
-   local `.ai/` brain. A new log catalogue starts empty; append nothing.
+   surface**, ownership and demonstrated versus unverified consumer capability,
+   not a fictitious local `.ai/` brain. A new log catalogue starts empty;
+   append nothing.
 4. Allocate stable portable logical IDs in the owned scope; keep physical
    locators separate. Retain full content, metadata and relations; convert
    template-internal link targets to resolvable logical relations through
@@ -68,10 +71,11 @@ filesystem preconditions/directory creation below:
    `conduct` owns executive contents. README role guidance below still applies
    locally, but its context pointer must describe the actual surface.
 8. Close with types/counts, full-read/receipt evidence, every unresolved gap
-   by logical address and persistence status; hand off to adapted doctor for
-   local ATL/checkup when onboarding. Report **consumer capability pending
-   Phase4** and stop before `conduct`, `ask`, `fast` or the battery. A clean
-   external brain is not yet permission to invoke those consumers.
+   by logical address and persistence status; hand off to effective doctor for
+   local ATL/checkup when onboarding. Subsequent consumers must independently
+   resolve their effective surface procedures and verify actual callable tools,
+   ownership, required capabilities and operation-specific human approval.
+   A clean external brain alone grants no consumer mutation authority.
 
 ## Preconditions — filesystem
 
@@ -316,8 +320,10 @@ End every `initialize` run with a short report:
    must never find an incomplete brain by surprise.
 3. **Next step** — if gaps remain, the developer resolves them (re-run
    the relevant questions or fill by hand). If the brain is clean, the
-   filesystem project is ready for the `conduct` chain. External mode instead
-   reports **consumer capability pending Phase4** and stops.
+   project can proceed to the `conduct` chain only through its effective
+   selected-surface procedure, verified capabilities and required approvals.
+   Report any unverified requirement and block the dependent operation; never
+   substitute filesystem consumers for an external binding.
 
 ## Common failure modes
 

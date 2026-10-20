@@ -27,8 +27,8 @@ be touched on the way.
 ## External maintenance — resolve logical concepts, not paths
 
 Apply SKILL.md's canonical resolution, identity/binding, mutation discipline
-and Phase3 gates first. For an **external** selection use this procedure;
-the filesystem layout rules below do not require a local brain or mirror:
+and effective capability checks first. For an **external** selection use this
+procedure; the filesystem layout rules below do not require a local brain or mirror:
 
 1. Verify the exact owned registry association, full constitutive catalogue
    and full index/entry reads. Empty scope is `initialize` only after
@@ -71,11 +71,13 @@ the filesystem layout rules below do not require a local brain or mirror:
    and relations; report exact changes, verified/unknown effects and all
    outstanding gaps by logical address, not a fictitious local file.
 7. No `.ai/` cache, executive artifact edits or ordinary backend-memory
-   mutations. Populated-store surface migration is **pending Phase5**:
-   explain the block and offer the explicit filesystem exception, never
-   transfer/merge/dual-write under this mode. Stop any external hand-off to
-   `conduct`, `ask`, `fast` or the battery with **capability pending Phase4**;
-   adapted doctor can check the resulting brain and local ATL.
+   mutations. Populated-store surface migration belongs to the separate explicit
+   `migrate-surface` operation (`references/surface-migration.md`), with verified
+   endpoint capabilities and separate staging/activation approvals; offer an
+   explicit filesystem exception when appropriate. Never transfer/merge/dual-write
+   under this mode. Doctor can check the resulting brain and local ATL; subsequent
+   `conduct`, `ask`, `fast` or battery use must resolve its own effective surface
+   procedure and verify tools, ownership, capabilities and required approvals.
 
 ## Preconditions — filesystem
 

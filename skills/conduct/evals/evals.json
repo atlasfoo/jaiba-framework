@@ -511,7 +511,7 @@
         "External scenario performs logical full retrieval, cat/context, revision readback and exact owned-scope archive operations through simulated tools; asks approval before append/cleanup and stops on refusal",
         "External scenario never invokes path-based archive helper, creates .ai/ mirror, or falls back on simulated access/transport failure",
         "External claims are labeled simulation, not proof of actual Engram or an unseen adapter",
-        "Migration remains blocked pending Phase5: no import, merge, dual-write or source retirement"
+        "No migration is executed in this closure scenario; any separately approved transfer must use init's effective migrate-surface workflow with complete inventories, full staged readbacks, separate activation approval, retained source, and no implicit merge, dual-write or retirement"
       ],
       "files": []
     },
@@ -553,6 +553,27 @@
         "Fake trace records scoped reads/writes and result revisions, not actual adapter guarantees"
       ],
       "files": []
+    },
+    {
+      "id": 27,
+      "name": "migration-close-retry-isolation-fixture",
+      "phase_under_test": "summarize (historical closure preservation during migration review)",
+      "prompt": "Review the valid transfer-recovery fixture and structural validator for closure archive/retry implications. Explain handling of duplicate versus changed close IDs, interrupted selective clear, another context, and the ordinary witness. Do not execute a migration, archive, or clear operation.",
+      "context": {
+        "fixture": "../../create-memory/evals/fixtures/transfer-recovery-cases.json",
+        "validator": "../../create-memory/evals/fixtures/run_transfer_recovery.py",
+        "close_record": "constitutive log-entry with stable close-immutable-7 identity",
+        "contexts": ["ctx-alpha", "ctx-beta", "ctx-empty"],
+        "ordinary_record": "outside JAIBA namespace/project scope"
+      },
+      "expected_output": [
+        "Treats historical log-entry and close ID as immutable; same-ID same-full-payload may only be reused with exact verified ownership, while changed payload conflicts.",
+        "Interrupted archive preserves the verified log and exact remaining work inventory; clear is scoped to unchanged objects in the approved context only.",
+        "Keeps independent contexts and the empty registry context separate; never adopts or clears the ordinary witness.",
+        "A fixture validator is structural only: no actual archive/retry behavior, adapter conformance, or migration execution is claimed.",
+        "Any real transfer/activation requires the effective init migration procedure, full target verification and separate activation approval; source remains retained."
+      ],
+      "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"]
     }
   ]
 }

@@ -53,13 +53,17 @@ Executive objects belong only to one explicitly resolved `.ai/work/`
 context: `PRD.md`, `plan.md`, `tasks.md`, and `walkthrough.md`, when present.
 Do not merge multiple executive contexts into a single `.ai/work/` root.
 Each requires a distinct selected destination root and preserved context ID.
-Other work files are not silently treated as concepts. The conduct archive
-script is a related existing operation, not a guarantee of this binding:
-`skills/conduct/scripts/archive.sh` moves a `<slug>-summary.md` into
-`log/` and removes four known executive files after its stated preconditions.
-It does not implement the complete inventory, immutable receipt,
-readback, revision-stability, or selective-clear guarantees of the surface
-contract. Do not infer those guarantees from invoking or inspecting it.
+Other work files are not silently treated as concepts. The conduct helper
+`skills/conduct/scripts/archive.sh` is filesystem-only: explicit `prepare`
+freezes a visible summary receipt with close ID, root/project/context scope,
+body fingerprint and known inventory revisions; explicit `archive` verifies
+that receipt and the identical immutable log, then rechecks inventory/log
+before selective clear and verifies deletions. It preserves `.gitignore`,
+rejects unexpected work/unsafe roots/changed payloads, and retries the original
+close with residual-state reporting. Caller attestations are not locks.
+See `interchange.md` for its exact boundary: these scoped guarantees do not
+make the helper a complete surface, neutral transfer engine, external adapter
+or binding-activation mechanism.
 
 ## Physical and logical addressing
 
@@ -117,11 +121,99 @@ These are semantic bindings, not commands or new consumer behavior:
 | `create` | Check exact logical address and physical destination for absence, refuse collisions, create only within owned roots, then read back and verify. |
 | `update` | Re-read and compare the complete source revision, preserve unmodified and unknown data, write the authorized change, then verify complete readback. Historical log entries are immutable. |
 | `append-log` | Add a new immutable log entry with stable idempotency/close identity; exact readback verifies it. Existing entries are not edited to correct them. |
-| `archive` / `clear-work` | First verify the closing entry and frozen, exact executive inventory; re-enumerate and compare unchanged revisions before removing only those objects in that context. The current archive script does not establish this full contract by itself. |
+| `archive` / `clear-work` | First verify the closing entry and frozen, exact executive inventory; re-enumerate and compare unchanged revisions before removing only those objects in that context. The prepare/archive helper realizes scoped filesystem closure, not generic surface or migration conformance. |
 | `export` / `import` | Use the neutral manifest in `interchange.md`; stage into separately selected roots, read back all objects, compare inventory/content/relations and source stability, then require explicit human approval before authority changes. |
 
 File writes are not assumed atomic or serialized. Without an established
 single-writer discipline and full pre/post verification, mutations and
 cleanup are blocked. Filesystem acknowledgment alone is not verification.
-No migration or consumer change is implemented by this reference; migration
-implementation details are reserved for the approved later phase.
+This reference supplies the transfer mapping below, not an executable importer
+or consumer activation. Init's effective migration reference owns orchestration.
+
+## Neutral export, staged restore and resume
+
+Use `interchange.md`'s **same neutral transfer records** for either direction,
+not a directory copy offered as a complete manifest. Resolve ownership before
+reading a source root or creating a destination: approved absolute real roots,
+their namespace/project/context assignment, and ID-to-locator lineage. Check
+every traversed path component for symlinks/escape and verify readable complete
+scope; do not follow a link into unowned storage. Unsafe, inaccessible or
+unrepresentable paths block the affected complete-transfer claim.
+
+### Export to a read-only snapshot
+
+1. Resolve the layout and the entire declared project/context registry, including
+   empty contexts and exclusions. Freeze actual writers across all selected
+   roots and shared constitutive authority. Enumerate unfiltered in-scope files,
+   including all bundle concepts, index and unlinked logs; findings cannot hide
+   unknown/malformed objects. Inventory unexpected work separately and block
+   until scope/disposition is resolved, rather than deleting or coercing it.
+2. Persist existing logical-ID assignments in the approved snapshot lineage;
+   do not rederive IDs from restored filenames. Capture full bytes/content,
+   frontmatter/unknown metadata, relations and their original forms, filename
+   extensions and layout paths. Legacy raw documents are single persisted
+   objects with deterministic section views, never converted or split copies.
+3. Compute revisions using a verified deterministic byte/structured-value
+   profile. Record exact raw bytes/length/digest **and** a fingerprint of the
+   complete logical object (address/type, all metadata, content, ordered
+   relations/unknown fields and original representation). Declare encoding,
+   key ordering and normalization; no newline/Unicode or metadata loss. A raw
+   file hash alone does not cover separately mapped relations/identity. Registry,
+   locator/view mappings and context inventories have independent full evidence.
+4. Write snapshot/manifest only at the approved transaction-artifact location;
+   read back all payloads and complete inventories, then re-enumerate/recheck
+   the source and registry. Seal that snapshot revision read-only. Source changes
+   invalidate freshness; recapture explicitly in the original transaction.
+   No export writes to source memory or creates a hidden mirror.
+
+### Import from the neutral snapshot
+
+1. Verify the complete snapshot and journal, target ownership and writer handoff.
+   Approve an absent, separately selected staging scope; inspect any existing
+   destination completely without modifying it. Address/path/alias/close-ID
+   collisions conflict, even with matching content, except exact journal-proven
+   results of this same transaction. No merge, overwrite or implicit remap.
+2. Record a stable destination root per executive context and each constitutive
+   root/replica with its authority policy. Each context uses its own workspace's
+   `.ai/work/{PRD.md,plan.md,tasks.md,walkthrough.md}`; preserve IDs and names,
+   never collapse contexts or substitute context subdirectories. No automatic
+   clone synchronization follows. Roots must stay outside effective authority
+   until verified activation; reject overlapping source/staging roots.
+3. Journal intent, exact target path, approved address map, full intended bytes/
+   logical value and proven absence before each create. Use actually available
+   no-overwrite filesystem facilities under serialization, not an assumed atomic
+   multi-file rename/transaction. Restore bundle paths/index or original legacy
+   raw documents, absent frontmatter and section mappings losslessly. Preserve
+   extensions, unknown optional extensions and historic log/close payloads.
+   Import copies history; it does not invoke work closure or create new logs.
+4. Serialize ordinary relative links for the approved target layout, preserving
+   original forms and logical targets in lineage. Compare against the explicitly
+   intended target serialization as well as the original source representation.
+   If path constraints would require rewriting immutable historical payloads or
+   cannot retain raw legacy form, choose an approved compatible layout or block;
+   do not rewrite history as a transfer side effect.
+5. Fully read back each created file and reconstructed logical object, compute
+   independent target revisions and journal verified receipts. Re-enumerate
+   all target roots and registry for exact manifest equality, including empty
+   contexts and no extra files. Keep transaction control artifacts out of concept
+   inventories. Preserve ID-to-locator mappings as authorized registry/lineage,
+   not required new concept metadata or a mandatory hidden payload store.
+
+### Interrupted filesystem attempts
+
+Reopen the original transaction and exact paths, not a newly named destination.
+For a known create intent, a fully matching owned file may be reused **only**
+with journal proof of the request and full payload/revision verification. An
+absent path after a proven failed/no-effect attempt permits a journaled retry
+after full absence/scope checks; an unattempted path may be created. A partial,
+different or unexpectedly missing verified file is a conflict requiring explicit
+reconciliation, never permission to truncate/overwrite. Unknown outcomes remain
+unknown until exact path/registry/receipt checks establish their effects. Do not
+reappend imported history or delete residual staging to conceal an interruption.
+
+Before requesting binding activation, repeat interchange's complete source and
+target/registry revision barrier under actual serialization and obtain explicit
+approval for that manifest revision. Init re-resolves/readbacks routing and the
+active inventory; filesystem creation or successful static checks alone cannot
+mark `active-verified`. Retain source, read-only snapshot and journal; neither
+activation nor retry authorizes source/staging cleanup or fallback.

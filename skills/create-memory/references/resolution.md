@@ -264,3 +264,48 @@ mode may omit project `AGENTS.md` and `.ai/` entirely. Do not create a local
 `.atl/tool-layout.md` always remains local at the work root, regardless of
 surface or context. It is machine/toolchain evidence, never constitutive
 or executive memory and never relocated into an external catalogue.
+
+## 6. Unavailability, confirmed fallback and resumption
+
+Preserve the last verified selection, authority and project/context identity
+when a probe, catalogue, read or mutation fails. Distinguish unavailable tools
+or backend, permission denial, incomplete data, unsupported capability and
+unknown mutation outcome from authoritative absence. None authorizes init of
+an empty brain, a new context, a lower-priority adapter or a local `.ai/` cache.
+Draft/unverified adapters (including `jaiba-engram-memory`) remain unselectable
+until required operational conformance is established; an outage is no waiver.
+
+Offer the human **retry the selected source after restoration**, **stop and
+retain pending work**, or **explicitly request fallback/recovery**. Retry means
+non-destructive availability/exact-state checks first, not replay of a possibly
+successful mutation. Freeze dependent execute/validate/closure progress and
+init, registry and append-log writers across contexts sharing constitutive
+data (and shared publication infrastructure). Establish pause acknowledgements;
+an offline service does not prove other writers stopped. Record exact pending
+request IDs, known receipts/locators, prior/intended revisions and residuals in
+the owning workflow's recoverable evidence, never in routing-only bindings.
+If that evidence cannot be durably retained, stop before further side effects.
+
+Fallback is **not** a resolver branch. Resolve the effective `jaiba-init`
+installation independently and use `references/surface-migration.md` and its
+same durable migration/recovery journal. A new recovery request opens that
+journal before effects; an interrupted transfer reopens its original transaction.
+Require a complete verified neutral snapshot: full bodies/original forms,
+metadata, relations, registry/aliases/all declared contexts, revision provenance
+and closure/residual evidence, not search, recent context, summaries or hashes
+without payloads. No complete snapshot means retry or stop, not empty replacement.
+
+With the source reachable, normal migration requires its current full inventory
+and revision barrier. With source freshness unverifiable, use only init's
+explicit **stale-snapshot recovery** decision and later-write reconciliation;
+never report it as a current-source-verified migration. Target staging and full
+readback, separate activation consent and actual routing/active readback remain
+mandatory. Use distinct filesystem roots per executive context. Retain source
+and evidence, with no merge, purge, dual-write or automatic failback.
+
+An edited override or saved/session binding cannot bypass this barrier. On
+partial activation, freeze all affected roots until exact routing/registry and
+request outcomes are reconciled; do not assume either store is safely writable.
+After verified activation, update only approved routing fields and hand off one
+authority. When the old backend returns, reconcile possible later writes with
+the human before resuming any writer or proposing a separate transfer back.

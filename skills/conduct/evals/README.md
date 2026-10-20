@@ -1,9 +1,10 @@
-# Surface consumer regression evidence (T-021)
+# Historical surface consumer rehearsal evidence (T-021)
 
 ## What was actually exercised
 
-The executor model read the **current shipped sources**, then performed a
-bounded **executor-as-consumer synthetic rehearsal** of conduct's six phases,
+The historical executor model read the shipped sources recorded in the
+immutable source profile, then performed a bounded **executor-as-consumer
+synthetic rehearsal** of conduct's six phases,
 ask and fast. Developer turns and approvals in the recordings are scripted
 fixtures, not human approval of any real project artifact. The current user's
 approval authorized T-021 and scratch evaluation only.
@@ -13,17 +14,24 @@ Recorded follow-up: `/tmp/opencode/jaiba-memory-surfaces/phase4-t021/model-SBRbQ
 The initial run and named dispatch attempts remain at `model-Ht4DnTfq` in the
 same scratch parent. The follow-up tightened verified citations and stable
 append request identity, reusing the observed host blocker, not new child access.
-The three recorded journals contain **592 events**: full logical input/output objects,
+The three immutable recorded journals contain **592 events**: full logical input/output objects,
 actual model-authored decisions, simulated transport requests/results, mutation
-receipts, and real command results. Source fingerprints bind the rehearsal to
-the shipped consumer references/templates and canonical create-memory sources.
-Fingerprints use SHA-256 of canonical UTF-8 JSON, with no content normalization.
+receipts, and real command results. Their source fingerprints describe the
+sources observed at recording time; they do **not** assert those sources are
+current. `fixtures/surface-rehearsal/reviewed-source-drift.json` records exact
+recorded/current pairs for four reviewed later changes: filesystem mapping in
+T-023 and recovery guidance in T-024, with the unchanged
+source set, and immutable raw hashes for the index and all three journal files.
+The source-profile hash is SHA-256 over canonical compact JSON encoding of the
+decoded UTF-8 source text (the `surface_rehearsal.digest` convention); no
+normalization is applied. Unknown future drift fails the freshness regression.
 
 `capture_rehearsal.py` packages the actual journals losslessly as a
 content-addressed DAG; `$blob` entries are references into `blobs`, not summaries
 or truncated reads. `capture_rehearsal.load(path)` verifies and expands them.
-Tests do not overwrite recordings. Recapture requires a new source-guided
-rehearsal; merely regenerating expected results is not new model evidence.
+Tests do not overwrite recordings. The recordings remain historical protocol
+evidence. Recapture requires a new source-guided rehearsal; merely regenerating
+expected results is not new model evidence. No fresh LLM run is claimed here.
 
 | Workflow | Actual protocol/action evidence | Assertions |
 |---|---|---|
@@ -75,9 +83,13 @@ PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 skills/conduct/evals/test_workflow_re
 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 skills/conduct/evals/test_surface_regressions.py
 ```
 
-The first command checks recordings against current consumer source revisions
-and replays the **recorded decisions/actions**, without a runtime model API or
-fresh child dispatch. Replays are explicitly not new LLM compliance evidence.
+The first command checks historical source profiles against the reviewed drift
+manifest (unchanged sources must still match; changed sources must match their
+exact reviewed current hash) and replays the **recorded decisions/actions**,
+without a runtime model API or fresh child dispatch. A static current-source
+migration guard asserts the effective init staging/readback/approval/source
+retention requirements and draft nonselectability; it is not behavior or adapter
+conformance certification. Replays are not new LLM compliance evidence.
 It prints its new exclusive scratch root and leaves evidence there. PyYAML is
 required; `/usr/bin/python3` has it on the evaluated host. No package install is
 performed. The earlier three primitive tests remain, honestly labeled as helper
@@ -112,8 +124,9 @@ not permission to edit those files here.
 
 ## Barrier decision
 
-After the exercised integrations passed, only the temporary Phase3 consumer
-block was removed from the two contract copies. Required capability/readback
-checks, draft/nonconforming adapter restrictions, and the **Phase5 migration
-barrier** remain. Releasing a consumer integration gate neither promotes an
-adapter nor authorizes a populated-store switch, import, merge or retirement.
+At recording time, the temporary Phase3 consumer block had been removed from
+the two contract copies while draft/nonconforming adapter restrictions and the
+then-current migration barrier remained. Current migration guidance is now
+defined by init's explicit `migrate-surface` procedure; historical recordings do
+not exercise that procedure or authorize a populated-store switch, import,
+merge or retirement.
