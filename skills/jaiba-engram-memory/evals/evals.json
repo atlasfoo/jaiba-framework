@@ -38,6 +38,19 @@
         "Preserves already verified tombstones and retires only unchanged known residuals; unexpected/new work blocks cleanup.",
         "No physical deletion, bulk purge, backend mutation, or conformance certification is claimed."
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Use the contract-valid transfer fixture and its structural validator to assess payload and recovery requirements for a hypothetical external-to-external transfer. Do not call Engram or infer live capabilities.",
+      "expected_output": "The fixture provides valid full logical objects and computed complete-object fingerprints, but only structural fixture checks. Every real endpoint still needs complete authoritative catalogue/read, target-scoped revisions and receipts; synthetic fixture content is not evidence of Engram conformance.",
+      "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"],
+      "assertions": [
+        "Uses exact namespace/project/category/context/logical-ID addresses and validates closed type/category combinations.",
+        "Preserves unknown optional metadata/envelope extensions, relation metadata, internal target identity, external unresolved findings and historical close ID.",
+        "Requires complete real source and target catalogues and full reads before any migration decision; fixture revision fingerprints are not target concurrency tokens.",
+        "Unknown ACK, same-count source change, identical-payload foreign collision, and partial catalogue remain reconciliation/block conditions.",
+        "Labels all fixture checks synthetic; no real Engram calls, writes, or conformance certification."
+      ]
     }
   ]
 }

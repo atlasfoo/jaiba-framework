@@ -47,7 +47,7 @@ doctor is a *maintenance* action — it presumes a brain to inspect.
 |---|---|---|
 | Selected, readable scope authoritatively has no constitutive brain | Project is not instrumented on that surface | `jaiba-init` (bootstrap, with authorization) |
 | Brain exists but the developer wants it *rebuilt/reconciled* | That's the fix, not the diagnosis | `jaiba-init:update-brain` |
-| Developer just wants to *know what the brain says* | Read-only question | `ask` (external calls pending Phase4; stop rather than fall back) |
+| Developer just wants to *know what the brain says* | Read-only question | `ask` through its effective surface procedure and verified read capability; stop on failure, never silently fall back |
 | Brain exists and the developer wants a *health check* | — | **Continue here** |
 
 Resolve the surface before deciding whether a brain exists. External mode
@@ -189,13 +189,16 @@ Rules for the report:
 - Distinguish `unsupported-version`, `missing-capability`, `unavailable`,
   `permission-denied`, `ambiguous`, ownership `conflict`, partial/truncated
   reads and authoritative `not-found`; these are not interchangeable.
-- Report consumer capability separately from surface health: in **Phase3**,
-  setup/init/configure/doctor may resolve/probe external surfaces, but
-  `conduct`, `ask`, `fast` and subagents remain **pending Phase4**. Stop
-  those external calls, even after a green probe; never create `.ai/` or
-  use filesystem consumers as a fallback.
-- Populated-store transitions remain **pending Phase5** migration. Explain
-  the barrier and offer an explicit filesystem exception (normally
+- Report consumer capability separately from surface health: `conduct`,
+  `ask`, `fast` and each subagent require their effective surface procedures,
+  actual callable tools, exact ownership and verified operation-specific
+  capabilities/approval. Block dependent calls when absent or unverified, even
+  after a green probe; never create `.ai/` or use filesystem consumers as fallback.
+- Populated-store transitions require explicit `jaiba-init:migrate-surface`.
+  Resolve that effective installation independently and its
+  `references/surface-migration.md`; report endpoint capability, collision,
+  journal, writer-pause and verification/activation approval barriers, not a
+  phase-number block. Offer an explicit filesystem exception (normally
   `jaiba-memory-surface: filesystem`) for existing local work; doctor does
   not edit that override, bindings, activate, transfer, merge or retire stores.
 - **If everything is green, say so plainly** and note doctor is a good

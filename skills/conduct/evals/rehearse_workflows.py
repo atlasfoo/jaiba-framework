@@ -1,8 +1,9 @@
-"""Recorded model-authored protocol, replayable without a model API.
+"""Historical recorded protocol, replayable without a model API.
 
-The first run is an executor-as-consumer synthetic rehearsal. Subsequent runs
-are structural/action regression replays of those decisions, not fresh model
-compliance tests. Run one stage at a time; named children run between stages.
+The packaged turns are historical executor-as-consumer rehearsal evidence.
+This script replays their fixed decisions/actions, not fresh model compliance.
+It does not claim current-source or adapter conformance. Run one stage at a
+time; named children ran between stages in the original rehearsal only.
 """
 import copy
 import json

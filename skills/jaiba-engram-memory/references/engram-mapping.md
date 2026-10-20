@@ -410,23 +410,114 @@ physical and logical ownership checks. No operation edits ordinary memory.
    only unchanged residuals against the same verified archive. Never bulk-purge
    a namespace, backend project, category, search results or host session.
 
-### export / import boundary
+### export / import and transaction resume
 
-Export composes complete catalogue + full reads with the canonical interchange
-manifest: preserve every logical ID, original form, metadata, relation, log
-close ID and source revision. Name all included/excluded contexts; an inaccessible
-context is not empty. Recheck the full source inventory/revisions after capture.
-An incomplete export cannot authorize migration or source cleanup.
+Use the effective `create-memory/references/interchange.md` transfer profile
+and template, **identically for filesystem and Engram endpoints**. Resolve
+`jaiba-init` independently for `references/surface-migration.md` and its
+migration journal template. Init owns scope/activation approvals and binding
+changes; [storage protocol §9](storage-integrity.md#9-transfer-staging-and-cross-surface-recovery)
+maps these transfers to existing physical roles/tools. These recipes are
+declarative and remain unexecuted portability paths, not draft promotion.
 
-Import composes authorized create into a separately identified **staging** target
-with a migration/request ID; reject collisions and preserve source provenance,
-not source physical IDs as target identities. Record any explicit approved
-project/context remapping. Verify every staged object, full target inventory,
-relations and unchanged source before explicit human-approved activation.
-Keep source authoritative/intact through verification; no automatic binding
-switch, dual writing, source retirement or merge. Full migration/journal and
-activation workflow implementation belongs to the later migration task, not
-this initial adapter or a claim of executed portability.
+#### Export
+
+1. Resolve the human-bound exact source root, registry and full selected
+   namespace/project/category/context scope. Before an ID read, require a
+   trusted locator/expected ownership chain; after it, validate actual physical
+   Project/Scope, response-profile Topic and full envelope before interpreting
+   payloads. Backend project is a physical routing key, not logical project-id.
+   Source access is read-only; no source journal/root writes for export.
+2. Under the established writer pause, capture exact source root/publication
+   evidence. Traverse every registry, catalogue, close-index and allocation
+   page to explicit ends, validating counts/digests. Record all declared
+   projects/aliases/contexts, empty contexts and explicit exclusions. Export
+   active objects fully; declare retained history/tombstone provenance
+   separately, never export ordinary memory or adopt unpublished records.
+3. Reconstruct each full object via immutable manifest/descriptor/chunk reads
+   (§3 and storage §4), checking the entire canonical value and raw bytes. The
+   neutral record retains full logical address, filename/extension where
+   applicable, original legacy/bundle representation, absent frontmatter,
+   unknown metadata/extensions and ordered relations/unknown relation fields,
+   immutable close IDs and source revision evidence. Legacy views point to
+   their one raw persisted source object, not independent copies. A target
+   need not adopt Engram's physical chunk IDs as logical identity.
+4. Write/readback the manifest and payloads at the approved external transaction
+   artifact location, then keep the verified snapshot read-only. Re-read exact
+   source root/publication and full inventory/object/registry evidence; a source
+   change invalidates completeness/freshness. An interrupted read or hidden page
+   is incomplete, never an empty context. Recapture a new snapshot revision in
+   the same transaction after reconciliation, retaining invalidated evidence.
+
+#### Import into isolated staging
+
+1. Verify a complete neutral snapshot, approved scope/remaps, current capability
+   evidence, writer handoff and durable external journal. Record one stable
+   transaction ID and each request/version/record allocation before effects.
+   Inventory any existing target completely; address, path, alias, context and
+   close-ID collisions conflict even if content matches. Choose an approved
+   absent staging/activation scope, not a merge into populated logical memory.
+2. Obtain explicit authorization for a separate exclusive **physical staging
+   namespace/root**, not selected by any consumer. Record it once in the
+   journal, with exact backend project, reserved prefix, registry identity,
+   intended root key and intended active binding; capture the returned numeric
+   root ID before another effect and verify it before binding. This routing
+   prefix is distinct from the portable logical namespace in object addresses:
+   preserve that address namespace unless an explicit approved remap changes it.
+   Reuse the same staging allocation on retry; never provision a new namespace
+   to hide an unknown result. Bootstrap only by §2's authorized root procedure.
+3. Follow storage §9: keep the staging root's live pointer at its verified
+   empty baseline (or prior verified staging generation on an explicitly
+   reconciled refresh) and bind the migration journal as pending while building
+   all immutable payload chunks/manifests, complete catalogue, registry,
+   close-index and allocation collections. Preserve all logical IDs and
+   context inventory, including empty contexts and approved aliases. Import
+   historical logs as exact immutable objects with original close IDs, not
+   newly generated work-closure appends. No call to archive/clear-work.
+4. Verify every staged record by exact ID and trusted ownership, reconstruct
+   each complete object, then compare the full candidate publication/registry
+   against the neutral manifest after approved remaps. Target source-revision
+   fields are provenance; target wire/logical/publication revisions and full
+   intended-versus-observed evidence are separate journal receipts. Validate
+   internal relation targets and preserve external/source-unresolved forms.
+5. Recheck source and staging evidence completely under serialization. Only
+   after the whole candidate is verified may the isolated root publish its
+   complete candidate through the existing guarded ID update/readback protocol.
+   This makes a **verified staging surface**, not effective authority. Never
+   publish per-object partial import generations to consumers. Target root
+   publication does not activate a binding or permit source retirement.
+6. Init obtains separate explicit activation approval for that manifest revision,
+   rechecks both full inventories/revisions immediately before the binding
+   change, then re-resolves actual routing and full-reads the active surface.
+   Retain source, snapshot, staging allocations and journals. A source change,
+   partial activation or unknown outcome stops dependent writers; no assumed
+   rollback, dual writing, fallback or automatic physical cleanup.
+
+#### Resume the original transaction
+
+Read the external journal, exact target root/pending journal and all known
+receipts first. Storage §6/§9's reconciliation rules govern every physical
+attempt. Reuse an exact owned staged record only when its request/version/key,
+full intended wire/value and journal lineage match. A fully verified published
+candidate for this transaction is reused, not saved/imported again. Same request
+with different payload is conflict, not an update to immutable history.
+
+Known root/journal update outcomes compare direct read with the retained full
+old and intended wire; other values remain conflict/unknown. An attempted save
+without a recoverable returned ID blocks retry, including bootstrap/control
+records. Neither a stable topic key (save is upsert) nor bounded search can prove
+absence or repair it. Report exact verified/failed/unknown/residual objects and
+last verified phase; only proven never-attempted or reconciled no-effect
+attempts may continue under the original IDs after renewed preflight checks.
+No duplicate logical objects, imports or closing logs may be created to make a
+retry appear successful. Engram remains draft/unverified and not selectable
+until the full required operational conformance paths actually pass.
+
+A reconciled source change produces a new snapshot revision in this same
+transaction and staging namespace, invalidating dependent verification. Changed
+payloads need explicitly recorded new child request/version IDs under that
+transaction, never a different payload disguised as an identical retry. Retain
+old immutable records and renew scope/remap approval where affected.
 
 ## 6. Limits, failures and validation
 

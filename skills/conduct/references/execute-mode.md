@@ -72,6 +72,32 @@ branch; elsewhere use logical addresses, never guessed paths or backend
 record IDs. These checks do not alter the existing Phase gate or task
 authority rules.
 
+### Surface outage or uncertain progress
+
+Use the effective `create-memory/references/resolution.md` outage policy.
+Offer retry/stop or explicitly confirmed recovery through effective
+`jaiba-init/references/surface-migration.md`, never filesystem fallback by
+creating `.ai/work/`, changing context, or reconstructing tasks from summaries.
+Pause new executor waves and dependent writers; account for already dispatched
+children and their actual effects before retry. Include all affected contexts
+sharing constitutive data or publication infrastructure in the writer freeze.
+
+Retain the original project/context, task IDs, exact attempted artifact request,
+full intended value, pre-read revisions, receipts and child reports. A lost
+update acknowledgement may mean the write happened: reconcile that exact request
+by complete reads and ownership/revision evidence before retrying it. A new
+request ID or unchecked-looking task is not evidence of nonexecution. On return,
+re-read the complete context and reconcile actual source changes with the human.
+
+If walkthrough verified but tasks failed (or conversely), preserve both outcomes
+and mark the phase pending reconciliation. Do not infer completion from one
+artifact, run dependent tasks, record gate approval, suggest phase completion or
+start the next phase. A gate command's actual result may be reported as evidence,
+but code success, an executor report or a partial memory write does not commit
+workflow progress. Resume only after all required artifacts and their consistent
+progress have full verified readback under serialized access. Recovery restores
+evidence, not plan approval, task completion or validation that never occurred.
+
 ## Executing a phase
 
 One plan-phase per invocation. Do not start the next phase in the

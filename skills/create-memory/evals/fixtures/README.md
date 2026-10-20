@@ -19,6 +19,12 @@ directory trees; their `path` fields model the source paths. The separate
 `layout-boundaries.json` tests dual/no entry markers. No migration, cleanup,
 global configuration edit, or real installation scenario is included.
 
+`transfer-recovery-cases.json` models an approved, inert synthetic scope
+inventory for future migration exercises. It is not a fully instrumented brain,
+an active source/target, or evidence that a target adapter conforms. Its
+validator checks structure and computes fingerprints only; operational faults
+and retries belong to separately authorized isolated mock-storage exercises.
+
 These evals have not been executed. JSON/schema and fixture consistency checks
 are structural checks only; they do not simulate tool calls, adapter behavior,
 or certify conformance. Comparative with/without-skill viewing is reserved for

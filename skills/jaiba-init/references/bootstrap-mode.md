@@ -15,7 +15,8 @@ installs **nothing** at the machine level. That half of the setup
 ## Resolve first — external registration/linking
 
 Apply SKILL.md's Universal Preconditions, binding/identity procedure,
-mutation discipline and Phase3 gates **before** the filesystem sequence.
+mutation discipline and effective capability checks **before** the filesystem
+sequence.
 Resolve canonical definitions from the host-effective `create-memory`
 installation, not a checkout or assumed sibling directory. These are
 declarative operations using already available tools, not service setup.
@@ -28,9 +29,12 @@ steps 1–3 below:
    cannot be used to bootstrap. Failure is not an empty brain.
 2. Resolve the sanitized origin/full namespace identity (absolute-root +
    host fallback only without origin). Inspect existing local memory/work
-   without changing it. A populated-store transition is **blocked pending
-   Phase5**, not a fresh initialization; offer the explicit filesystem
-   exception. Do not transfer, ignore, merge or dual-write existing stores.
+   without changing it. A populated-store transition is not fresh initialization:
+   route an explicit migration request to `migrate-surface` in this effective
+   init installation (`references/surface-migration.md`), or offer the explicit
+   filesystem exception. Require verified endpoint capabilities and separate
+   staging/activation approvals; do not transfer, ignore, merge or dual-write
+   existing stores under bootstrap.
 3. Look up the exact identity in the owned registry. If it already resolves
    a real external brain, verify the complete catalogue, full index and
    entry concepts, then **link**, do not seed/overwrite. Obtain explicit
@@ -55,8 +59,10 @@ steps 1–3 below:
 7. For a new empty brain transition internally to `initialize`'s external
    branch. A verified existing brain needs no initialization; use `update`
    only for an approved content change. Hand off to `jaiba-doctor` for the
-   checkup and local ATL probe, then report **consumer capability pending
-   Phase4** and stop, not `conduct`/`ask`/`fast` or the battery.
+   checkup and local ATL probe. Report verified versus unverified consumer
+   capabilities; subsequent `conduct`/`ask`/`fast` or battery use requires its
+   own effective surface procedure, callable tools, exact ownership and approval.
+   A green checkup alone grants no consumer mutation or activation authority.
 
 ATL always lives at `<work-root>/.atl/tool-layout.md`, even with no local
 brain. If ignore is needed without tracked repo changes, add the narrow

@@ -212,6 +212,12 @@ current runtime's actual backend tools and permissions without writes; do
 not infer child-session namespace/context access from the parent or ATL.
 Unavailable, unsupported-version, missing-capability and ownership conflict
 are distinct outcomes, not an empty store. Do not create test records to
-certify revision/receipt/CAS guarantees. External consumers/subagents remain
-pending Phase4 and populated-store migration pending Phase5; this independent
-physical probe neither activates an adapter nor bypasses those barriers.
+certify revision/receipt/CAS guarantees. External consumers/subagents require
+their effective surface procedures and verified tools, exact ownership,
+capabilities and operation-specific approval. Populated-store transitions require
+the separately resolved effective init's explicit `migrate-surface` operation
+(`references/surface-migration.md`) and its journal, writer-pause, complete staged
+verification and separate activation checks. This independent physical probe
+neither activates an adapter nor proves those requirements. Draft Engram remains
+nonselectable until required operational conformance; probes/fixtures do not
+promote it. Failure is never permission for silent empty/filesystem fallback.

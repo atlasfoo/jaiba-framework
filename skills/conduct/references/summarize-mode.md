@@ -159,6 +159,35 @@ conduct's full catalogue/read/confirmation obligations.
 
 ## Recovery and limits
 
+- **Outage and repeated closure:** use effective `create-memory` resolution's
+  retry/stop/explicit-recovery policy. Freeze append-log, cleanup and dependent
+  progress across contexts sharing constitutive data/publication infrastructure.
+  Preserve the original close ID, confirmed payload, frozen full inventory,
+  verified log/receipt (if any), exact operation IDs and cleanup residuals. Keep
+  this recoverable evidence accessible before effects; bindings carry routing
+  only, never the summary, work payloads or receipts containing them. If evidence
+  cannot be retained, stop. Unavailable log/work reads do not mean an empty
+  context, successful deletion, or permission to prepare a new close.
+- **Uncertain append or deletion:** reconcile the exact original request first.
+  Partition the original inventory into verified cleared/retired by this close,
+  unchanged residuals, changed/new objects and unknown outcomes. Verify the same
+  log in full and re-enumerate before clearing only unchanged residuals under
+  the existing confirmation. Unknown outcomes remain pending; neither an ACK nor
+  a prior partial enumeration establishes clearance. Report each set, retaining
+  pending executive data and evidence until exact resolution. Never repeat append
+  or delete to discover whether it previously succeeded.
+- **Confirmed fallback during closure:** only init's same migration/recovery
+  journal may transfer authority. Its complete snapshot must preserve the
+  immutable log/close identity, original frozen archive evidence and exact
+  residual executive inventory/full bodies, including any known retirement
+  history. Preserve uncertainty as uncertainty, not invented tombstones or
+  absence. After verified activation, reconcile closure addresses through the
+  approved remap and independent target revisions, retaining source provenance.
+  Reverify the log, receipt lineage and all residuals in the active surface before
+  cleanup. A stale snapshot cannot prove later appends/deletions or authorize
+  deleting restored/new work; unresolved later writes block closure. Do not use
+  the filesystem helper against imported receipts it cannot verify; stop for a
+  supported reviewed operation, not a fresh `prepare` or new close ID.
 - **Verified log, work retained:** recoverable, not failed archiving to
   redo with a new ID. Keep the log and original receipt. Reconcile exact
   reads, then retry `archive` with the same slug/project/context under

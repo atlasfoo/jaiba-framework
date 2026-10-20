@@ -476,10 +476,14 @@ and file-change consent. Declining is a successful core-only configuration.
 Installation is not activation, instrumentation, migration or MCP verification.
 
 Do not change a binding during inspection, create/register a project, choose
-an executive context, or invoke consumers to test setup. In this Phase3 stage,
-external `conduct`/`ask`/`fast` and battery consumers must **stop pending Phase4**;
-populated-store migration remains blocked pending Phase5. Never create `.ai/`
-as a mirror/cache or a compatibility workaround.
+an executive context, or invoke consumers to test setup. Subsequent external
+`conduct`/`ask`/`fast` and battery use requires each effective surface procedure,
+actual callable tools, exact ownership, verified required capabilities and
+operation-specific approval. Populated-store migration belongs to the separately
+resolved effective init's explicit `migrate-surface` operation
+(`references/surface-migration.md`), not configure. Installation/probes/fixtures
+do not establish conformance or promote draft Engram. Never create `.ai/` as a
+mirror/cache or a compatibility workaround.
 
 ## Shared model discovery and validation
 
@@ -558,7 +562,9 @@ End with a short, honest report:
    and actual tool/permission evidence versus unverified requirements. Missing
    optional MCP affects its demander only, not core health. Report identity,
    context or populated-store conflicts without changing bindings; state the
-   Phase4 consumer and Phase5 migration barriers and that no activation occurred.
+   effective consumer capability/approval and explicit init migration barriers
+   (journal, actual writer pause, complete staged verification and separate human
+   activation), and that no activation occurred.
 6. **Next step** — if the developer's intent is to set up JAIBA for a
    *specific project*, tell them to run **`jaiba-init`** from inside that
    repo: it resolves the selected surface, owns authorized registration and

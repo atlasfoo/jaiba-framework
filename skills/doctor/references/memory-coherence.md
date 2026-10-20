@@ -102,11 +102,24 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
 
 Stop affected checks on unresolved selection/ownership/reads; the independent
 physical ATL probe may continue, but reference checks cannot use an unresolved
-index. Report **Phase4 consumer capability pending** for external conduct,
-ask, fast and subagents. Populated-store changes are **Phase5 migration
-pending**: retain source authority and offer an explicit filesystem exception
-for existing local memory, not an automatic transfer, activation, binding edit,
-merge, dual-write or retirement. A successful diagnostic is not activation.
+index. Report demonstrated versus unverified requirements for each effective
+conduct, ask, fast or subagent surface procedure; a healthy brain does not prove
+consumer tools, ownership, mutation capabilities or operation-specific approval.
+Block dependent use on failure, not solely on a delivery phase number.
+Populated-store transitions require the separate explicit `migrate-surface`
+operation: resolve effective init independently and its
+`references/surface-migration.md`, plus effective create-memory's interchange.
+Retain source authority through complete inventory, actual writer pause,
+no-merge collision decisions, staged full-readback verification and separate
+human activation with active routing readback. Retain the source afterwards;
+retirement needs separate exact-scope consent. Recover unknown outcomes in the
+same durable journal/transaction; source-outage stale-snapshot recovery requires
+its explicit qualified decision, never a fabricated current-source check or
+empty fallback. Offer an explicit filesystem exception for existing local memory,
+not an automatic transfer, activation, binding edit, merge, dual-write or retirement.
+A successful diagnostic is not activation or adapter conformance; draft Engram
+remains nonselectable until required operational conformance, not installation,
+probe, authoring or fixture success.
 Route machine dependency/configuration defects to `jaiba-configure`; repo
 identity, binding association and constitutive defects to `jaiba-init` with
 human approval. Backend permissions never authorize brain repair.

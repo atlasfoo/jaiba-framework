@@ -16,7 +16,7 @@ tags:
 # jaiba-init
 
 The **repo-scoped** half of JAIBA setup, and the framework's long-term
-memory owner. `jaiba-init` does two things, in two modes:
+memory owner. `jaiba-init` provides three entry points:
 
 - **Bootstrap** (`jaiba-init`, bare) — instrument *this project* on the
   selected surface: filesystem marker and skeleton as before, or an
@@ -24,6 +24,9 @@ memory owner. `jaiba-init` does two things, in two modes:
   then the first `jaiba-doctor` checkup. ATL always stays local.
 - **Maintain** (`jaiba-init:update-brain`) — keep the brain true to the
   repository for the rest of the project's life.
+- **Surface migration** (`jaiba-init:migrate-surface`) — explicitly transfer
+  an approved scope between surfaces through snapshot, staging, verification
+  and a human-confirmed authority switch; never an implicit merge.
 
 Everything here is scoped to **one repo**. The machine-level half of
 setup — the global behavioral contract, the skillset, the subagent
@@ -31,7 +34,10 @@ battery — belongs to **`jaiba-configure`** and is never performed here.
 
 This is the **constitutive memory owner** (`.ai/memory/` on filesystem),
 including authorized project-registry identity changes. It never writes
-executive artifacts: `conduct` owns those. Everywhere else the brain is read-mostly:
+executive artifacts during ordinary maintenance: `conduct` owns those.
+Surface migration may only copy their verified, unchanged payloads with an
+explicit writer handoff; it does not gain executive editing or closure rights.
+Everywhere else the brain is read-mostly:
 `conduct:summarize` *proposes* ADRs and brain changes, but never enacts
 them — it hands off here (`AGENTS.md` §2.9, §5).
 
@@ -61,6 +67,7 @@ Absence of local files is never evidence of an absent external brain.
 | The `.ai/` skeleton exists but the brain does not (no `.ai/memory/index.md`, or the concept files it links to are bare templates) and the developer wants it built — "build the brain", "initialize the memory". Also: reached from bootstrap mode's step 4, and from a half-bootstrapped repo (see the resume table in `references/bootstrap-mode.md`). | `update-brain:initialize` | `references/initialize-mode.md` |
 | The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the identity concepts are stale", "reconcile memory with the code") after the project evolved. | `update-brain:update` | `references/update-mode.md` |
 | The brain exists in populated flat layout (`constitution.md`, `adr-log.md`, `reference-index.md` with real content, no `index.md`) and the developer explicitly wants to convert it to the OKF concept bundle — "convert the brain to OKF", "migrate to the new format", "I want the concept bundle". Also: optional and human-triggered, never offered unprompted. | `update-brain:migrate` | `references/migrate-mode.md` |
+| The developer explicitly requests a transfer between filesystem/external surfaces, between external bindings, or a return to filesystem. Layout conversion is not implied. | `migrate-surface` | `references/surface-migration.md` and `assets/migration-journal-template.md` |
 | Anything else — a pure question about the brain (that's `ask`), *implementing* code (that's `conduct`/`fast`), or **machine-level** setup (that's `jaiba-configure`) | **Route, don't guess.** See "Hand-off" below. | — |
 
 Bare `jaiba-init` means bootstrap; `jaiba-init:update-brain` selects the
@@ -157,7 +164,9 @@ developer means rather than guessing.
    fields before claiming persistence; preserve conflicts for reconciliation.
    If persistence is unavailable, report it and obtain explicit **session-only**
    consent (same identity checks, no durable claim), or stop. Never mint a
-   new context silently on every session.
+    new context silently on every session.
+   During migration these are proposed target fields only: do not persist
+   them as effective authority before verified, human-approved activation.
 7. Enumerate the exact owned constitutive catalogue completely, including
    all pages, logs, unindexed and malformed objects; support unfiltered and
    exact type-filtered enumeration. Require explicit completion/consistency,
@@ -197,25 +206,22 @@ before retry, never acknowledge-only success or blind upsert. Append logs
 with stable change IDs across retries: identical payload verifies the existing
 receipt, different payload conflicts. Corrections are new entries.
 
-### Phase3 capability boundaries
+### Migration and consumer boundaries
 
-Setup/init/doctor/configure may resolve external surfaces within their
-authority. `conduct`, `ask`, `fast` and the battery are **pending Phase4**:
-on external selection report capability pending and stop at that boundary,
-even after successful bootstrap/update/doctor. Never invoke path-based
-consumers, fall back to `.ai/`, or declare external project work ready yet.
-
-Surface migration involving **populated filesystem or external stores is
-blocked pending Phase5**. Offer an explicit filesystem exception (normally
-the `filesystem` override) to retain existing local memory. Selection,
-binding or override does not approve transfer, merge, dual-write, activation
-or retirement. Do not implement export/import here; canonical interchange
-describes future lossless staging/verification, not a current capability.
-This gate does **not** disable the existing human-requested filesystem
-legacy → bundle `migrate` mode. A new, authoritatively empty external scope
+Populated-store transitions use only the explicit `migrate-surface` procedure.
+Selection, binding or override never approves transfer, merge, dual-write,
+activation or retirement. If migration prerequisites cannot be established,
+stop; offer an explicit filesystem exception only to retain existing local
+memory, never as a substitute empty brain. A new authoritatively empty scope
 may bootstrap with approval through a conforming adapter; an existing real
-external brain may be linked/maintained without transfer. Ambiguous authority
-or any unreadable store blocks association rather than treating it as empty.
+brain may be linked/maintained without transfer once authority is resolved.
+Ambiguous authority or an unreadable store blocks association.
+
+Migration is declarative workflow guidance, not proof of backend conformity.
+Use only each consumer's supported operation contracts and verified callable
+tools. No path-based operations against external memory, implicit local cache,
+or promotion of draft adapters. Preserve the separate human-requested
+filesystem legacy → bundle `update-brain:migrate` mode.
 
 ## Artifacts at a Glance
 
@@ -486,6 +492,7 @@ Per `AGENTS.md` §3.5:
         │  summarize / archive *propose* ADRs, refs, scope changes
         ▼
   jaiba-init:update-brain:migrate ──(convert flat → OKF bundle)──▶ brain in new layout
+  jaiba-init:migrate-surface ──(verified transfer + approval)──▶ confirmed target authority
   jaiba-init:update-brain:update ──(applies proposals, fixes drift)──▶ brain stays true
 ```
 
@@ -522,9 +529,9 @@ Per `AGENTS.md` §3.5:
 | Machine-level setup — the global behavioral contract, the skillset, the subagent battery | `jaiba-configure` |
 | A health check of an already-instrumented repo | `jaiba-doctor` |
 
-External hand-offs to `ask`, `conduct`, `fast` or the battery remain blocked
-with **capability pending Phase4**. Doctor is adapted for Phase3; its probe
-does not certify unadapted consumers. `.atl/tool-layout.md` always remains
+External hand-offs to `ask`, `conduct`, `fast` or the battery require their
+surface-aware operation contracts and a verified active binding; an init or
+doctor probe alone does not certify a consumer. `.atl/tool-layout.md` always remains
 local at the work root. If ignoring ATL must avoid tracked repository edits,
 use the worktree's local Git exclusion file (resolve with Git), preserving
 all prior entries; never create `.ai/` for ATL. Outside Git report that

@@ -43,9 +43,10 @@ constitutive scope without a local log file/mirror. Retain a stable change
 or close ID across retries and verify complete readback plus canonical
 receipt before proceeding; the same ID with a different payload conflicts.
 Unknown metadata/relations survive updates and portability. `jaiba-init`
-may append `brain-change`; `conduct` owns `work-closure`, with external
-consumer capability pending Phase4 during Phase3. This template does not
-grant archive/cleanup authority or implement surface migration.
+may append `brain-change`; `conduct` owns `work-closure` through its effective
+surface procedure, verified archive/receipt capabilities and required approval.
+Unknown outcomes block dependent cleanup and require exact close-ID reconciliation.
+This template does not grant archive/cleanup authority or implement surface migration.
 
 ---
 

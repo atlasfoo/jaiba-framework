@@ -9,6 +9,14 @@ authority. Consumers first resolve the effective
 `create-memory` installation and its canonical `memory-surface-contract.md`;
 cross-installation use must not assume sibling files were installed.
 
+The transfer profile below completes the adapter mappings under contract
+**1.0.0**, not a second contract or storage SDK. Resolve the effective
+`jaiba-init` installation separately for `references/surface-migration.md`
+and `assets/migration-journal-template.md`. Those own orchestration, approvals,
+writer handoff and activation; this reference owns the shared interchange
+fields and verification rules used by **both** endpoint mappings. Definitions
+do not establish operational conformance or make a draft adapter selectable.
+
 ## Manifest contents
 
 An interchange manifest is a complete inventory, not a summary. Use
@@ -28,6 +36,27 @@ manifest must carry at least:
 - for legacy objects, the complete raw source document and deterministic
   section/entry mapping, preserving absent frontmatter and unknown material.
 
+For a resumable transfer, populate the template together with these explicit
+records (embedded or referenced by exact verified artifact locator). They are
+the same neutral format for filesystem and Engram, not backend-native exports:
+
+| Record | Required transfer evidence |
+|---|---|
+| Manifest identity | Stable transaction ID, manifest ID/revision, contract/version, source and intended target binding/adapter/version, state/completeness, approved scope and approval references. |
+| Registry inventory | Namespace, stable logical project IDs, sanitized identity candidates and approved aliases; every declared context, including empty ones, marked included or explicitly excluded with reason/approval. Record registry revisions and complete traversal evidence. Backend project/account keys are separate physical routing fields, never logical project IDs. |
+| Address/restoration mapping | Each full source logical address → approved target address, source representation/locator → target representation/locator; stable logical ID retained. Include original filename/extension, raw byte encoding, bundle index paths or legacy document/view anchors, and distinct filesystem root per context. Record remaps explicitly, including namespace/project/context changes and their relation-target mapping. |
+| Complete object | Full content, type as found, all metadata, relations with ordered targets/unknown fields/original forms, original raw representation and source revision. Preserve unknown optional envelope/object extensions as opaque lossless values; unknown required extensions block use, not silent downgrade. |
+| History | Immutable historical payloads and stable close IDs with original log address/revision and frozen archive inventories when present. Preserve missing historical metadata as missing; do not fabricate close IDs or append new closure logs during import. Declare included histories/tombstones separately from the active object inventory. |
+| Integrity/completion | Fingerprint method/version, exact coverage/normalization, byte counts/digests and complete payload comparison evidence, catalogue/registry counts and explicit traversal ends, findings/limits/exclusions. Include snapshot readback and source re-enumeration/revision evidence. |
+| Target attempt/receipt | Journal transaction and per-object request IDs, exact intended payload/locator, proven prior absence, known effects/outcome, target revision and full readback evidence. Source revision remains provenance, never a target concurrency token. |
+
+Preserve filename extensions and representation-specific unknown fields even
+when the target has no native filenames/frontmatter. Preserve absent versus
+null and raw non-JSON metadata without lossy coercion. The manifest's referenced
+payloads must be fully accessible and integrity-verified; a digest, preview,
+summary or expired attachment alone is not a complete object record. Transport
+IDs/chunks and target receipts do not replace portable logical addresses.
+
 Never replace content with summaries, omit unlinked log entries, coerce
 unknown types, or treat omitted/inaccessible roots as empty. Historical
 legacy entries with no type remain represented with original content and a
@@ -36,6 +65,13 @@ lossless preservation. An incomplete
 manifest is explicitly incomplete and cannot authorize migration, cleanup,
 or an assertion of full portability. Checkout paths are provenance/locators,
 not portable project IDs.
+
+The context inventory describes the declared registry, not merely contexts
+having objects. An approved smaller scope needs its own complete manifest
+revision and explicit limitations; retain the earlier incomplete result.
+Resolve shared constitutive authority and excluded-context routing before any
+switch. Scope expansion, alias/remap changes or a different target need renewed
+approval and invalidate dependent verification; they are not retry defaults.
 
 ## Export and staging
 
@@ -61,6 +97,52 @@ Partial or unverified staging is not activation. Switching the effective
 binding requires explicit human approval after complete verification; retain
 the source through verified activation. Source retirement is a separate
 explicit decision. No fallback or dual-write is implied.
+
+## Transaction resume and activation barrier
+
+Use init's durable, user-visible journal outside both catalogues and routing
+storage. The approved snapshot is read-only after verification; a source
+change creates a new manifest/snapshot revision in the **same transaction**,
+retaining old evidence and invalidating dependent staging/activation checks.
+Never mutate source memory to make export agree with a snapshot.
+An explicitly reconciled changed payload gets a new journaled child request/
+version ID under that same transaction; never repurpose an existing request
+ID for different bytes. Preserve previous staged generations and collision
+findings; replacement staging needs explicit authorization, not blind overwrite.
+
+Journal phases are `preflight → snapshot-verified → staging-pending →
+staging-verified → activation-pending → active-verified`; `blocked` and
+`outcome-unknown` retain the last verified state. Each side effect has a stable
+request ID and intent recorded **before** dispatch, then full verified receipt
+or explicit failed/partial/unknown status. Adapter storage journals supplement,
+not replace, this cross-surface journal.
+
+| Resume observation | Required action in the original transaction |
+|---|---|
+| Exact owned staged result belongs to this request and matches the full intended payload | Verify/reuse its existing receipt and locator; no create or duplicate log append. Matching content alone does not prove request ownership. |
+| Proven never attempted, or conclusively failed with exact absence/no side effect | Recheck ownership, scope, absence and all prior revisions before the journal-authorized attempt with the original request ID. |
+| Known locator but readback missing, partial or different | Directly reconcile the exact intended/previous state; stop dependent writes. Do not overwrite partial data or issue a fresh request to hide it. |
+| Save ID lost, routing outcome unknown or ownership unprovable | Keep unknown status and reconcile the exact request/binding using retained receipts and trusted locators. Search or a new UUID cannot establish nonexecution. No blind retry. |
+| Already active by this request | Re-resolve actual routing, verify complete target inventory/revisions and entry concepts, then reuse activation evidence. Do not import again. |
+
+Before activation, compare the complete target inventory and context registry
+with the approved manifest after recorded remaps: no missing, extra, duplicate
+or unexpected objects. Full-read **every** payload, metadata/extension/relation
+and raw representation against its intended target value; verify source
+lineage and independent target revisions. Reconstruct chunks to a verified
+end. Internal targets must resolve; preserve external and source-unresolved
+links with explicit findings. Link serialization changes require approved
+mapping and retained original forms, not silent payload normalization.
+
+Re-enumerate and recheck **all** source and staged target revisions, including
+registry/aliases/empty contexts, after capture and immediately before the
+confirmed binding change under actual writer serialization. A change invalidates
+the barrier, not merely a count. Request new explicit human activation approval
+for that verified manifest revision. After routing mutation, re-resolve actual
+host precedence, read back routing/registry and the complete active surface,
+and compare revisions again. A storage-root publication is not a binding switch.
+Partial staging remains unpublished to consumers; activation failures pause
+writers with exact effects recorded, without assumed rollback or fallback.
 
 ## Representation preservation
 
@@ -92,10 +174,21 @@ object is unchanged; new, unexpected, or changed objects block clearing.
 Clear only those exact unchanged objects under serialized access and verify
 the final state. Keep the archive and source evidence.
 
-The existing `skills/conduct/scripts/archive.sh` has narrower behavior: it
-moves a summary file and removes known work files after script preconditions.
-It does not itself provide the above immutable close identity, complete
-inventory binding, verified readback, or stability guarantees. This
-interchange definition neither changes nor invokes that script, and does not
-claim that a compliant importer/runtime currently exists. Migration
-implementation is reserved for Phase 5.
+The existing filesystem-only `skills/conduct/scripts/archive.sh` now uses
+explicit `prepare` and `archive` modes with project/context arguments and
+filesystem/serialized-writer attestations. Prepare freezes a visible
+`jaiba-close-v1` receipt in the summary: stable close ID, exact root/project/
+context scope, summary-body fingerprint and presence/revisions of the four
+executive files plus `.gitignore`. Archive checks that receipt and complete
+payload, creates without overwrite or reuses an identical closing log, verifies
+log readback, rechecks inventory/log before each selective deletion and reports
+residual work on failure. It retains `.gitignore`; it rejects unexpected work,
+changed payloads/inventory and unsafe roots. Retrying uses the frozen close,
+not a newly derived date/ID.
+
+These are scoped helper guarantees under caller-established serialization,
+not native CAS, generic complete-surface conformance, or a migration receipt.
+The helper neither exports/imports neutral manifests nor operates an external
+surface, changes bindings, inventories multiple contexts or proves portable
+logical identity/registry coverage. This definition does not invoke it or
+claim that transfer/recovery/activation paths were operationally exercised.

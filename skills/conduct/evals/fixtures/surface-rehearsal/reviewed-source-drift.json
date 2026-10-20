@@ -1,0 +1,60 @@
+{
+  "manifest_version": 1,
+  "purpose": "reviewed source drift for immutable Phase4 T-021 historical rehearsal recordings",
+  "source_hash_algorithm": "SHA-256 of canonical compact JSON encoding of decoded UTF-8 source text (surface_rehearsal.digest); no source normalization",
+  "recording_policy": "Recorded journals and index are immutable; replay validates historical protocol evidence, not current-source execution. No recapture or fresh model run is claimed.",
+  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. These four source paths changed afterward: filesystem-surface.md under T-023; resolution.md, execute-mode.md and summarize-mode.md under T-024. T-033 is not the provenance of any listed change. Any additional or changed pair is unreviewed and must fail.",
+  "changed_sources": {
+    "skills/create-memory/references/resolution.md": {
+      "recorded_source_sha256": "2875ae3fa180b27058ae47485199b0fa53950d37b2a142bfad03d7df15922c2e",
+      "current_source_sha256": "d538b50b1971b5b3f60a870e8e9642559dd0ba131255da90e91f2a7bdeb2e942",
+      "classification": "known post-recording T-024 source change",
+      "reason": "T-024: added explicit unavailable-surface retry/stop and approved snapshot-recovery policy; prohibits empty fallback and requires authority handoff."
+    },
+    "skills/create-memory/references/filesystem-surface.md": {
+      "recorded_source_sha256": "a14dbc4e48f9b1a04b922b60d7da6000ae83f897f207d6277ce2a27567e62951",
+      "current_source_sha256": "5ad84be03038f0a8943cf4fff748dd3555695e214ae058db1b10354cc986e86b",
+      "classification": "known post-recording T-023 source change",
+      "reason": "T-023: reconciled filesystem mapping with neutral export, isolated staged restore, full revision/readback verification and migration-resume boundaries."
+    },
+    "skills/conduct/references/execute-mode.md": {
+      "recorded_source_sha256": "0a0c2428b7bbe10a3e46c7ecbb356ffb029f0d78ea6ec566128c2bfde29aa7a2",
+      "current_source_sha256": "61382f80c8dec766b8ebabeb30107f36de28a9a00205f92f983ff227c08c93fa",
+      "classification": "known post-recording T-024 source change",
+      "reason": "T-024: added execute outage/recovery rules for pending tasks, lost acknowledgements, child effects and verified task/walkthrough progress."
+    },
+    "skills/conduct/references/summarize-mode.md": {
+      "recorded_source_sha256": "327deca81a3b1b0128049ee101517b42e9de92b6b2170b8665884606ec65da48",
+      "current_source_sha256": "03178f9387e7d68851e8dd9310974878be0ca1aaaff6e6e33e03777ac124ee13",
+      "classification": "known post-recording T-024 source change",
+      "reason": "T-024: added close-ID recovery rules for uncertain append/clear, frozen inventory, immutable archive verification and context isolation."
+    }
+  },
+  "unchanged_source_paths": [
+    "skills/ask/SKILL.md",
+    "skills/ask/references/handoff.md",
+    "skills/ask/references/orientation.md",
+    "skills/conduct/SKILL.md",
+    "skills/conduct/assets/plan-summary-template.md",
+    "skills/conduct/assets/plan-template.md",
+    "skills/conduct/assets/prd-template.md",
+    "skills/conduct/assets/tasks-template.md",
+    "skills/conduct/assets/walkthrough-template.md",
+    "skills/conduct/references/propose-mode.md",
+    "skills/conduct/references/spec-mode.md",
+    "skills/conduct/references/subagents.md",
+    "skills/conduct/references/tasks-mode.md",
+    "skills/conduct/references/triage.md",
+    "skills/conduct/references/validate-mode.md",
+    "skills/conduct/scripts/archive.sh",
+    "skills/create-memory/references/memory-surface-contract.md",
+    "skills/fast/SKILL.md",
+    "skills/fast/references/plan-adjustment.md"
+  ],
+  "immutable_recordings_sha256_raw_bytes": {
+    "index.json": "8ed1337444cc66a3ac71067540932fbe208a976c753987e270cb9287fc4cfeb7",
+    "external.json": "091d54c7c11f8353897327b2ffe3e9cf59483ff6d21d453263e0581e993c47cb",
+    "bundle.json": "2331a298f0f8396f0cd300841a0310826a1fde33e9526470ed9747a5228c8847",
+    "legacy.json": "95f0bcfe8e7e1c335f410c334cda389f6ba21a0ebd784372f603158dc606c28e"
+  }
+}

@@ -58,7 +58,9 @@ migration or authorization to supersede existing local memory. Installation
 can change future candidate precedence; show that consequence before consent.
 With existing `.ai/` memory/work, require a separately confirmed filesystem
 exception (normally the explicit `filesystem` override, written only through
-an authorized project workflow), or stop at the **Phase5 migration barrier**.
+an authorized project workflow), or hand off an explicit migration request to
+the independently resolved effective `jaiba-init:migrate-surface` operation
+(`references/surface-migration.md`). Configure performs neither operation.
 If local and external stores are both populated, stop for an explicit
 authority/collision decision; never prefer timestamps, merge, ignore, retire
 or dual-write stores. An unreadable store is not empty. Configure reports
@@ -124,10 +126,24 @@ uninstrumented just because those local files are absent. `.atl/tool-layout.md`
 always stays local at the work root; recommend a local doctor probe even when
 there is no `.ai/`. Configure does not run that probe or create project files.
 
-**Phase3 gate:** setup may resolve/inspect within its authorized scope, but
-external `conduct`, `ask`, `fast` and remaining battery consumers must stop
-with capability pending until **Phase4** adaptation. Installation is not
-consumer activation. Migration involving populated stores is pending
-**Phase5**, even with an explicit selection or saved binding. Hand off to
-`jaiba-init` for authorized registration/instrumentation and `jaiba-doctor`
-for diagnostics; mention them, do not invoke or perform their work inline.
+**Effective capability gate:** setup may resolve/inspect within its authorized
+scope, but installation is not consumer activation. Each external `conduct`,
+`ask`, `fast` or battery call requires its effective surface procedure, actual
+callable tools, exact ownership, verified required capabilities and applicable
+approval. Missing/unverified requirements block dependent operations; never
+substitute filesystem consumers to bypass them. Draft Engram remains nonselectable
+until required operational conformance; install, authoring, probe and fixture
+success never promote it.
+
+Migration involving populated stores requires the separately resolved effective
+init's explicit `migrate-surface` procedure and canonical neutral interchange,
+even with an override or saved binding. Require complete source/target catalogues
+and full reads, actual writer pause, explicit no-merge collision decisions, a
+durable same-transaction journal for unknown outcomes, full staged verification
+and separate human activation with routing/active readback. Preserve source;
+no automatic purge, dual-write or retirement. Source-outage recovery requires
+init's qualified stale-snapshot decision and later-write reconciliation, never
+silent empty fallback or an invented current-source verification. Hand off to
+`jaiba-init` for authorized registration/instrumentation or explicit migration
+and `jaiba-doctor` for diagnostics; mention them, do not invoke or perform their
+work inline.

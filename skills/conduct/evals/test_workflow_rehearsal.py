@@ -1,9 +1,10 @@
-"""Structural/action assertions on captured model turns + fixed-decision replay.
+"""Structural/action assertions on immutable historical turns + fixed-decision replay.
 
 Requires /usr/bin/python3 with PyYAML (no install performed). Does not call an
 LLM, spawn children, contact a backend, or claim adapter/model conformance.
 """
 import copy
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -35,29 +36,84 @@ def frontmatter(content):
     return yaml.safe_load(content.split('---\n', 2)[1])
 
 
-class CapturedRehearsal(unittest.TestCase):
+class HistoricalCapturedRehearsal(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.journals = {p.stem: load(p) for p in FIXTURES.glob('*.json') if p.name != 'index.json'}
+        cls.journals = {p.stem: load(p) for p in FIXTURES.glob('*.json')
+                        if p.name not in ('index.json', 'reviewed-source-drift.json')}
         assert set(cls.journals) == {'external', 'bundle', 'legacy'}
 
-    def test_source_revisions_are_current_full_shipped_sources(self):
-        for journal in self.journals.values():
-            for path, revision in journal['source_revisions'].items():
-                self.assertEqual(digest((ROOT / path).read_text()), revision, f'stale rehearsal: {path}')
+    def test_historical_source_profile_has_only_exact_reviewed_drift(self):
+        manifest = json.loads((FIXTURES / 'reviewed-source-drift.json').read_text())
+        provenance = {
+            'skills/create-memory/references/filesystem-surface.md': 'T-023',
+            'skills/create-memory/references/resolution.md': 'T-024',
+            'skills/conduct/references/execute-mode.md': 'T-024',
+            'skills/conduct/references/summarize-mode.md': 'T-024',
+        }
+        self.assertIn('predate T-023 and T-024', manifest['review_scope'])
+        self.assertNotIn('T-033 is the provenance', manifest['review_scope'])
+        index_path = FIXTURES / 'index.json'
+        self.assertEqual(hashlib.sha256(index_path.read_bytes()).hexdigest(),
+                         manifest['immutable_recordings_sha256_raw_bytes']['index.json'])
+        index = json.loads(index_path.read_text())
+        recorded = next(iter(index['fixtures'].values()))['sources']
+        self.assertEqual(set(manifest['changed_sources']) | set(manifest['unchanged_source_paths']), set(recorded))
+        for layout, journal in self.journals.items():
+            self.assertEqual(journal['source_revisions'], recorded, f'{layout}: altered historical source profile')
+            indexed = index['fixtures'][layout]
+            packaged = json.loads((FIXTURES / indexed['file']).read_text())
+            self.assertEqual(digest(journal), indexed['digest'], f'{layout}: journal/index mismatch')
+            self.assertEqual(hashlib.sha256((FIXTURES / indexed['file']).read_bytes()).hexdigest(),
+                             manifest['immutable_recordings_sha256_raw_bytes'][indexed['file']])
+            self.assertEqual(indexed['events'], len(journal['events']))
+            self.assertEqual(digest(journal), packaged['journal_digest'])
+        for path, old in recorded.items():
+            current = digest((ROOT / path).read_text())
+            if path in manifest['changed_sources']:
+                pair = manifest['changed_sources'][path]
+                self.assertEqual(pair['recorded_source_sha256'], old)
+                self.assertEqual(pair['current_source_sha256'], current, f'unreviewed future drift: {path}')
+                task = provenance[path]
+                self.assertEqual(pair['classification'], f'known post-recording {task} source change')
+                self.assertTrue(pair['reason'].startswith(f'{task}:'))
+            else:
+                self.assertEqual(current, old, f'unreviewed future drift: {path}')
+        self.assertEqual(set(manifest['changed_sources']), set(provenance))
 
-    def test_only_consumer_barrier_released_and_old_cases_are_filesystem_scoped(self):
+    def test_historical_consumer_release_state_and_legacy_eval_scopes(self):
         canonical = (ROOT / 'skills/jaiba-configure/assets/jaiba-contract.md').read_bytes()
         self.assertEqual(canonical, (ROOT / 'skills/doctor/assets/jaiba-contract.md').read_bytes())
         text = canonical.decode()
         self.assertNotIn('`conduct`, `ask` and `fast` remain gated', text)
-        self.assertIn('Surface migration is **not implemented until Phase5**', text)
         self.assertIn('Draft categories are not conforming selectable mutable adapters.', text)
         self.assertIn('`jaiba-engram-memory` remains `memory-surface-draft`', text)
         for skill, last in [('conduct', 23), ('ask', 8), ('fast', 6)]:
             data = json.loads((ROOT / f'skills/{skill}/evals/evals.json').read_text())
             self.assertEqual(data['filesystem_scoped_eval_ids'], list(range(1, last + 1)))
             self.assertEqual([e['id'] for e in data['evals']], list(range(1, len(data['evals']) + 1)))
+        for skill, eval_id in [('create-memory', 7), ('jaiba-init', 22),
+                               ('jaiba-engram-memory', 4), ('conduct', 27)]:
+            eval_path = ROOT / f'skills/{skill}/evals/evals.json'
+            entry = next(e for e in json.loads(eval_path.read_text())['evals'] if e['id'] == eval_id)
+            references = list(entry.get('files', []))
+            references.extend(entry.get('context', {}).get(k) for k in ('fixture', 'validator'))
+            for reference in filter(None, references):
+                self.assertTrue((eval_path.parent / reference).resolve().is_file(),
+                                f'{skill} eval {eval_id}: unresolved reference {reference}')
+
+    def test_current_migration_source_guard_is_static_not_conformance(self):
+        migration = (ROOT / 'skills/jaiba-init/references/surface-migration.md').read_text().lower()
+        for required in ('complete target enumeration', 'full readback', 'new explicit\nhuman approval to activate this verified manifest revision',
+                         'source remains authoritative', 'source and staging', 'same transaction',
+                         'registry', 'stale-snapshot recovery'):
+            self.assertIn(required, migration)
+        self.assertNotIn('not implemented until phase5', migration)
+        init = (ROOT / 'skills/jaiba-init/SKILL.md').read_text().lower()
+        self.assertIn('migrate-surface', init)
+        engram = (ROOT / 'skills/jaiba-engram-memory/SKILL.md').read_text().lower()
+        self.assertIn('not selectable', engram)
+        self.assertRegex(migration, r'adapter files,\s*test fixtures and host memory bookkeeping are not backend evidence')
 
     def test_propose_and_refusal_have_zero_artifact_mutations(self):
         for journal in self.journals.values():
@@ -216,7 +272,7 @@ class CapturedRehearsal(unittest.TestCase):
 
 
 class ActionReplay(unittest.TestCase):
-    def test_replay_recorded_model_decisions_all_three_surfaces(self):
+    def test_replay_historical_recorded_model_decisions_all_three_surfaces(self):
         PARENT.mkdir(parents=True, exist_ok=True)
         run = Path(tempfile.mkdtemp(prefix='replay-', dir=PARENT))
         for layout in ('external', 'bundle', 'legacy'):

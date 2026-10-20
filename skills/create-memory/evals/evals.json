@@ -72,6 +72,19 @@
         "Supported coordination uses a separate consumer-supplied ID and does not conflate project identity; unsupported coordination is explicitly optional.",
         "Partial, permission-denied, unavailable, and truncated outcomes are not reported as not-found or empty."
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "Inspect the valid synthetic transfer-recovery fixture and run its structure validator. Confirm address categories/types/contexts, relation preservation, immutable history, raw legacy mapping, revisions, and failure expectations. Do not perform transfer or claim adapter conformance.",
+      "expected_output": "The fixture has complete schema-shaped payloads and closed contract addresses; the validator computes complete-object fingerprints and checks internal relations and representation constraints. It clearly distinguishes fixture validation from transfer execution and backend conformance.",
+      "files": ["fixtures/transfer-recovery-cases.json", "fixtures/run_transfer_recovery.py"],
+      "assertions": [
+        "Constitutive and executive addresses use valid categories, context rules, and exact type vocabularies.",
+        "Internal relation targets resolve and unknown relation metadata is retained; unresolved external links are reported, not adopted.",
+        "Raw legacy documents remain without fabricated frontmatter, and historical close IDs remain immutable fixture data.",
+        "Fingerprint coverage includes address, type, full content, metadata, and relations; source revision claims are computed rather than invented.",
+        "No transfer, adapter conformance, or live backend operation is claimed."
+      ]
     }
   ]
 }

@@ -135,7 +135,10 @@ serialized/single-writer access or block mutation.
 
 `jaiba-init` owns constitutive creation and curated updates; `conduct` owns
 executive memory, with one writer per context and delegated workers reporting
-results rather than writing it. `conduct:summarize` has only the immutable,
+results rather than writing it. Init's explicit `migrate-surface` operation may
+coordinate exact-copy executive transfer after conduct's writer handoff, never
+edit executive content, advance tasks, validate work or clear work as a migration
+side effect. `conduct:summarize` has only the immutable,
 idempotent constitutive append-log exception for closure, not general brain edit
 authority. Retain a stable close ID across retries: the same ID and complete
 payload returns the verified existing receipt; a different payload is a conflict.
@@ -156,15 +159,40 @@ activation or mutation authority. Never fall back to filesystem, invoke
 path-based consumer operations
 against external memory, or create `.ai/` to make the call appear supported.
 
-Surface migration is **not implemented until Phase5**. A transition involving
-existing populated stores remains blocked pending that capability: explain the
-obstacle and offer an explicit filesystem exception (normally the `filesystem`
-override) to keep using existing local memory. Do not ignore, transfer, merge,
-dual-write or retire populated stores implicitly. Selection, an override or a
-saved binding never approves migration. Activation requires complete
-inventories, separately staged lossless import, verified full readback and
-source revisions, explicit human approval and retained source authority until
-activation; source retirement remains a separate explicit decision.
+Consumer use requires each effective surface procedure, actual callable tools,
+exact ownership, verified required capabilities and operation-specific approval;
+block dependent operations when requirements are absent or unverified, not solely
+by delivery phase. A green probe does not grant consumer or mutation authority.
+
+For an explicit populated-store transition, independently resolve effective
+`jaiba-init` and its `migrate-surface` operation in
+`references/surface-migration.md`, and effective `create-memory`'s canonical
+neutral interchange. Missing procedures or unverified endpoint capabilities
+block migration; draft Engram remains nonselectable until required operational
+conformance. Installation, authoring, probes and fixtures do not promote it.
+Selection, an override or a saved binding never approves migration. Offer an
+explicit filesystem exception (normally the `filesystem` override) to retain
+existing local authority when appropriate, never silent fallback.
+
+Require complete source/target and registry/context inventories, full payloads,
+actual pause/handoff of all affected writers, explicit collision decisions with
+no merge/overwrite, separately staged lossless import and complete full-readback
+verification. Recheck source and target revisions before separate human approval
+to activate the exact verified manifest, then verify effective routing, ownership
+and active inventory before releasing writers. Keep source authoritative until
+that verified switch and retain it afterwards; retirement requires separate
+exact-scope consent. No automatic purge, dual-write or failback.
+
+Journal intent and exact known/partial/unknown outcomes durably before further
+effects; interrupted transfers reopen the same transaction and reconcile exact
+requests, never blind replay. Outage is not absence. Retry, stop, or explicitly
+request init's qualified stale-snapshot recovery using a complete verified
+neutral snapshot and the same journal. If current source freshness is unavailable,
+leave that normal check unverified and obtain a separate later-write loss/divergence
+and authority decision, plus fresh activation approval for the verified recovery
+manifest. Target integrity, unknown-request reconciliation and actual writer pause
+are not waived. Reconcile later source writes on restoration before resuming its
+writers; never replace missing evidence with an empty brain.
 
 ### Concept and filesystem layout resolution
 
