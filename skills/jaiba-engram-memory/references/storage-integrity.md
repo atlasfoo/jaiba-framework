@@ -1,12 +1,27 @@
 # Storage integrity and publication
 
-Declarative storage protocol **1**, adapter `jaiba-engram-memory` 3.2.0,
+Declarative storage protocol **2**, adapter `jaiba-engram-memory` 3.2.0,
 contract `jaiba-memory-surface` 1.0.0. Read `engram-mapping.md` for authority,
 binding and ownership, and the effective `create-memory` contract/interchange
 references for logical semantics. This reference specifies storage, not a new
 runtime SDK, installation, migration implementation or activation permission.
-It covers MEM-005, MEM-008 and MEM-011; **full conformance remains unverified**.
-Scoped executed T009 evidence is recorded in §8; it does not certify all paths.
+It covers MEM-005, MEM-008, MEM-009 and MEM-011; **full conformance remains unverified**.
+Scoped executed T009 **profile-1 historical** evidence is recorded in §8; it
+does not certify profile 2 or supply its computation/size evidence. Profile 2
+remains draft/unverified; T-035 stays blocked until T-040 and any required
+approval for a concrete binding transition. This is not logical contract v2.
+
+## Contents
+
+1. Evidence, prerequisites and measured bounds
+2. Exact bytes and executable computation profile
+3. Wire records and bounded structures
+4. Complete catalogue and exact object read
+5. Staging, publication and preserving the previous version
+6. Retry, immutable close and logical retirement
+7. Evidence and portability boundary
+8. Historical profile-1 execution evidence
+9. Transfer staging and cross-surface recovery
 
 ## 1. Evidence, prerequisites and measured bounds
 
@@ -66,60 +81,173 @@ source/layout/raw-document representation and source revision provenance.
 Unknown keys survive. Transport generation/request/physical IDs are outside the
 logical object so storage retries do not change its logical fingerprint.
 
-Define `C(value)` by this deterministic tagged JSON tree, serialized as compact
-ASCII JSON without whitespace or a final newline:
+Serialize each complete logical object and each control envelope **once** as
+ordinary JSON using an existing standard tool, then encode that output as UTF-8
+without BOM. Retain the complete resulting byte snapshot `B` before dispatch,
+including any serializer-produced whitespace/newline. Record tool/version and
+options. No canonical key order, tagged tree, token-aware parser, normalization,
+custom serializer/codec or cross-serializer equality is required or allowed as
+a substitute. Different standard serializations may yield different revisions;
+the chosen snapshot, not a regenerated serialization, defines this revision.
+Each new write/revision gets its own snapshot. Reuse the original snapshot for
+an identical retry; never reserialize data to justify a readback difference.
 
-- JSON null, booleans and strings become `["null"]`, `["bool",value]` and
-  `["str",value]`. Strings are Unicode scalar sequences, never normalized.
-- Integers become `["int","<base-10>"]` with no leading zeros or plus sign;
-  zero is `0`. JSON decimal numbers become `["decimal","<original-token>"]`:
-  retain their exact valid JSON numeric token, never parse through binary float.
-- Arrays become `["array",[C-tree(item),...]]` preserving order.
-- Objects become `["map",[[key,C-tree(value)],...]]`, sorted by the UTF-8
-  bytes of the original keys. Duplicate JSON keys are invalid, not last-wins.
-- For strings/keys, escape quote and backslash, encode controls as lowercase
-  `\u00xx`, all non-ASCII BMP scalars as lowercase `\uxxxx`, and non-BMP
-  scalars as UTF-16 surrogate-pair escapes. Do not escape `/` or printable ASCII.
-  Reject lone surrogates. Absent and null fields remain different.
+Preserve unknown metadata/types, missing versus null, ordered relations and
+unknown relation fields without coercion. Preserve Unicode and CR/LF content
+exactly; no normalization or replacement characters. Retain original source
+bytes separately with declared media type/encoding and standard base64, including
+non-UTF-8 or non-JSON sources (YAML tags/aliases/duplicate keys, for example).
+Opaque extensions remain opaque; unknown required extensions block use.
 
-`C-tree` means the tagged tree before its one outer JSON serialization, not a
-string containing serialized JSON. Integer/decimal token distinction and raw
-number spelling are retained by a token-aware parser. Non-JSON metadata (for
-example YAML tags, aliases or duplicate keys) requires a reversible typed/raw
-representation in the logical object, not lossy JSON coercion. If unavailable,
-block structured mutation and retain the exact raw source with findings.
-Raw source bytes, including non-UTF-8 originals, use a declared base64 byte
-field; they must never be decoded with replacement characters. Text content
-retains exact Unicode scalars and CR/LF bytes; original raw bytes are also
-retained when needed to restore the source form.
+Declare the effective standard parser/serializer's numeric limits **before**
+structured use. Control counts, offsets, revisions and numeric IDs must be exact
+non-negative integers within the intersection of all effective tools' supported
+ranges; exceeding it blocks the operation, never rounding or string coercion.
+For binary64-only tools this range is at most `0..9007199254740991`; a wider
+range requires demonstrated exact support throughout. Reject duplicate keys,
+NaN/Infinity, invalid UTF-8 and lone surrogates in profile-2 JSON. Use standard
+parser facilities for strict validation (including duplicate-key rejection),
+not a new parser. If those facilities are unavailable, block structured use.
+Do not assume a parser's default last-key-wins behavior is safe.
 
-The following are workflow computations executed using an actually available
-general-purpose tool (for example a verified Python/Node executable), **not
-new MCP methods**. T009 must record the actual tool invocation and outputs.
+Apply the exact non-negative integer validator only to the protocol fields
+named above, by their schema roles, not recursively to every number in an
+external tool result or receipt. External telemetry such as
+`elapsed_from_intent_seconds: 177.250265`, or any other non-protocol float on a
+receipt, is not a control count, offset, revision or numeric ID: it must not
+fail that validator or be rounded/coerced into a protocol counter. Its presence
+does not invalidate an otherwise intact record. Protocol integer checks and
+the separate lossless-representation rules for logical/source values remain
+unchanged.
+
+Unsupported precision, significant numeric lexemes (such as `1.00`, `1e0` or
+`-0`) and non-JSON values must remain in a declared opaque byte representation,
+or unsafe structured edits/imports must stop. A parsed projection is not the
+lossless authority for those values. Preserve original source bytes **before**
+parsing; do not first round/coerce a value and then snapshot the lossy result.
+If standard tooling cannot establish exact structured representability, keep
+the affected source/extension opaque or block its structured use. No token-aware
+inspection is a prerequisite for retaining the entire source opaquely.
+Restore numeric spelling from preserved source bytes, never reconstituted parser
+tokens. Unchanged opaque source and
+extensions are copied exactly; if an authorized edit cannot preserve their
+meaning and restoration mapping, block it rather than silently desynchronize
+structured fields and source. This does not add an alternate typed-tree codec.
+
+The following are standard workflow computations, **not new MCP methods or
+helpers**. Capability evidence must record actual tools, options and results;
+historical profile-1 execution is not profile-2 evidence.
 
 | Computation | Exact input → output/check |
 |---|---|
-| Canonicalize | Strict token-aware logical/control value → ASCII `C(value)` bytes; decode the tagged tree and compare every original value/token. |
+| Snapshot | Complete logical/control value → one standard JSON UTF-8 byte snapshot; retain all bytes and verify that strict standard parsing preserves supported fields/types. Parsing validates structure, not byte equality. |
 | Fingerprint | Bytes `B` → `n=len(B)` and lowercase hex SHA-256 of all `B`. No ellipsis or estimated counts. |
 | Encode | Bytes → standard RFC 4648 base64, padded, no whitespace/newlines. Decode strictly and require re-encoding equality. |
 | Split | `B` and tested positive byte budget → contiguous slices with zero-based indexes and offsets; concatenate and byte-compare to `B`. Base64 expansion and envelope/request overhead are included in budget calculation. |
-| Verify | Retrieved ASCII wire → strict parse/decode; compare exact intended bytes, length, digest and decoded complete value. Byte equality, not digest alone, verifies intended readback. |
+| Verify | Retrieved wire → exact wire comparison, strict base64 decode and standard JSON validation; compare FULL recovered bytes to the retained intended snapshot, length and digest. Never parse/reserialize as an equality test. |
 | Allocate | Available UUID generator → stable request/version/record tokens, checked against the full known allocation inventory. Never regenerate on retry. |
+
+For wire fingerprints, `wire_bytes` is `len(W)`, where `W` is the retained
+complete ASCII `JAIBA2.<base64>` payload line (prefix included), compared to
+the verified wire snapshot extracted under §3. It is not `len(B)` of the decoded
+JSON snapshot and excludes MCP headers/footers. `truncation.original_bytes` is
+external response metadata, **not the wire length**; never substitute it for
+`len(W)` or use it to establish complete readback. Truncation still blocks
+verification when complete wire bytes are unavailable.
 
 For example, with a verified Python standard library tool, `len(B)`,
 `hashlib.sha256(B).hexdigest()`, `base64.b64encode(B)` and
 `base64.b64decode(text, validate=True)` implement the byte primitives;
-`B == observed_B` performs comparison. These alone do **not** implement the
-tagged canonicalizer or token-preserving parser. Those computations must be
-provided and verified in the authorized workflow before claiming capability.
+`B == observed_B` performs comparison. Standard JSON facilities provide JSON
+serialization/validation within their declared limits; there is no additional
+canonicalization algorithm to implement. Full snapshots may be retained as
+verified referenced artifacts/pages in existing journal/receipt workflows, not
+machine routing data. Hashes alone cannot recover them. Unavailable original
+operation snapshots block uncertain-write recovery; regenerated bytes are not
+replacement evidence.
 The model must not manually encode large values or calculate fingerprints.
 
+### Point commands and profile-2 measured caps
+
+For a retained snapshot file `snapshot.json`, these point invocations compute
+its byte length, SHA-256 and standard-base64 representation from the bytes
+already retained (they do not regenerate or normalize the snapshot):
+
+```sh
+python3 -c 'import base64,hashlib,pathlib; b=pathlib.Path("snapshot.json").read_bytes(); print("bytes",len(b)); print("sha256",hashlib.sha256(b).hexdigest()); print("base64",base64.b64encode(b).decode("ascii"))'
+sha256sum snapshot.json
+base64 -w 0 < snapshot.json
+```
+
+GNU `base64` wraps at 76 columns unless `-w 0` disables wrapping. Check the same
+bytes with `base64 -d` when decoding a retained base64 value,
+then compare the recovered file byte-for-byte with the snapshot; `sha256sum`
+checks the file digest independently. These commands calculate evidence only,
+not a complete record/wire or publication implementation. Do not use
+`crypto.subtle`, an MCP client, a codec, a writer, a full-cycle harness, or a
+maximum-search campaign.
+
+The following profile-2 caps are conservative class-specific limits derived
+only from already measured anchors. Margin is zero headroom above each anchor:
+the cap equals the measured size, with no rounding or increase. A specimen is
+in-cap only when its computed length is less than or equal to its own class cap.
+Unknown classes or unavailable size evidence are not-in-cap; report them rather
+than guessing. These are not backend maxima and do not authorize searching for
+larger maxima.
+
+| Profile-2 specimen class | Measured anchor and cap (bytes) |
+|---|---:|
+| Root JSON snapshot | 656 |
+| Root wire | 883 |
+| Journal JSON | 2304 |
+| Journal wire | 3079 |
+| Retained object | 1087 |
+| Local fixture A | 876 |
+| Local fixture B | 1146 |
+
+The historical 57127-byte figure is profile-1 evidence only, not a profile-2
+cap.
+
 ## 3. Wire records and bounded structures
+
+### Profile boundary and confirmed transitions
+
+The effective binding must explicitly declare `jaiba-engram-storage/2`, its
+exact root/registry/namespace/backend project and fingerprint/number-tool profile.
+Check that declaration, every locator's `storage_profile`, the `JAIBA2.` prefix
+and envelope `format` agree **before** authoritative use. Missing, mixed,
+unknown or incompatible profiles/locators/bindings block the operation as
+`unsupported-version` (or `invalid-object` for malformed records); there is no
+fallback decoder or profile inference from the decoded shape. Apply this to
+all roles, including root, pending journal, history and staging references.
+
+`JAIBA1.<base64(C(envelope))>` / `jaiba-engram-storage/1` is a distinct historical
+profile. Never decode it as profile-2 JSON, relabel it, rewrite it in place or
+automatically migrate it. Its existing bytes and evidence keep their original
+meaning; this document supplies no new profile-1 writer or compatibility decoder.
+A profile-1 source requires an independently supported, explicitly selected
+legacy reader/exporter; otherwise export/transition is blocked. Retaining opaque
+legacy source bytes is preservation, not verified interpretation or conformance.
+Legacy physical references may occur only as explicitly labeled opaque
+provenance, never as traversable profile-2 storage locators.
+
+Any transition needs specific human approval of the **concrete** source and
+destination storage profiles, bindings, physical namespace/root allocation and
+logical address/restoration/remap table before transition writes. Follow §9 and
+the neutral transfer barriers, with an isolated profile-2 target and source
+authority retained. Activation requires its separate confirmed binding change,
+precedence re-resolution and full readback; document correction, installation,
+a version-looking namespace prefix or profile-1 evidence authorizes none of
+these. Logical contract `1.0.0` and logical object identities do not change merely
+because storage is profile 2. Do not broaden ownership to change routing assets
+or a live binding here; an undeclared binding stays blocked pending approval.
+
+### Standard wire and role schemas
 
 Observation `content` is exactly one line with no surrounding whitespace:
 
 ```text
-JAIBA1.<base64(C(envelope))>
+JAIBA2.<base64(UTF8-JSON-envelope-snapshot)>
 ```
 
 The outer encoding protects all punctuation/Unicode/newlines and synthetic
@@ -128,10 +256,25 @@ and does not promise immunity to truncation/redaction. Verify exact wire equalit
 after every write and on reads; no Markdown wrapper, appended prose or tolerated
 prefix/suffix. A backend transform of this representation fails verification.
 
+That single stored line is not the surrounding MCP tool response. Extract
+exactly one complete line beginning `JAIBA2.` by that prefix within the
+established response framing, never by a fixed line position or total line
+count. Extract server-rendered physical fields by the labels `Project:`,
+`Scope:` and, when present, `Topic:`; do not use strings inside decoded content
+or the outer request-context project as physical metadata. Headers/footers may
+vary: a 9-line response and a 10-line response are both acceptable when the
+labeled wire and required physical fields match and complete verification
+passes. Neither 9 nor 10 lines is required. Missing wire or required physical
+fields, duplicate labeled wire/fields (even identical), or ambiguous framing
+block verification; never choose the first/last match. This permits neither
+wrapping nor suffixing stored content, nor stripping whitespace from the wire
+to make it match. Conditional Topic absence follows the response-profile rule
+below, not a line-count test.
+
 Every envelope is an object with these required fields:
 
 ```text
-format: "jaiba-engram-storage/1"
+format: "jaiba-engram-storage/2"
 adapter: "jaiba-engram-memory"
 contract: {id: "jaiba-memory-surface", version: "1.0.0"}
 namespace: exact exclusive prefix
@@ -146,16 +289,20 @@ address: complete logical address, or null for namespace infrastructure
 body: role-specific complete value below
 ```
 
-A **locator** is `{id, record_key, kind, version_id, wire_bytes, wire_sha256}`.
+A **locator** is `{storage_profile, id, record_key, kind, version_id,
+wire_bytes, wire_sha256}`, where `storage_profile` is `jaiba-engram-storage/2`.
 Every reference carries these expected values; roots/journals are mutable and
 their current exact revision is captured separately, never inferred from ID.
-For each read validate server-rendered physical `Project` and `Scope: project`,
+For each read validate server-rendered physical `Project:` and `Scope: project`,
 then expected envelope/locator and complete wire. Use the mapping's trusted
 human-bound root or verified parent chain. Self-declared ownership is not enough.
-Ambiguous content/footer framing blocks verification. Native topic is not
+Ambiguous content/footer framing blocks verification regardless of line count.
+Native topic is not
 returned by the response shape previously inspected in T006: retain submitted
 key/ACK as routing evidence, **do not claim native topic was checked**. If a
-host returns it, check it too. Never search unrelated IDs for recovery.
+host returns `Topic:`, extract it by label and check it too, under the mapping's
+established response-profile rules. Absence is not proof that native topic was
+checked. Never search unrelated IDs for recovery.
 
 For mutable root/journal locators, the bound ID/key/kind establish identity;
 their locator's creation-time wire fingerprint is historical, not a claim
@@ -171,11 +318,11 @@ Role bodies (all counts are exact non-negative integers, all digests computed):
 
 | Role | Required body fields and meaning |
 |---|---|
-| `payload-chunk` | `object_version`, `index`, `offset`, `bytes`, `sha256`, `data_base64`. Data is one contiguous slice of `C(logical-object)`. |
+| `payload-chunk` | `object_version`, `index`, `offset`, `bytes`, `sha256`, `data_base64`. Data is one contiguous slice of the complete logical-object JSON UTF-8 snapshot. |
 | `descriptor-page` | `collection_id`, `page_index`, `entries`, `next` locator or explicit null, `entry_count`, `remaining_count`. Entries are ordered chunk descriptors or other declared collection entries; no mixed collection kinds. |
 | `object-manifest` | `object_version`, `logical_address`, `logical_bytes`, `logical_sha256`, `chunk_count`, `descriptors_head` locator, `descriptor_page_count`, `complete:true`, encoding profile identifier. Descriptor entries bind each chunk locator plus index/offset/bytes/digest. |
 | `catalogue-shard` | `generation`, `index`, `entries`, `entry_count`, `remaining_count`, `next` locator or null. Each entry has full address, type-as-found/findings, lifecycle (`live`/`retired`), logical revision, immutable object-manifest locator. Retired entries additionally carry tombstone evidence below. |
-| `publication-manifest` | `generation`, `previous` publication locator or null, `catalogue_head`, `shard_count`, total/live/retired entry counts, `inventory_sha256`, registry collection head/counts, close-index collection head/counts, allocation head/counts, `request_id`, `complete:true`. |
+| `publication-manifest` | `generation`, `previous` publication locator or null, `catalogue_head`, `shard_count`, total/live/retired entry counts, `inventory_fingerprint_method`, `inventory_bytes`, `inventory_sha256`, registry collection head/counts, close-index collection head/counts, allocation head/counts, `request_id`, `complete:true`. Every collection also declares its own method/byte length/digest under §4. |
 | `allocation-page` | Immutable linked page of allocated keys/known IDs/roles/versions and attempt states, plus explicit next/null and counts. Retain staging, superseded, failed and retired records, not just active payloads. |
 | `journal` | `journal_revision`, stable request/version/close IDs, prior publication/root evidence, intended object/inventory fingerprints, phase, append-only event-page head/counts and exact known ID receipts/unknown attempts. Never put an unbounded receipt array in this record. |
 | `root` | `root_revision`, exact registry identity, `live` publication locator or null only for explicitly authorized empty bootstrap, `pending` journal locator or null. Prior live publication remains reachable through immutable `previous` links. |
@@ -186,7 +333,8 @@ close ID, immutable log address/revision and frozen inventory evidence. Large
 frozen inventories use immutable descriptor pages, not a giant log metadata
 array. Their evidence is part of the complete log object. Collections declare
 their entry kind, head locator, page count, total count and digest over the
-canonical ordered entries. Empty collections use head null and zero counts.
+exact collection snapshot defined in §4. Empty collections use head null and
+zero counts; their snapshot is the empty byte sequence with its computed digest.
 
 All paged collections use the same explicit linked-page/count rules. Build
 pages tail-first so immutable locators are known before encoding predecessors.
@@ -217,9 +365,11 @@ budgets are disclosed; exceeding them is incomplete, not silent success.
    exactly indexes `0..chunk_count-1`, contiguous offsets, matching lengths and
    locators, explicit end and matching page counts. Verify every chunk and
    concatenate decoded bytes in index order using the computation tool.
-   Require full byte count/digest, strict canonical decode/re-encode equality,
+   Require full byte count/digest and strict standard JSON validation of the
    full address/type/metadata/content/relations and original representation.
-   Compare full intended-versus-observed object when verifying a mutation.
+   For mutation verification compare every reconstructed byte to the original
+   intended object snapshot, not a parsed/reserialized equivalent. Each control
+   record likewise compares to its own retained full envelope/wire snapshot.
 5. Re-read the root and require the captured exact revision/wire still matches.
    Return traversal evidence: root/publication revisions, every page/locator,
    declared/observed counts, unique-address count, explicit terminal nulls,
@@ -227,9 +377,21 @@ budgets are disclosed; exceeding them is incomplete, not silent success.
    and verified continuation, never absence. A changed root restarts/reconciles;
    a hidden page, denied read, omitted bytes or count mismatch fails closed.
 
-The inventory digest covers the canonical ordered full catalogue entry list
-(ordered by canonical address bytes), including lifecycle/revisions/locators
-and tombstones. Registry/close/allocation collections have their own digests.
+For each inventory/registry/close/allocation collection, declare fingerprint
+method `sha256-page-json-bytes/2`: concatenate the **complete decoded envelope
+JSON snapshots** of its pages/shards in head-to-next traversal order, with no
+separator or reserialization. Retain that full concatenation and the ordered
+page locators/byte lengths in operation snapshot evidence; each immutable page
+also retains its own original bytes. The digest covers every field, including
+entry order, lifecycle/revisions/locators/tombstones and next/count fields.
+Record total concatenated byte length alongside the digest. Page boundaries
+are the declared lengths, not a custom parser. The concatenation is a byte
+sequence for hashing/comparison, not another JSON document to parse. Verify page
+bytes individually and the full reconstructed collection against the retained intended snapshot
+on publication/readback; parsing only checks structure/counts/addresses. No
+canonical address sort or key-order normalization is involved. A differently
+ordered or paginated new inventory is a new snapshot/revision, not an equal
+retry. Frozen inventories retain their original ordered snapshots as well.
 Complete enumeration describes this exclusively managed namespace; it does not
 claim to discover arbitrary unpublished Engram records. Allocation evidence
 accounts for known staging records separately. Unknown IDs remain unknown;
@@ -243,7 +405,8 @@ handoff includes pending/unknown attempts and receipts. Read/write/readback is
 not a lock. Without actual exclusion, block all mutations.
 
 1. Verify authority, full inventory, current object/absence and prior exact
-   revisions. Compute the complete intended value and fingerprints. Allocate
+   revisions. Serialize once and retain each complete intended byte snapshot,
+   length and SHA-256, including new controls/collections as they are built. Allocate
    stable request, version and record keys once. Preserve original unknown
    fields and source forms. A retired/reserved address is not createable.
 2. Create/verify a request journal and bind it through `root.pending` while
@@ -251,7 +414,8 @@ not a lock. Without actual exclusion, block all mutations.
    each ID-based update; increment its revision and verify exact post-read.
    Initial journal creation itself needs retained tool receipts; unknown ID
    during this bootstrap blocks progress pending explicit reconciliation.
-3. Before each save record the intended key, full wire fingerprint and
+3. Before each save record the intended key, complete intended snapshot/wire
+   (or verified durable snapshot reference), byte length, SHA-256 and
    `attempting` event in the verified journal. All saves use authorized project,
    scope `project`, type `manual`, exact allocated topic and `capture_prompt:false`.
    Persist the returned numeric ID in the operation receipt **before another
@@ -293,7 +457,8 @@ the retained prior exact evidence under the namespace owner's authority.
 
 ## 6. Retry, immutable close and logical retirement
 
-Retries use the same request/version/close IDs and intended fingerprints.
+Retries use the same request/version/close IDs and original intended snapshots,
+lengths and fingerprints. Snapshot loss blocks recovery, not a new serialization.
 Read the exact root, pending journal, publication chain and known returned IDs:
 
 - Published identical request/result: verify full object and return its existing
@@ -335,15 +500,16 @@ report exact completed/failed/unknown/residual sets; `clear-work` succeeds only
 when all intended addresses are tombstoned and no outside address changed.
 The immutable close must already be verified before the first retirement.
 
-## 7. T009 evidence and portability boundary
+## 7. Evidence and portability boundary
 
-Required authorized tests as specified at T007, **not run during T007**.
-Section 8 distinguishes subsequent executed paths from remaining obligations:
+The following remain operational obligations for profile 2, with fixtures
+deferred to T-040; this documentation change runs none. Section 8 records only
+historical profile-1 results, not transferable profile-2 conformance:
 
 - A complete object larger than the measured individual-record operating bound,
   with adversarial escaping/Unicode/newlines, nested unknown metadata/relations
   and original raw representation; reconstruct all chunks and byte-compare the
-  entire canonical object. Exercise truncation/transformation failures too.
+  entire original JSON UTF-8 snapshot. Exercise truncation/transformation failures too.
 - Multiple catalogue shards and descriptor pages, explicit completion/counts,
   empty contexts, malformed logical objects and unlinked logs. Missing/hidden
   page, cycle, duplicate address and changing root must never report complete.
@@ -367,7 +533,13 @@ approval workflow before activation, retaining source authority. This is
 declarative guidance, not an executed migration, binding switch, merge, dual
 writer or cleanup.
 
-## 8. Scoped T009 execution evidence — 2026-10-17
+## 8. Historical profile-1 scoped T009 execution evidence — 2026-10-17
+
+Everything in this section concerns `JAIBA1` / `jaiba-engram-storage/1` and
+its historical canonicalizer, not the new JSON profile. Preserve its meaning,
+byte counts, digests and evidence unchanged. No historical artifacts or backend
+data were accessed for this profile-2 correction; the following is the retained
+prior account, not a claim that this correction replayed or read those artifacts.
 
 Provenance: run `531ae94b-393e-4e4f-a3f1-0055642782d3`, executor session
 `ses_eb2b1144fffeId1ERTDOS6Bd4y`; evidence artifacts `report.md` and
@@ -483,6 +655,10 @@ identity, intended root record key and logical address/remap table before
 provisioning. The root numeric ID is initially unknown: capture the returned
 ID in the external receipt before another effect, then fully read/verify and
 bind it. Never invent a preallocated numeric ID.
+Record source and destination storage profiles and exact approved bindings in
+the external journal, including every address/restoration mapping and approval
+reference (§3). A profile mismatch blocks before provisioning; no implicit
+profile-1 read/migration is supplied by these profile-2 recipes.
 The prefix is a storage allocation, not a new portable logical namespace or
 project ID. Envelope `namespace`/`backend_project`/`registry_id` identify the
 physical chain but prove nothing alone: require physical owner verification
@@ -499,7 +675,7 @@ explicit authorization, retaining intent, full intended wire and numeric-ID
 receipt externally before there is any backend journal. Unknown bootstrap
 save IDs stop the transfer. No backend project/session registration hack.
 
-Use **existing protocol-1 roles** rather than a parallel import store:
+Use **profile-2 roles from §3** rather than a parallel import store:
 
 | Transfer evidence | Existing physical realization |
 |---|---|
@@ -524,14 +700,26 @@ requires verified referenced pages/artifacts or blocks before dispatch.
    reconstruction plus neutral snapshot readback, with no source-side pending
    journal or writes. Capture/recheck source root, registry, complete inventory
    and every full logical revision, not just object count or recent context.
+   Preserve source snapshots as source evidence. Serialize each neutral manifest
+   or payload once using its declared standard representation, retain all bytes
+   and compare its full artifact readback/length/SHA-256. Neutral interchange
+   is not an Engram storage envelope and gains no new canonicalization rule.
+   Already-opaque raw payloads are copied byte-for-byte, not parsed or converted
+   to JSON; their complete original bytes are the expected artifact snapshot.
 2. Apply §5's allocation/journal sequence to all imported objects under the
    same migration transaction. Leave `root.live` at its verified empty baseline
    during the first import; on an explicitly reconciled refreshed candidate,
    retain the prior verified staging publication. Every new payload, page and
-   manifest is immutable and journaled; no per-object live generations while
-   the candidate inventory is partial. No in-place live catalogue edits.
-3. Reconstruct **every** candidate object and compare complete intended neutral
-   values, unknown fields/extensions, ordered relations and original bytes.
+   manifest is immutable and journaled. Each target logical object is serialized
+   once as its own profile-2 snapshot; preserve exact opaque source bytes and
+   provenance independently, without coercing them through the target parser.
+   No per-object live generations while the candidate inventory is partial.
+   No in-place live catalogue edits.
+3. Reconstruct **every** candidate object and compare FULL bytes against its
+   original intended target JSON snapshot, length and digest. Separately validate
+   complete neutral values, unknown fields/extensions, ordered relations and
+   opaque original bytes against the approved source/restoration mapping;
+   never use cross-serializer byte equality or parse/reserialize for readback.
    Traverse the candidate publication directly through its trusted journal
    locator even while it is not live. Check all counts/digests/ends, no duplicate
    addresses/locators, exact registry/context equality and close-ID uniqueness;

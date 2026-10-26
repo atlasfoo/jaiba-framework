@@ -4,10 +4,13 @@ Adapter `jaiba-engram-memory` **3.2.0**; canonical contract
 `jaiba-memory-surface` **1.0.0**, resolved through the effective `create-memory`
 installation. This is a declarative mapping with **scoped execution evidence,
 not complete mutable-surface certification**.
-Read the completed [Storage integrity and publication](storage-integrity.md)
-protocol 1 alongside this mapping for all storage operations. It specifies
+Read [Storage integrity and publication](storage-integrity.md)
+protocol 2 alongside this mapping for all storage operations. It specifies
 encoding, computation, record roles, traversal, publication and recovery;
-T-009 demonstrated the scoped results below, not universal operating limits.
+T-009 demonstrated only historical profile-1 results below, not profile-2
+capabilities or universal operating limits. New profile-2 writes require their
+own applicable evidence. T-035 remains blocked until T-040 and any required
+approval of a concrete transition; no draft promotion follows from this edit.
 
 ## Contents
 
@@ -73,11 +76,30 @@ and checked. ACKs and docs are not preservation evidence.
 Other exposed tools (session/prompt bookkeeping, pin/review, judge/compare,
 passive capture and doctor) are not adapter storage primitives. In particular,
 native Engram relation judgments do not replace lossless logical relations or
-authorize changes to ordinary observations. If save returns judgment candidates,
-do not follow candidate IDs into unrelated memory as part of this adapter;
-surface unresolved side effects and stop dependent operations as necessary.
+authorize changes to ordinary observations.
 
-### Executed scoped evidence — 2026-10-17
+Native `judgment_required` results and relation suggestions are host metadata,
+not entries in the JAIBA catalogue. Apply this deterministic distinction:
+
+1. **Foreign judgment:** a suggestion whose candidate is outside the active
+   namespace or belongs to another trial is recorded as metadata only (candidate
+   IDs and relation labels). Do not read candidate bodies, call `mem_judge` or
+   `mem_judge_many` automatically, or stop integrity verification of the own
+   record because of the suggestion.
+2. **Own judgment:** a conflict or `judgment_required` concerning this adapter's
+   own record in the active namespace blocks verification. Do not auto-judge;
+   return control for human authorization.
+3. **Human authorization:** run a judgment only when the human explicitly
+   authorizes that specific judgment. Authorization for one judgment covers no
+   others. This rule does not promise that Engram will stop returning suggestions.
+
+### Historical profile-1 executed scoped evidence — 2026-10-17
+
+This retained prior account concerns `JAIBA1` / `jaiba-engram-storage/1`
+only, including its canonicalizer and measured bytes. It is not profile-2
+evidence. This documentation correction accessed no trial artifacts or backend
+records; statements below about reading/replaying artifacts describe the earlier
+evidence refresh, not this change.
 
 T-009 execution session: `ses_eb2b1144fffeId1ERTDOS6Bd4y`. Evidence bundle label:
 `jaiba-memory-surfaces/531ae94b-393e-4e4f-a3f1-0055642782d3`; source labels:
@@ -126,13 +148,24 @@ project**, always with `scope: project`. The namespace token is collision-free
 and stable, not a repository basename. Global skill installation never means
 Engram `scope: global`. Ordinary memory stays outside this prefix.
 
-The machine binding independently records backend project, namespace prefix,
+The machine binding independently records the explicit storage profile,
+backend project, namespace prefix,
 exact root observation locator, stable JAIBA project-id, sanitized identity
 candidate and executive context-id. A backend project may contain several
 JAIBA projects; its label is not the logical project-id. The registry maps
 exact canonical identity candidates/confirmed aliases to stable project IDs,
 and lists contexts. Follow canonical origin normalization, nonportable root
 fallback and explicit alias/rename authority; do not infer identity from titles.
+
+For this new-write mapping, the approved binding must declare
+`jaiba-engram-storage/2`; all traversable locators carry that same profile, all
+content starts exactly `JAIBA2.`, and every envelope declares storage format 2.
+Missing/incompatible/unknown profiles and mixed-profile references block
+operations as `unsupported-version`, never trigger fallback or shape-based
+sniffing. A namespace containing `/v1/` is an allocation name, not evidence of
+wire profile or permission to change it. Logical contract 1.0.0 is unchanged.
+The profile boundary and transition approvals in storage §3 apply before root
+acquisition/bootstrap too; this mapping supplies no automatic legacy decoder.
 
 **Owned physical record predicate**, checked after every ID read and before
 any authoritative interpretation or write:
@@ -200,7 +233,7 @@ project/context associations. Logical objects retain their contract addresses:
 ### Root acquisition (no search-based absence)
 
 1. Prefer a previously confirmed **exact numeric root ID** plus registry ID
-   and expected namespace/backend ownership and root record key in routing
+   and expected namespace/backend ownership, storage profile and root record key in routing
    configuration. Directly read and verify it. A changed/missing/inaccessible root blocks reuse; do not
    find a replacement by title or bootstrap an empty brain.
 2. Without a root binding, bounded `mem_search` may show candidates in the
@@ -262,11 +295,11 @@ Before accepting completeness, re-read the root/publication revision under
 serialized access. A changed root, dangling page, duplicate logical ID,
 unreadable/truncated record or missing termination invalidates the result.
 
-The completed [storage protocol](storage-integrity.md) specifies sharded
+The [storage protocol](storage-integrity.md) specifies sharded
 catalogues, reversible encoding, chunk reconstruction, staged version manifests
 and publication/recovery. Follow its exact locator, page/count/digest and root
 recheck rules rather than inventing a second layout here. T-009 demonstrated
-the scoped multi-page/large-content roundtrip above. Validate applicable host,
+the scoped profile-1 multi-page/large-content roundtrip above. Validate applicable host,
 computation and tested bounds before reuse; block dependent operations without
 that evidence. This demonstration does not cover arbitrary size/depth or hosts.
 All storage roles (registry, catalogue, payload versions, chunks and staging
@@ -281,12 +314,21 @@ context and serialize constitutive writes, logs and **shared catalogue/root
 publication across contexts**. If external writers cannot be excluded, block
 mutations. Pre-read/write/readback is not atomic exclusion.
 
-Revision evidence covers the **entire** decoded logical object, including
-unknown metadata, body, relations and preserved original representation. Use
-the storage protocol's token-preserving canonical `C(value)`, exact byte counts,
-computed SHA-256 and complete intended-versus-observed byte/value comparison.
-Map key order is canonicalized; array order, numeric token distinctions and
-string bytes remain significant. Do not normalize body whitespace/Unicode/newlines.
+Revision evidence covers the **entire** logical-object JSON UTF-8 snapshot,
+including address/type, unknown metadata, body, ordered relations, opaque source
+representation and provenance. Serialize once using an existing standard JSON
+tool and retain the full bytes, exact length and SHA-256 (storage §2). No key
+sorting, tagged tree, token-aware parser or other canonicalizer is required.
+Compare FULL recovered bytes to the original intended snapshot and also verify
+length/digest; parsing validates structure, never equality by reserialization.
+Each new revision owns a new snapshot; a different serialization is not an
+identical retry. Controls and ordered inventory-page snapshots follow the same
+exact-byte rule, with fingerprint coverage/order declared in storage §4.
+Do not normalize body whitespace/Unicode/newlines or coerce unknown fields.
+Declare supported number ranges; reject duplicate keys/NaN/Infinity in JSON.
+Unsupported precision/significant numeric lexemes and non-JSON sources require
+declared opaque source bytes or block unsafe structured edits. Restore source
+numeric spelling from those bytes, not parser tokens. No custom codec/parser.
 Use actually available, verified computation tools; no invented digest,
 timestamp, preview or revision counter alone establishes integrity. Retain
 root/publication revision evidence too. Source revisions remain provenance,
@@ -334,7 +376,9 @@ physical and logical ownership checks. No operation edits ordinary memory.
    return scoped logical `not-found`; an unavailable locator for a live entry
    is an integrity/access error, **not** logical absence.
 3. Call `mem_get_observation({id, project:<backend-project>})`, verify physical
-   owner despite the project argument, envelope and complete version. Follow
+   owner despite the project argument, envelope and complete version. Extract
+   the `JAIBA2.` line and physical `Project:` / `Scope:` / conditional `Topic:`
+   by prefix/label under storage §3 and §6 below, never by line count. Follow
    the integrity manifest through all chunks to its explicit end when needed.
 4. Return the complete decoded object and revision with `complete:true` only
    after exact reconstruction and verification. Unknown response format,
@@ -348,7 +392,10 @@ physical and logical ownership checks. No operation edits ordinary memory.
    and matching pre-read revision; it never implicitly upserts absence.
    Reject ordinary update/retirement of constitutive `log-entry` objects;
    immutable history is changed only by appending a separately identified entry.
-2. Preserve all unmodified/unknown fields. Follow the storage protocol's
+2. Preserve all unmodified/unknown fields and opaque source bytes; block edits
+   beyond the declared parser/number capabilities. Serialize the full intended
+   logical object once and retain its complete snapshot, length and SHA-256.
+   Retain each new control record's own snapshot too. Follow the storage protocol's
    journal/allocation sequence before staging any new physical payload version
    using `mem_save` with a unique reserved request/version key. Because save can
    upsert/dedupe, verify the returned ID, physical project/scope and entire
@@ -365,8 +412,9 @@ physical and logical ownership checks. No operation edits ordinary memory.
    manifest, then publish only by updating the exact owned root's live pointer
    via `mem_update({id, expected_project, content:<whole-new-wire>})`, retaining
    its pending journal until verification. Never edit live shards in place.
-4. Full-read the publication and the resolved logical object. Compare all
-   intended fields and retained unknowns, then return the verified receipt.
+4. Full-read the publication and the resolved logical object. Compare FULL
+   recovered wire/control/object bytes with their retained original snapshots,
+   lengths and digests, then validate intended fields/unknowns and return the receipt.
    Failed publication/readback leaves old work intact or outcome unknown; stop
    dependent writes. Reconcile exact root/staging IDs before retry, never
    overwrite a historical version to make a mismatch disappear.
@@ -420,6 +468,15 @@ changes; [storage protocol §9](storage-integrity.md#9-transfer-staging-and-cros
 maps these transfers to existing physical roles/tools. These recipes are
 declarative and remain unexecuted portability paths, not draft promotion.
 
+Before any transition writes, init must obtain specific approval identifying
+the concrete source/destination profiles and bindings, exact physical staging
+namespace/root and complete logical address/restoration/remap table. `JAIBA1`
+records retain their original bytes/meaning: no in-place relabeling or automatic
+migration. A legacy source requires an independently supported and explicitly
+selected profile-1 reader/exporter; otherwise block. It must not be read through
+this profile-2 decoder, nor may legacy physical locators become live profile-2
+references. Profile-1 provenance may be retained opaquely and labeled as such.
+
 #### Export
 
 1. Resolve the human-bound exact source root, registry and full selected
@@ -435,15 +492,22 @@ declarative and remain unexecuted portability paths, not draft promotion.
    active objects fully; declare retained history/tombstone provenance
    separately, never export ordinary memory or adopt unpublished records.
 3. Reconstruct each full object via immutable manifest/descriptor/chunk reads
-   (§3 and storage §4), checking the entire canonical value and raw bytes. The
+   (§3 and storage §4), checking the complete original snapshot, length/digest
+   and raw bytes under the declared source profile. The
    neutral record retains full logical address, filename/extension where
    applicable, original legacy/bundle representation, absent frontmatter,
    unknown metadata/extensions and ordered relations/unknown relation fields,
    immutable close IDs and source revision evidence. Legacy views point to
    their one raw persisted source object, not independent copies. A target
    need not adopt Engram's physical chunk IDs as logical identity.
-4. Write/readback the manifest and payloads at the approved external transaction
-   artifact location, then keep the verified snapshot read-only. Re-read exact
+4. Serialize each neutral manifest/payload once using its declared standard
+   representation; retain complete byte snapshots, lengths and SHA-256.
+   Write/readback the manifest and payloads at the approved external transaction
+   artifact location, comparing FULL recovered bytes to those snapshots without
+   parse/reserialize equality, then keep the verified snapshot read-only. Neutral
+   interchange is not required to share Engram's wire representation. Opaque raw
+   payloads are copied byte-for-byte, not JSON-coerced; compare the complete
+   recovered artifact to those original bytes. Re-read exact
    source root/publication and full inventory/object/registry evidence; a source
    change invalidates completeness/freshness. An interrupted read or hidden page
    is incomplete, never an empty context. Recapture a new snapshot revision in
@@ -466,7 +530,11 @@ declarative and remain unexecuted portability paths, not draft promotion.
    preserve that address namespace unless an explicit approved remap changes it.
    Reuse the same staging allocation on retry; never provision a new namespace
    to hide an unknown result. Bootstrap only by §2's authorized root procedure.
-3. Follow storage §9: keep the staging root's live pointer at its verified
+3. Serialize each intended target object once as standard JSON UTF-8, retaining
+   its own full target snapshot/length/digest separately from source snapshots
+   and revision provenance. Preserve opaque extensions/raw sources without
+   parser coercion; unsupported structured conversion blocks import. Follow
+   storage §9: keep the staging root's live pointer at its verified
    empty baseline (or prior verified staging generation on an explicitly
    reconciled refresh) and bind the migration journal as pending while building
    all immutable payload chunks/manifests, complete catalogue, registry,
@@ -475,7 +543,10 @@ declarative and remain unexecuted portability paths, not draft promotion.
    historical logs as exact immutable objects with original close IDs, not
    newly generated work-closure appends. No call to archive/clear-work.
 4. Verify every staged record by exact ID and trusted ownership, reconstruct
-   each complete object, then compare the full candidate publication/registry
+   each complete object and compare FULL bytes/length/SHA-256 against the original
+   intended target snapshot (controls/collections likewise). Separately validate
+   all preserved fields and opaque source bytes against the approved mapping;
+   cross-serializer equality is not required. Compare the full candidate publication/registry
    against the neutral manifest after approved remaps. Target source-revision
    fields are provenance; target wire/logical/publication revisions and full
    intended-versus-observed evidence are separate journal receipts. Validate
@@ -521,9 +592,34 @@ old immutable records and renew scope/remap approval where affected.
 
 ## 6. Limits, failures and validation
 
-Transport follows protocol 1's exact `JAIBA1.<base64(C(envelope))>` wire,
-canonical logical values, reversible raw-byte representation and chunk/page
-rules. T-009's independent audit established these **largest successfully
+New transport follows protocol 2's exact `JAIBA2.<base64(UTF8-JSON-envelope-snapshot)>`
+wire, standard padded RFC 4648 base64 without whitespace, complete JSON snapshots,
+reversible opaque source-byte representation and chunk/page rules. Every readback
+compares full original bytes, length and SHA-256, not parse/reserialize equality.
+
+The stored content remains exactly one `JAIBA2.<base64>` line; MCP response
+headers/footers are not part of that content. Under storage §3, locate the
+unique complete `JAIBA2.` line and physical `Project:` / `Scope:` fields by
+prefix/label, plus `Topic:` when present, not fixed positions or a total line
+count. A 9-line response and a 10-line response can both pass when the labeled
+wire and required physical fields match; neither count is required. Missing
+required fields, duplicate matches or ambiguous framing still block. Apply
+§2's Topic-present/Topic-omitting distinction: omission is not a line-count
+failure, must not silently downgrade an established Topic-present profile,
+and never proves that native topic was checked.
+
+Keep protocol validation separate from external receipt telemetry (storage
+§2). Exact non-negative integer checks apply to protocol control counts,
+offsets, revisions and numeric IDs, not every numeric receipt field.
+`elapsed_from_intent_seconds: 177.250265` and other non-protocol floats must
+neither fail that validator nor be coerced into counters; the protocol checks
+remain strict. For wire length/fingerprint verification use `len(W)` of the
+retained complete `JAIBA2.` payload bytes / verified wire snapshot, including
+the prefix, not decoded JSON length or MCP framing length.
+`truncation.original_bytes` is not the wire length and cannot prove full
+readback; missing/truncated wire bytes still block verification.
+
+T-009's **historical profile-1** independent audit established these **largest successfully
 read-back wire sizes in bytes**, not backend maxima or portable safe caps:
 
 | Record role | Observed wire bytes |
@@ -543,7 +639,8 @@ returned-value sizes were audited separately; **actual MCP/network overhead
 and backend binary version remain unknown**. No absolute observation/request/
 response/page maximum is certified. Exact tested Unicode/source preservation
 does not establish all possible text transformations or hidden-field visibility.
-Revalidate applicable evidence for the active host/schema; block affected writes
+None of those sizes certifies profile 2. Establish applicable evidence for the
+active host/schema/storage profile; block affected writes
 without a tested computation/budget profile or return `limit-exceeded` before
 mutation. Never derive safe thresholds from search/context budgets. No
 truncation, summarization, unknown-field dropping or guessed limits are acceptable.
