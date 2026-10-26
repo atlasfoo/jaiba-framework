@@ -1,5 +1,15 @@
 {
-  "fixture_kind": "synthetic protocol-analysis cases; not a live Engram export",
+  "fixture_kind": "synthetic protocol-analysis cases; original JAIBA1 records are historical profile-1 material, not a live Engram export",
+  "historical_storage_profile": "jaiba-engram-storage/1",
+  "profile_2_boundary_cases": [
+    {"name": "explicit-matching-profile-2", "binding_profile": "jaiba-engram-storage/2", "locator_storage_profile": "jaiba-engram-storage/2", "wire": "JAIBA2.WzFd", "envelope_format": "jaiba-engram-storage/2", "expected": "all declarations and literal JAIBA2. prefix match; only then may subsequent exact profile-2 validation proceed"},
+    {"name": "missing-binding-profile", "binding_profile": null, "locator_storage_profile": "jaiba-engram-storage/2", "wire": "JAIBA2.WzFd", "envelope_format": "jaiba-engram-storage/2", "expected": "block before interpreting bytes"},
+    {"name": "unknown-locator-profile", "binding_profile": "jaiba-engram-storage/2", "locator_storage_profile": "jaiba-engram-storage/99", "wire": "JAIBA2.WzFd", "envelope_format": "jaiba-engram-storage/2", "expected": "block before interpreting bytes"},
+    {"name": "mismatched-wire-prefix", "binding_profile": "jaiba-engram-storage/2", "locator_storage_profile": "jaiba-engram-storage/2", "wire": "JAIBA1.WzFd", "envelope_format": "jaiba-engram-storage/2", "expected": "block on prefix mismatch before base64 or JSON decoding"},
+    {"name": "mismatched-envelope-format", "binding_profile": "jaiba-engram-storage/2", "locator_storage_profile": "jaiba-engram-storage/2", "wire": "JAIBA2.WzFd", "envelope_format": "jaiba-engram-storage/1", "expected": "block before interpreting envelope as profile 2"},
+    {"name": "missing-envelope-format", "binding_profile": "jaiba-engram-storage/2", "locator_storage_profile": "jaiba-engram-storage/2", "wire": "JAIBA2.WzFd", "expected": "block before interpreting bytes"},
+    {"name": "legacy-jaiba1-not-sniffed-as-profile-2", "wire": "JAIBA1.WzFd", "historical_storage_profile": "jaiba-engram-storage/1", "expected": "retain as historical profile-1 material; reject profile-2 prefix precondition before any base64/JSON decode; never relabel or reinterpret"}
+  ],
   "schema_profiles": {
     "observed_callable_profile": {
       "mem_get_observation": {"required": ["id"], "optional": ["project", "include_history", "history_cursor"], "project_semantics": "response context, not ownership filter"},
