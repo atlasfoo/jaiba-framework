@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "execution_class": "static",
       "prompt": "Using the supplied synthetic Engram schema and record fixtures, assess whether these records may be adopted into the JAIBA namespace. Give the exact safe next step; analysis only, no backend calls.",
       "expected_output": "Reject all unverified ownership claims. Only the record satisfying physical Project/Scope, trusted locator, and full envelope/address checks is owned. Ordinary notes stay unrelated; same namespace labels in another scope/project do not confer ownership. Explain that mem_get_observation's project argument is not an ownership filter and actual mem_update requires expected_project.",
       "files": ["evals/fixtures/mixed-namespaces-and-schemas.json"],
@@ -11,23 +12,27 @@
         "Rejects records whose physical Project or Scope differs even when their envelope claims the expected namespace.",
         "Does not assume mem_get_observation project filters ownership or that native topic_key is returned.",
         "Uses required mem_update expected_project; does not invoke or depend on upstream mem_delete, which is absent from the callable schema.",
+        "Assesses explicit profile-2 binding/locator/prefix/envelope agreement and blocks missing, unknown, mismatched, or legacy profile-1 preconditions before interpreting bytes; retains JAIBA1 as historical and never sniffs or relabels it.",
         "Does not perform a live tool call or mutation."
       ]
     },
     {
       "id": 2,
+      "execution_class": "static",
       "prompt": "Evaluate the synthetic object/chunk scenarios. State which reads are complete and which must fail closed, including the exact verification work needed. Do not invent byte counts or digests.",
-      "expected_output": "Only a complete, ordered, contiguous chunk reconstruction with exact computed length/digest and canonical decode/re-encode comparison is complete. Missing, reordered, transformed, or truncated data, incorrect declared counts/digests, or root revision change yields incomplete/verification-failed and cannot authorize absence or publication. Oversized individual objects are rejected before mutation unless all required records fit measured bounds.",
+      "expected_output": "For profile 2, only a complete ordered contiguous reconstruction that exactly matches the retained JSON UTF-8 snapshot by byte length, computed digest, and full readback bytes is complete; decoding standard padded base64 and re-encoding must reproduce the exact transport, but JSON must not be reserialized as an equality test. Equivalent JSON serializations can have different bytes and define different snapshots. Missing, reordered, transformed, truncated/corrupt data, incorrect declarations, or root revision change fails closed. JAIBA1 remains a distinct historical profile and is never reinterpreted as profile 2. Oversized individual objects are rejected before mutation unless all required records fit measured bounds.",
       "files": ["evals/fixtures/chunk-and-large-object-cases.json"],
       "assertions": [
-        "Requires indexes 0..chunk_count-1, contiguous offsets, explicit terminal page, and verified byte reconstruction.",
+        "Requires indexes 0..chunk_count-1, contiguous offsets, explicit terminal page, and exact recovered bytes equal to the retained profile-2 snapshot.",
         "Treats text transformation, truncation, missing/out-of-order chunks, bad counts/digests, and root revision race as failures.",
-        "Does not assert fictional digest values or infer a universal size limit from a large fixture.",
+        "Does not assert fictional digest values, demand cross-serializer byte equality, or infer a universal size limit from a large fixture.",
+        "Separates profile-2 snapshot checks from profile-1 JAIBA1 material; requires profile boundary agreement before profile-2 interpretation and never falls back to JAIBA1.",
         "Retains the prior live publication on pre-publication failure and never reports a partial object as complete."
       ]
     },
     {
       "id": 3,
+      "execution_class": "static",
       "prompt": "Walk the synthetic catalogue and archive retry fixtures. Report completeness and whether cleanup is permitted in each case; analysis only.",
       "expected_output": "Catalogue completeness requires all linked pages through explicit null, exact declared counts, uniqueness and a stable root re-read. Archive retries reuse the same close ID: identical full payload returns the existing immutable log, different payload conflicts. Partial retirement may retry only unchanged residuals for the same verified archive; new or changed work, unknown save IDs, or an unverifiable log blocks cleanup.",
       "files": ["evals/fixtures/catalogue-and-retirement-cases.json"],
@@ -41,6 +46,7 @@
     },
     {
       "id": 4,
+      "execution_class": "static",
       "prompt": "Use the contract-valid transfer fixture and its structural validator to assess payload and recovery requirements for a hypothetical external-to-external transfer. Do not call Engram or infer live capabilities.",
       "expected_output": "The fixture provides valid full logical objects and computed complete-object fingerprints, but only structural fixture checks. Every real endpoint still needs complete authoritative catalogue/read, target-scoped revisions and receipts; synthetic fixture content is not evidence of Engram conformance.",
       "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"],
@@ -51,6 +57,38 @@
         "Unknown ACK, same-count source change, identical-payload foreign collision, and partial catalogue remain reconciliation/block conditions.",
         "Labels all fixture checks synthetic; no real Engram calls, writes, or conformance certification."
       ]
+    },
+    {
+      "id": 5,
+      "execution_class": "static",
+      "prompt": "Statically inspect the labeled MCP response cases. Extract JAIBA2, Project, and Scope by prefix; do not depend on total line count.",
+      "expected_output": "Both 9-line and 10-line responses pass when exactly one labeled JAIBA2., Project:, and Scope: line matches. Missing or duplicate labels fail. Static fixture checks are not skill execution or operational conformance.",
+      "files": ["evals/fixtures/profile-2-static-cases.json"],
+      "assertions": ["Labels this case static; extracts by prefixes without a line-count precondition.", "Rejects missing and duplicate labels.", "Makes no skill execution or conformance claim."]
+    },
+    {
+      "id": 6,
+      "execution_class": "static",
+      "prompt": "Check profile-2 receipt types and distinguish wire length from truncation metadata.",
+      "expected_output": "elapsed_from_intent_seconds may be decimal; protocol counts/revisions/IDs remain exact integers. Wire length is the JAIBA2 line length, not truncation.original_bytes.",
+      "files": ["evals/fixtures/profile-2-static-cases.json"],
+      "assertions": ["Accepts decimal telemetry without relaxing protocol integer fields.", "Uses retained wire line length rather than truncation.original_bytes.", "Labels this case static."]
+    },
+    {
+      "id": 7,
+      "execution_class": "static",
+      "prompt": "Run local stdlib snapshot checks for preservation and fail-closed corruption/truncation.",
+      "expected_output": "Receipts record exact UTF-8 snapshot/readback length and SHA-256; Unicode, CRLF, unknown fields and relation order are preserved, while truncation/corruption fail closed.",
+      "files": ["evals/fixtures/profile-2-static-cases.json", "evals/fixtures/run_profile2_static.py"],
+      "assertions": ["Uses Python standard library only for byte checks.", "Labels this case static, not skill execution or operational conformance."]
+    },
+    {
+      "id": 8,
+      "execution_class": "static",
+      "prompt": "Check that JAIBA1 is rejected before any profile-2 decoding.",
+      "expected_output": "JAIBA1 remains historical and incompatible; reject on prefix before base64 or JSON decoding. Static check only.",
+      "files": ["evals/fixtures/profile-2-static-cases.json"],
+      "assertions": ["Rejects JAIBA1 without decoding its suffix as JAIBA2.", "Labels this case static."]
     }
   ]
 }
