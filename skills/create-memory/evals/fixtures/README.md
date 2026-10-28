@@ -28,4 +28,18 @@ and retries belong to separately authorized isolated mock-storage exercises.
 These evals have not been executed. JSON/schema and fixture consistency checks
 are structural checks only; they do not simulate tool calls, adapter behavior,
 or certify conformance. Comparative with/without-skill viewing is reserved for
-the separately approved Phase 6 T-027 and is not launched here.
+the separately approved Phase 15 work and is not launched here.
+
+`contrasting-profiles.json` is an additional synthetic, declarative input for
+the factory-decision evals. Its profile claims, schemas, permissions, outcomes,
+identities, byte counts, costs, and interruption states are invented fixture
+conditions—not observed or documented claims about Engram, a filesystem, or
+any product. The fixture is unexecuted and makes no backend calls. Grading is
+intended to inspect the generated representation, cost/recovery plan, profile
+claim states, and reject/adopt decisions against those inputs; matching
+instruction keywords in Markdown is not evidence of a conforming decision.
+
+The separately approved comparative evaluation should use the same
+requirements, tools, and profiles with and without the skill, save complete
+outputs and grading, and include viewer-based human review. No such generation,
+run, grading, or viewer review occurred here. Valid JSON is not conformity.
