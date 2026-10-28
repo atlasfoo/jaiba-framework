@@ -9,6 +9,12 @@ by the host's skill resolution. Consumers resolve that installation and
 this contract before using a surface; they do not choose a second copy
 by backend or silently substitute an incompatible version.
 
+Logical guarantees below are not a storage topology. §11 separates
+physical representation from those guarantees. Read this installation's
+`storage-nature.md` when characterizing a backend or deriving a mapping.
+That procedure is not a second contract, and a profile produced from it
+is not conformance evidence.
+
 ## 1. Version and ownership
 
 The surface's declaration names the contract identifier and supported
@@ -30,7 +36,9 @@ same way; its templates own executive artifact contents. An unavailable
 or ambiguous dependency blocks use; never assume sibling installation
 paths or substitute another copy.
 Backend instructions describe how existing tools realize this contract,
-not a parallel definition of its semantics.
+not a parallel definition of its semantics. How a backend physically
+stores those objects is not defined here. §11 requires a contrasted
+nature profile before a conformant mapping depends on a physical claim.
 
 JAIBA-owned memory is explicitly isolated from ordinary backend memory:
 namespace membership and project/category ownership must be declared,
@@ -153,16 +161,23 @@ are provenance, not valid target revision tokens.
 Before mutation compare the current revision to the pre-read revision;
 after mutation read back and compare the complete intended object,
 including retained unknown fields, and receipt revision. An accepted
-write acknowledgement alone is not verification. Missing readback,
-eventual consistency without a verified final read, or a mismatch leaves
-an unverified outcome; stop dependent writes/cleanup and reconcile by
-exact reads before retrying. A retry must not duplicate a log entry.
+write acknowledgement alone is not verification. A later exact readback
+that matches the intended object verifies that observed result only. It
+does not prove that the write, its metadata, history, index, or side
+effects committed atomically across a crash or an interrupted call.
+Missing readback, eventual consistency without a verified final read, or
+a mismatch leaves an unverified outcome; stop dependent writes/cleanup
+and reconcile by exact reads before retrying. A retry must not duplicate
+a log entry.
 
 Atomic compare-and-swap (CAS) is **optional**. Read/compare/write/read is
 not atomic CAS and must never be described as such. Without CAS, safety
 depends on actual single-writer/serialized access, not optimistic claims
 that a race cannot happen. If that discipline cannot be established,
 block mutation. Native CAS conflicts also block dependent operations.
+Absence of CAS does not authorize a different physical topology, extra
+per-object controls, or a claim of distributed exclusion. §11 keeps
+those distinctions.
 
 ## 5. Required and optional capabilities
 
@@ -194,6 +209,11 @@ lossy normalization. Unknown or unverified limits must be explicit.
 Oversized content requires a declared lossless chunking/reassembly method
 or a `limit-exceeded` error before mutation, never silent truncation,
 summarization or dropping fields. No universal numeric limit is imposed.
+A sample that fit is not a maximum. Name a documented limit, an observed
+sample, and any chosen operating cap separately, each with its unit;
+unknown stays unknown. Chunking and other extra physical controls are
+not a default representation. §11 allows them in a conformant mapping
+only for a demonstrated insufficiency with recoverable enumeration.
 
 ## 6. Authority and concurrent writers
 
@@ -291,3 +311,100 @@ surface availability. This contract reserves the boundary only: no
 mission model, lifecycle, operations, records or implementation is
 defined here. Absent coordination support does not invalidate the
 mandatory memory capabilities.
+
+## 11. Logical contract and physical representation
+
+This section restates the logical/physical boundary already implied by
+§§1–5 and §§7–8. Operation guarantees are unchanged, and the contract
+version remains **1.0.0**. Physical facts belong in a nature profile,
+not in a second copy of this contract and not in one backend's topology
+imposed on every other.
+
+`storage-nature.md` in this installation is the procedure: assertion
+states, dimensions, the finite experiment, the independent residue gate,
+and derivation constraints. Read it before characterizing a backend or
+deriving a mapping. If that procedure is missing or ambiguous, block
+characterization and physical derivation; do not invent a profile or
+borrow one from another installation. Do not read the procedure on every
+logical operation of an already-bound surface, and do not treat a filled
+profile as certification of this contract, of an adapter, or of a product
+trial.
+
+### What must be true before a physical claim is depended on
+
+A conformant mapping may depend on a physical claim only after a
+contrasted profile records that claim with sufficient evidence.
+Documentation, an effective schema, a static inspection, and a probe of
+arguments or permissions do not substitute for that profile. Each
+assertion is one claim, in exactly one state: documented, observed,
+inferred, unknown, or discrepant. A documented statement and an
+observation are separate claims. Inference does not promote itself to
+observed.
+
+Block dependent mapping and conformant generation when a necessary
+guarantee lacks sufficient evidence, or when current documentation and
+observation materially disagree. Keep both sides of a discrepancy. Do
+not choose the convenient source. A diagnosis or an explicitly incomplete
+profile may remain; it must not be labeled a conforming surface.
+
+The factory order is interview and authorized scope, current docs and
+effective schemas, a labeled preliminary hypothesis, the finite native
+experiment, the contrasted profile, derivation, generation, conformance,
+then confirmed installation or activation. Generation does not leapfrog
+the profile. Conformance uses a different scope from the nature
+experiment. Installation and activation remain separate confirmations.
+
+A nature experiment that depends on residual conditions of a historically
+contaminated store stays blocked until the residue gate in
+`storage-nature.md` accepts either a verified retirement under exact
+identifiers and actions, or justified abstention with explicit human
+acceptance of the named residual conditions. Approving this contract is
+not that acceptance. The gate does not require deleting protected
+records, does not authorize reading out-of-scope candidate bodies, and
+does not imply an empty or semantically isolated engine.
+Repository-specific trial identifiers are scope inputs, not part of
+this contract.
+
+### Physical choices this contract does not universalize
+
+- One native unit holds a small object's complete payload and ownership
+  when the profile shows that unit can do so and the result can be
+  verified. A complete catalogue is a separate logical obligation. An
+  adapter-owned index is justified only when native enumeration cannot
+  meet §3. Full-text search never proves absence or completeness.
+- Extra staging, chunks, manifests, or per-object control records need a
+  concrete capability gap, with cost and evidence, and must themselves
+  fit and enumerate without an unbounded stack of further controls.
+  Absence of CAS is not that gap. A passing sample is not a reason to
+  invent a tighter cap so that the gap appears.
+- Payload and index writes that are not atomic need a finite
+  reconciliation that preserves the last guaranteed previous version.
+  Do not describe that pair as one transaction unless the profile
+  observed the atomicity. Do not recover by minting a second logical
+  object.
+- Native history replaces snapshots only when fidelity and retention are
+  both verified. Without native CAS, single-writer checks remain
+  single-writer checks, not distributed exclusion.
+- A multi-object migration journal required by §8 is not removed by
+  simplifying how one object is stored.
+- Semantic suggestions, whether they name the operator's own records or
+  foreign ones, are native effects. They are not integrity locks, not
+  authorization to read or mutate candidates, and not automatic
+  judgments. The host's personal judgment protocol stays independent.
+  Block instead on a checkable mismatch of logical address (namespace,
+  project, category, context when present, logical id), owner, revision,
+  or bytes. Do not adopt a returned identifier that fails those checks.
+- Historical physical encodings and prior trial results are not evidence
+  for a new profile and must not be reinterpreted as the new
+  representation. That includes historical `JAIBA1` and `JAIBA2`
+  encodings where those labels exist. Noting that they exist, as a
+  residue-gate fact, is not a fresh observation of current guarantees.
+- A new incompatible physical structure needs an unambiguous
+  discriminator and version before it is written. An unexercised
+  migration is not a completed one. A protective encoding justified by
+  an observed transform uses standard primitives and must itself be
+  tested; a plaintext observation does not stand in for that test.
+
+Optional coordination remains §10. A profile may record whether that
+boundary was observed. It must not infer support from memory
+availability, and it must not define a mission model.

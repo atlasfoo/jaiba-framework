@@ -32,7 +32,11 @@ catalogues concepts and their existing relative file paths determine the
 physical locators. Include every declared concept and every `log/` entry in
 the inventory, not just objects linked from a curated subset. Preserve each
 complete document, frontmatter, unknown metadata, relations, and original
-representation.
+representation. Where the filesystem and selected tool can store a complete
+object and its ownership in one file, that file is the payload unit; the
+catalogue/index remains an independent logical completeness requirement. Do
+not add per-file journals, chunks, or manifests unless a characterized native
+limit or verification gap requires them.
 
 For legacy brains, map `constitution.md`, `adr-log.md`,
 `reference-index.md`, and each `log/` entry as logical objects without
@@ -124,9 +128,25 @@ These are semantic bindings, not commands or new consumer behavior:
 | `archive` / `clear-work` | First verify the closing entry and frozen, exact executive inventory; re-enumerate and compare unchanged revisions before removing only those objects in that context. The prepare/archive helper realizes scoped filesystem closure, not generic surface or migration conformance. |
 | `export` / `import` | Use the neutral manifest in `interchange.md`; stage into separately selected roots, read back all objects, compare inventory/content/relations and source stability, then require explicit human approval before authority changes. |
 
-File writes are not assumed atomic or serialized. Without an established
-single-writer discipline and full pre/post verification, mutations and
-cleanup are blocked. Filesystem acknowledgment alone is not verification.
+No atomicity, crash durability, serialization, or history behavior is
+asserted here for filesystem operations; those properties depend on the
+selected filesystem, tools, and configuration and remain unknown until
+documented or observed in a contrasted profile. A successful write/readback
+only verifies that read's bytes. Rename or replacement of one file does not
+establish a transaction across payload, index, history, or metadata, nor
+crash durability. A read-revision-write-read sequence is not CAS or
+distributed exclusion. Where the required guarantees are insufficient or
+unknown, block the dependent mutation/cleanup route and reconcile; do not
+generalize that block to unrelated filesystem operations. Mutations and
+cleanup require established single-writer serialized access and full pre/post
+verification; without both, block them regardless of whether filesystem
+atomicity is characterized. Filesystem acknowledgment alone is not
+verification.
+
+Use native history instead of snapshots only when fidelity and retention are
+verified for the required recovery window. Otherwise retain snapshot-based
+recovery. A multi-object migration journal remains required; simplifying a
+single-file payload does not remove it.
 This reference supplies the transfer mapping below, not an executable importer
 or consumer activation. Init's effective migration reference owns orchestration.
 

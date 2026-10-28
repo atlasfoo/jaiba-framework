@@ -1,0 +1,116 @@
+{
+  "fixture_kind": "synthetic_declarative_profiles",
+  "status": "unexecuted",
+  "purpose": "Contrast representations and observable factory decisions; this is not product evidence, a generation, or a conformance run.",
+  "invented_conditions": [
+    "All profile claims, permissions, operation outcomes, sizes, costs, IDs, and interruption states below are synthetic fixture inputs.",
+    "The fixture makes no claim about Engram, any filesystem, or any actual backend guarantee."
+  ],
+  "profiles": [
+    {
+      "id": "native-fit-enumerable",
+      "claims": [
+        {"dimension":"small_payload_and_ownership","state":"observed","evidence":"Synthetic exact readback and publication outcome for one native object; no interruption test."},
+        {"dimension":"complete_catalogue","state":"observed","evidence":"Synthetic completed native enumeration with continuation completion marker."},
+        {"dimension":"maximum_size","state":"unknown","evidence":"No current pertinent limit/unit supplied."},
+        {"dimension":"native_history_fidelity_and_retention","state":"unknown","evidence":"Not tested."},
+        {"dimension":"CAS","state":"documented","evidence":"Synthetic current documentation says CAS unavailable."}
+      ],
+      "permissions": ["native create", "native full read", "native update", "native complete enumeration"],
+      "cost_example": {"shared_records":0,"per_object_records":1,"native_write_calls":1,"verification_read_calls":1,"catalogue_calls":"one completed enumeration traversal when inventory is requested; not included in create","recovery_calls":"unknown; no interruption plan exercised","total_verified_create_calls":"unknown; native write and verification read are listed separately","data_bytes":128,"control_bytes":0,"unit":"synthetic bytes/calls/records"},
+      "expected_decision": "Use one native unit for fitting payload and ownership. No control graph based only on absent CAS. Catalogue is independently satisfied. Unknown maximum remains unknown; do not certify arbitrary large payloads."
+    },
+    {
+      "id": "no-native-enumeration",
+      "claims": [
+        {"dimension":"small_payload_and_ownership","state":"observed","evidence":"Synthetic intact exact readback and publication for the stated small object."},
+        {"dimension":"complete_catalogue","state":"observed","evidence":"Synthetic native enumeration unavailable; search returns candidates only."},
+        {"dimension":"index_publication_atomicity","state":"unknown","evidence":"No joint commit or crash behavior evidence."},
+        {"dimension":"maximum_size","state":"unknown","evidence":"No limit or unit supplied."}
+      ],
+      "permissions": ["native create", "native full read", "native update", "search"],
+      "cost_example": {"shared_records":1,"per_object_records":1,"native_write_calls":2,"native_write_scope":"payload plus index only; excludes verification, catalogue traversal, and recovery","verification_read_calls":"unknown","catalogue_calls":"unknown; search is not a complete catalogue","recovery_calls":"unknown","total_verified_create_calls":"unknown","data_bytes":128,"control_bytes":64,"unit":"synthetic bytes/calls/records; per-operation figures illustrative, not measured"},
+      "expected_decision": "Only a minimal owned index may address missing native enumeration. Account for its shared cost, calls, and bytes; describe non-atomic interruption/reconciliation, preserving the last guaranteed version, or block if that workflow cannot be guaranteed. Search is not the index."
+    },
+    {
+      "id": "filesystem-file-index",
+      "claims": [
+        {"dimension":"native_file_unit","state":"observed","evidence":"Synthetic profile asserts complete small object bytes plus ownership in one file and exact reread."},
+        {"dimension":"native_enumeration","state":"unknown","evidence":"The fixture does not establish whether enumeration is complete."},
+        {"dimension":"file_publication_under_interruption","state":"unknown","evidence":"No interruption evidence supplied."}
+      ],
+      "permissions": ["read file", "write file", "list paths"],
+      "expected_decision": "Represent fitting object as a native file. Do not assume path listing is complete; use minimal owned index only if native enumeration is established unavailable. Unknown publication behavior blocks dependent conforming claims."
+    },
+    {
+      "id": "known-current-size-limit",
+      "claims": [
+        {"dimension":"limit","state":"documented","evidence":"Synthetic current effective schema states 4096 envelope bytes, including metadata."},
+        {"dimension":"measured_specimen","state":"observed","evidence":"Synthetic specimen is measured once at 4100 envelope bytes including metadata."}
+      ],
+      "fragmentation_profile": {
+        "claims": [
+          {"dimension":"chunk_envelope_limit","state":"documented","evidence":"Synthetic current schema: each chunk envelope is limited to 1024 bytes including 32 bytes of per-chunk metadata."},
+          {"dimension":"fragmentation_and_reassembly","state":"observed","evidence":"Synthetic finite specimen exercise asserts ordered chunks carrying logical byte length and digest metadata can be read back, reassembled, and verified against the original full bytes; no digest or chunk bytes are supplied or generated here."},
+          {"dimension":"bounded_controls_and_enumeration","state":"observed","evidence":"Synthetic profile asserts at most five chunk records plus one 128-byte descriptor per logical object, all enumerable in the exact owner scope. The descriptor uses the 4096-byte native record limit; the dedicated chunk operation has its separate documented 1024-byte envelope limit, not an artificial cap."},
+          {"dimension":"recovery","state":"observed","evidence":"Synthetic finite recovery exercise asserts interrupted publication preserves the prior guaranteed version and can reconcile without duplicating logical identity."}
+        ],
+        "required_derivation_inputs": {"logical_object_size":"4100 envelope bytes including metadata, measured once as above","per_chunk_metadata":"32 envelope bytes","maximum_chunk_envelope":"1024 envelope bytes","maximum_chunk_payload":"derive from the above unit and overhead; do not invent payload byte values","ordering":"explicit chunk ordinal and total count","length":"original logical byte length recorded and checked","digest":"digest field/check required; no digest or value generated by this fixture","verification":"full reassembly and exact full-byte comparison against original required","controls":"bounded descriptor and max five chunk records per object; enumerate all controls","synthetic_operation_costs":{"native_chunk_and_descriptor_write_calls":6,"verification_read_calls":6,"catalogue_traversal_calls":"one complete scoped traversal per inventory; not included in per-object write/read calls","finite_recovery_calls":"at most 3 calls per reconciliation; preserves prior version; synthetic bound, not a backend claim","total_publication_calls":"unknown because publication and verification boundaries are not claimed atomic"},"recovery":"finite reconciliation preserving prior guaranteed version; no second logical object"},
+        "expected_decision": "Derive lossless fragmentation only if every synthetic sufficient guarantee supports it and account for per-chunk and descriptor records/calls/data/control bytes, verification, enumeration, and recovery. If chunk fitting, ordering/length/digest verification, bounded controls/enumeration, or finite recovery is unsupported or unknown, reject the fragmented mapping as unsupported; do not invent missing guarantees."
+      },
+      "expected_decision": "The supplied specimen exceeds the pertinent current known envelope limit by its stated unit. This justifies considering fragmentation only under the separately supplied sufficient synthetic fragmentation profile; do not generalize beyond measured evidence or the documented envelope limit."
+    },
+    {
+      "id": "unknown-size-limit",
+      "claims": [
+        {"dimension":"limit","state":"unknown","evidence":"No current limit or size unit supplied."},
+        {"dimension":"sample","state":"observed","evidence":"Synthetic 128-byte sample fits; this is one sample, not a maximum."}
+      ],
+      "expected_decision": "Do not label another object oversized, invent a maximum, impose an artificial cap, or certify large-object capability."
+    },
+    {
+      "id": "discrepant-doc-schema-observation-permission",
+      "claims": [
+        {"dimension":"publication","state":"documented","evidence":"Synthetic current docs claim intact publish."},
+        {"dimension":"publication","state":"discrepant","evidence":"Synthetic observation records changed bytes after publication; retain both sides."},
+        {"dimension":"revision","state":"discrepant","evidence":"Synthetic effective schema describes revision coverage differently from current docs."},
+        {"dimension":"required_operation","state":"unknown","evidence":"Granted permission omits the necessary verified update operation."}
+      ],
+      "permissions": ["read", "create"],
+      "expected_decision": "Retain discrepancies and missing permission; diagnose/incomplete profile is allowed, conforming generation depending on these guarantees is blocked."
+    },
+    {
+      "id": "dedupe-and-suggestion-outcomes",
+      "cases": [
+        {"id":"own-suggestion-all-checks-match","dedupe_kind":"key","returned_address":"same logical address","owner":"same owner","revision":"same revision","bytes":"exact match","suggestions":["own-record"],"expected":"proceed according to operation; own suggestion alone does not block"},
+        {"id":"foreign-suggestion-all-checks-match","dedupe_kind":"content","returned_address":"same logical address","owner":"same owner","revision":"same revision","bytes":"exact match","suggestions":["foreign-record"],"expected":"proceed according to operation; foreign suggestion alone does not block"},
+        {"id":"content-dedupe-different-logical-id","dedupe_kind":"content","returned_address":"different logical id","owner":"same owner","revision":"same revision","bytes":"exact match","suggestions":[],"expected":"block adoption/publication; do not mint a second logical object or inspect candidate body"},
+        {"id":"key-dedupe-wrong-owner-revision-bytes","dedupe_kind":"key","returned_address":"same logical address","owner":"different owner","revision":"different revision","bytes":"mismatch","suggestions":[],"expected":"block; never blindly adopt"}
+      ],
+      "expected_decision": "Assess key and content dedupe separately. Suggestions, own or foreign, alone neither block nor authorize candidate reads/mutations or judgments. Actual address, owner, revision, or byte mismatch blocks."
+    },
+    {
+      "id": "catalog-transform-interruption-history",
+      "catalogue_cases": [
+        {"id":"complete","pages":2,"completion_marker":true,"permission_denied":false,"expected":"complete only after completion marker"},
+        {"id":"truncated","pages":1,"completion_marker":false,"permission_denied":false,"expected":"incomplete, not empty or complete"},
+        {"id":"permission-denied","pages":0,"completion_marker":false,"permission_denied":true,"expected":"blocked, not empty"}
+      ],
+      "readback_cases": [
+        {"id":"exact","expected_bytes":"specimen","returned_bytes":"specimen","expected":"intact for this read only"},
+        {"id":"normalized","expected_bytes":"CRLF+Unicode specimen","returned_bytes":"LF+Unicode specimen","expected":"transform detected; not intact"},
+        {"id":"truncated","expected_bytes":"full specimen","returned_bytes":"prefix only","expected":"truncation; not intact"}
+      ],
+      "interruption": {"payload_write":"completed","index_write":"interrupted","atomicity":"unknown","previous_version":"v1 guaranteed","retry_identity":"same logical address and stable operation identity","expected":"finite reconciliation; preserve v1 until new object/index consistency verified; do not create a second logical object"},
+      "history": {"fidelity":"unknown","retention":"unknown","expected":"retain snapshot recovery; single-writer is not CAS; preserve multi-object migration journal"},
+      "expected_decision": "Require complete catalogue evidence and exact bytes. Treat payload/index as non-atomic unless observed. Name records, calls, data/control bytes or mark unknown. History cannot replace snapshots without observed fidelity and retention."
+    }
+  ],
+  "authorization_boundaries": {
+    "backend_calls": false,
+    "candidate_body_reads_or_mutations": false,
+    "automatic_judgments": false,
+    "retirement": "Requires exact-ID/action approval. Explicitly accepted abstention is an alternate residue-gate outcome and authorizes no cleanup or retirement; generic continuation is insufficient.",
+    "personal_host_judgment_protocol": "Independent and not invoked by this fixture."
+  }
+}
