@@ -272,8 +272,8 @@ when a probe, catalogue, read or mutation fails. Distinguish unavailable tools
 or backend, permission denial, incomplete data, unsupported capability and
 unknown mutation outcome from authoritative absence. None authorizes init of
 an empty brain, a new context, a lower-priority adapter or a local `.ai/` cache.
-Draft/unverified adapters (including `jaiba-engram-memory`) remain unselectable
-until required operational conformance is established; an outage is no waiver.
+Draft/unverified adapters remain unselectable until required operational
+conformance is established; an outage is no waiver.
 
 Offer the human **retry the selected source after restoration**, **stop and
 retain pending work**, or **explicitly request fallback/recovery**. Retry means

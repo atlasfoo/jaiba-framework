@@ -165,7 +165,7 @@ At the framework's current source-development stage, JAIBA gains a memory-surfac
 | Skill | Status | What it is |
 |---|---|---|
 | `create-memory` | **Core** — installed with the workflow/meta skillset | The memory-surface **generator**: it builds a memory-surface skill for a user-selected backend from the canonical `jaiba-memory-surface` contract **1.0.0** — and ships that canonical contract plus its `resolution.md` and `filesystem-surface.md`, which `jaiba-configure`, `jaiba-init` and `jaiba-doctor` resolve surface semantics from. Requires only `git`: no MCP tool, no backend service, no automatic installation, and no change to any consumer or binding. |
-| `jaiba-engram-memory` | **Optional** — deliberately kept out of the core skillset | The first-party **Engram adapter** (Engram MCP). Its own operations require `mcp:engram`, which affects only this adapter. Conformance is currently **draft/unverified** (one isolated direct exercise): it is not selectable as a conforming mutable surface until its evidence passes, and that status says nothing about the rest of the framework. |
+| `jaiba-engram-memory` | **Optional** — deliberately kept out of the core skillset | The first-party **Engram adapter** (Engram MCP). Its own operations require `mcp:engram`, which affects only this adapter. Conformance is **verified on finite trial evidence** (T-086/T-087); selecting it is strictly opt-in and requires an explicit binding, and installing it changes no consumer or active binding. |
 
 ### Installing the optional adapter
 
@@ -474,7 +474,7 @@ The framework health check — a pre-flight before entering the conduct chain. *
 
 ### 🧩 `jaiba-engram-memory` — optional Engram adapter
 
-The first-party memory-surface adapter for the Engram MCP — developed in the same source stage but **outside** the core skillset: `jaiba-configure` offers it after core setup as a separate, explicitly chosen install pinned to the packaged release — reported unavailable if absent at that pin, never fetched unpinned ([Memory surfaces](#memory-surfaces-phase-3-status)). It declares `category: memory-surface-draft` with **unverified conformance** and a `mcp:engram` requirement scoped to itself alone; it is not selectable as a conforming mutable surface until its evidence passes, and installing it changes no consumer, binding or workflow. Consult it only when explicitly reviewing, validating or operating the selected surface.
+The first-party memory-surface adapter for the Engram MCP — developed in the same source stage but **outside** the core skillset: `jaiba-configure` offers it after core setup as a separate, explicitly chosen install pinned to the packaged release — reported unavailable if absent at that pin, never fetched unpinned ([Memory surfaces](#memory-surfaces-phase-3-status)). It declares `category: memory-surface` with **verified conformance** (on bounded trial evidence) and a `mcp:engram` requirement scoped to itself alone; selecting or operating it requires explicit configuration, and installing it changes no consumer, binding or workflow. Consult it only when explicitly reviewing, validating or operating the selected surface.
 
 ---
 

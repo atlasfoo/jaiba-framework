@@ -1,9 +1,9 @@
 # Inactive Engram routing example
 
 Illustrative identifiers/locators only; **not an activated binding**, live
-project, backend schema or conformance evidence. Resolve the effective
-`create-memory` contract/resolution before completing any value. This draft
-adapter is not selectable as a certified mutable surface.
+project, backend schema or conformance evidence. Copying this template activates
+nothing. Resolve the effective `create-memory` contract/resolution before
+completing any value; selecting this adapter requires explicit host binding.
 
 ```yaml
 binding-format-version: "1"

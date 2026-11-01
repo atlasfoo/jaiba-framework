@@ -4,8 +4,10 @@ Maps the logical surface (`jaiba-memory-surface` **1.0.0**) onto Engram's
 existing MCP tools. Physical bytes, keys, verified reads and write order are in
 [storage integrity](storage-integrity.md); profile facts in
 [storage nature](storage-nature.md). This file is the tool mapping and the
-per-operation recipes. Package status: `memory-surface-draft`, conformance
-`unverified` until `T-088`.
+per-operation recipes. Package status: `memory-surface`, conformance verified on
+finite trial evidence (phase15r trial `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`,
+`profiles/` for T-086 and `e2e/` for T-087, outside this repository). This is not a claim of universal conformance across
+all hosts or production scopes.
 
 ## Contents
 

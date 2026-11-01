@@ -23,10 +23,10 @@ resolve by sibling paths, a source checkout or another host's installation.
   not itself an adapter. Record malformed declarations as findings.
 - Report `memory-surface-draft` separately: a package is selectable only
   when `category: memory-surface`. `memory-surface-draft` is not a
-  conforming selectable mutable adapter. The current first-party Engram
-  package is `memory-surface-draft` / unverified. Isolated historical
-  evidence does not certify general mutable use, other hosts or production
-  scopes.
+  conforming selectable mutable adapter. The first-party Engram package
+  `jaiba-engram-memory` is `memory-surface` with verified conformance on
+  finite trial evidence (T-086/T-087); bounded trial evidence does not certify
+  other hosts or production scopes.
 - Report exact ID/version, effective local/global path, host visibility,
   contract compatibility, required tools/permissions and verification limits.
   Check this agent's actual callable schemas and authorized non-destructive
