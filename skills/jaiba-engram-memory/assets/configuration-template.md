@@ -18,13 +18,13 @@ surface:
   adapter-version: "3.2.0"
   installation-locator: "<effective-host-visible-installation>"
   confirmed-candidate-ids: []
-  namespace: "jaiba-memory/v1/<allocated-exclusive-token>/"
-  registry-locator: "<human-verified-root-observation-id>"
+  storage-profile: "jaiba-engram-storage/3"
+  namespace: "jaiba/v3/<ns16>/"
+  catalogue-locator: "<human-verified-catalogue-observation-id>"
 backend:
   project: "<existing-authorized-Engram-project>"
   scope: project
-  registry-id: "<verified-stable-registry-id>"
-  root-record-key: "<verified-envelope-key-bound-to-root-locator>"
+  catalogue-topic-key: "jaiba/v3/<ns16>/cat/<proj_sha24>"
 project:
   project-id: "<stable-JAIBA-project-id-not-backend-project-label>"
   identity:
@@ -33,7 +33,7 @@ project:
     path: "Group/App"
 executive:
   context-id: "<confirmed-stable-context-for-this-work-root>"
-  context-locator: "<verified-exact-registry-context-locator>"
+  context-locator: "<context-id-verified-in-catalogue>"
 ```
 
 For local remotes or root fallback, use the canonical `local-remote`,
@@ -46,26 +46,17 @@ or a committed project file. Only IDs, sanitized locators and versions belong
 there: no catalogue dumps, bodies, summaries, receipts, raw tool results,
 passwords or tokens. Authentication stays in the existing host mechanism.
 
-Recompute selection precedence and verify origin, ownership and exact root
-before reuse. The root locator requires a full physical-owner/envelope check;
+Recompute selection precedence and verify origin and ownership before reuse.
+The catalogue locator requires a full `Project:`/`Scope:` and digest check;
 numeric ID lookup is not project-filtered. Search may suggest human-verified
-candidates but cannot prove root absence or allocate a namespace. An unknown
-backend project is not registered by this adapter.
-
-Physical Project/Scope must be returned and checked independently of content.
-Historical read 24 omitted native topic_key; the T-009 owned-record profile
-exposed server-rendered Topic and checked it against the expected key. Require
-that check whenever the established profile exposes Topic; unexpected omission
-or mismatch blocks use. For a verified Topic-omitting profile, the bound root
-key remains envelope identity, not proof of a native key read. Both profiles
-require physical Project/Scope and the trusted locator chain. Submitted
-UUID-exclusive keys remain routing evidence; logical lookup uses the catalogue's
-exact IDs, never a topic upsert or fuzzy search. Trial IDs are not defaults.
+candidates but cannot prove catalogue absence or allocate a namespace. An
+unknown backend project is not registered by this adapter. Logical lookup uses
+the catalogue's exact IDs, never a topic upsert or fuzzy search. Trial IDs are
+not defaults.
 
 Read back any authorized routing write before claiming persistence. If machine
 configuration is unavailable, obtain explicit consent for the same validated
 session-only binding or stop. Do not claim it was saved, mint a fresh context
 on retry or create an `.ai/` cache. Existing memory still requires authority
 resolution and any migration/activation approval. Branch/session changes alone
-do not change the context; another root requires explicit resume/handoff or a
-confirmed independent context. `.atl/tool-layout.md` remains local.
+do not change the context. `.atl/tool-layout.md` remains local.

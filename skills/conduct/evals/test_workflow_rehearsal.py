@@ -1,7 +1,8 @@
 """Structural/action assertions on immutable historical turns + fixed-decision replay.
 
-Requires /usr/bin/python3 with PyYAML (no install performed). Does not call an
-LLM, spawn children, contact a backend, or claim adapter/model conformance.
+Requires /usr/bin/python3 only (stdlib; `json` parses the fenced
+JSON-compatible blocks). Does not call an LLM, spawn children, contact a
+backend, or claim adapter/model conformance.
 """
 import copy
 import hashlib
@@ -13,7 +14,6 @@ import tempfile
 import unittest
 
 sys.dont_write_bytecode = True
-import yaml
 
 from capture_rehearsal import FIXTURES, load
 from surface_rehearsal import Session, ROOT, PARENT, address, digest
@@ -33,7 +33,18 @@ def segment(events, phase):
 
 
 def frontmatter(content):
-    return yaml.safe_load(content.split('---\n', 2)[1])
+    """Minimal flat `key: value` frontmatter reader (no external YAML dependency)."""
+    out = {}
+    for line in content.split('---\n', 2)[1].splitlines():
+        if ':' in line and not line.startswith((' ', '#')):
+            key, _, value = line.partition(':')
+            out[key.strip()] = value.strip().strip('\'"')
+    return out
+
+
+def yaml_json_block(content):
+    """Fenced yaml block emitted as JSON (valid YAML); parsed with json."""
+    return json.loads(re.search(r'```yaml\n(.*?)\n```', content, re.S)[1])
 
 
 class HistoricalCapturedRehearsal(unittest.TestCase):
@@ -46,10 +57,11 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
     def test_historical_source_profile_has_only_exact_reviewed_drift(self):
         manifest = json.loads((FIXTURES / 'reviewed-source-drift.json').read_text())
         provenance = {
-            'skills/create-memory/references/filesystem-surface.md': 'T-023',
+            'skills/create-memory/references/filesystem-surface.md': 'T-083',
             'skills/create-memory/references/resolution.md': 'T-024',
             'skills/conduct/references/execute-mode.md': 'T-024',
             'skills/conduct/references/summarize-mode.md': 'T-024',
+            'skills/create-memory/references/memory-surface-contract.md': 'T-083',
         }
         self.assertIn('predate T-023 and T-024', manifest['review_scope'])
         self.assertNotIn('T-033 is the provenance', manifest['review_scope'])
@@ -138,7 +150,7 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
                 fm = frontmatter(o['content'])
                 self.assertEqual(fm['type'], o['type'])
                 if o['type'] == 'prd':
-                    criteria = yaml.safe_load(re.search(r'```yaml\n(.*?)\n```', o['content'], re.S)[1])['criteria']
+                    criteria = yaml_json_block(o['content'])['criteria']
                     self.assertEqual([c['id'] for c in criteria], ['GREET-001'])
                     self.assertTrue(criteria[0]['happy'] and criteria[0]['sad'])
                     self.assertEqual(set(criteria[0]['happy'][0]), {'given', 'when', 'then'})

@@ -28,6 +28,26 @@ Conduct hands you exactly three things:
 If any of the three is missing, say so and stop — don't guess the
 task's boundaries.
 
+## Memory access boundary
+
+The envelope is sufficient task context, not proof of a full object read.
+No backend access is required when supplied excerpts suffice; report it as
+not required, not verified. Ask conduct for a scoped follow-up if context
+is missing or revisions conflict. If direct reads are authorized, use the
+canonical contract/resolution references from the effective `create-memory`
+installation resolved through the host, and first assess your own exposed
+tool schemas, non-destructive probes and permissions in the supplied scope.
+Parent MCP tools/probes and ATL inventory do not prove inherited access.
+Read exact owned addresses fully, including metadata/relations/revisions;
+consume pagination/chunks to explicit completion. Search/summary/truncation
+is not a read or absence evidence. Report access failures for conduct's
+per-task fallback; never choose another backend/project/context or create
+probe records. Host bookkeeping is separate, not JAIBA adapter evidence.
+
+Only on a selected filesystem surface do `.ai/` paths and bundle/legacy
+dual resolution apply: both entry layouts present means ambiguous;
+neither present means uninstrumented. External memory needs no `.ai/` cache.
+
 ## Rules
 
 - **Implement the task, the whole task, and nothing but the task.**

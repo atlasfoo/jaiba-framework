@@ -19,17 +19,39 @@ it, or contradict it.
 
 1. **The requirement** — as landed so far (it may still be rough; say
    so where roughness blocks a judgment).
-2. **The project root** — where `.ai/memory/` lives. If
-   `.ai/memory/` is missing or holds bare `[bracket]` templates,
-   report exactly that and stop: there is no memory to contrast
-   against, and inventing one is worse than none.
+2. **The project root and selected surface** — conduct identifies the
+   work root and whether the selected surface is filesystem or external.
+   **Filesystem only:** a missing `.ai/memory/` means that filesystem
+   brain is uninstrumented; bare `[bracket]` templates are empty
+   templates, not facts. Report that and stop rather than inventing
+   memory. External mode needs no `.ai/` and must not be treated as an
+   empty or missing brain merely because those paths are absent.
+
+## Own-access preflight
+
+Use the canonical contract and resolution references from the effective
+`create-memory` installation (resolved through the host), as identified by
+conduct. Inspect your own exposed tool schemas and permissions; parent
+MCP tools, parent probes and ATL entries do not establish your access.
+For external sources, use non-destructive scoped catalogue/read probes,
+consume complete pagination and read every assigned JAIBA-owned reference
+in full (content, metadata, relations and revision evidence). Deterministic
+chunks must reach their explicit end; summaries/search hits are not reads.
+Discover additional concepts only within the assigned scope. Report an
+unavailable tool, denied permission, partial/truncated read or revision
+conflict with its operation/address; stop the affected analysis and return
+the blocker for conduct's per-role fallback. Never silently use filesystem,
+another project/context, or ordinary host memory instead. Do not mutate
+backend data or create probe records. Host bookkeeping is not adapter evidence.
 
 ## What to contrast
 
-Resolve the layout first (`index.md` present → concept bundle;
-`constitution.md` with no `index.md` → legacy flat — see
-`jaiba-contract.md` §1), then read, in order, and check the
-requirement against each:
+**Filesystem only:** resolve the layout first (`index.md` present →
+concept bundle; `constitution.md` with no `index.md` → legacy flat —
+see `jaiba-contract.md` §1). Both present means ambiguous; neither
+present means uninstrumented. External mode needs no `.ai/` and is
+not read through these paths. Then read the resolved constitutive
+sources, in order, and check the requirement against each:
 
 - **Identity concepts** (`project`, `architecture`, `purpose`,
   `scope`, `sub-unit`, `quality-gate` — or `constitution.md` in the
@@ -46,7 +68,7 @@ requirement against each:
   contracts does the requirement touch? Does it imply an integration
   that is **not** indexed (flag as `NEW — to be added`, for
   `jaiba-init:update-brain`)?
-- **Recent `.ai/memory/log/` entries** — was something like this
+- **Recent constitutive log entries** (filesystem: `.ai/memory/log/`) — was something like this
   tried, delivered, or explicitly rejected before? Cite the entry.
 
 ## Output contract

@@ -5,7 +5,9 @@
       "id": 1,
       "prompt": "Make a memory adapter for the selected team's store using only the callable tools I provide. The tool catalogue includes exact project/context listing, full reads with revisions, guarded create/update, immutable append with idempotency, archive/clear receipts, complete export/import and readback. Ask me to confirm the namespace, host, output location, and whether I want a draft or installation before making changes. Use only the synthetic schemas in the supplied fixture; do not contact or mutate any real backend.",
       "expected_output": "A metadata-safe inactive adapter package specification based on the discovered schemas, with no invented tools, real installation, or backend access. It reports capabilities as unverified because the schemas are synthetic and no real isolated roundtrip was run.",
-      "files": ["evals/fixtures/tools-sufficient.json"],
+      "files": [
+        "evals/fixtures/tools-sufficient.json"
+      ],
       "assertions": [
         "The output distinguishes synthetic schema inspection from successful live tool calls and does not certify conformance.",
         "The proposed inactive configuration contains routing identifiers only and no payloads, credentials, or raw credential-bearing endpoints.",
@@ -17,7 +19,9 @@
       "id": 2,
       "prompt": "Our MCP tools only offer search and save. Can you certify an adapter using them? Use the provided tool inventory; don't assume other tools exist.",
       "expected_output": "A refusal to certify a mutable adapter: identifies missing exact catalogue/full reads, revision-safe create/update and readback, immutable log/closure, and portability capabilities; search/save are not substitutes. No fallback, fake tool, backend write, or install.",
-      "files": ["evals/fixtures/tools-insufficient.json"],
+      "files": [
+        "evals/fixtures/tools-insufficient.json"
+      ],
       "assertions": [
         "The output marks the adapter nonconforming or blocked and does not certify it.",
         "Search is not treated as authoritative catalogue, absence, or uniqueness evidence.",
@@ -29,7 +33,9 @@
       "id": 3,
       "prompt": "Using the selection-state fixture, tell me exactly which memory surface is selected in each scenario and which cases must stop for a human decision. Do not activate anything or move data.",
       "expected_output": "Scenario-by-scenario selection matching the declared precedence, same-ID collapse/local win, exact-ID override, explicit choice for different IDs at the winning level, and fail-closed behavior for ambiguous overrides, unavailable selections and failed prior bindings. No fallback is treated as recovery from a selected adapter failure.",
-      "files": ["evals/fixtures/selection-cases.json"],
+      "files": [
+        "evals/fixtures/selection-cases.json"
+      ],
       "assertions": [
         "The local same-ID copy wins over a newer global copy.",
         "Different IDs at the winning level and conflicting overrides are surfaced as ambiguous rather than sorted or selected by readiness.",
@@ -41,7 +47,9 @@
       "id": 4,
       "prompt": "From the origin and work-root fixtures, identify equivalent and distinct project identities, and state the context behavior for two branches, two roots, and an explicit resume. Do this as analysis only; never read network origins or change bindings.",
       "expected_output": "Sanitized SSH/HTTPS forms of the same host/path compare equal; DNS host case and transport syntax normalize, while path case and different hosts remain distinct. Missing origin uses a root-based nonportable fallback; malformed/changed/moved origin requires clarification. Context IDs are stable per work root across branches; another root gets an independent context unless the human explicitly selects a context and establishes writer handoff.",
-      "files": ["evals/fixtures/identity-cases.json"],
+      "files": [
+        "evals/fixtures/identity-cases.json"
+      ],
       "assertions": [
         "The SSH and HTTPS same-repository cases normalize to the same sanitized identity without retaining credentials or raw URLs.",
         "Different hosts and path-case variants are kept distinct.",
@@ -53,7 +61,11 @@
       "id": 5,
       "prompt": "Inventory the two synthetic .ai/memory fixtures as filesystem surfaces. Report layout, explicit ambiguity/no-brain outcomes, and what must remain byte-for-byte or logically preserved. No migration or write is authorized.",
       "expected_output": "The bundle fixture resolves via index and includes all indexed files plus every log entry; the legacy fixture is supported without inventing frontmatter, preserving raw documents and unknown sections. Dual markers are ambiguous; neither marker is no resolved brain. Full content, unknown metadata and relation representations are retained; no migration is performed.",
-      "files": ["evals/fixtures/layout-bundle.json", "evals/fixtures/layout-legacy.json", "evals/fixtures/layout-boundaries.json"],
+      "files": [
+        "evals/fixtures/layout-bundle.json",
+        "evals/fixtures/layout-legacy.json",
+        "evals/fixtures/layout-boundaries.json"
+      ],
       "assertions": [
         "Every bundle inventory entry, including the unlinked log entry, is included with its full payload, unknown metadata, and relation data.",
         "Legacy raw documents, including absent frontmatter and unknown sections, are preserved without coercion or splitting into duplicate writable objects.",
@@ -65,7 +77,9 @@
       "id": 6,
       "prompt": "Use the scope fixture to classify records, contexts, coordination, and failure results. Show which records are JAIBA-owned and which operations must stop. Do not write or clear anything.",
       "expected_output": "Only exact namespace/project/category/context addresses are owned; title/tag similarity does not adopt ordinary memory. Executive contexts remain isolated. Optional coordination is separate and needs a consumer-supplied coordination-id; lack of coordination support is not a memory failure and no lifecycle is invented. Partial, permission-denied, unavailable, or truncated results are not absence and block dependent operations.",
-      "files": ["evals/fixtures/scope-cases.json"],
+      "files": [
+        "evals/fixtures/scope-cases.json"
+      ],
       "assertions": [
         "The ordinary backend record is excluded despite matching title/tags, and the exact JAIBA address is included.",
         "Executive records from another context are excluded from the selected context inventory.",
@@ -77,7 +91,10 @@
       "id": 7,
       "prompt": "Inspect the valid synthetic transfer-recovery fixture and run its structure validator. Confirm address categories/types/contexts, relation preservation, immutable history, raw legacy mapping, revisions, and failure expectations. Do not perform transfer or claim adapter conformance.",
       "expected_output": "The fixture has complete schema-shaped payloads and closed contract addresses; the validator computes complete-object fingerprints and checks internal relations and representation constraints. It clearly distinguishes fixture validation from transfer execution and backend conformance.",
-      "files": ["fixtures/transfer-recovery-cases.json", "fixtures/run_transfer_recovery.py"],
+      "files": [
+        "fixtures/transfer-recovery-cases.json",
+        "fixtures/run_transfer_recovery.py"
+      ],
       "assertions": [
         "Constitutive and executive addresses use valid categories, context rules, and exact type vocabularies.",
         "Internal relation targets resolve and unknown relation metadata is retained; unresolved external links are reported, not adopted.",
@@ -90,50 +107,121 @@
       "id": 8,
       "prompt": "Compare the two synthetic native profiles and propose the smallest defensible physical mapping for each. Grade the actual representation, catalogue plan, writes, and recovery costs; do not repeat procedure wording as proof.",
       "expected_output": "Use one native unit for the fitting, verifiable small object; reject per-object graph controls justified only by absent CAS or an invented cap. For the profile with no complete native enumeration, propose only a minimal owned index and describe its independent cost and finite interruption reconciliation. Unknown necessary guarantees block conforming mapping.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["Small payload plus ownership is one native unit when intact verification/publication is evidenced; no unjustified root/journal/chunk/descriptor/manifest/allocation is proposed.", "Catalogue completeness is assessed independently; full-text search is not enumeration, and an owned index appears only for the profile lacking native enumeration.", "Shared and per-object records, native write calls, verification reads, catalogue traversal, recovery calls, data bytes and control bytes are separately accounted for or explicitly unknown; non-atomic interruption reconciles to the last guaranteed version without minting another object.", "Absent CAS and a sample that fits do not create an artificial limit or justify controls."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "Small payload plus ownership is one native unit when intact verification/publication is evidenced; no unjustified root/journal/chunk/descriptor/manifest/allocation is proposed.",
+        "Catalogue completeness is assessed independently; full-text search is not enumeration, and an owned index appears only for the profile lacking native enumeration.",
+        "Shared and per-object records, native write calls, verification reads, catalogue traversal, recovery calls, data bytes and control bytes are separately accounted for or explicitly unknown; non-atomic interruption reconciles to the last guaranteed version without minting another object.",
+        "Absent CAS and a sample that fits do not create an artificial limit or justify controls."
+      ]
     },
     {
       "id": 9,
       "prompt": "Choose a filesystem representation from the synthetic filesystem profile. Show the actual native files and index strategy, ownership, catalogue behavior, and costs. Do not make a proposal conforming where required guarantees are unknown.",
       "expected_output": "A native file plus minimal index only if native enumeration is unavailable; exact ownership and full-object readback are represented. Search is not completeness. Unknown necessary publication or enumeration facts keep the profile incomplete rather than being filled by assumptions.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["The proposed filesystem objects and ownership are explicit, and the payload stays in a native fitting file rather than an unnecessary control-record graph.", "Index records/calls/bytes are itemized and only used where native enumeration is unavailable; search absence is not empty-catalogue evidence.", "Unknown claims remain unknown and block dependent conforming mapping."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "The proposed filesystem objects and ownership are explicit, and the payload stays in a native fitting file rather than an unnecessary control-record graph.",
+        "Index records/calls/bytes are itemized and only used where native enumeration is unavailable; search absence is not empty-catalogue evidence.",
+        "Unknown claims remain unknown and block dependent conforming mapping."
+      ]
     },
     {
       "id": 10,
       "prompt": "Assess the known-current-size-limit and unknown-size-limit profiles. For the known excess, derive a reversible representation and operation plan from the supplied fragmentation profile, including chunk/control sizes, ordering, verification, enumeration, costs and recovery. Reject unsupported guarantees. For the unknown limit, state what remains unknown without inventing an oversized case or maximum.",
       "expected_output": "Only the profile with a pertinent current known limit and matching unit supports a one-time measured comparison. For the known excess, derive lossless fragmentation only from the sufficient synthetic profile, accounting for per-chunk/control overhead, exact-unit fit, ordering, length, digest, full-byte reassembly verification, bounded enumerable controls, and finite recovery. If any necessary guarantee is unsupported, reject fragmentation. Unknown limits remain unknown: no invented maximum, oversized classification, or certification of large-object capability.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["The known-limit case compares a single measured specimen in the limit's exact unit, including relevant overhead, and derives fragmentation only from sufficient evidence.", "Fragmentation accounts for each chunk's metadata overhead and exact envelope fit; records ordering, total count/length, and digest checks; requires full-byte reassembly verification; bounds and enumerates controls; and gives finite recovery preserving the previous version.", "If any necessary fragmentation/reconstruction guarantee is unknown or unsupported, output rejects the mapping as unsupported rather than inventing a value or claiming conformance.", "The unknown-limit case does not invent a maximum, call the object oversized, or treat omission as capability evidence.", "A fitting sample is not a maximum and does not justify an artificial operating cap; no generated bytes, chunks, or digest values are required."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "The known-limit case compares a single measured specimen in the limit's exact unit, including relevant overhead, and derives fragmentation only from sufficient evidence.",
+        "Fragmentation accounts for each chunk's metadata overhead and exact envelope fit; records ordering, total count/length, and digest checks; requires full-byte reassembly verification; bounds and enumerates controls; and gives finite recovery preserving the previous version.",
+        "If any necessary fragmentation/reconstruction guarantee is unknown or unsupported, output rejects the mapping as unsupported rather than inventing a value or claiming conformance.",
+        "The unknown-limit case does not invent a maximum, call the object oversized, or treat omission as capability evidence.",
+        "A fitting sample is not a maximum and does not justify an artificial operating cap; no generated bytes, chunks, or digest values are required."
+      ]
     },
     {
       "id": 11,
       "prompt": "The synthetic current documentation, effective schema, and observed specimen disagree about publication and revision behavior, and the granted permissions omit a necessary operation. Prepare the profile and generation decision.",
       "expected_output": "Keep each documented, observed, inferred, unknown, or discrepant claim distinct; preserve both sides of disagreement and name missing permission. Block only dependent conforming generation, allowing a diagnosis or explicitly incomplete profile.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["Documentation/schema/observation contradiction is represented as discrepant, not resolved by choosing one source.", "A missing necessary permission is not silently assumed or replaced with an invented tool.", "No conforming mapping is generated from a necessary insufficient/discrepant claim; diagnosis/incomplete profile remains acceptable.", "The current-host procedure reference is re-resolved separately from historical provenance and never self-links to the generated profile or hardcodes a machine path."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "Documentation/schema/observation contradiction is represented as discrepant, not resolved by choosing one source.",
+        "A missing necessary permission is not silently assumed or replaced with an invented tool.",
+        "No conforming mapping is generated from a necessary insufficient/discrepant claim; diagnosis/incomplete profile remains acceptable.",
+        "The current-host procedure reference is re-resolved separately from historical provenance and never self-links to the generated profile or hardcodes a machine path."
+      ]
     },
     {
       "id": 12,
       "prompt": "Evaluate all four named dedupe outcomes in the fixture: own-suggestion-all-checks-match, foreign-suggestion-all-checks-match, content-dedupe-different-logical-id, and key-dedupe-wrong-owner-revision-bytes. State whether publication may proceed and what identity checks or recovery are appropriate; do not read candidate bodies or adopt returned IDs blindly.",
       "expected_output": "Same-key/content dedupe is distinguished. Matching logical address, owner, revision, and bytes can be accepted according to the declared operation; a different logical ID/address or mismatching owner/revision/bytes blocks adoption and publication. No second logical object is minted to hide collision.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["Key dedupe and content dedupe are assessed as separate observations.", "Identity is checked across namespace, project, category, context when present, logical ID, owner, revision, and bytes before adoption.", "A logical collision or identity/content mismatch blocks rather than blindly adopting, overwriting, or creating a second object.", "No candidate body read or mutation is proposed."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "Key dedupe and content dedupe are assessed as separate observations.",
+        "Identity is checked across namespace, project, category, context when present, logical ID, owner, revision, and bytes before adoption.",
+        "A logical collision or identity/content mismatch blocks rather than blindly adopting, overwriting, or creating a second object.",
+        "No candidate body read or mutation is proposed."
+      ]
     },
     {
       "id": 13,
       "prompt": "Compare own-suggestion-all-checks-match and foreign-suggestion-all-checks-match with content-dedupe-different-logical-id and key-dedupe-wrong-owner-revision-bytes. Decide when a suggestion alone permits publication and when an actual identity/content mismatch blocks. Describe permitted handling without invoking the host's personal judgment protocol.",
       "expected_output": "Suggestions alone do not block publication, authorize candidate reads/mutations, or trigger automatic judgments. A separate logical-address/owner/revision/byte collision blocks. Host personal judgment remains independent; generic continuation does not authorize cleanup or protected judgments.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["Own and foreign suggestions with matching logical address, owner, revision, and bytes each permit publication according to operation semantics; suggestion alone is not a lock or blocker.", "The named cases with actual logical collision or owner/revision/byte mismatch block, whether or not a suggestion exists.", "No automatic judgment, candidate mutation, or retirement occurs; retirement requires exact-ID/action approval. Accepted abstention is an alternate residue-gate outcome and authorizes no cleanup; generic continue is insufficient."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "Own and foreign suggestions with matching logical address, owner, revision, and bytes each permit publication according to operation semantics; suggestion alone is not a lock or blocker.",
+        "The named cases with actual logical collision or owner/revision/byte mismatch block, whether or not a suggestion exists.",
+        "No automatic judgment, candidate mutation, or retirement occurs; retirement requires exact-ID/action approval. Accepted abstention is an alternate residue-gate outcome and authorizes no cleanup; generic continue is insufficient."
+      ]
     },
     {
       "id": 14,
       "prompt": "Review the incomplete-catalogue, transform/truncation, and interrupted payload/index scenarios. Decide what representation is safe and what remains blocked; preserve the last guaranteed version.",
       "expected_output": "Incomplete catalogue, changed bytes, truncated reads, or interrupted payload/index publication are not success. Require complete catalogue evidence, exact-byte verification, and bounded reconciliation to the last guaranteed version. Do not declare atomicity or create a duplicate logical object.",
-      "files": ["evals/fixtures/contrasting-profiles.json"],
-      "assertions": ["Every catalog page requires completion evidence; partial, permission-denied, or truncated readback is not absence or completeness.", "Normalization/transform/truncation is detected by exact byte comparison and does not count as intact persistence; protective encoding requires observed justification and its own evidence.", "Payload/index interruption is modeled as non-atomic unless observed otherwise, with finite retry identity and reconciliation preserving prior guaranteed version.", "Costs distinguish shared/per-object records, native write calls, verification reads, catalogue traversal, recovery calls, payload bytes, and control bytes; unknown totals remain explicitly unknown and no transaction is claimed without evidence.", "Native history replaces snapshots only with verified fidelity and retention; single-writer is not CAS, and multi-object migration journal remains."]
+      "files": [
+        "evals/fixtures/contrasting-profiles.json"
+      ],
+      "assertions": [
+        "Every catalog page requires completion evidence; partial, permission-denied, or truncated readback is not absence or completeness.",
+        "Normalization/transform/truncation is detected by exact byte comparison and does not count as intact persistence; protective encoding requires observed justification and its own evidence.",
+        "Payload/index interruption is modeled as non-atomic unless observed otherwise, with finite retry identity and reconciliation preserving prior guaranteed version.",
+        "Costs distinguish shared/per-object records, native write calls, verification reads, catalogue traversal, recovery calls, payload bytes, and control bytes; unknown totals remain explicitly unknown and no transaction is claimed without evidence.",
+        "Native history replaces snapshots only with verified fidelity and retention; single-writer is not CAS, and multi-object migration journal remains."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "A backend documents a hard physical limit of 50,000 bytes per record and offers no CAS, multi-record transactions, or delete. Decide whether the profile can close and how large objects are routed, without first walking sizes upward.",
+      "expected_output": "Close the profile on current official source/schema plus one finite verification batch. Choose an operating threshold of at most 80% of the documented limit as a stated choice, route payloads at or below it through the direct path and only the excess through lossless conditional chunking. CAS, transactions and delete are absent / not-assumed and do not block derivation.",
+      "files": [],
+      "assertions": [
+        "The 80% threshold is labeled an operating choice, not a measured maximum, and no size walk or observed-failure prerequisite is required.",
+        "Direct path is used at or below the threshold; chunking is conditional on excess, with lossless reassembly and enumeration.",
+        "CAS, multi-record transactions and physical delete are recorded absent / not-assumed and do not block derivation or justify extra per-object records."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "During a nature experiment the operator wants to know if a local typo in a specimen file, a long verification batch of six calls, and a slow LLM turn each force the run to stop. Also may a local stdlib script hash and frame the envelopes?",
+      "expected_output": "Only an uncertain or contradictory backend outcome or an exhausted declared mutation/size budget stops the run. A local file typo is fixed locally and recorded. A finite declared batch is not capped at three calls. LLM turn wall-clock is not a bound. A local deterministic stdlib utility may hash, base64 and compare envelopes but must not call the backend or become a storage protocol.",
+      "files": [],
+      "assertions": [
+        "Local file errors are fixed locally and recorded; they are not a backend outcome and do not freeze the run.",
+        "No per-batch call cap of three or turn-time abort applies; the finite declared plan governs.",
+        "A local stdlib packaging/hash utility is allowed; a backend client, SDK, codec, writer, service or supervisor is not."
+      ]
     }
   ]
 }

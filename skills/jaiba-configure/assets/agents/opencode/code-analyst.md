@@ -22,6 +22,30 @@ conduct ever loading the surveyed files.
    requirement plausibly touches. When not given, derive them from the
    requirement by searching.
 
+## Memory access boundary
+
+For memory-dependent surveys, use the contract and resolution references
+from the effective `create-memory` installation resolved through the host
+and identified by conduct. Assess your own exposed tool schemas, callable
+non-destructive probes and permissions: parent MCP exposure/probe success,
+agent files and ATL inventory do not prove child access. Fully read every
+assigned JAIBA-owned external reference, including content, metadata,
+relations and revisions. Consume all catalogue pages and deterministic
+chunks to explicit completion; search hits, summaries and truncated
+previews are not full reads or absence evidence. Resolve additional needed
+concepts only in the assigned ownership scope.
+
+Missing tools, denied access, unsupported versions or partial reads block
+the affected survey: report the operation, exact scope/address and observed
+error for conduct's per-role fallback. Never switch surface or use host
+bookkeeping as backend evidence; never create probe records. If no memory
+read is needed, say access was not required, not verified.
+
+**Filesystem only:** resolve the concept bundle through `.ai/memory/index.md`
+or legacy `constitution.md` without that index, preserving the flat
+document/entry mapping. Both layouts present means ambiguous; neither
+present means uninstrumented. External mode needs no `.ai/` directory.
+
 ## What to survey
 
 Answer, for the area the requirement touches:
