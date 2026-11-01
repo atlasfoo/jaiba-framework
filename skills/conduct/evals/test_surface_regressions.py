@@ -5,12 +5,15 @@ catalogue/read/revision/append/clear calls, not live Engram and not LLM behavior
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import json
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+
+from surface_guards import GuardRejected, accept_chunk_or_reject, write_exclusive
 
 ROOT = Path(__file__).resolve().parents[3]
 ARCHIVE = ROOT / "skills/conduct/scripts/archive.sh"
@@ -141,6 +144,59 @@ class SurfaceRegressionTests(unittest.TestCase):
         self.assertFalse(any(call[1] == "ctx-other" for call in store.calls))
         TRACE.append({"scenario": "close-refusal+append-readback+resume-clear", "inventory": inventory,
                       "log_revision": log_rev, "calls": store.calls})
+
+
+class SurfaceGuardRegressionTests(unittest.TestCase):
+    """Stdlib guards. No live Engram call and no host-specific trial path."""
+
+    def test_guard_module_has_no_backend_client_or_host_path(self):
+        text = (Path(__file__).resolve().parent / "surface_guards.py").read_text(encoding="utf-8")
+        self.assertNotIn("mem_save", text)
+        self.assertNotIn("mem_get_observation", text)
+        self.assertNotIn("/home/atlasfoo", text)
+        self.assertNotIn("engram", text.lower())
+
+    def test_corrupt_chunk_digest_mismatch_writes_nothing(self):
+        payload = b"synthetic-chunk-bytes-not-a-secret"
+        declared = hashlib.sha256(payload).hexdigest()
+        flipped = bytearray(payload)
+        flipped[0] ^= 0x01
+        with tempfile.TemporaryDirectory() as td:
+            dest = Path(td) / "destination-object.bin"
+            with self.assertRaises(GuardRejected) as caught:
+                accept_chunk_or_reject(bytes(flipped), declared, dest)
+            self.assertEqual(caught.exception.code, "digest-mismatch")
+            self.assertFalse(dest.exists())
+            self.assertEqual(list(Path(td).iterdir()), [])
+
+    def test_matching_chunk_digest_may_write(self):
+        payload = b"synthetic-chunk-bytes-not-a-secret"
+        declared = hashlib.sha256(payload).hexdigest()
+        with tempfile.TemporaryDirectory() as td:
+            dest = Path(td) / "destination-object.bin"
+            accept_chunk_or_reject(payload, declared, dest)
+            self.assertEqual(dest.read_bytes(), payload)
+
+    def test_symlink_root_rejected_without_payload(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            decoy = base / "decoy"
+            decoy.mkdir()
+            link = base / "symlink-root"
+            link.symlink_to(decoy, target_is_directory=True)
+            with self.assertRaises(GuardRejected) as caught:
+                write_exclusive(link, "payload.bin", b"must-not-land")
+            self.assertEqual(caught.exception.code, "invalid-object")
+            self.assertTrue(link.is_symlink())
+            self.assertEqual(list(decoy.iterdir()), [])
+            self.assertFalse((decoy / "payload.bin").exists())
+            self.assertFalse((base / "payload.bin").exists())
+
+    def test_real_directory_root_can_exclusive_create(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            written = write_exclusive(root, "payload.bin", b"ok")
+            self.assertEqual(written.read_bytes(), b"ok")
 
 
 if __name__ == "__main__":
