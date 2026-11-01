@@ -3,7 +3,7 @@
   "purpose": "reviewed source drift for immutable Phase4 T-021 historical rehearsal recordings",
   "source_hash_algorithm": "SHA-256 of canonical compact JSON encoding of decoded UTF-8 source text (surface_rehearsal.digest); no source normalization",
   "recording_policy": "Recorded journals and index are immutable; replay validates historical protocol evidence, not current-source execution. No recapture or fresh model run is claimed.",
-  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. These four source paths changed afterward: filesystem-surface.md under T-023; resolution.md, execute-mode.md and summarize-mode.md under T-024. T-033 is not the provenance of any listed change. Any additional or changed pair is unreviewed and must fail.",
+  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. Reviewed post-recording source paths: filesystem-surface.md under T-023 plus the later T-083 factory clarification; resolution.md, execute-mode.md and summarize-mode.md under T-024; memory-surface-contract.md under T-083. T-033 is not the provenance of any listed change.",
   "changed_sources": {
     "skills/create-memory/references/resolution.md": {
       "recorded_source_sha256": "2875ae3fa180b27058ae47485199b0fa53950d37b2a142bfad03d7df15922c2e",
@@ -13,9 +13,9 @@
     },
     "skills/create-memory/references/filesystem-surface.md": {
       "recorded_source_sha256": "a14dbc4e48f9b1a04b922b60d7da6000ae83f897f207d6277ce2a27567e62951",
-      "current_source_sha256": "5ad84be03038f0a8943cf4fff748dd3555695e214ae058db1b10354cc986e86b",
-      "classification": "known post-recording T-023 source change",
-      "reason": "T-023: reconciled filesystem mapping with neutral export, isolated staged restore, full revision/readback verification and migration-resume boundaries."
+      "current_source_sha256": "df57e01e789528d1617f39c4d4713a041a72efb5c95affa26ed28b80f578e066",
+      "classification": "known post-recording T-083 source change",
+      "reason": "T-083: current bytes keep the T-023 filesystem mapping reconciliation and add the factory rule that one file is the payload unit, with no per-file journals, chunks, or manifests unless a characterized native limit or verification gap requires them; filesystem atomicity stays unasserted."
     },
     "skills/conduct/references/execute-mode.md": {
       "recorded_source_sha256": "0a0c2428b7bbe10a3e46c7ecbb356ffb029f0d78ea6ec566128c2bfde29aa7a2",
@@ -28,6 +28,12 @@
       "current_source_sha256": "03178f9387e7d68851e8dd9310974878be0ca1aaaff6e6e33e03777ac124ee13",
       "classification": "known post-recording T-024 source change",
       "reason": "T-024: added close-ID recovery rules for uncertain append/clear, frozen inventory, immutable archive verification and context isolation."
+    },
+    "skills/create-memory/references/memory-surface-contract.md": {
+      "recorded_source_sha256": "0316302534d1e76558458ec449f64f35743acf56d37e03a6b6d7f2947b60357b",
+      "current_source_sha256": "4da3eb77fe5958844922a9abdfc0adf3be014ae283b1177ea41200525d425a93",
+      "classification": "known post-recording T-083 source change",
+      "reason": "T-083: factory contract records the 80% operating threshold as a derivation choice, conditional lossless chunking above it, and absent backend guarantees as not-assumed without weakening contract 1.0.0."
     }
   },
   "unchanged_source_paths": [
@@ -47,7 +53,6 @@
     "skills/conduct/references/triage.md",
     "skills/conduct/references/validate-mode.md",
     "skills/conduct/scripts/archive.sh",
-    "skills/create-memory/references/memory-surface-contract.md",
     "skills/fast/SKILL.md",
     "skills/fast/references/plan-adjustment.md"
   ],

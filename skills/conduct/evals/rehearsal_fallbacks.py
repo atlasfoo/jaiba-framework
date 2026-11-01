@@ -81,8 +81,7 @@ def verify(s, recovery=False):
         schema = s.state['criteria_schema']
         prd = next(o for o in objects if o['type'] == 'prd')
         import re
-        import yaml
-        parsed = yaml.safe_load(re.search(r'```yaml\n(.*?)\n```', prd['content'], re.S)[1])
+        parsed = json.loads(re.search(r'```yaml\n(.*?)\n```', prd['content'], re.S)[1])
         assert parsed == schema
         tasks = next(o for o in objects if o['type'] == 'tasks')
         assert 'covers: GREET-001' in tasks['content']

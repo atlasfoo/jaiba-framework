@@ -118,9 +118,10 @@ developer means rather than guessing.
    winning level require human choice. Conflicting/duplicate overrides
    block. Recompute precedence; saved choice is not a fifth level and a
    changed candidate set needs confirmation. An unavailable/failed selected
-   adapter blocks, never falls back. Draft adapters are not selectable:
-   `jaiba-engram-memory` remains `memory-surface-draft`, not certified by
-   its scoped happy path; do not bootstrap through it pending validation.
+   adapter blocks, never falls back. A package is selectable only when
+   `category: memory-surface`. `memory-surface-draft` is not a conforming
+   selectable mutable adapter; isolated historical evidence does not
+   certify general mutable use. Do not bootstrap through a draft.
 2. Validate the selected contract/version, capabilities, permissions,
    ownership, limits and actual callable MCP/tools **in this host**, with
    non-destructive probes. Skill files or ATL entries are not operational

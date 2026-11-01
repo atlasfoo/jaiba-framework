@@ -168,7 +168,7 @@ profile's inputs.
 Residue acceptance is §6, not a generic continuation. Until it accepts,
 a dependent experiment stays blocked. Do not read candidate, foreign, or
 protected judgment bodies. The experiment is not conformance and does not
-certify the product. Do not retry or patch this factory inside it, and do
+certify the product. Do not retry a backend effect or patch this factory inside it, and do
 not use historical `JAIBA1` or `JAIBA2` records as the specimen.
 
 ## Contrasted profile gate
@@ -189,7 +189,10 @@ recover it. A schema, a probe, or a write acknowledgement cannot. An
 empty sufficient list means nothing physical may be depended on.
 
 Block dependent mapping and conforming generation when a necessary
-guarantee is unknown, inferred-only, documented-only, or discrepant.
+guarantee is unknown, inferred-only, or discrepant. A consistently
+documented guarantee that the derivation names is usable. Guarantees the
+backend does not offer (CAS, multi-record transactions, physical delete)
+are `absent / not-assumed` and do not block derivation.
 Keep the diagnosis. Do not weaken the logical contract. A relevant
 version, schema, or configuration change invalidates the affected
 assertions only; say which claims fell and why.
@@ -206,8 +209,10 @@ contract §10: record whether it was observed; do not infer a mission.
 
 Factory checks, not a second recipe. Fail a conforming package if any miss:
 
-- One native unit only when payload and ownership fit **and** intact
-  verification and publication are supported. Catalogue completeness is
+- One native unit only when payload and ownership fit (within the 80%
+  operating threshold of the documented limit) **and** intact
+  verification and publication are supported. Above the threshold,
+  conditional chunking is allowed with lossless reassembly. Catalogue completeness is
   separate. Reject an unjustified extra root, journal, chunk, descriptor,
   manifest, or allocation. Byte length fitting is not that proof. A
   concrete observed verification or publication gap may justify the

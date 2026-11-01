@@ -45,154 +45,106 @@ storage requirements; external surfaces address the same concepts logically.
 ### Surface resolution and identity
 
 The `jaiba-memory-surface` **1.0.0** contract is declarative guidance
-interpreted by the agent, not a resolver runtime, SDK or storage schema.
-Resolve the **current host agent's effective `create-memory` installation**
-and its `references/memory-surface-contract.md`, `resolution.md` and
-`filesystem-surface.md`. Do not assume sibling installations or use a
-backend-specific contract copy. Missing, ambiguous or incompatible canonical
-definitions are explicit resolution failures, not permission to improvise.
-Filesystem is built in: existing filesystem users need no adapter installation
-or MCP service merely to retain their supported layout.
+interpreted by the agent, not a resolver runtime or storage schema. Resolve the
+**current host agent's effective `create-memory` installation** and its
+`references/memory-surface-contract.md`, `resolution.md` and
+`filesystem-surface.md`; never assume sibling installations or a
+backend-specific contract copy. Missing, ambiguous or incompatible definitions
+are explicit resolution failures. Filesystem is built in and needs no adapter.
 
-Select in this order: explicit project `AGENTS.md` data field
-`jaiba-memory-surface: filesystem` or `jaiba-memory-surface: <exact-adapter-id>`
-→ host-visible installed project-local `memory-surface` skill → host-visible
-installed global `memory-surface` skill → built-in filesystem. Visibility is
-to this agent, not another host or a checkout on disk. Resolve same-ID copies
-using host precedence (local beats global); unresolved copies or different
-IDs at the winning level require explicit human choice. Duplicate/conflicting
-overrides are ambiguous. Recompute precedence; a remembered choice is not
-another precedence level, and a changed candidate set needs confirmation.
-A missing, failed or unavailable selected adapter blocks work, never means
-empty memory and never permits silent fallback. Validate contract/version,
-actual callable tools, permissions, capabilities and limits non-destructively;
-installation or an ATL entry alone is not evidence of operational access.
-Draft categories are not conforming selectable mutable adapters. In particular,
-`jaiba-engram-memory` remains `memory-surface-draft` / globally unverified:
-the scoped T-009 happy path does not certify general mutable use.
+Select in this order: `AGENTS.md` field `jaiba-memory-surface: filesystem` or
+`<exact-adapter-id>` → host-visible project-local `memory-surface` skill →
+host-visible global `memory-surface` skill → built-in filesystem. Visibility is
+to this agent. Local beats global for the same ID; unresolved copies or
+different IDs at the winning level need an explicit human choice. A remembered
+choice is not a precedence level. A missing, failed or unavailable selected
+adapter blocks work: never empty memory, never silent fallback. Validate
+contract version, callable tools, permissions, capabilities and limits
+non-destructively; installation or an ATL entry is not operational evidence.
+Only a package with `category: memory-surface` is a conforming selectable
+mutable adapter. Draft categories are not conforming selectable mutable adapters.
+`jaiba-engram-memory` remains `memory-surface-draft` until its package metadata
+says otherwise; this contract names no adapter's evidence.
 
-Establish the exact Git checkout/worktree root (not the common Git directory),
-or absolute host workspace root without Git; ambiguous roots require a choice.
-Prefer the configured `origin` identity, inspected locally without network
-access or exposing raw URLs. Normalize SSH/SCP and HTTP(S) transport forms
-to sanitized host plus full namespace/repository path: remove userinfo,
-credentials, query and fragment, lowercase DNS host, normalize separators,
-default ports and one terminal `.git`, but preserve path case, meaningful
-encoding and non-default ports. Local remotes retain absolute path and local
-host identity. Unsupported/ambiguous parsing blocks automatic association;
-selection-affecting query/fragment removal requires confirmation. Do not guess
-SSH aliases. With no origin, use the normalized absolute Git root or host
-workspace root plus host identity, visibly labeled nonportable. Malformed
-origins are not permission to fall back. Apply the canonical resolution rules.
-
-Look up that exact candidate in the selected surface's owned project registry;
-retain its stable `project-id`, never infer identity from basename, title or
-search ranking. No match requires explicit association or authorized init;
-multiple matches block use. Aliases, moved roots, changed origins and registry
-identity changes require human confirmation and `jaiba-init` authority, even
-when the new origin already names another project. Do not create a second brain.
+Establish the exact Git checkout/worktree root, or the absolute workspace root
+without Git; ambiguity requires a choice. Prefer the local `origin` identity
+(no network, no raw URLs): normalize to sanitized host plus full path (drop
+userinfo, credentials, query/fragment, one `.git`; lowercase host; keep path
+case and non-default ports). Unsupported or ambiguous parsing blocks automatic
+association. With no origin, use the absolute root plus host identity, labeled
+nonportable. Look the candidate up in the surface's owned project registry and
+retain its stable `project-id`; never infer identity from basename, title or
+search ranking. No match needs explicit association or authorized init;
+multiple matches block. Aliases, moved roots and identity changes need human
+confirmation and `jaiba-init` authority. Never create a second brain.
 
 Logical addresses are `(namespace, project-id, category, context-id?, logical-id)`;
-category is `constitutive` or `executive`, with a context required for executive
-objects. Namespace ownership must be exact, persisted and checkable. Ordinary
-host/backend memory is not JAIBA memory merely because a search hit, title or
-tag resembles it; do not adopt or modify unrelated records.
+category is `constitutive` or `executive`, with a context for executive
+objects. Namespace ownership must be exact and checkable; ordinary
+host/backend memory is not JAIBA memory because a hit or title resembles it.
 
 Persist routing-only bindings under `~/.jaiba/memory/`, keyed by exact host-agent
-identity and normalized absolute work root, retaining sanitized identifiers,
-versions and locators only, not payloads, credentials or an `.ai/` mirror.
-Validate precedence, root, origin and registry ownership before reuse and read
-back saved routing fields. If persistence fails, report it and obtain explicit
-session-only consent or stop; never claim persistence or silently mint contexts.
-The executive context ID persists per root independently of branch, session,
-model or terminal. Clones/worktrees share constitutive identity when resolved
-but default to independent executive contexts; confirm a fresh external context
-or explicit existing-context selection. Resuming elsewhere requires exact owned
-lookup and a single-writer handoff, not latest-plan or branch-name heuristics.
-Switching contexts retains old work. Filesystem keeps `.ai/work/` per checkout,
-not a new context directory or implicit synchronization layer.
+identity and absolute work root: sanitized identifiers, versions and locators
+only, never payloads, credentials or an `.ai/` mirror. Read back saved routing;
+if persistence fails, get explicit session-only consent or stop. The executive
+context ID persists per root independent of branch, session or model;
+clones/worktrees default to independent contexts, and resuming elsewhere needs
+exact owned lookup plus a single-writer handoff. Filesystem keeps `.ai/work/`
+per checkout.
 
 ### Catalogue, verification and authority
 
-Resolve a complete catalogue and direct full reads in the exact owned scope;
-consume all pages with explicit completion and declared consistency. Include
-logs and unindexed/malformed objects, reporting unknown types rather than
-discarding them. Support exact type-filtered and unfiltered enumeration; without
-a stable snapshot, serialize enumeration and recheck changes before destructive
-work. Search, summaries, previews and truncated responses are not
-full reads or proof of absence, uniqueness or safe cleanup. Only authoritative
-exact `not-found` or complete enumeration establishes scoped absence; permission,
-availability, version and partial-read failures block affected work.
+Resolve a complete catalogue and direct full reads in the exact owned scope,
+with explicit completion; report unknown types and logs, never discard them.
+Search, summaries, previews and truncated responses are not full reads or proof
+of absence. Only exact `not-found` or complete enumeration establishes scoped
+absence; permission, availability, version and partial-read failures block.
 
-Preserve full content, metadata (including unknown fields), relations and stable
-logical IDs. Before mutation compare the current revision to the pre-read revision
-or declared full-object fingerprint; afterwards verify complete exact readback and a receipt identifying
-scope, operation, request/close ID, previous/result revision and payload evidence.
-An acknowledgement alone is not verification. Unknown/partial outcomes stop
-dependent writes and cleanup; reconcile exact reads before retrying. Do not call
-read/compare/write/read atomic CAS. Without genuine CAS, establish actual
-serialized/single-writer access or block mutation.
+Preserve full content, metadata (including unknown fields), relations and
+stable IDs. Before mutation compare the pre-read revision or fingerprint;
+afterwards verify complete exact readback and a receipt (scope, operation,
+request/close ID, previous/result revision, payload evidence). An
+acknowledgement is not verification. Unknown or partial outcomes stop
+dependent writes until reconciled by exact reads. Read/compare/write/read is not
+CAS: without genuine CAS, establish serialized single-writer access or block.
 
 `jaiba-init` owns constitutive creation and curated updates; `conduct` owns
-executive memory, with one writer per context and delegated workers reporting
-results rather than writing it. Init's explicit `migrate-surface` operation may
-coordinate exact-copy executive transfer after conduct's writer handoff, never
-edit executive content, advance tasks, validate work or clear work as a migration
-side effect. `conduct:summarize` has only the immutable,
-idempotent constitutive append-log exception for closure, not general brain edit
-authority. Retain a stable close ID across retries: the same ID and complete
-payload returns the verified existing receipt; a different payload is a conflict.
-Historical log corrections are new entries, not rewrites. Serialize shared
-constitutive, registry and catalogue writes even
-across independent contexts. Backend permission never expands workflow authority
-or replaces human approval. Archive must verify the closing log and exact frozen
-executive inventory before selective, revision-checked clear-work; unexpected or
-changed objects block cleanup. The existing filesystem archive script alone does
-not establish these complete surface guarantees. No namespace-wide purge or
-side effects outside the resolved ownership and authorized operation are allowed.
+executive memory with one writer per context, workers reporting rather than
+writing. `migrate-surface` may coordinate exact-copy executive transfer after
+conduct's handoff and never edits executive content or clears work.
+`conduct:summarize` has only the immutable, idempotent append-log exception for
+closure; the same close ID and payload returns the existing receipt, a
+different payload conflicts, corrections are new entries. Archive verifies the
+closing log and frozen executive inventory before selective, revision-checked
+clear-work; unexpected or changed objects block cleanup. No namespace-wide
+purge or side effects outside the resolved ownership. Backend permission never
+expands workflow authority or replaces human approval.
 
 ### Transition — migration capability gate
 
 Setup, `jaiba-init`, `jaiba-doctor` and `jaiba-configure` may resolve/probe
-external surfaces within their approved scope; selection/probing is not
-activation or mutation authority. Never fall back to filesystem, invoke
-path-based consumer operations
-against external memory, or create `.ai/` to make the call appear supported.
+external surfaces within approved scope; probing is not activation or mutation
+authority. Never fall back to filesystem, run path-based consumer operations
+against external memory, or create `.ai/` to look supported. Consumer use needs
+each effective surface procedure, callable tools, exact ownership, verified
+capabilities and operation-specific approval; a green probe grants none.
 
-Consumer use requires each effective surface procedure, actual callable tools,
-exact ownership, verified required capabilities and operation-specific approval;
-block dependent operations when requirements are absent or unverified, not solely
-by delivery phase. A green probe does not grant consumer or mutation authority.
-
-For an explicit populated-store transition, independently resolve effective
-`jaiba-init` and its `migrate-surface` operation in
-`references/surface-migration.md`, and effective `create-memory`'s canonical
-neutral interchange. Missing procedures or unverified endpoint capabilities
-block migration; draft Engram remains nonselectable until required operational
-conformance. Installation, authoring, probes and fixtures do not promote it.
-Selection, an override or a saved binding never approves migration. Offer an
-explicit filesystem exception (normally the `filesystem` override) to retain
-existing local authority when appropriate, never silent fallback.
-
-Require complete source/target and registry/context inventories, full payloads,
-actual pause/handoff of all affected writers, explicit collision decisions with
-no merge/overwrite, separately staged lossless import and complete full-readback
-verification. Recheck source and target revisions before separate human approval
-to activate the exact verified manifest, then verify effective routing, ownership
-and active inventory before releasing writers. Keep source authoritative until
-that verified switch and retain it afterwards; retirement requires separate
-exact-scope consent. No automatic purge, dual-write or failback.
-
-Journal intent and exact known/partial/unknown outcomes durably before further
-effects; interrupted transfers reopen the same transaction and reconcile exact
-requests, never blind replay. Outage is not absence. Retry, stop, or explicitly
-request init's qualified stale-snapshot recovery using a complete verified
-neutral snapshot and the same journal. If current source freshness is unavailable,
-leave that normal check unverified and obtain a separate later-write loss/divergence
-and authority decision, plus fresh activation approval for the verified recovery
-manifest. Target integrity, unknown-request reconciliation and actual writer pause
-are not waived. Reconcile later source writes on restoration before resuming its
-writers; never replace missing evidence with an empty brain.
+An explicit populated-store transition resolves effective `jaiba-init`
+(`references/surface-migration.md`) and `create-memory`'s neutral interchange.
+Missing procedures or unverified endpoint capabilities block it. Selection, an
+override or a binding never approves migration; offer the `filesystem`
+override rather than silent fallback. Require complete source/target
+inventories, full payloads, paused writers, explicit collision decisions (no
+merge/overwrite), staged lossless import and full-readback verification;
+recheck revisions before separate human approval to activate the exact verified
+manifest, then verify routing and inventory. The source stays authoritative
+until that switch and after it; retirement needs separate exact-scope consent;
+no auto purge, dual-write or failback. Journal intent and exact outcomes
+durably; interrupted transfers reopen the same transaction. Outage is not
+absence: retry, stop, or request init's qualified stale-snapshot recovery from
+a verified neutral snapshot with a separate loss/divergence decision and fresh
+activation approval. Target integrity, reconciliation and writer pause are
+never waived; never replace missing evidence with an empty brain.
 
 ### Concept and filesystem layout resolution
 

@@ -31,9 +31,10 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
    conflicting overrides stop resolution. Recompute precedence and validate
    remembered choices against the current candidate set. A failed, missing
    or unavailable selected adapter is a blocked selection, not permission
-   to choose another or claim an empty brain. Drafts are not conforming
-   mutable adapters: `jaiba-engram-memory`'s T-009 happy path is not whole
-   conformance or general activation evidence.
+   to choose another or claim an empty brain. A package is selectable only
+   when `category: memory-surface`. `memory-surface-draft` is not a
+   conforming selectable mutable adapter; isolated historical evidence
+   does not certify general mutable use.
 2. **Root and project.** Establish the exact checkout/worktree root (not
    common Git directory), or absolute host workspace root without Git.
    Unknown/multiple roots stop association. Inspect configured origin locally

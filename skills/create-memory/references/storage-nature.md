@@ -176,6 +176,26 @@ not a maximum. An operating cap is a choice, not a measured maximum,
 and it must not be tightened in order to justify extra structure.
 Unknown limits stay unknown.
 
+**Practical sufficiency.** A profile may close on current official
+source or effective schema plus one finite verification batch; it need not
+reproduce every claim by experiment. Claims the documentation and schema
+state consistently stay `documented` and may be used when the
+derivation names them. A documented hard limit with its unit is enough to
+choose an operating threshold. A conservative operating threshold of at
+most 80% of the physical limit (in that limit's unit) is a *choice*, not a
+measurement: payloads at or below it use the direct path, and only an
+excess above it may use conditional chunking. This threshold resolves the
+circularity of needing to observe a maximum before choosing a path. The
+verification batch need only confirm the chosen path round-trips exactly at
+the threshold; it never walks upward looking for failure.
+
+**Absent guarantees.** Compare-and-swap, multi-record transactions, and
+physical delete, when the tool schema and documentation do not offer them,
+are recorded `absent / not-assumed`. Absence is a fact the derivation lives
+with. It does not block derivation, does not by itself justify extra
+records, and is not a reason to withhold a mapping the remaining
+sufficient guarantees support.
+
 ### Revision and cost
 
 Record whether the native revision token covers the full object, and
@@ -197,9 +217,12 @@ is not a reason to add records.
 
 The experiment answers the dimensions. It is not a product trial, a
 conformance run, or a search for maxima. Use ordinary backend tools
-only: no client, SDK, codec, writer, service, supervisor, or transaction
-engine. Snapshot, hash, base64, and comparison helpers may record
-evidence; they must not become a second storage protocol.
+for every backend interaction: no client, SDK, codec, writer, service,
+supervisor, or transaction engine that talks to the backend. A small
+deterministic local stdlib utility (for example `json`, `base64`,
+`hashlib`, `pathlib`) may build, hash, frame, and compare byte envelopes
+and record evidence. It stays local, never calls the backend, and must not
+become a second storage protocol.
 
 Authorize a new disposable namespace or location and a physical project,
 separate from historical trials and their residues, from any residue-gate
@@ -210,16 +233,16 @@ to study one native record — that would measure the mapping, not the
 store.
 
 Before the first effect, fix the exact operations, the closed variant
-list, maximum calls, mutations, intended times, and sizes, expected
-receipts, stop conditions, and specimen bytes and hashes. A planned
-dedupe check is not a retry. There is no open loop and no hunt for a
-maximum. At most three backend calls per batch; record the batch before
-another starts. Intended bounds, operator-watched and possibly
-unenforced by the host: 15 seconds native, 60 seconds auxiliary, five
-minutes per microstep. State whether this host can abort at those
-bounds. If it cannot, they remain a stop rule: when the time passes or
-the outcome is unknown, stop. Do not call the budget a technical
-guarantee, and do not build a supervisor to impose it.
+list, maximum mutations, intended sizes, expected receipts, stop
+conditions, and specimen bytes and hashes. A planned dedupe check is not a
+retry. There is no open loop and no hunt for a maximum. Group calls into
+finite verification batches sized to the declared variants; record each
+batch before it starts. There is no per-batch call cap beyond the declared
+finite plan. Intended time bounds (15 seconds native, 60 seconds auxiliary)
+are operator-watched stop rules, not a technical guarantee: state whether
+this host can abort at them. An LLM turn's wall-clock time is not a bound
+and never aborts a run; only the backend call outcome does. When a bound
+passes or an outcome is unknown, stop and diagnose once.
 
 Use one small specimen. Include Unicode and CRLF so a transformation of
 endings or non-ASCII bytes is visible, plus synthetic text shaped so
@@ -232,13 +255,13 @@ the same content at a second logical address. Record original, stored,
 and transported bytes, and the full comparison.
 
 A later protective encoding, if derivation chooses one, is a separate
-pre-declared batch with the same helper and budget limits. Do not assume
+pre-declared batch under the same finite-plan rules. Do not assume
 it behaves as the plaintext specimen did, and do not treat that batch
 as certification.
 
 Run an oversized specimen only when a pertinent current limit and its
 unit are already known from current documentation or the effective
-schema. Compute the size once, including the overhead that counts
+schema; at most one, to confirm the conditional-chunk path. Compute the size once, including the overhead that counts
 against that unit. Do not walk upward until something fails. If the
 limit or the unit is unknown, do not invent an oversized case, and do
 not treat the omission as approval of large-object capability. Do not
@@ -248,9 +271,11 @@ persistence.
 
 Stop, record the last verified state, and write one diagnosis on an
 unexpected contradiction, an effect the plan did not name, an
-acknowledgement whose outcome is uncertain, or an exhausted call,
-mutation, size, or time budget. Hand control to the human. Do not retry or redispatch, and do not
-correct the procedure inside the experiment.
+acknowledgement whose outcome is uncertain, or an exhausted mutation,
+size, or declared-plan budget. Hand control to the human. Do not retry
+the backend effect or redispatch. A purely local error (a typo in a
+specimen file, a wrong path, a malformed local envelope) is not a backend
+outcome: fix it locally and re-run the local step, recording the fix.
 Cleanup, if authorized, removes only this experiment's own residues,
 under permission specific to those residues. It does not extend to
 historical runs, candidate records, or protected judgments. Record what
@@ -294,7 +319,7 @@ trial identifiers. Leave protected records, their pending judgments, and
 incident endpoints whose safety is not shown untouched: do not resolve,
 cancel, consume, or delete them, and do not retire an endpoint as an
 indirect way to reach them. Previously prohibited resources stay
-inaccessible. Do not resume or repair a frozen run.
+inaccessible. Do not resume a frozen backend run.
 
 Before proposing retirement, keep a verified full copy of each eligible
 record outside the repository and the backend: content, ownership,

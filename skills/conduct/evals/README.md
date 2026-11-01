@@ -37,7 +37,7 @@ expected results is not new model evidence. No fresh LLM run is claimed here.
 |---|---|---|
 | propose | Clarification and landed requirement; zero executive artifacts | `test_propose_and_refusal_have_zero_artifact_mutations` |
 | spec | Spec-depth triage, full PRD + plan drafts, refusal, explicit synthetic revision approval + complete readbacks | `test_full_artifact_schemas_approval_and_gate_provenance` |
-| tasks | Original GREET-001 happy/sad YAML, load/dependency/covers schema, full gate/convention read and copied command/address/revision, walkthrough | Same test; parsed with PyYAML |
+| tasks | Original GREET-001 happy/sad YAML fences (JSON inside), load/dependency/covers schema, full gate/convention read and copied command/address/revision, walkthrough | Same test; parsed with stdlib `json` |
 | execute | Source-only low task; real named-tier dispatch refusal, inline fallback, actual source diff/test, divergent walkthrough readback stops checkbox/gate, explicit reconciliation | `test_execute_divergence_stops_before_gate_or_checkbox`, `test_actual_dispatch_failure_is_not_child_backend_evidence` |
 | validate | Full source criteria + covers; real Plan gate; actual verify dispatch unavailable; separately injected actor permission-denied => not verifiable/no delivered write; restored permission + inline direct read/test => verified status update | `test_validate_failure_and_recovery_use_full_criteria_not_ack` |
 | ask | Exact selected context + revisions, grounded answer, read-only trace; read failure reports failure, no other-context/path fallback | `test_ask_read_only_exact_context_and_failure_without_fallback` |
@@ -90,9 +90,9 @@ without a runtime model API or fresh child dispatch. A static current-source
 migration guard asserts the effective init staging/readback/approval/source
 retention requirements and draft nonselectability; it is not behavior or adapter
 conformance certification. Replays are not new LLM compliance evidence.
-It prints its new exclusive scratch root and leaves evidence there. PyYAML is
-required; `/usr/bin/python3` has it on the evaluated host. No package install is
-performed. The earlier three primitive tests remain, honestly labeled as helper
+It prints its new exclusive scratch root and leaves evidence there. The
+rehearsal uses the Python standard library only; fenced blocks are JSON.
+No package install is performed. The earlier three primitive tests remain, honestly labeled as helper
 and toy-store tests, not consumer evidence.
 
 All fixture/test runtime writes are below

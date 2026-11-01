@@ -21,10 +21,12 @@ resolve by sibling paths, a source checkout or another host's installation.
   operation mappings, limits and applicable conformance evidence. A tag or
   name containing “memory” is not enough; `create-memory` is a generator,
   not itself an adapter. Record malformed declarations as findings.
-- Report `memory-surface-draft` separately: it cannot participate as a
+- Report `memory-surface-draft` separately: a package is selectable only
+  when `category: memory-surface`. `memory-surface-draft` is not a
   conforming selectable mutable adapter. The current first-party Engram
-  package is `memory-surface-draft` / unverified. Its isolated T-009 evidence
-  does not certify general mutable use, other hosts or production scopes.
+  package is `memory-surface-draft` / unverified. Isolated historical
+  evidence does not certify general mutable use, other hosts or production
+  scopes.
 - Report exact ID/version, effective local/global path, host visibility,
   contract compatibility, required tools/permissions and verification limits.
   Check this agent's actual callable schemas and authorized non-destructive

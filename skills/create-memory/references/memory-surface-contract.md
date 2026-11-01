@@ -408,3 +408,13 @@ this contract.
 Optional coordination remains §10. A profile may record whether that
 boundary was observed. It must not infer support from memory
 availability, and it must not define a mission model.
+
+### Operating thresholds and absent guarantees
+
+An operating threshold of at most 80% of a documented physical limit (in
+that limit's unit) is a derivation choice, not a measured maximum. Direct
+representation at or below it, conditional lossless chunking above it.
+Guarantees a backend does not offer (CAS, multi-record transactions,
+physical delete) are `absent / not-assumed`; they neither weaken this
+contract nor, alone, justify extra records. Logical operations and
+guarantees remain at **1.0.0**.

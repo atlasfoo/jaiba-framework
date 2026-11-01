@@ -106,7 +106,7 @@ when the procedure marks that claim sufficient.
 | A-rev | Revision | `<revision covers the full object, or not>` | unknown | | | yes |
 | A-hist-fid | Revision | `<history fidelity>` | unknown | | | yes |
 | A-hist-ret | Revision | `<history retention>` | unknown | | | yes |
-| A-cas | Revision | `<native CAS, or absent; read/compare/write is not CAS>` | unknown | | | yes |
+| A-cas | Revision | `<native CAS, or absent / not-assumed; read/compare/write is not CAS>` | unknown | | | no |
 | A-cost-create | Cost | `<records, calls, data bytes, control bytes>` | unknown | | | yes |
 | A-cost-read | Cost | `<records, calls, data bytes, control bytes>` | unknown | | | yes |
 | A-cost-update | Cost | `<records, calls, data bytes, control bytes>` | unknown | | | yes |
@@ -131,15 +131,16 @@ Leave this section as the plan until the authorized experiment runs.
 |---|---|
 | Authorized operations | `<exact list, or not-authorized>` |
 | Variants | `<write/readback, update, repeated key, content dedupe across two logical addresses>` |
-| Max backend calls | `<at most 3 per batch>` |
+| Max backend calls | `<finite total for the declared plan, grouped in named batches>` |
 | Max mutations | `<finite>` |
-| Intended native / auxiliary / microstep | `<15s / 60s / 5m, operator-watched>` |
+| Intended native / auxiliary time bounds | `<15s / 60s, operator-watched; LLM turn time is not a bound>` |
 | Host can enforce those deadlines | `<yes/no; if no, say so>` |
 | Max sizes and units | `<finite>` |
 | Expected receipts | `<what success and expected rejection look like>` |
 | Stop conditions | `<unexpected contradiction, unnamed effect, uncertain ACK, budget>` |
 | Specimen hash / description | `<small, Unicode, CRLF, synthetic transformable text, no secrets>` |
-| Oversized | `<not-run unless current pertinent limit and unit are known>` |
+| Operating threshold | `<chosen, at most 80% of the documented physical limit, in its unit; a choice, not a measurement>` |
+| Oversized | `<not-run unless current pertinent limit and unit are known; at most one chunk-path confirmation>` |
 | Oversized size, computed once, overhead included | `<or not-applicable>` |
 | Protective encoding batch | `<later, separate; not assumed from plaintext>` |
 | JAIBA root / journal / catalogue created to study the record | `no` |
