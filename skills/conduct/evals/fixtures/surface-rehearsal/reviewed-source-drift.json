@@ -3,13 +3,13 @@
   "purpose": "reviewed source drift for immutable Phase4 T-021 historical rehearsal recordings",
   "source_hash_algorithm": "SHA-256 of canonical compact JSON encoding of decoded UTF-8 source text (surface_rehearsal.digest); no source normalization",
   "recording_policy": "Recorded journals and index are immutable; replay validates historical protocol evidence, not current-source execution. No recapture or fresh model run is claimed.",
-  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. Reviewed post-recording source paths: filesystem-surface.md under T-023 plus the later T-083 factory clarification; resolution.md, execute-mode.md and summarize-mode.md under T-024; memory-surface-contract.md under T-083. T-033 is not the provenance of any listed change.",
+  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. Reviewed post-recording source paths: filesystem-surface.md under T-023 plus the later T-083 factory clarification; resolution.md under T-024 plus the later T-088 removal of the stale Engram draft parenthetical; execute-mode.md and summarize-mode.md under T-024; memory-surface-contract.md under T-083. T-033 is not the provenance of any listed change.",
   "changed_sources": {
     "skills/create-memory/references/resolution.md": {
       "recorded_source_sha256": "2875ae3fa180b27058ae47485199b0fa53950d37b2a142bfad03d7df15922c2e",
-      "current_source_sha256": "d538b50b1971b5b3f60a870e8e9642559dd0ba131255da90e91f2a7bdeb2e942",
-      "classification": "known post-recording T-024 source change",
-      "reason": "T-024: added explicit unavailable-surface retry/stop and approved snapshot-recovery policy; prohibits empty fallback and requires authority handoff."
+      "current_source_sha256": "35baa7d28a8fbec4dd80e76b67004b0785f9c080d1474b46e852c4c2b2862b49",
+      "classification": "known post-recording T-088 source change",
+      "reason": "T-088: current bytes keep the T-024 unavailable-surface retry/stop and snapshot-recovery policy, and drop the parenthetical that named jaiba-engram-memory as a still-unselectable draft."
     },
     "skills/create-memory/references/filesystem-surface.md": {
       "recorded_source_sha256": "a14dbc4e48f9b1a04b922b60d7da6000ae83f897f207d6277ce2a27567e62951",

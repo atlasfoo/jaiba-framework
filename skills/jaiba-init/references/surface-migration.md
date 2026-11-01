@@ -13,7 +13,7 @@ effective `create-memory` installation through the host, then its canonical
 `memory-surface-contract.md`, `resolution.md`, `filesystem-surface.md` and
 `interchange.md` with the interchange template. Resolve each endpoint's
 operation mappings without assuming sibling installations. Missing definitions,
-incompatible versions, draft adapters (including `jaiba-engram-memory`), or
+incompatible versions, draft adapters, or
 unverified required capabilities block dependent operations. Adapter files,
 test fixtures and host memory bookkeeping are not backend evidence.
 

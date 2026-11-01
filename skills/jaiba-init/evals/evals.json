@@ -376,7 +376,7 @@
         "Does not treat missing local marker or .ai/ as proof the selected external project is absent; external mode requires no marker",
         "Verifies exact registry identity and complete owned catalogue/full reads; associates the existing brain without changing its concepts",
         "Creates only the authorized routing binding and fresh context identity, reads back routing fields; creates no executive context contents or constitutive objects",
-        "Does not seed or overwrite the existing brain and does not invoke current-draft Engram",
+        "Does not seed or overwrite the existing brain and does not invoke unselected jaiba-engram-memory",
         "Creates no .ai/ mirror/cache; ATL remains local",
         "Hands off to doctor; for later transfer, requires the effective init migrate-surface workflow, complete inventory, staged full readback and separate activation approval; does not claim live adapter conformance"
       ],
@@ -418,7 +418,7 @@
         "Honors explicit filesystem override over global candidate; same-ID local copy wins over global",
         "Surfaces human choice for two different IDs at the winning level and for malformed/duplicate/conflicting overrides; does not call a lower-precedence global candidate a conflict when one local ID wins",
         "Does not fall back if selected adapter is unavailable/failed; surfaces changed candidate set requiring reconfirmation",
-        "Does not select current-draft jaiba-engram-memory as conforming"
+        "Does not auto-select jaiba-engram-memory; category memory-surface is not activation"
       ],
       "files": []
     },

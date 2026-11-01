@@ -58,7 +58,7 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
         manifest = json.loads((FIXTURES / 'reviewed-source-drift.json').read_text())
         provenance = {
             'skills/create-memory/references/filesystem-surface.md': 'T-083',
-            'skills/create-memory/references/resolution.md': 'T-024',
+            'skills/create-memory/references/resolution.md': 'T-088',
             'skills/conduct/references/execute-mode.md': 'T-024',
             'skills/conduct/references/summarize-mode.md': 'T-024',
             'skills/create-memory/references/memory-surface-contract.md': 'T-083',
@@ -124,7 +124,9 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
         init = (ROOT / 'skills/jaiba-init/SKILL.md').read_text().lower()
         self.assertIn('migrate-surface', init)
         engram = (ROOT / 'skills/jaiba-engram-memory/SKILL.md').read_text().lower()
-        self.assertIn('not selectable', engram)
+        self.assertIn('never automatic', engram)
+        self.assertIn('filesystem by default', engram)
+        self.assertNotIn('memory-surface-draft', engram)
         self.assertRegex(migration, r'adapter files,\s*test fixtures and host memory bookkeeping are not backend evidence')
 
     def test_propose_and_refusal_have_zero_artifact_mutations(self):
