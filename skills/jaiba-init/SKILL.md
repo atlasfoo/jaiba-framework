@@ -1,7 +1,7 @@
 ---
 name: jaiba-init
 description: "Project-scoped JAIBA setup and constitutive memory maintenance on the resolved surface. Preserves filesystem bootstrap and legacy layouts; registers or links verified external brains without an `.ai/` mirror. Populates concepts, applies approved ADRs and fixes drift; machine setup belongs to jaiba-configure."
-version: 3.2.0
+version: 3.3.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

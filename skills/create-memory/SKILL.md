@@ -1,7 +1,7 @@
 ---
 name: create-memory
 description: Create a JAIBA memory-surface extension for a user-selected backend and available tools. Use when the user asks to build or adapt a memory adapter, connect JAIBA memory to a backend, or generate and install a memory-surface skill. Interviews an authorized scope, requires a contrasted storage-nature profile before any physical mapping, generates a skill with justified mappings, configuration and evals, verifies conformance separately, and offers explicit local or global host-visible installation. Not ordinary memory saving, implicit migration, service setup, or automatic backend activation.
-version: 3.2.0
+version: 3.3.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

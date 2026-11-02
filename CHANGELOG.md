@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v3.3.0 (2026-11-02)
+
+### Feat
+
+- **memory**: pluggable memory surfaces architecture and verified adapter protocols
+
+### Fix
+
+- **memory**: address PR review findings on surface guards and engram orphan reconciliation
+
 ## v3.2.0 (2026-10-16)
 
 ### Feat

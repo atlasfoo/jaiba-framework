@@ -1,7 +1,7 @@
 ---
 name: jaiba-engram-memory
 description: "Optional first-party JAIBA memory-surface adapter for Engram MCP. Consult when explicitly reviewing, validating, or operating the selected jaiba-engram-memory surface, including owned catalogue reads, authorized concept or executive writes, immutable logs and selective work retirement. Not ordinary Engram bookkeeping, automatic installation, project registration, migration or activation. Protocol JAIBA3 (jaiba-engram-storage/3). Selecting or operating this surface requires explicit configuration and binding; installation and activation are strictly opt-in and never automatic."
-version: 3.2.0
+version: 3.3.0
 author: atlasfoo<iscomejia15@outlook.com>
 category: memory-surface
 adapter-id: jaiba-engram-memory
