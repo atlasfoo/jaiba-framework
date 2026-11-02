@@ -93,6 +93,10 @@ Collisions are conflicts; never merge or overwrite silently.
 Read back every staged object and compare complete payloads, metadata,
 relations, and target inventory for missing or extra objects. Recheck source
 revision evidence and repeat staging verification if the source changed.
+Multi-hop transfer between physical protocols (`filesystem`, `JAIBA3`, and
+`posix-file/1`) has verified lossless evidence under trial `6c90b698-39ba-441e-9c63-35ba9f9055c3`,
+confirming fail-closed rejection of `digest-mismatch` (corrupt chunk) and
+`symlink-root` (decoy target) before write.
 Partial or unverified staging is not activation. Switching the effective
 binding requires explicit human approval after complete verification; retain
 the source through verified activation. Source retirement is a separate

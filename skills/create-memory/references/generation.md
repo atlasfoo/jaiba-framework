@@ -200,6 +200,34 @@ assertions only; say which claims fell and why.
 ## Minimal derivation
 
 Derive only from guarantees the contrasted profile marks sufficient.
+The pluggable surfaces architecture maintains three distinct layers:
+1. **Canonical logical contract (`jaiba-memory-surface/1.0.0`):** Defines
+   invariants, categories (constitutive vs executive), operations, and schema
+   validation across bundle and legacy flat layouts (`references/memory-surface-contract.md`).
+2. **Storage-nature profile:** The empirical characterization resulting from the
+   finite native experiment (`references/storage-nature.md`).
+3. **Physical adapter protocol:** The derived concrete serialization format and
+   wire protocol matching backend characteristics.
+
+Characterized physical adapter protocols include:
+- `jaiba-engram-storage/3` (`JAIBA3`): Single-observation JSON+base64+SHA-256
+  envelope used by `jaiba-engram-memory`. Bounded limits verified in trial
+  `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`: single catalogue observation per
+  `(namespace, project)`, direct objects `≤ 30,000` raw bytes, chunked objects
+  `> 30,000` raw bytes (verified at 55,000 B across two chunks in `T-087`), absent
+  native CAS (`absent / not-assumed`, single-writer serialization required), and
+  MCP `judgment_required` notifications ignored as advisory metadata.
+- `posix-file/1`: One-file-per-object format for external filesystem vaults
+  verified in multi-hop migration trials (`6c90b698-39ba-441e-9c63-35ba9f9055c3`).
+- Built-in `filesystem`: Directory tree layout mapping concept bundles or legacy flat files.
+
+Adapters such as `jaiba-engram-memory` remain strictly opt-in (`category: memory-surface`,
+`conformance-status: verified`), kept outside `skills/jaiba-configure/assets/skillset.txt`,
+and repositories remain on `filesystem` by default. Multi-hop migrations
+(`jaiba-init:migrate-surface`) require a staging verification barrier before activation,
+with fail-closed guards against `digest-mismatch` (corrupt chunk rejected) and
+`symlink-root` (decoy target rejected before write).
+
 Canonical constraints are
 [storage-nature.md §7](storage-nature.md#7-derivation) and contract §11.
 Do not universalize one backend's topology. Filesystem layout stays in
