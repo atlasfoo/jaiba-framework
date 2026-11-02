@@ -21,8 +21,30 @@ It is a user-chosen extension, not a third-party addition to JAIBA's pinned
 first-party distribution.
 
 A physical mapping is a conclusion from a contrasted nature profile, not a
-default record graph. Documentation, a schema, a probe, or that profile
-does not certify the product. A generated draft is not activated.
+default record graph. The architecture strictly separates three tiers:
+1. **Canonical logical contract (`jaiba-memory-surface/1.0.0`):** defines
+   invariants, categories (constitutive vs executive), operations, and schema
+   validation for bundle and legacy flat layouts (`references/memory-surface-contract.md`).
+2. **Storage-nature profile:** characterizes empirical backend guarantees through
+   a finite native experiment (`references/storage-nature.md`).
+3. **Physical adapter protocol:** derived serialization and wire mapping
+   (e.g., `JAIBA3` / `jaiba-engram-storage/3` single-observation envelope for
+   `jaiba-engram-memory`, `posix-file/1` one-file-per-object for vault trials, or
+   directory tree for `filesystem`).
+
+Documentation, a schema, a probe, or that profile does not certify the product.
+A generated draft is not activated. Adapters like `jaiba-engram-memory` are
+strictly opt-in (`category: memory-surface`, `conformance-status: verified` on
+bounded trial evidence `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`, outside
+`skills/jaiba-configure/assets/skillset.txt`), and repositories remain on
+`filesystem` by default. Migration across surfaces (`jaiba-init:migrate-surface`)
+was verified lossless across multi-hop trials (filesystem ↔ `JAIBA3` ↔ `posix-file/1`
+under trial `6c90b698-39ba-441e-9c63-35ba9f9055c3`), observing limits: single-catalogue
+observation per `(namespace, project)`, direct objects `≤ 30,000` raw bytes, chunked
+objects `> 30,000` raw bytes (verified at 55,000 B across two chunks in `T-087`), absent
+native CAS (`absent / not-assumed`, single-writer serialization required), advisory
+`judgment_required` ignored without calling judgment tools, and fail-closed
+`digest-mismatch` and `symlink-root` guards.
 
 ## References and authority
 

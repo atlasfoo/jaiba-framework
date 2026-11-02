@@ -21,7 +21,7 @@
   - [Installation modes](#installation-modes)
     - [Global installation (Recommended ✅)](#global-installation-recommended-)
     - [Project-scoped installation (Legacy)](#project-scoped-installation-legacy)
-  - [Memory surfaces (Phase 3 status)](#memory-surfaces-phase-3-status)
+  - [Pluggable memory surfaces architecture](#pluggable-memory-surfaces-architecture)
   - [Uninstalling JAIBA from a machine](#uninstalling-jaiba-from-a-machine)
   - [What is JAIBA?](#what-is-jaiba)
     - [Core principles](#core-principles)
@@ -80,7 +80,7 @@ The release-tag suffix pins the install to that git tag — the tag *is* the fra
 - Installs the **workflow/meta skillset** (`conduct`, `ask`, `fast`, `jaiba-init`, `create-knowledge`, `create-memory`, `jaiba-doctor` — seven core skills, exactly what `assets/skillset.txt` lists) globally — or project-locally, if you want one project's versions pinned
 - Installs the **subagent battery** (executors + specialists) into your agent's global `agents/` folder
 
-As a separate, explicitly chosen extra — never part of the core install — `jaiba-configure` can also offer the optional first-party `jaiba-engram-memory` adapter (see [Memory surfaces](#memory-surfaces-phase-3-status)). Declining it is a successful core-only setup.
+As a separate, explicitly chosen extra — never part of the core install — `jaiba-configure` can also offer the optional first-party `jaiba-engram-memory` adapter (see [Memory surfaces](#pluggable-memory-surfaces-architecture)). Declining it is a successful core-only setup.
 
 It is **safe to re-run**: that is how a machine gets refreshed after a framework upgrade. Anything already present but different is a question, never a silent overwrite.
 
@@ -158,14 +158,20 @@ Skills are installed locally in each project under `.agents/` or `.claude/skills
 
 ---
 
-## Memory surfaces (Phase 3 status)
+## Pluggable memory surfaces architecture
 
-At the framework's current source-development stage, JAIBA gains a memory-surface layer as **two skills**, split core vs optional exactly as the configure manifest (`skills/jaiba-configure/assets/skillset.txt`) draws it: **seven core skills** plus **one optional package**. The install examples below are pinned to the packaged release; each package must actually be present at that release tag — if it is not, the outcome is reporting it unavailable, never falling back to HEAD or an unpinned source.
+JAIBA provides a pluggable memory-surface layer with a strict three-tier separation of concerns:
+
+1. **Canonical logical contract (`jaiba-memory-surface/1.0.0`):** Defines canonical memory invariants, concept categories (constitutive vs executive), operations (`catalogue`, `get`, `put`, `append-log`, `archive-context`, `clear-work`), and schema validation across both bundle and legacy flat layouts. Owned by `skills/create-memory/references/memory-surface-contract.md`.
+2. **Storage-nature profile (`references/storage-nature.md`):** Characterizes empirical backend guarantees through a finite native experiment (persistence, single-writer serialization, operating thresholds, absent capabilities like native CAS, and error boundaries).
+3. **Physical adapter protocol:** Derived concrete serialization and wire mapping matching backend guarantees (e.g., `jaiba-engram-storage/3` / `JAIBA3` single-observation envelope for Engram, `posix-file/1` one-file-per-object for file vaults, or the directory tree for `filesystem`).
+
+The framework distributes this layer as **two skills**, split core vs optional exactly as defined in the configure manifest (`skills/jaiba-configure/assets/skillset.txt`): **seven core skills** plus **one optional package**. The install examples below are pinned to the packaged release; each package must actually be present at that release tag:
 
 | Skill | Status | What it is |
 |---|---|---|
 | `create-memory` | **Core** — installed with the workflow/meta skillset | The memory-surface **generator**: it builds a memory-surface skill for a user-selected backend from the canonical `jaiba-memory-surface` contract **1.0.0** — and ships that canonical contract plus its `resolution.md` and `filesystem-surface.md`, which `jaiba-configure`, `jaiba-init` and `jaiba-doctor` resolve surface semantics from. Requires only `git`: no MCP tool, no backend service, no automatic installation, and no change to any consumer or binding. |
-| `jaiba-engram-memory` | **Optional** — deliberately kept out of the core skillset | The first-party **Engram adapter** (Engram MCP). Its own operations require `mcp:engram`, which affects only this adapter. Conformance is **verified on finite trial evidence** (T-086/T-087); selecting it is strictly opt-in and requires an explicit binding, and installing it changes no consumer or active binding. |
+| `jaiba-engram-memory` | **Optional** — deliberately kept out of the core skillset | The first-party **Engram adapter** (Engram MCP). Its own operations require `mcp:engram`, which affects only this adapter. Conformance is **verified on finite trial evidence** (`efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`); selecting it is strictly opt-in and requires an explicit binding, and installing it changes no consumer or active binding. |
 
 ### Installing the optional adapter
 
@@ -175,17 +181,21 @@ At the framework's current source-development stage, JAIBA gains a memory-surfac
 npx skills add atlasfoo/jaiba-framework#v3.2.0 --skill jaiba-engram-memory
 ```
 
-Add `-g` for a global install, or choose *project-local* for one repository. Declining is a successful core-only configuration: no optional adapter installed — and no Engram MCP available — is normal core setup, never a core failure.
+Add `-g` for a global install, or choose *project-local* for one repository. Declining is a successful core-only configuration: no optional adapter installed — and no Engram MCP available — is normal core setup, never a core failure. Repositories stay on the built-in filesystem surface by default.
 
-### Selection, instrumentation and current limits
+### Selection, instrumentation and migration guarantees
 
 - **Selection precedence:** explicit project `AGENTS.md` data field (`jaiba-memory-surface: filesystem`, or an exact adapter ID) → host-visible installed project-local adapter → host-visible installed global adapter → built-in filesystem. Multiple different candidates at the winning level require an explicit human choice; there is no silent fallback to a lower level, to another project, or to a new empty brain.
 - **The filesystem default is unchanged:** it preserves both supported `.ai/memory/` layouts — concept bundle and legacy flat — exactly as described in [Memory structure](#-memory-structure-the-agents-brain).
 - **External instrumentation needs no local marker:** on an external surface, a valid binding plus a real, complete, readable constitutive catalogue *is* the instrumentation — the `.ai/` folder and the root `AGENTS.md` marker may be absent. JAIBA creates no hidden `.ai/` mirror or cache for external surfaces.
 - **`.atl/` stays local:** the toolchain layer remains at each work root, gitignored and independent of memory — external or not.
-- **Existing local memory is retained:** with populated `.ai/` stores, an external selection requires an explicitly confirmed filesystem exception, and any surface migration is deferred (below) — nothing is moved or superseded automatically.
-
-> ⚠️ **Transitional status — Phase 3.** Setup now resolves and *inspects* surfaces, but this release does **not** yet run workflows on them: `conduct`, `ask`, `fast` and the remaining subagent battery report external capability as **pending Phase 4** instead of falling back to `.ai/`. Do not read an installation, binding or green probe as activation — end-to-end workflows on an external surface do not work yet. Surface migration involving populated stores is **pending Phase 5**, even with an explicit selection or a saved binding.
+- **Existing local memory is retained:** with populated `.ai/` stores, an external selection requires an explicitly confirmed filesystem exception, and any surface migration requires staging verification before activation — nothing is moved or superseded automatically.
+- **Verified migration and limits:** Surface migration (`jaiba-init:migrate-surface`) was verified lossless across multi-hop trials (filesystem ↔ Engram `JAIBA3` ↔ external vault `posix-file/1` under trial `6c90b698-39ba-441e-9c63-35ba9f9055c3`). Operational limits and constraints verified:
+  - Single-catalogue observation per `(namespace, project)` avoids full-text search dependency.
+  - Direct payload objects `≤ 30,000` raw bytes and chunked objects `> 30,000` raw bytes (verified at 55,000 B across two chunks in trial `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`) maintain exact byte round-trips.
+  - Native CAS is absent (`absent / not-assumed`); application single-writer serialization is mandatory.
+  - MCP `judgment_required` notifications are treated as advisory metadata without calling judgment tools or blocking execution.
+  - Fail-closed guards: corrupt chunks trigger `digest-mismatch` without writing, and symlink traversals trigger `symlink-root` rejection before modifying storage.
 
 ---
 
@@ -474,7 +484,7 @@ The framework health check — a pre-flight before entering the conduct chain. *
 
 ### 🧩 `jaiba-engram-memory` — optional Engram adapter
 
-The first-party memory-surface adapter for the Engram MCP — developed in the same source stage but **outside** the core skillset: `jaiba-configure` offers it after core setup as a separate, explicitly chosen install pinned to the packaged release — reported unavailable if absent at that pin, never fetched unpinned ([Memory surfaces](#memory-surfaces-phase-3-status)). It declares `category: memory-surface` with **verified conformance** (on bounded trial evidence) and a `mcp:engram` requirement scoped to itself alone; selecting or operating it requires explicit configuration, and installing it changes no consumer, binding or workflow. Consult it only when explicitly reviewing, validating or operating the selected surface.
+The first-party memory-surface adapter for the Engram MCP — developed in the same source stage but **outside** the core skillset: `jaiba-configure` offers it after core setup as a separate, explicitly chosen install pinned to the packaged release — reported unavailable if absent at that pin, never fetched unpinned ([Memory surfaces](#pluggable-memory-surfaces-architecture)). It declares `category: memory-surface` with **verified conformance** (on bounded trial evidence `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`) and a `mcp:engram` requirement scoped to itself alone; selecting or operating it requires explicit configuration, and installing it changes no consumer, binding or workflow. Consult it only when explicitly reviewing, validating or operating the selected surface.
 
 ---
 
