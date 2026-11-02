@@ -74,24 +74,43 @@ They never enter verification, never block, and are never answered with
 ## 5. Write order and reconciliation (single writer)
 
 1. Encode the snapshot; choose direct or chunked by the 30,000-byte threshold.
-2. Save/update object (or chunks, then chunked-object). Use `mem_save` with
-   `capture_prompt:false`, `type:"manual"`, `scope:"project"` and the
-   deterministic `topic_key`. Use `mem_update(id, content, expected_project)` for
-   in-place revisions when the `obs_id` is in the catalogue.
+2. Save/update object (or chunks, then chunked-object):
+   - When the `obs_id` is already in the catalogue, use
+     `mem_update(id, content, expected_project)` for in-place revisions.
+   - For an object not yet in the catalogue (new create or retry of an
+     interrupted attempt), **probe the deterministic `topic_key` first** (e.g.
+     via `mem_search(topic_key)`) before calling `mem_save`. Because `mem_save`
+     with an existing `topic_key` performs an in-place upsert (`A-upsert`),
+     saving blindly would overwrite an uncatalogued orphan from an interrupted
+     prior write without comparing bytes.
+   - If an existing observation is found for the key: read it back
+     (`mem_get_observation(id)`), verify framing and decode the snapshot. If
+     its address and `sha256` match the intended payload, adopt the existing
+     `obs_id` directly into the catalogue without rewriting. If the existing
+     observation has a different digest, owner, address, or revision, stop
+     immediately with a mismatch conflict (`mismatch-stop`); never overwrite it.
+   - If no existing observation is found for that topic key, save using
+     `mem_save` with `capture_prompt:false`, `type:"manual"`, `scope:"project"`
+     and the deterministic `topic_key`.
 3. Read the observation back; verify (section 4) and compare exact bytes.
 4. Save/update catalogue with the new entry; read back and verify.
 5. Never call `mem_save` for narrative notes during surface operations.
 
 Interruption points: after 2 (orphan object), after 3, after 4 (stale catalogue).
-Retry uses the same address and key. On retry, a found object whose address and
-sha256 match is adopted into the catalogue (no second object); a different owner,
-address, revision or digest stops with a mismatch. A previous catalogue version
-remains the last guaranteed state until step 4 verifies.
+Retry uses the same address and key. On retry, the pre-save probe finds the
+orphan; if its address and sha256 match, it is adopted into the catalogue (no
+second object and no upsert); a different owner, address, revision or digest stops
+with a mismatch before any write. A previous catalogue version remains the last
+guaranteed state until step 4 verifies.
 
 ## 6. Closure, logs and retirement
 
-- `append-log`: immutable log object keyed by close ID. Same close ID and same
-  digest is idempotent; same ID with different payload is a conflict.
+- `append-log`: immutable log object keyed by close ID. Before calling
+  `mem_save`, probe the deterministic close ID topic key. If an observation
+  already exists: read back and verify its digest. The same close ID and same
+  digest is idempotent (returns existing observation ID); the same ID with a
+  different payload stops with a conflict before writing. Never perform a blind
+  `mem_save` upsert over an existing close ID.
 - `archive` then `clear-work`: verify the closing entry first, enumerate the
   context's executive objects from the catalogue, recheck revisions, mark only
   that context's entries `retired`, update catalogue, verify. Other contexts and

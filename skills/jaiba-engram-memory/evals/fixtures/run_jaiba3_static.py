@@ -125,12 +125,42 @@ def expect_fail(fn, label):
     raise AssertionError(f"{label} was accepted")
 
 
-def reconcile(catalog, observed):
-    """Finite reconcile: object/chunks first, then catalog. Never mint a second object."""
+def reconcile(catalog, observed, intended=None):
+    """Finite reconcile: object/chunks first, then catalog. Never mint a second object.
+
+    An uncatalogued orphan is adopted only when its observed sha256 matches the intended
+    payload digest. A differing digest or mismatched catalog entry stops with mismatch-stop.
+    """
     out = {}
-    for addr, obj_id in observed.items():
+    for addr, obs in observed.items():
+        if isinstance(obs, dict):
+            obj_id = obs["obs_id"]
+            obs_sha = obs.get("sha256")
+        elif isinstance(obs, tuple):
+            obj_id, obs_sha = obs
+        else:
+            obj_id = obs
+            obs_sha = None
+
         entry = catalog["entries"].get(addr)
-        out[addr] = "adopt-existing" if entry is None else ("ok" if entry["obs_id"] == obj_id else "mismatch-stop")
+        expected_sha = intended.get(addr) if intended else None
+
+        if entry is None:
+            if obs_sha is not None and expected_sha is not None:
+                out[addr] = "adopt-existing" if obs_sha == expected_sha else "mismatch-stop"
+            elif expected_sha is not None:
+                out[addr] = "mismatch-stop"
+            else:
+                out[addr] = "adopt-existing"
+        else:
+            if entry["obs_id"] != obj_id:
+                out[addr] = "mismatch-stop"
+            elif entry.get("sha256") is not None and obs_sha is not None and entry["sha256"] != obs_sha:
+                out[addr] = "mismatch-stop"
+            elif expected_sha is not None and obs_sha is not None and expected_sha != obs_sha:
+                out[addr] = "mismatch-stop"
+            else:
+                out[addr] = "ok"
     return out
 
 
@@ -198,10 +228,39 @@ def main(evidence):
     swapped = dict(manifest, chunks=list(reversed(manifest["chunks"])))
     expect_fail(lambda: reassemble(swapped, reads), "chunk order")
 
-    # 6. Catalogue reconciliation.
-    catalog = {"kind": "catalog", "entries": {"decisions/001": {"obs_id": 7, "state": "live"}}}
-    rec = reconcile(catalog, {"decisions/001": 7, "decisions/002": 9})
+    # 6. Catalogue reconciliation with sha256 verification.
+    catalog = {
+        "kind": "catalog",
+        "entries": {
+            "decisions/001": {"obs_id": 7, "sha256": "digest-001", "state": "live"},
+        },
+    }
+    intended = {
+        "decisions/001": "digest-001",
+        "decisions/002": "digest-002",
+    }
+    rec = reconcile(
+        catalog,
+        {"decisions/001": {"obs_id": 7, "sha256": "digest-001"},
+         "decisions/002": {"obs_id": 9, "sha256": "digest-002"}},
+        intended,
+    )
     assert rec == {"decisions/001": "ok", "decisions/002": "adopt-existing"}
+
+    # Differing orphan digest stops with mismatch (must NOT overwrite or adopt):
+    rec_diff = reconcile(
+        catalog,
+        {"decisions/001": {"obs_id": 7, "sha256": "digest-001"},
+         "decisions/002": {"obs_id": 9, "sha256": "digest-CONFLICT"}},
+        intended,
+    )
+    assert rec_diff == {"decisions/001": "ok", "decisions/002": "mismatch-stop"}
+
+    # Legacy invocation backwards-compatible:
+    assert reconcile(catalog, {"decisions/001": 7, "decisions/002": 9}) == {
+        "decisions/001": "ok",
+        "decisions/002": "adopt-existing",
+    }
     assert reconcile(catalog, {"decisions/001": 8}) == {"decisions/001": "mismatch-stop"}
 
     # 7. judgment_required is advisory: never a verification input.

@@ -198,6 +198,58 @@ class SurfaceGuardRegressionTests(unittest.TestCase):
             written = write_exclusive(root, "payload.bin", b"ok")
             self.assertEqual(written.read_bytes(), b"ok")
 
+    def test_intermediate_symlink_component_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            root = base / "root"
+            root.mkdir()
+            decoy = base / "decoy"
+            decoy.mkdir()
+            link = root / "sub"
+            link.symlink_to(decoy, target_is_directory=True)
+            with self.assertRaises(GuardRejected) as caught:
+                write_exclusive(root, "sub/payload.bin", b"must-not-land")
+            self.assertEqual(caught.exception.code, "invalid-object")
+            self.assertIn("sub", caught.exception.detail)
+            self.assertEqual(list(decoy.iterdir()), [])
+            self.assertFalse((decoy / "payload.bin").exists())
+
+    def test_nested_relative_path_exclusive_create(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            written = write_exclusive(root, "identity/purpose.md", b"# Purpose")
+            self.assertEqual(written.read_bytes(), b"# Purpose")
+            self.assertTrue((root / "identity" / "purpose.md").is_file())
+
+    def test_partial_write_failure_cleans_destination_and_allows_retry(self):
+        import unittest.mock as mock
+        with tempfile.TemporaryDirectory() as td:
+            dest = Path(td) / "chunk.bin"
+            payload = b"test-payload-bytes-for-chunk"
+            declared = hashlib.sha256(payload).hexdigest()
+            original_write = os.write
+
+            def failing_write(fd, data):
+                original_write(fd, data[:5])
+                raise OSError("simulated short write or disk full")
+
+            with mock.patch("os.write", side_effect=failing_write):
+                with self.assertRaises(OSError):
+                    accept_chunk_or_reject(payload, declared, dest)
+
+            # Incomplete destination must be cleaned up:
+            self.assertFalse(dest.exists())
+
+            # Retry without mock error must succeed and not fail with FileExistsError:
+            accept_chunk_or_reject(payload, declared, dest)
+            self.assertEqual(dest.read_bytes(), payload)
+
+    def test_external_store_append_conflict_on_different_payload(self):
+        store = ExternalStore()
+        store.append("ctx", "key", "payload-1", approved=True)
+        with self.assertRaisesRegex(RuntimeError, "append conflict"):
+            store.append("ctx", "key", "payload-2-different", approved=True)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

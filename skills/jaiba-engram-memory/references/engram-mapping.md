@@ -87,9 +87,9 @@ executive contexts. Uncontrolled concurrent writers block mutation.
 | `resolve` | Recompute selection (override, local, global, built-in filesystem); resolve identity via catalogue aliases; confirm context binding. A failed selected adapter never falls back or creates an empty brain. |
 | `catalog` | Verified catalogue read; return entries for the exact address scope (live and retired states preserved). |
 | `read` | Catalogue entry, then verified object (or chunked-object reassembly); exact full content, metadata, unknown fields and relations. |
-| `create` | Absent from catalogue, then storage §5 order; exclusive create is checked via catalogue, never via topic upsert. |
+| `create` | Absent from catalogue; probe deterministic topic_key before save to detect orphans from interrupted attempts; if orphan found, verify digest (match adopts, mismatch stops with conflict); only call mem_save if absent; then storage §5 order. |
 | `update` | Pre-read, check expected revision, `mem_update(id, content, expected_project)`, readback, catalogue update. |
-| `append-log` | Immutable log object keyed by close id; idempotent on same digest, conflict otherwise. |
+| `append-log` | Immutable log object keyed by close id; probe topic_key before save; readback existing to verify digest: idempotent on same digest, stops with conflict on different payload; never blind mem_save upsert. |
 | `archive` | Verified closing entry first; no destructive step. |
 | `clear-work` | After archive: frozen inventory of one context, revision recheck, mark only that context's entries `retired`, verify. |
 | `export` / `import` | Neutral transfer per `create-memory` `interchange.md`; every object read verified; import never overwrites without explicit decision and never changes the source. |
@@ -102,8 +102,8 @@ otherwise ignored.
 Fail closed on: wrong `Project`/`Scope`, missing or duplicate wire/labels,
 truncation, digest mismatch, foreign owner/address/revision, unsupported
 profile, corrupt or missing chunk, unknown outcome of a write. An uncertain
-write ACK gets one diagnosis and an id-based reconcile; no blind retry through
-`mem_save`.
+write ACK gets one diagnosis and an id/digest-based reconcile; probe topic_key
+before retry and never blind retry through `mem_save`.
 
 Local validation: `python3 -B skills/jaiba-engram-memory/evals/fixtures/run_jaiba3_static.py <evidence-dir>`
 checks wire, framing, truncation, censorship, chunk reassembly, ownership and

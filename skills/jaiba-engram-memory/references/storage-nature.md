@@ -81,9 +81,12 @@ not replayed.
   object, save catalogue, get catalogue), plus one prior `mem_current_project`.
   Object wire 612 ASCII characters; catalogue wire 780. Chunked objects
   were not measured in this profile batch (measured in T-087).
-- **Interruption:** object first, catalogue last. Both readbacks matched,
-  so this batch did not stop between them. No second logical object was
-  minted.
+- **Interruption and orphan protection:** object first, catalogue last. Both
+  readbacks matched, so this batch did not stop between them. No second logical
+  object was minted. Because A-upsert updates in place on topic_key matches,
+  retries and uncatalogued creates probe topic_key before saving; matching
+  sha256 adopts the orphan, while a differing digest stops with a mismatch
+  rather than overwriting via upsert.
 
 ## Sufficient and blocked
 
