@@ -1,8 +1,18 @@
+---
+jaiba-memory-surface: filesystem
+---
+
 # AGENTS.md — JAIBA project marker
 
 This repository is **JAIBA-instrumented** (Joint-operations Artificial
 Intelligence Behavioral Architecture). This file is deliberately
 minimal: behavior does not live per-repo.
+
+**Surface pin.** The frontmatter field above is selection data for this
+repository only. It pins the built-in filesystem surface so showcase and
+dogfooding sessions resolve `.ai/` even when a host-visible adapter is
+installed. It is not a behavioral rule, and the marker template does not
+copy it into other projects.
 
 1. **Behavior** — follow the **JAIBA Behavioral Contract** installed
    globally in your agent configuration (file `jaiba-contract.md` in
@@ -38,4 +48,6 @@ case where "the project" and "the JAIBA framework" are the same thing
 — see [`.ai/memory/identity/purpose.md`](.ai/memory/identity/purpose.md)
 and [`scope.md`](.ai/memory/identity/scope.md) for how that boundary is
 drawn. For the framework's own architecture as a reader-facing
-document, see `README.md`, not this file.)
+document, see `README.md`, not this file.) The surface pin in the
+frontmatter is the documented exception: selection is an `AGENTS.md`
+data field, not a memory concept.
