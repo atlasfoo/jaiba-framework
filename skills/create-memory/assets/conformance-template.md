@@ -9,57 +9,32 @@ A generated draft is not activated.
 
 ## Claim envelope
 
-- Adapter ID/version, backend/tool/schema versions: `<fill>`
-- Effective `create-memory` installation and contract: `jaiba-memory-surface`
-  `1.0.0`; `<verified host-visible locator>`
-- Procedure provenance locator: `<generation-time installation>/references/storage-nature.md`.
-  Historical. Not a sibling path, not this package's profile, and not
-  authority after the package moves. Date and resolution method are
-  separate fields, not part of the path.
-- Active procedure reference: `<this host's re-resolved installation>/references/storage-nature.md`,
-  or `not-yet-resolved`. Same string in the profile, mapping, and this
-  record. An unidentified relevant procedure or contract change blocks
-  re-derivation of affected claims. Do not ship a repository absolute
-  path as universal active configuration.
-- Filled profile: package `references/storage-nature.md`; role
-  `backend-specific-profile`; status `<unfilled / hypothesis-only /
-  incomplete / discrepant / contrasted>`
+Certification strictly anchors to the tuple `(backend, tool/schema versions, physical protocol, contract-version: 1.1.0)`. Conformance is a property of the adapter package and backend protocol, portable across all agent hosts.
+
+- Adapter ID and version: `<fill>`
+- Backend identity and version: `<fill>`
+- Tool versions (canonical server and published tool name): `<fill>`
+- Physical protocol identifier and version: `<fill>`
+- Contract identifier and version: `jaiba-memory-surface` `1.1.0`; effective `create-memory` installation: `<verified host-visible locator>`
+- Archetype: `<document-tree | record-store>` (unknown strictly blocks derivation and conformance)
+- Certifying host agent (`certifying-host: <host>`): recorded as provenance of the test run only, NOT as an applicability scope. Conformance certification is portable across all agent hosts.
+- Date, tester, and documentation sources: `<fill>`
+- Procedure provenance locator: `<generation-time installation>/references/storage-nature.md`, with identified revision/digest, date, and resolution method. Historical provenance only. Not a sibling path, not this package's profile, and not authority after the package moves. Dynamic re-resolution applies per session; `active-procedure-reference` is not a persisted field.
+- Filled profile: package `references/storage-nature.md`; role `backend-specific-profile`; status `<unfilled / hypothesis-only / incomplete / discrepant / contrasted>`
 - Sufficient guarantees the mapping depends on: `<assertion ids, or none>`
 - Blocked guarantees: `<unknown / inferred / documented-only / discrepant>`
-- Profile evidence locator, versions, date, environment: `<durable locator
-  outside the repository and the backend, or absent>`
-- Host, date, tester and documentation sources: `<fill>`
-- Nature-experiment scope: `<namespace / location / identities; physical
-  project or account only if explicitly authorized and ownership is
-  checkable; or not-run>`
-- Conformance scope: `<new namespace, location, and identities>`. A shared
-  physical backend project or account is allowed only under that same
-  explicit, checkable isolation. Do not require a newly registered
-  physical project. Do not reuse experiment records, bindings, locators,
-  or caps.
-- Residue-gate outcome, if the nature experiment depended on a historically
-  contaminated store: `<not-applicable / blocked / retirement-verified /
-  abstention-accepted>` — exact ids and actions, or the named residual
-  conditions the human accepted. A generic continuation is not this field.
+- Profile evidence locator, versions, date, environment: `<durable locator outside the repository and the backend, or absent>`
+- Nature-experiment scope: `<namespace / location / identities; physical project or account only if explicitly authorized and ownership is checkable; or not-run>`
+- Conformance scope: `<new namespace, location, and identities>`. A shared physical backend project or account is allowed only under that same explicit, checkable isolation. Do not require a newly registered physical project. Do not reuse experiment records, bindings, locators, or caps.
+- Residue-gate outcome, if the nature experiment depended on a historically contaminated store: `<not-applicable / blocked / retirement-verified / abstention-accepted>` — exact ids and actions, or the named residual conditions the human accepted. A generic continuation is not this field.
 - Fixture mutation/cleanup authorization and writer handoff: `<fill>`
 - Fixture inventory, expected payloads and redacted evidence location: `<fill>`
-- Costs the mapping declares: `<records, calls, data bytes, control bytes;
-  shared index vs per-object; unknown is not zero>`
-- Recovery boundaries: `<non-atomic points, retry identity, last guaranteed
-  version; or not derived>`
+- Costs the mapping declares: `<records, calls, data bytes, control bytes; shared index vs per-object; unknown is not zero>`
+- Recovery boundaries: `<non-atomic points, retry identity, last guaranteed version; or not derived>`
 - Required capabilities: `<supported / unsupported / unverified, each>`
-- Optional capabilities, including native CAS: `<supported / unsupported /
-  unverified, each, with actual guarantees>` — single-writer evidence is
-  not a CAS pass.
-- Limits/encoding/normalization and unknown restrictions: `<fill with units;
-  documented limit, observed sample, and operating cap stay separate>`
-- Overall: **UNVERIFIED** until every required check passes for this envelope
-  and the mapping depends only on sufficient guarantees from a contrasted
-  profile. Unsupported required capabilities, a necessary guarantee without
-  sufficient evidence, or a docs/observation discrepancy mean
-  **NONCONFORMING**. Blocked/not-run checks remain unverified. No
-  whole-backend or all-version certification. Do not upgrade the verdict
-  because the profile exists.
+- Optional capabilities, including native CAS and executive-journal: `<supported / unsupported / unverified, each, with actual guarantees>` — single-writer evidence is not a CAS pass.
+- Limits/encoding/normalization and unknown restrictions: `<fill with units; documented limit, observed sample, and operating cap stay separate>`
+- Overall: **UNVERIFIED** until every required check passes for this envelope, the mapping depends only on sufficient guarantees from a contrasted profile, and the Efficiency Gate passes. Unsupported required capabilities, a necessary guarantee without sufficient evidence, an efficiency nonconformance (such as monolithic full-object executive overwrites on a `record-store`), or a docs/observation discrepancy mean **NONCONFORMING**. Blocked/not-run checks remain unverified. No whole-backend or all-version certification. Do not upgrade the verdict because the profile exists.
 
 ## Profile precondition
 
@@ -69,7 +44,7 @@ the operation matrix.
 
 | Check | Evidence required | Status / evidence |
 |---|---|---|
-| Procedure locator | Provenance locator preserved. Active reference re-resolved on this host and identical in the profile, the mapping, and this record. Not a relative link to the package profile, not a sibling assumption, and not a stored absolute path treated as authority. | not run |
+| Procedure locator | Provenance locator preserved (`procedure-provenance` only). Active reference is dynamically re-resolved per session on this host (never persisted). Not a relative link to the package profile, not a sibling assumption, and not a stored absolute path treated as authority. | not run |
 | Profile is filled evidence | Instantiated from the profile template. Not a paste of the factory procedure. Assertion states are only documented, observed, inferred, unknown, or discrepant. | not run |
 | Contrast | Documented and observed claims compared; both sides of a discrepancy kept; evidence locator recovers original, stored, and transported bytes plus the full comparison. | not run |
 | Sufficiency | Every physical claim the mapping depends on cites a sufficient assertion. Empty list means no physical dependence. | not run |
@@ -95,11 +70,67 @@ maximum.
 | read | Exact address, complete content/metadata/relations/revision; deterministic chunk reconstruction and explicit end only when chunking was derived. | not run |
 | create | Authoritative absence, collision refusal, receipt and full exact readback including unknown fields. Returned id checked against logical address and ownership before adopt. | not run |
 | update | Pre-read full revision, preservation of unrelated/unknown fields, changed revision, receipt and intended full-object readback. | not run |
+| patch | Closed op vocabulary, expected-head pre-check, draft-only rules, atomic refusal without partial effects; in-place edit for `document-tree`, base + deltas + context-head for `record-store`. | not run |
+| compact | Idempotent consolidation of deltas into base (`record-store`) or no-op success (`document-tree`); expected-head check, unchanged materialized readback, intact inventory. | not run |
 | append-log | Immutable entry, close ID, exact readback; same key/payload returns existing verified receipt; changed payload conflicts. | not run |
 | archive | Verified log receipt and frozen complete context inventory with addresses/revisions/payload evidence. | not run |
 | clear-work | Re-enumeration/revision check, selective unchanged-object deletion, authoritative absence, unchanged other contexts/logs; exact residuals after partial deletion. | not run |
 | export | Complete scoped manifest/full payloads/unknown fields/relations/original forms/IDs/source revisions; stable source inventory. | not run |
 | import | Separate staging, collision refusal, every-object full readback, no missing/extra objects, resolvable relations and stable source; no automatic activation. Multi-object migration journal retained. | not run |
+
+## Efficiency Gate
+
+Grade token and operation efficiency across canonical Spec-Driven Development (SDD)
+lifecycle scenarios under `jaiba-memory-surface` **1.1.0**.
+
+### Normative efficiency rules
+
+- **$O(\delta)$ efficiency**: Updates to executive artifacts during iterative drafting,
+  task execution waves, and state transitions must transmit payload bytes and require
+  operation calls proportional to the modified delta ($O(\delta)$), not the full size
+  of the cumulative artifact ($O(N)$).
+- **Archetype enforcement**:
+  - `record-store`: Surfaces declaring archetype `record-store` MUST support `patch`
+    via the executive journal (`base` + ordered deltas + `context-head`). Monolithic
+    full-object executive overwrites during `spec` draft iterations or `execute` task
+    updates MUST be graded **NONCONFORMING** in 1.1.0. The §3 full-`update` compatibility
+    path is reserved for legacy `1.0.x` adapters and must not paper over a missing
+    `patch` capability or journal obligation in 1.1.0.
+  - `document-tree`: Surfaces declaring archetype `document-tree` implement `patch`
+    as in-place document edits. Rewriting unaffected documents across the context or
+    triggering quadratic write amplification is nonconforming.
+- **Gate verdict**: Any scenario exhibiting nonconforming efficiency, or any `record-store`
+  resorting to monolithic executive overwrites, makes the overall conformance verdict
+  **NONCONFORMING**.
+
+### Lifecycle scenario evaluation
+
+| Scenario | Declared transport | Calls count | Transmitted token payload bytes | Efficiency verdict (conforming O(delta) vs nonconforming) |
+|---|---|---|---|---|
+| `initialize` | `<batch create / direct tool / atomic pipeline>` | `<calls>` | `<bytes; initial creation without quadratic rewrites>` | not run |
+| Iterative draft revisions in `spec` | `<patch ops: replace-section, update-criterion, remove-criterion>` | `<calls>` | `<bytes; delta payload only, no monolithic rewrite>` | not run |
+| Wave of `execute` | `<patch ops: check, amend-task, append-entry>` | `<calls>` | `<bytes; incremental delta per task/walkthrough step>` | not run |
+| Plan approval | `<patch op: set-frontmatter status: approved>` | `<calls>` | `<bytes; minimal metadata mutation without rewriting body>` | not run |
+| In-session read / display | `<deterministic render / selective projection>` | `<calls>` | `<bytes; structured read without FTS or token bloat>` | not run |
+
+### Scenario descriptions
+
+1. **`initialize`**: Batch creation of initial constitutive and executive objects.
+   Must verify absence and adopt/link initial concepts without quadratic re-writes
+   or repeated full-tree rebuilds.
+2. **Iterative draft revisions in `spec`**: Modifying `draft` PRD or plan before
+   approval using `replace-section`, `update-criterion`, and `remove-criterion`.
+   For `record-store`, deltas append to the journal; for `document-tree`, edits
+   apply in-place. Monolithic full-object replacement is graded **NONCONFORMING**.
+3. **Wave of `execute`**: Continuous task execution updating tasks (`check`,
+   `amend-task`) and walkthrough (`append-entry`). Updates must transmit delta
+   increments $O(\delta)$ without re-transmitting completed task history or entire
+   walkthrough content. Monolithic rewrites are graded **NONCONFORMING**.
+4. **Plan approval**: Updating frontmatter status (`set-frontmatter status: approved`).
+   Must mutate only frontmatter metadata in-place or via delta without re-serialising
+   or re-transmitting the entire specification body.
+5. **In-session read / display**: Deterministic formatting and display via `render`
+   without full-text search sweeps, unindexed scans, or token bloat.
 
 ## Derivation, cost, and recovery
 
@@ -206,9 +237,13 @@ Record actual evidence or fixture outcomes separately from live claims:
 
 List passed/failed/blocked/not-run checks, optional exclusions, retained
 fixture state and authorized cleanup results, exact evidence locators,
-revalidation triggers and remaining risks. Distinguish the nature profile,
-generated evals, executed backend checks, and separately approved
-comparative skill evaluations. State draft/conformance, installed/host-visible,
-and activated status independently. No migration, consumer activation, or
-native CAS claim without its own observed evidence and explicit authority.
-Do not report engine emptiness, and do not report a profile as certification.
+revalidation triggers, and remaining risks. Include the Efficiency Gate
+results across all five canonical SDD scenarios. Surfaces with archetype
+`record-store` that rely on monolithic executive rewrites during `spec`
+draft revisions or `execute` task updates must be delivered as
+**NONCONFORMING**. Distinguish the nature profile, generated evals, executed
+backend checks, and separately approved comparative skill evaluations.
+State draft/conformance, installed/host-visible, and activated status
+independently. No migration, consumer activation, or native CAS claim without
+its own observed evidence and explicit authority. Do not report engine
+emptiness, and do not report a profile as certification.

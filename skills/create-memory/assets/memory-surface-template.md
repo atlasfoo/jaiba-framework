@@ -18,10 +18,12 @@ author: <user-confirmed-author>
 category: memory-surface
 adapter-id: <stable-exact-id>
 contract-id: jaiba-memory-surface
-contract-version: "1.0.0"
+contract-version: "1.1.0"
 conformance-status: <verified-or-explicitly-unverified/nonconforming>
 profile-status: <unfilled|hypothesis-only|incomplete|discrepant|contrasted>
-requires: [] # Fill only with actual dependencies in host-supported syntax.
+requires:
+  - python3
+  - mcp:<server>
 tags: [jaiba, memory-surface]
 ---
 ```
@@ -29,6 +31,16 @@ tags: [jaiba, memory-surface]
 `profile-status: contrasted` is not conformance and not activation. An
 empty sufficient-guarantee list means the mapping may depend on nothing
 physical. A draft is not activated by being generated.
+
+Replace `requires:` with the real list before the package is delivered.
+Include `python3` only when `scripts/` is present: Python 3 standard
+library, no pip package. Include one `mcp:<server>` token per server the
+mapping actually calls (`mcp:engram`, not `mcp:<server>` left as a
+placeholder, and not `mcp__engram__mem_save`). The shipped token has no
+trailing comment. Published tool names (`mem_save`, `mem_search`) are
+declared in the mapping, not as bare `requires:` tokens. A bare tool
+name is a host-executable probe, not an MCP declaration. Host prefixes
+are session preflight, not this package.
 
 ## Canonical dependency and boundaries
 
@@ -40,14 +52,19 @@ a competing canonical contract. Resolve `jaiba-init` through the host for
 its OKF-owned definitions as needed.
 
 The factory procedure is the `references/storage-nature.md` inside the
-resolved effective installation, recorded below as an absolute locator
-string. It is not a package-relative path. This package's
-`references/storage-nature.md` is the filled backend-specific profile,
-not that procedure, even though the basename matches. Do not open the
-profile as the procedure, and do not link the procedure at the profile.
-Do not read the procedure on every logical operation of an already-bound
-surface. A missing or ambiguous procedure blocks re-derivation; it does
-not invite an invented profile.
+effective `create-memory` installation this session resolved. Record
+that generation-time path only as `procedure-provenance`: locator,
+revision or digest, date, and method. It is history, not a
+package-relative path, and not the procedure a later session must open.
+Do not persist `active-procedure-reference` or this session's
+installation path. This package's `references/storage-nature.md` is the
+filled backend-specific profile, not that procedure, even though the
+basename matches. Do not open the profile as the procedure, and do not
+link the procedure at the profile. Each session re-resolves its own
+installation and does not write that path back. Do not read the
+procedure on every logical operation of an already-bound surface. A
+missing or ambiguous procedure blocks re-derivation; it does not invite
+an invented profile.
 
 Constitutive updates belong to `jaiba-init`, executive work to `conduct`,
 and conduct closure has only the immutable append-log exception. Backend
@@ -60,15 +77,17 @@ The host's personal judgment protocol stays independent.
 
 Require package-local `references/storage-nature.md`, instantiated from the
 effective installation's profile template and filled from this run. Do not
-paste the factory procedure there. Keep provenance and the active reference
-separate, and keep each one identical in this skill, the profile, the
-mapping, and the conformance record:
+paste the factory procedure there. Keep `procedure-provenance` identical
+in this skill, the profile, the mapping, and the conformance record.
+Do not add `active-procedure-reference` to any of them. If the profile
+template still shows that key, omit it. An unidentified relevant
+procedure or contract change blocks re-derivation of the affected claims.
+It does not authorize writing an active path into the package.
 
 | Field | Value to supply |
 |---|---|
-| Procedure provenance locator | `<installation>/references/storage-nature.md` resolved at generation. Historical. Not a sibling path, not this package's profile, and not later authority. Do not append the date to the path. |
-| Provenance date / method | `<date>` and `<host skill resolution, or the disambiguation asked>`. Separate from the path. |
-| Active procedure reference | `<this host's re-resolved installation>/references/storage-nature.md`, written only after re-resolution and kept identical across profile, mapping, conformance, and this skill. Empty until then. An unidentified relevant procedure or contract change blocks re-derivation. |
+| `procedure-provenance` locator | `<installation>/references/storage-nature.md` resolved at generation. Historical. Not a sibling path, not this package's profile, and not later authority. Do not append the date to the path. |
+| `procedure-provenance` revision / date / method | `<revision or digest>`, `<date>`, and `<host skill resolution, or the disambiguation asked>`. Separate from the path. |
 | Profile role | Backend-specific filled profile. Not the procedure. Not certification. |
 | Profile status | `<unfilled / hypothesis-only / incomplete / discrepant / contrasted>` |
 | Sufficient guarantees | `<assertion ids the mapping may depend on, or none>` |
@@ -87,7 +106,7 @@ Fill every field with actual facts, measured evidence or explicit unknowns:
 
 | Field | Value to supply |
 |---|---|
-| Backend and tools | Exact names, versions, schema/documentation sources and dates. |
+| Backend and tools | Exact canonical published names, versions, schema/documentation sources and dates. `requires:` is `mcp:<server>` plus `python3` when `scripts/` exists. Tool names such as `mem_save` live here and in the mapping, never as a host prefix and never as a bare `requires:` token. |
 | Ownership | Enforced JAIBA namespace and registry predicates; exclusion of ordinary memory. |
 | Address mapping | Namespace/project/category/context/logical ID to the derived physical locator. Validate a returned id against that address and ownership before adopting it. |
 | Selection | Override → host-visible local → host-visible global → built-in filesystem; ambiguity/failure blocks, not fallback. |
@@ -96,17 +115,18 @@ Fill every field with actual facts, measured evidence or explicit unknowns:
 | Limits | Encoding and sizes with exact units. Documented limit, observed sample, and chosen operating cap stay separate. A sample that fit is not a maximum. Unknown limits stay unknown. No artificial cap to justify extra structure. |
 | Physical representation | One native unit when the profile shows payload and ownership fit and intact verification and publication are supported. Extra controls only for a concrete observed gap, including when the byte length fits but verification or publication does not. |
 | Consistency | Catalogue snapshot or serialized recheck; full-object revision coverage and normalization; actual CAS or serialized access. Single-writer checks are not CAS. |
-| Configuration | Inactive safe template; eventual machine routing under `~/.jaiba/memory/`, no payloads/secrets. |
+| Configuration | Inactive safe template; eventual machine routing under `~/.jaiba/memory/`, no payloads/secrets, no `active-procedure-reference`, no installation path. |
 | Evidence | Package-local profile and conformance record, redacted evidence locators, versions, tested scopes and dates. Isolate experiment and conformance by new namespace, location, and identities. A shared physical project or account only if explicitly authorized and ownership is checkable. Do not reuse experiment records or bindings. |
 
 ## Operation mapping
 
-Provide package-local `references/backend-mapping.md`. Open it with the
-provenance locator, the active procedure reference, profile status, and
-sufficient/blocked lists. The
+Provide package-local `references/backend-mapping.md`. Open it with
+`procedure-provenance`, profile status, and sufficient/blocked lists.
+Do not open it with an active procedure reference. The
 physical representation is only what the contrasted profile's sufficient
-guarantees justify. For **each** family below specify real tools/schema
-arguments, logical-to-physical translation, permissions, ordered steps,
+guarantees justify. For **each** family below specify real tools by
+canonical published name and schema arguments, logical-to-physical
+translation, permissions, ordered steps,
 output/completion checks, revision comparisons, full readback, receipts,
 errors/partial outcomes, limits, costs, and safe retries:
 
@@ -170,13 +190,35 @@ evidence for this profile and are not reinterpreted or migrated by
 generation. An incompatible new physical representation needs a
 discriminator and version distinct from those labels before it is written.
 An unexercised migration is not a completed one. Logical contract version
-stays **1.0.0** unless its guarantees change. Optional coordination is
+stays **1.1.0** unless its guarantees change. Optional coordination is
 recorded only if observed; do not infer it.
 
 No search-as-catalogue, ACK-as-verification, truncated-as-full reads, silent
 fallback, native-CAS fiction or unsafe cleanup. Errors distinguish absence,
 ambiguity, access/unavailability/version/capability failures, conflicts,
 invalid objects, limits, truncation, partial and verification failure.
+
+## Package scripts and transport
+
+Fill this section when the package ships `scripts/`. If it does not, write
+`scripts/`: absent, omit `python3` from `requires:`, and do not declare a
+transport mode. Absence is not permission to hide a pip client elsewhere.
+
+| Field | Value to supply |
+|---|---|
+| Entrypoint | `scripts/<entrypoint>.py`. One file. Python 3 standard library only. No pip dependency, vendored SDK, service, supervisor, or transaction engine. |
+| `requires` | `python3` when this directory exists, plus each `mcp:<server>` the mapping calls. Tool names are the server-published names (`mem_save`, `mem_search`), recorded in the mapping. Not `mcp__<host>__<tool>`. |
+| Transport | Exactly one of `local-cli`, `local-http`, `agent-relay`. |
+| Local I/O | `local-cli` and `local-http`: the script reads and writes the backend directly. Payload bytes, tokens, and credentials do not pass through the model. Do not start a server or install a CLI to finish generation. |
+| Agent relay | `agent-relay`: the script prepares payloads and parses reads for the agent. It does not open the backend, spawn a backend CLI, or send HTTP to it. Say that bytes transit the model. |
+| Subcommands | `encode`, `decode`, `delta`, `materialize`, `render`, `batch-prepare`, `batch-verify`, `binding-path`, `cost`. No alias in place of a missing canonical name. |
+
+`encode`, `decode`, `delta`, `materialize`, `render`, `binding-path`, and
+`cost` never call the backend. `batch-prepare` and `batch-verify` perform
+direct read/write only under `local-cli` or `local-http`. Under
+`agent-relay` they prepare and parse. Do not persist an installation path
+or `active-procedure-reference` in the script. `binding-path` prints the
+resolution formula's path; it does not create the binding file.
 
 ## Usage examples and verification
 
@@ -191,7 +233,7 @@ is allowed only when explicitly authorized and ownership is checkable.
 Do not reuse experiment records, bindings, locators, or caps.
 
 Link package-local configuration, mapping, filled profile, conformance
-record and observable eval fixtures. Required evidence includes full
+record, `scripts/` when present, and observable eval fixtures. Required evidence includes full
 isolated roundtrip and negative paths, not generated test text. A missing
 result remains unverified. State that installation visibility is not
 backend scope, instrumentation or activation, and that a contrasted

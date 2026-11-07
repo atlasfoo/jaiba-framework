@@ -24,8 +24,9 @@ the procedure into the package as if its blanks were evidence.
 5. [Contrasted profile gate](#contrasted-profile-gate)
 6. [Minimal derivation](#minimal-derivation)
 7. [Output package](#output-package)
-8. [Validation and conformance](#validation-and-conformance)
-9. [Installation without activation](#installation-without-activation)
+8. [Package scripts](#package-scripts)
+9. [Validation and conformance](#validation-and-conformance)
+10. [Installation without activation](#installation-without-activation)
 
 ## Factory sequence
 
@@ -49,6 +50,8 @@ the procedure into the package as if its blanks were evidence.
 8. Conformance in an isolated scope. See
    [scope isolation](#nature-experiment-and-residue-gate).
 9. Confirmed installation or activation, each a separate decision.
+   Installation may name several destinations; see
+   [installation](#installation-without-activation).
 
 A tool-capability matrix is not a mapping. A profile is not conformance
 or certification. A draft is not activated. Do not read candidate bodies
@@ -62,55 +65,83 @@ derived mapping, and is not selectable.
 A generation-time path is provenance. It is not authority on another
 machine, after the installation moves, or as universal active
 configuration. Do not ship a repository checkout path, or any other
-machine-specific absolute path, as the active procedure for every host.
+machine-specific absolute path, as the procedure every later session
+must open.
 
-Resolve the effective `create-memory` installation the same way the
-canonical contract is resolved: host skill resolution for **this** host,
-not a sibling directory and not another host's path. If several copies
-remain, ask which one is active. Do not guess.
+Persisted procedure identity is `procedure-provenance` only: the
+generation-time locator, revision or digest, date, and resolution
+method, kept as history. The claim envelope and the package retain that
+record. They do not retain `active-procedure-reference`. The envelope's
+other certified fields stay those in
+[resolution](resolution.md): backend identity and version, tool versions
+by canonical server and published name, physical protocol identifier
+and version, and contract identifier and version. Do not shrink that
+envelope down to the procedure record, and do not add an active path
+to it.
 
-The procedure file is `references/storage-nature.md` inside that
-installation. Keep the locator and its provenance fields separate. Do
-not append the date, the method, or a revision note to the path.
+`active-procedure-reference` is not a persisted field. Do not write it
+into the skill, the profile, the mapping, the conformance record, the
+claim envelope, or the binding. Do not persist the path this session
+resolved. Every host session dynamically re-resolves its own effective
+`create-memory` installation and reads the procedure from that
+installation. A stored path is not that resolution.
+
+Resolve the effective installation the same way the canonical contract
+is resolved: host skill resolution for **this** session, not a sibling
+directory and not another host's path. If several copies remain, ask
+which one is active. Do not guess. Do not write the answer back into
+the package.
+
+The procedure file is `references/storage-nature.md` inside the
+installation this session resolved. Keep the provenance locator and its
+other provenance fields separate. Do not append the date, the method,
+or a revision note to the path.
 
 | Field | Record |
 |---|---|
-| Procedure provenance locator | `<installation>/references/storage-nature.md` resolved at generation. Historical. Not later authority. |
-| Provenance date | Date that resolution was made. Not part of the path. |
-| Provenance method | Host skill resolution, or the question that disambiguated copies. |
-| Active procedure reference | Empty until this host re-resolves. Then this host's effective installation procedure. |
+| `procedure-provenance` locator | `<installation>/references/storage-nature.md` resolved at generation. Historical. Not later authority. Not a sibling path and not this package's profile. |
+| `procedure-provenance` revision | Identified revision or exact source digest. Not part of the path. |
+| `procedure-provenance` date | Date that resolution was made. Not part of the path. |
+| `procedure-provenance` method | Host skill resolution, or the question that disambiguated copies. |
 
 Before characterization, derivation, or re-derivation on the current host:
 
-1. Re-resolve the effective installation. Do not open the stored
-   provenance path as if it still named the procedure.
+1. Re-resolve the effective installation for this session. Do not open
+   the stored provenance path as if it still named the procedure. Do
+   not persist the path you resolved.
 2. Read that installation's procedure and `memory-surface-contract.md`.
 3. Compare the relevant procedure revision and contract version with
-   the versions the profile recorded.
-4. Leave the provenance locator unchanged.
-5. After that resolution, write the same active reference in the filled
-   profile (beside the template's `factory-procedure-locator`, which
-   keeps provenance), in `references/backend-mapping.md`, in the
-   conformance record, and in the generated skill. Do not update one
-   copy and leave another on the old path.
+   the versions `procedure-provenance` and the profile recorded.
+4. Leave `procedure-provenance` unchanged. Keep that same record in the
+   skill, the profile, the mapping, and the conformance record. Do not
+   update one copy and leave another on a different provenance locator.
+5. Do not write an active procedure reference in any package file. If a
+   profile or conformance template still shows
+   `active-procedure-reference`, omit the field. If an older package
+   still contains it, do not copy it forward. Deleting it belongs to
+   generation or an authorized upgrade. Resolution ignores a leftover
+   field and does not rewrite the package to remove it.
 6. If the relevant procedure or contract revision cannot be identified,
    or it changed in a way the profile does not cover, block
    re-derivation and the affected claims. Say which claims fell. Do not
    routine-repeat claims the same evidence still covers.
 
-Never record either locator as `storage-nature.md` when that target is
-the generated profile, as `../create-memory/references/storage-nature.md`
-or `../../create-memory/...`, or as a paste of the procedure. A package
+Never record the provenance locator as `storage-nature.md` when that
+target is the generated profile, as
+`../create-memory/references/storage-nature.md` or
+`../../create-memory/...`, or as a paste of the procedure. A package
 file may link to its own `references/storage-nature.md` only in a
-sentence that calls it the filled profile. If this host's installation
-cannot be resolved, block characterization and derivation.
+sentence that calls it the filled profile. If this session's
+installation cannot be resolved, block characterization and derivation.
 
 ## Discovery evidence
 
 1. Record current host, visible tools and schema discovery mechanism. Inspect
    exact callable names, versions, required/optional arguments, output shapes,
    pagination tokens, truncation flags, errors and permissions. Tool names
-   are evidence, not conventions to extrapolate. Sanitize evidence at capture.
+   are evidence, not conventions to extrapolate. For MCP, the name to record
+   is the one the server publishes, not the prefix this host added. Sanitize
+   evidence at capture.
 2. Consult current documentation for the actual backend/tool version. For
    library/API/CLI questions use Context7 ID resolution then focused docs
    queries; record source/version/date. If docs and schemas disagree, block
@@ -123,7 +154,8 @@ cannot be resolved, block characterization and derivation.
    probe of arguments or permissions is not a contrasted profile.
 4. Build a **tool-capability matrix** for `probe`, `resolve`, `catalog`,
    `read`, `create`, `update`, `append-log`, `archive`, `clear-work`,
-   `export`, `import`. Each row gives real tool/schema, argument mapping
+   `export`, `import`. Each row names the tool by its canonical published
+   name, then gives the real schema, argument mapping
    from the full logical address, all steps, output/completion evidence,
    revisions, readback, errors, permissions, limits and status. If composed
    from several tools, describe the entire workflow, including
@@ -141,6 +173,26 @@ cannot be resolved, block characterization and derivation.
    native transactions are optional, not assumptions. Absence of CAS is a
    fact, not a reason to add records.
 
+**Canonical MCP names.** Declare and map MCP tools by the name the server
+publishes. A `requires:` entry is `mcp:<server>` (for example
+`mcp:engram`). The published tool name (`mem_save`, `mem_search`) is
+recorded beside that server in the matrix, the mapping, and the claim
+envelope's tool versions. It is not a host exposure prefix, not a skill
+name, and not an alias an agent product invented. Claude Code's
+`mcp__engram__mem_save` is an exposure of server `engram`, tool
+`mem_save`, on that host only. Do not put that exposure in `requires:`,
+the matrix, the mapping, evals, or configuration.
+
+Do not put the published tool name in `requires:` as its own token. A
+bare `mem_save` is parsed as a host executable, not as an MCP tool. The
+server token is `mcp:<server>` and nothing else: no placeholder brackets,
+no trailing comment, no host prefix. Mapping that published name to the
+name this session exposes is session preflight, owned by
+[resolution](resolution.md). A remembered prefix table, a previous host's
+inventory, or a guessed `mcp__` spelling is not evidence the tool exists.
+If this session's catalogue does not prove the exposure, the tool is not
+visible.
+
 Unknown limits stay visibly unverified. If limits are necessary for safety,
 block the affected operation until measured or documented from a current
 source. Do not probe limits by sending production data, by walking sizes
@@ -151,9 +203,14 @@ upward, or by silently truncating. Do not reuse a historical trial's cap.
 Read [storage-nature.md §§5–6](storage-nature.md#5-finite-native-experiment)
 before the first effect. Those sections own the closed variants, call
 budget, deadlines, specimen rules, stop, and residue acceptance. Do not
-raise a bound to finish a package, and do not build a client, SDK, codec,
-writer, service, supervisor, or transaction engine. Snapshot, hash,
-base64, and comparison may record evidence only.
+raise a bound to finish a package. During the experiment, backend
+interaction follows those sections: ordinary backend tools, not a client,
+SDK, service, supervisor, or transaction engine built to talk to the
+backend. Package [scripts](#package-scripts) are not that experiment. Do
+not use them to call the backend while characterizing it. The earlier
+ban on a package codec or writer is withdrawn only for scripts that stay
+inside that section. Snapshot, hash, base64, and comparison may record
+evidence only.
 
 **Scope isolation.** Use a new namespace, location, and identities,
 separate from historical trials, residue-gate probes, and conformance.
@@ -176,9 +233,10 @@ not use historical `JAIBA1` or `JAIBA2` records as the specimen.
 Instantiate this installation's
 [profile template](../assets/storage-nature-template.md) as the package's
 `references/storage-nature.md`. That file is a filled profile, not the
-procedure, and must not point at itself. Fill provenance and, after
-re-resolution, the active reference per
-[procedure locator](#procedure-locator). Replace placeholders with this
+procedure, and must not point at itself. Fill `procedure-provenance`
+per [procedure locator](#procedure-locator). Do not fill
+`active-procedure-reference`, even if the profile template still shows
+the key. Omit it. Replace placeholders with this
 run's facts or leave them `unknown`. Do not reuse a prior profile.
 
 States, blocking, and required evidence fields are
@@ -201,7 +259,7 @@ assertions only; say which claims fell and why.
 
 Derive only from guarantees the contrasted profile marks sufficient.
 The pluggable surfaces architecture maintains three distinct layers:
-1. **Canonical logical contract (`jaiba-memory-surface/1.0.0`):** Defines
+1. **Canonical logical contract (`jaiba-memory-surface/1.1.0`):** Defines
    invariants, categories (constitutive vs executive), operations, and schema
    validation across bundle and legacy flat layouts (`references/memory-surface-contract.md`).
 2. **Storage-nature profile:** The empirical characterization resulting from the
@@ -272,8 +330,16 @@ before a derived mapping. Choose a collision-free skill name and stable
 adapter ID. Start from the [surface template](../assets/memory-surface-template.md);
 replace placeholders with facts or explicit pending findings. Adapter
 version is independent of the contract; this generator follows `.cz.toml`,
-not backend releases. Scripts must not hide a driver, runtime, client,
-SDK, codec, or writer. Do not install a backend service to finish generation.
+not backend releases. Contract version in the package is
+`jaiba-memory-surface` **1.1.0** unless that contract's guarantees have
+changed. A package may include `scripts/` only as
+[governed below](#package-scripts): Python 3 standard library, no pip
+dependencies, one declared transport. That script is the codec and writer
+for the derived representation. It is not a hidden driver, runtime, SDK,
+service, supervisor, or transaction engine, and it is not a second
+logical contract. Do not install a backend service to finish generation.
+Do not persist `active-procedure-reference` or this session's installation
+path in any package file.
 
 ```text
 <adapter-name>/
@@ -282,6 +348,7 @@ SDK, codec, or writer. Do not install a backend service to finish generation.
   references/backend-mapping.md
   references/conformance.md
   assets/configuration-template.md
+  scripts/                           # optional; Python 3 stdlib only
   evals/evals.json
   evals/fixtures/                    # synthetic, no real memory or secrets
 ```
@@ -291,19 +358,24 @@ SDK, codec, or writer. Do not install a backend service to finish generation.
 The description names the selected-surface trigger, not every mention of
 memory. An adapter is not a workflow or knowledge plugin and does not gain
 constitutive or conduct authority. `requires:` lists real host-supported
-dependencies; dynamic capabilities stay in the mapping, not as fictional
-callable names.
+dependencies. MCP servers are `mcp:<server>` tokens. Published tool names
+stay in the mapping, not as bare `requires:` tokens and not as host
+prefixes. When `scripts/` is present, `requires:` includes `python3`.
+Dynamic capabilities stay in the mapping, not as fictional callable names.
 
 Re-resolve effective `create-memory` per [procedure locator](#procedure-locator)
 and read its contract, resolution, and applicable filesystem/interchange
 references. Do not open this package's profile as that procedure, embed a
-forked contract, or use `../../create-memory/...`. Resolve `jaiba-init`
+forked contract, persist the path you resolved, or use
+`../../create-memory/...`. Resolve `jaiba-init`
 separately for OKF definitions. Stop if a dependency is missing or
 ambiguous. Do not read the nature procedure on every bound operation.
 
-`references/backend-mapping.md` opens with provenance locator, active
-reference, profile status, and sufficient/blocked lists. Operation steps
-use only that derivation. Map all sixteen existing types; invent none.
+`references/backend-mapping.md` opens with `procedure-provenance`,
+profile status, and sufficient/blocked lists. It does not open with an
+active procedure reference. Operation steps
+use only that derivation. Map tools by canonical published name; leave
+host prefixes to session preflight. Map all sixteen existing types; invent none.
 Preserve unknown/missing types, raw legacy documents, absent frontmatter,
 full content, unknown metadata, and original relations. Stable IDs survive
 locator changes. Preserve log close IDs and immutable history. Optional
@@ -319,8 +391,11 @@ Use the host's existing auth; do not read credentials or mint live tokens
 or userinfo endpoints. If persistence is unavailable, session-only consent
 is explicit — do not fabricate saved state, an `.ai/` mirror, or new
 contexts on retry. Global install must not hardcode one project's binding.
-Do not copy experiment records, bindings, or fixture payloads into it, and
-do not put a machine-specific procedure path in active configuration.
+Do not copy experiment records, bindings, or fixture payloads into it.
+Do not put `active-procedure-reference`, a host-prefixed MCP alias, or
+this session's installation path in the binding or in active
+configuration. `procedure-provenance` stays in the package, not in the
+binding.
 
 ### Evals and fixtures
 
@@ -356,7 +431,12 @@ local install shadowing global; global install with isolated scopes;
 mapping before a contrasted profile; unjustified per-object root, journal,
 chunk, descriptor, manifest, or allocation; full-text search used as a
 catalogue or owned index; a suggestion treated as a lock; a returned id
-adopted after an owner, address, revision, or byte mismatch. Judge backend
+adopted after an owner, address, revision, or byte mismatch; a
+host-prefixed MCP name recorded as the requirement; a published tool name
+placed in `requires:` as a CLI token; `active-procedure-reference` or an
+absolute installation path persisted in the package; a `scripts/` tree
+that imports a third-party package, omits a canonical subcommand, declares
+no transport, or calls the backend under `agent-relay`. Judge backend
 state and receipts, not safety wording. Do not fail a control a concrete
 observed verification or publication gap justifies.
 
@@ -365,6 +445,87 @@ unlinked logs, multiple contexts, ordinary memory, malformed types, and
 both filesystem layouts when claimed. No live secrets. Comparative
 evaluations and viewer runs need their own approved step. Generating cases,
 or checking JSON, is not backend conformance.
+
+## Package scripts
+
+A generated package may ship `scripts/`. This withdraws the earlier
+prohibition on a package codec or writer, and only inside the boundary
+below. A script is the deterministic encoding and local transport for
+the derived representation. It is not a backend service, not a
+supervisor, not a transaction engine, and not a second logical
+contract. Do not install a backend, a virtualenv, or a pip package to
+finish generation. Do not use these scripts to call the backend during
+the nature experiment. That interaction stays with ordinary backend
+tools under
+[storage-nature.md §§5–6](storage-nature.md#5-finite-native-experiment).
+
+### Runtime
+
+- Python 3, standard library only. When `scripts/` is present,
+  `requires:` includes `python3` and does not include a pip distribution
+  name. Flow style `requires: [python3, mcp:engram]` and a block list are
+  the same declaration. `python3` is a host executable requirement.
+  `mcp:<server>` is a server requirement, not a `PATH` binary.
+- Imports are the standard library (`json`, `hashlib`, `base64`,
+  `pathlib`, `argparse`, `urllib`, and the rest of that library). No
+  third-party module, no vendored SDK, no generated client.
+- One entrypoint, invoked as
+  `python3 scripts/<entrypoint>.py <subcommand>`. Subcommand names are
+  the canonical list below. Do not add an alias that hides a missing
+  canonical name. An extra subcommand is not a substitute for one of
+  these.
+- The script does not embed secrets, host exposure prefixes, or a
+  persisted `create-memory` path. `binding-path` prints a path. It does
+  not create the binding file, and it does not write `.ai/`.
+
+### Transport
+
+Declare exactly one mode in the skill and in
+`references/backend-mapping.md`. The mode is how this package reaches
+the backend. It is not a host decoration and not a second protocol.
+
+| Mode | Who moves backend bytes | Rule |
+|---|---|---|
+| `local-cli` | The script, via the host's already-installed CLI. | The script reads and writes directly. Do not pass payload bytes, tokens, or credentials through the model. Stdout is status, identifiers, digests, and the receipts the contract already requires, plus an explicit `render` when the agent asked to see an object. |
+| `local-http` | The script, via HTTP to an endpoint the host already runs. | Same direct read/write rule as `local-cli`. Do not mint tokens. Do not start a server to finish generation. A URL in the package is not a license to install that service. |
+| `agent-relay` | The agent, through this session's MCP tools. | The script does not open the backend, spawn a backend CLI, or send HTTP to it. It prepares payloads and the canonical tool arguments, and it parses reads the agent obtained. Say that bytes transit the model. Do not describe this mode as direct I/O. |
+
+`local-cli` and `local-http` exist so the model is not the pipe between
+the script and the backend. If the only backend access this session has
+is MCP, the mode is `agent-relay`. Do not declare a local mode the
+profile did not observe. Do not declare `agent-relay` and then have the
+script call the backend anyway.
+
+### Canonical subcommands
+
+Each subcommand is deterministic for the same inputs. Unmeasured cost
+is `unknown`, not zero. A non-zero exit is a named failure, not a
+guessed success.
+
+| Subcommand | Duty | Backend I/O |
+|---|---|---|
+| `encode` | Canonical bytes of one logical object or envelope from neutral input. | Never. |
+| `decode` | Inverse of `encode`. Exact bytes in, logical object out. | Never. |
+| `delta` | One journal delta, or an explicit refusal when the derived archetype stores no delta. | Never. |
+| `materialize` | Base plus ordered deltas to the canonical logical object. Callers receive the object, not a delta. | Never. |
+| `render` | The materialized object for the agent or for readback comparison. Not a second logical form. | Never. |
+| `binding-path` | Canonical binding path from an established work root, using the resolution reference's formula and no other. Prints the path. Does not create the file. Does not hash a URI, a trailing slash, or a relative path. | Never. |
+| `cost` | Records, calls, data bytes, and control bytes for a stated operation. Does not walk sizes to discover a limit. | Never. |
+| `batch-prepare` | The finite batch the transport will apply. | `local-cli` / `local-http`: the script performs the writes, and any reads that batch needs, directly. `agent-relay`: emit payloads and canonical tool arguments only. |
+| `batch-verify` | Expected versus observed receipts and readback for that batch. Does not certify conformance. | `local-cli` / `local-http`: the script reads back directly. `agent-relay`: parse reads the agent supplies and report equality or the named mismatch. |
+
+`encode`, `decode`, `delta`, `materialize`, `render`, `binding-path`,
+and `cost` ignore transport mode. They must not grow a hidden network
+or CLI call. `batch-prepare` and `batch-verify` are the only
+subcommands that may touch the backend, and only in `local-cli` or
+`local-http`.
+
+A package whose derivation needs deterministic encode, decode, delta, or
+materialize puts that logic in these subcommands, not in prose the model
+re-derives on each call. A package with no such codec may omit
+`scripts/`. It then does not declare `python3` and does not declare a
+transport mode. Omitting `scripts/` is not permission to reintroduce a
+pip client under another directory.
 
 ## Validation and conformance
 
@@ -382,37 +543,88 @@ or discrepant necessary guarantee, mean nonconforming. Blocked or unrun
 checks stay unverified. A static review cannot certify a mutable surface.
 
 Before delivery check frontmatter and description length, package links,
-provenance versus active procedure reference, placeholders, secrets, JSON,
-live `requires:`, and host resolution of the canonical dependency. The
+`procedure-provenance` present and `active-procedure-reference` absent,
+placeholders, secrets, JSON, live `requires:` (canonical `mcp:<server>`
+tokens, published tool names only in the mapping, `python3` only when
+`scripts/` exists, no pip package names), the declared transport when
+scripts exist, and host resolution of the canonical dependency. The
 profile must not be a pasted procedure or a self-link. Syntactic checks are
 not conformance. Report scope, versions, and date. Re-resolve the procedure
-on this host before treating a stored path as current.
+for this session before comparing a stored provenance locator with the
+current installation. Do not write that resolution back.
 
 ## Installation without activation
 
-1. Discover this host's documented skill locations and resolution. Do not
-   assume `.agents/skills`, `~/.claude/skills`, or another host's directory.
-   Do not invent an installer. Ask when visibility is uncertain.
-2. Offer draft-only, project-local, or global-host. Confirm destination,
-   files, profile status, conformance, gaps, and precedence effects before
-   writing. Conformance is not install authorization. A non-contrasted draft,
-    if installed for inspection, stays `category: memory-surface-draft`,
-    not selectable as `category: memory-surface` until mandatory evidence
-    passes. Install does not activate.
-3. On collision, do not overwrite, merge, or delete. Show a diff, get
-   explicit replacement approval, and preserve the prior install.
-4. Copy only the reviewed package. No credentials, fixture payloads, machine
-   bindings, pasted procedure, or third-party services. Read back contents
-   and internal links. Test host discovery, or report refresh/restart as
-   pending. Unseen by the host means installed-on-disk but **not verified
-   host-visible**.
-5. Re-resolve the canonical dependency and active procedure reference per
-   [procedure locator](#procedure-locator). Preserve provenance. Confirm
-   adapter ID/version and local-over-global shadowing. Multiple winning IDs
-   stay ambiguous; do not choose.
-6. Report what was and was not installed. Leave bindings, consumers, project
-   markers, source data, and the pinned first-party distribution untouched.
-   Selection still needs existing-data authority checks. Do not activate,
+Installation copies a reviewed package into one or more host-visible
+skill locations. It does not activate, bind, migrate, or select the
+adapter. Conformance is not install authorization.
+
+1. **Discover destinations.** Find this user's agent config roots that
+   already have JAIBA configured, and this project's documented
+   project-local skill location when a project-local install was
+   requested. Do not assume one directory. Do not invent an installer.
+   Ask when visibility is uncertain.
+
+   Global candidates are the known agent roots. Do not scan the whole
+   home directory:
+
+   - `~/.agents`
+   - `~/.claude`
+   - `~/.codex`
+   - `~/.config/opencode`
+
+   Also include a root the user names. A root counts as JAIBA-configured
+   only when it contains `jaiba-contract.md`, or a `skills/` directory
+   that already holds a JAIBA skill (for example `create-memory` or
+   `conduct`). A vendor directory with neither marker is not a
+   destination. Do not create a root in order to have somewhere to
+   install. Skill packages land in `<root>/skills/<adapter-name>/`.
+
+2. **Select destinations.** Offer draft-only, project-local, or one or
+   more detected global hosts. Present every detected root and let the
+   user select any subset, including several hosts in one confirmation.
+   Do not install to every detected root by default. An empty selection
+   is draft-only. Confirm, per destination, the files, profile status,
+   conformance, gaps, and precedence effects before writing. A
+   non-contrasted draft, if installed for inspection, stays
+   `category: memory-surface-draft`, not selectable as
+   `category: memory-surface` until mandatory evidence passes. Install
+   does not activate.
+
+3. **Collisions.** On collision at a destination, do not overwrite,
+   merge, or delete until the user confirms replacement for **that**
+   destination. Show the diff. Approval for one host is not approval
+   for another. When replacement is confirmed, preserve the prior
+   install before writing: move it to a sibling named
+   `<colliding-path>.bak-<timestamp>`. `<timestamp>` is local time
+   `YYYYMMDDTHHMMSS`, so the name is
+   `team-store.bak-20261106T153045` and contains no colon. If that
+   backup name already exists, do not overwrite it; disambiguate and
+   say which name you used. Do not delete the backup as part of install.
+
+4. **Copy and read back, per destination.** Copy only the reviewed
+   package. No credentials, fixture payloads, machine bindings, pasted
+   procedure, persisted installation path, `active-procedure-reference`,
+   host-prefixed tool aliases, or third-party services. After each
+   destination, read back that copy's contents and internal links.
+   Test that host's discovery, or report refresh/restart as pending
+   **for that destination**. Unseen by that host means installed-on-disk
+   but **not verified host-visible** there. A failure or a pending
+   check at one destination does not certify the others and is not an
+   automatic rollback of destinations that already read back. Report
+   each destination separately.
+
+5. Re-resolve the canonical dependency for this session per
+   [procedure locator](#procedure-locator). Do not persist the path.
+   Confirm the package still has `procedure-provenance` and does not
+   have `active-procedure-reference`. Confirm adapter ID/version and
+   local-over-global shadowing at each destination that was written.
+   Multiple winning IDs stay ambiguous; do not choose.
+
+6. Report what was and was not installed, by destination, including
+   backups created. Leave bindings, consumers, project markers, source
+   data, and the pinned first-party distribution untouched. Selection
+   still needs existing-data authority checks. Do not activate,
    migrate, or reinterpret historical `JAIBA1` / `JAIBA2` records.
 
 No backend service install, automatic dependency acquisition, implicit
