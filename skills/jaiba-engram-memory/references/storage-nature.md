@@ -2,25 +2,44 @@
 
 Backend-specific filled profile (not the factory procedure) for the
 `jaiba-engram-memory` adapter. Logical contract `jaiba-memory-surface`
-**1.0.0**, unchanged. Physical protocol `jaiba-engram-storage/3` (`JAIBA3`).
+**1.1.0**. Logical guarantees of 1.0.0 are unchanged
+(`logical-guarantees-changed: no`). Archetype: `record-store`. Declared
+physical protocol of this package: `jaiba-engram-storage/4` (`JAIBA4`).
+
+The contrasted batch below observed `JAIBA3.` wires. Those rows are
+historical evidence for the shared physical claims (one observation, one
+wire line, truncation, topic cut, upsert, ack). They are not a JAIBA4
+write trial and not a `patch` or `compact` trial. Do not relabel them.
 
 `contrasted` means documentation and one finite verification batch were
 compared. It is not conformance, not installation, and not activation.
 No MEM criterion is declared delivered by this file. The chunk path
-(`> 30,000` raw bytes) was subsequently exercised in the T-087 E2E trial.
+(`> 30,000` raw bytes) was subsequently exercised in the T-087 E2E trial
+on the same JAIBA3 protocol.
 
 ```yaml
 document-role: backend-specific-profile
 profile-status: contrasted
 contract-id: jaiba-memory-surface
-contract-version: "1.0.0"
+contract-version: "1.1.0"
 logical-guarantees-changed: no
-factory-procedure-locator: "/mnt/Storage/repos/jaiba-framework/skills/create-memory/references/storage-nature.md"
-factory-procedure-revision: "SHA-256 5ebab6a40f737c344a524f75980716beb50b1b5362e45dd09abfbe89f4a7e200"
-factory-procedure-resolved-at: "2026-10-31"
-factory-procedure-resolution-method: "explicit current repository path"
-active-procedure-reference: "/mnt/Storage/repos/jaiba-framework/skills/create-memory/references/storage-nature.md"
+archetype: record-store
+procedure-provenance:
+  locator: "/mnt/Storage/repos/jaiba-framework/skills/create-memory/references/storage-nature.md"
+  revision: "SHA-256 5ebab6a40f737c344a524f75980716beb50b1b5362e45dd09abfbe89f4a7e200"
+  resolved-at: "2026-10-31"
+  method: "explicit current repository path"
 ```
+
+`procedure-provenance` is generation-time history. It is not a
+package-relative path, and it is not the procedure a later session must
+open. This file does not persist `active-procedure-reference`. Each session
+re-resolves the effective `create-memory` installation and reads that
+installation's `references/storage-nature.md` before characterization or
+re-derivation. It does not write the resolved path back into this profile,
+the skill, the mapping, or the binding. A missing or ambiguous procedure
+blocks re-derivation; it does not invite an invented profile, and it does
+not block logical operations of an already-bound surface.
 
 ## Evidence
 
@@ -31,7 +50,7 @@ phase15r trial `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`: `profiles/` for this cont
 That locator holds the predicted snapshots, native ACK/get text, and
 byte comparisons in `receipts/`. It does not hold the specimen roots
 `filesystem-root/` or `vault-root/`; those are separate local profiles
-and do not certify Engram.
+and do not certify Engram. It does not hold JAIBA4 wires.
 
 Documentary source: Gentleman-Programming/engram tag `v3.6.0`
 `internal/store/store.go`, fetched 2026-10-31, 539801 bytes, SHA-256
@@ -76,17 +95,43 @@ not replayed.
   exercised in T-087.
 - **Index:** one owned catalogue observation per `(namespace, project_id)`,
   because native enumeration is unavailable. Full-text search is never the
-  catalogue.
+  catalogue. That gap is an operating choice of this profile, not a new
+  numbered observation beyond the batch that stored the catalogue as its
+  own record (A-unit).
 - **Cost, this batch:** 4 MCP calls for the write order (save object, get
   object, save catalogue, get catalogue), plus one prior `mem_current_project`.
   Object wire 612 ASCII characters; catalogue wire 780. Chunked objects
-  were not measured in this profile batch (measured in T-087).
+  were not measured in this profile batch (measured in T-087). Journal
+  costs were not measured in this batch; unmeasured stays `unknown`.
 - **Interruption and orphan protection:** object first, catalogue last. Both
   readbacks matched, so this batch did not stop between them. No second logical
   object was minted. Because A-upsert updates in place on topic_key matches,
   retries and uncatalogued creates probe topic_key before saving; matching
   sha256 adopts the orphan, while a differing digest stops with a mismatch
   rather than overwriting via upsert.
+
+## Derived controls (JAIBA4)
+
+Derivation uses the sufficient rows below plus contract **1.1.0** for
+archetype `record-store`. These controls are not new observations from
+phase15r. Each names the gap, the assertion it rests on, and the cost.
+None is justified by the absence of CAS alone. The 30,000-byte cap remains
+a chosen threshold (A-limit-cap), not a measured maximum; chunking still
+cites the documented cut (A-limit-doc, A-trunc) and the verification gap
+that a truncated or redacted body cannot be published intact (A-norm).
+
+| Control | Gap | Realization | Cost |
+|---|---|---|---|
+| Owned catalogue | No native enumeration was available to the batch; search is not a catalogue (operating choice, resting on A-unit). | One `catalog` observation per `(namespace, project_id)`, key `jaiba/v4/<ns16>/cat/<proj_sha24>`. | One extra record and its readback on every catalogue mutation. Not atomic with the object write (A-cas / A-txn absent). |
+| Chunk plus chunked-object | A-limit-doc / A-trunc: over-limit bodies are not published intact. A-limit-cap is the chosen direct threshold, not the gap by itself. | Payloads `> 30,000` raw bytes split into `chunk` slices plus one `chunked-object` manifest. JAIBA4 wires only. | One record per slice, plus the manifest. Unmeasured beyond the single T-087 sample. |
+| Executive journal (`exec-base`, `exec-delta`) | Archetype `record-store` follows A-unit (discrete observations, not a document tree). Contract 1.1.0 then requires a stored journal. A full-object `update` is not `patch`. The classification is derivation, not a product-name guess and not a new probe. | `patch` appends one `exec-delta` (`jaiba/v4/<ns16>/del/…`). The base stays. A monolith is an implicit base at `seq` 0. Materialization is the helper, deterministic in the base plus ordered deltas. | O(delta): one delta record. Not measured in phase15r. |
+| `context-head` | The journal pre-check needs one head per executive context without rewriting the project catalogue or other objects. | One `context-head` at `jaiba/v4/<ns16>/ctx/<sha24>`. A `patch` updates that object's slot only. A missing slot is `seq` 0, not absence. | One head record per patch, not one catalogue rewrite. Delta plus head is two records, not a transaction (A-txn absent). |
+| Stdlib helper `scripts/jaiba_engram.py` | The only observed backend access is MCP. A-ack: save acknowledgements omit scope and topic key, so the agent must read back. Transport characterization probed alternatives: local CLI (`engram save`, `engram search`) lacks numeric observation retrieval (`engram get <id>` absent), emits update warnings to stdout/stderr, and lacks readback verification; HTTP (`engram serve`) requires a background daemon and port management. Therefore, MCP `agent-relay` is the verified, native transport mode where `batch-prepare` emits tool arguments and `batch-verify` verifies readback receipts. | Python 3 standard library only. Subcommands `encode`, `decode`, `delta`, `materialize`, `render`, `binding-path`, `cost`, `batch-prepare`, `batch-verify`. The script does not open the backend. `binding-path` prints a path and creates nothing. | Local process plus the MCP calls the agent relays. Bytes transit the model. `cost` leaves unmeasured byte counts `unknown`. |
+
+Session re-resolution of the factory procedure can invalidate a derived
+claim if the relevant procedure revision or contract version changed and
+cannot be identified. It does not delete the observed rows above. It does
+not authorize writing an active procedure path into this file.
 
 ## Sufficient and blocked
 
@@ -95,17 +140,26 @@ cut plus the historical `#520` citation, not as a new probe), A-norm
 (documented plus the historical `#511` citation; this batch shows only
 that the `JAIBA3` wire round-trips), A-topic (documented 120-character
 cut; observed only for 54-character keys), A-upsert (documented only),
-A-ack, A-rev (owner check only), A-sug (non-blocking on this save).
+A-ack, A-rev (owner check only), A-sug (non-blocking on this save),
+A-unit (discrete observation; the catalogue record is that unit).
 
-Blocked: crash atomicity, CAS, history substituting snapshots, and any claim
-from historical `JAIBA1`/`JAIBA2`.
+The JAIBA4 wire prefix, `jaiba/v4/` keys, executive journal, context-head,
+and helper are derived controls in the table above. They are not sufficient
+observations. Depending on them as if phase15r had stored `JAIBA4.` lines
+or executed `patch` is not allowed.
+
+Blocked: crash atomicity, CAS, history substituting snapshots, journal
+delta-plus-head atomicity, any JAIBA4 write measurement, and any claim
+from historical `JAIBA1` / `JAIBA2`.
 
 ## Non-claims
 
 - This profile is not conformance, installation, or activation.
 - A passing sample is not a maximum; a readback is not crash atomicity.
 - Search is not a complete catalogue; absent CAS is not distributed exclusion.
-- Historical `JAIBA1`/`JAIBA2` records were not used as evidence or reinterpreted.
+- Historical `JAIBA1` / `JAIBA2` records were not used as evidence or reinterpreted.
+- The contrasted `JAIBA3.` wires were not relabeled `JAIBA4.` and were not migrated by this profile.
 - `#511` / `#519` / `#520` were cited from local receipt files and were not re-read.
 - Filesystem and vault profiles in the same evidence directory do not certify Engram.
 - No MEM criterion is declared delivered here.
+- `procedure-provenance` is not a live procedure pointer. There is no `active-procedure-reference` to follow.
