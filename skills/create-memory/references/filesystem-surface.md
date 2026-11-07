@@ -1,9 +1,11 @@
 # Filesystem surface binding
 
-This reference binds the `jaiba-memory-surface` contract to the existing
-JAIBA filesystem layouts. It is declarative guidance, not an importer,
-runtime, SDK, or filesystem synchronization service. Consumers must resolve
-the effective `create-memory` installation and read its canonical
+This reference binds the `jaiba-memory-surface` contract (version **1.1.0**)
+to the existing JAIBA filesystem layouts. Under contract 1.1.0, the
+filesystem surface is classified as archetype **`document-tree`** (one
+editable Markdown document per object). It is declarative guidance, not an
+importer, runtime, SDK, or filesystem synchronization service. Consumers must
+resolve the effective `create-memory` installation and read its canonical
 `memory-surface-contract.md`; they must not assume sibling skills are
 co-installed.
 
@@ -57,7 +59,21 @@ Executive objects belong only to one explicitly resolved `.ai/work/`
 context: `PRD.md`, `plan.md`, `tasks.md`, and `walkthrough.md`, when present.
 Do not merge multiple executive contexts into a single `.ai/work/` root.
 Each requires a distinct selected destination root and preserved context ID.
-Other work files are not silently treated as concepts. The conduct helper
+Other work files are not silently treated as concepts.
+
+Under the `document-tree` archetype, each executive object maps as-is to its
+corresponding Markdown file. The `patch` operation on an executive address
+`(namespace, project-id, executive, context-id, logical-id)` is realized
+directly as targeted, surgical text edits on `.ai/work/<file>.md` (such as
+toggling checklist items `[ ]` to `[x]`, inserting task blocks, splicing
+sections, or appending walkthrough notes) without rewriting unrelated
+sections of the document. All invariants from `executive-journal.md`
+(including the draft-only rule for `update-criterion` / `remove-criterion`,
+and ID permanence) are strictly enforced prior to editing. Deterministic
+materialization on filesystem is trivial: the document itself is the
+materialized canonical state, so no external delta chain or `context-head`
+record is required or stored on disk. Invoking `compact` on an executive
+document is a no-op success. The conduct helper
 `skills/conduct/scripts/archive.sh` is filesystem-only: explicit `prepare`
 freezes a visible summary receipt with close ID, root/project/context scope,
 body fingerprint and known inventory revisions; explicit `archive` verifies
@@ -126,6 +142,8 @@ These are semantic bindings, not commands or new consumer behavior:
 | `update` | Re-read and compare the complete source revision, preserve unmodified and unknown data, write the authorized change, then verify complete readback. Historical log entries are immutable. |
 | `append-log` | Add a new immutable log entry with stable idempotency/close identity; exact readback verifies it. Existing entries are not edited to correct them. |
 | `archive` / `clear-work` | First verify the closing entry and frozen, exact executive inventory; re-enumerate and compare unchanged revisions before removing only those objects in that context. The prepare/archive helper realizes scoped filesystem closure, not generic surface or migration conformance. |
+| `patch` | On executive address `(namespace, project-id, executive, context-id, logical-id)`, realize directly as targeted, surgical in-document text edits on `.ai/work/<file>.md` without rewriting unrelated sections; enforce `executive-journal.md` invariants (e.g. draft-only criteria, ID permanence), check pre-read revision, and verify full readback. |
+| `compact` | No-op success; the filesystem document itself is always in the materialized state with zero external deltas on disk. |
 | `export` / `import` | Use the neutral manifest in `interchange.md`; stage into separately selected roots, read back all objects, compare inventory/content/relations and source stability, then require explicit human approval before authority changes. |
 
 No atomicity, crash durability, serialization, or history behavior is
@@ -199,6 +217,10 @@ unrepresentable paths block the affected complete-transfer claim.
    never collapse contexts or substitute context subdirectories. No automatic
    clone synchronization follows. Roots must stay outside effective authority
    until verified activation; reject overlapping source/staging roots.
+   Import operates on materialized canonical objects: restoring an executive
+   object writes the file directly in its materialized state, requiring no
+   delta journal or context-head on disk. Prior monolithic objects restore
+   identically as implicit bases with zero deltas.
 3. Journal intent, exact target path, approved address map, full intended bytes/
    logical value and proven absence before each create. Use actually available
    no-overwrite filesystem facilities under serialization, not an assumed atomic

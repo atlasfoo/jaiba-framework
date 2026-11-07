@@ -10,7 +10,7 @@ authority. Consumers first resolve the effective
 cross-installation use must not assume sibling files were installed.
 
 The transfer profile below completes the adapter mappings under contract
-**1.0.0**, not a second contract or storage SDK. Resolve the effective
+**1.1.0**, not a second contract or storage SDK. Resolve the effective
 `jaiba-init` installation separately for `references/surface-migration.md`
 and `assets/migration-journal-template.md`. Those own orchestration, approvals,
 writer handoff and activation; this reference owns the shared interchange
@@ -45,7 +45,7 @@ the same neutral format for filesystem and Engram, not backend-native exports:
 | Manifest identity | Stable transaction ID, manifest ID/revision, contract/version, source and intended target binding/adapter/version, state/completeness, approved scope and approval references. |
 | Registry inventory | Namespace, stable logical project IDs, sanitized identity candidates and approved aliases; every declared context, including empty ones, marked included or explicitly excluded with reason/approval. Record registry revisions and complete traversal evidence. Backend project/account keys are separate physical routing fields, never logical project IDs. |
 | Address/restoration mapping | Each full source logical address → approved target address, source representation/locator → target representation/locator; stable logical ID retained. Include original filename/extension, raw byte encoding, bundle index paths or legacy document/view anchors, and distinct filesystem root per context. Record remaps explicitly, including namespace/project/context changes and their relation-target mapping. |
-| Complete object | Full content, type as found, all metadata, relations with ordered targets/unknown fields/original forms, original raw representation and source revision. Preserve unknown optional envelope/object extensions as opaque lossless values; unknown required extensions block use, not silent downgrade. |
+| Complete object | Full content, type as found, all metadata, relations with ordered targets/unknown fields/original forms, original raw representation and source revision. Export and import operate on **materialized canonical objects** (lossless at the logical level); for executive objects, content is the materialized state. Journal lineage (delta chain history, heads) is optional metadata, not required for migration. Prior monolithic executive objects (from 1.0.0 or legacy layouts) are read and imported as an implicit base with zero deltas (`seq: 0`). Preserve unknown optional envelope/object extensions as opaque lossless values; unknown required extensions block use, not silent downgrade. |
 | History | Immutable historical payloads and stable close IDs with original log address/revision and frozen archive inventories when present. Preserve missing historical metadata as missing; do not fabricate close IDs or append new closure logs during import. Declare included histories/tombstones separately from the active object inventory. |
 | Integrity/completion | Fingerprint method/version, exact coverage/normalization, byte counts/digests and complete payload comparison evidence, catalogue/registry counts and explicit traversal ends, findings/limits/exclusions. Include snapshot readback and source re-enumeration/revision evidence. |
 | Target attempt/receipt | Journal transaction and per-object request IDs, exact intended payload/locator, proven prior absence, known effects/outcome, target revision and full readback evidence. Source revision remains provenance, never a target concurrency token. |
@@ -76,11 +76,22 @@ approval and invalidate dependent verification; they are not retry defaults.
 ## Export and staging
 
 Export only an exact, resolved ownership scope after complete enumeration and
-full reads. Declare namespace and list all contexts in the selected scope,
-including contexts with no objects; each object records its own category and
-context. Preserve stable logical IDs and original source revision evidence.
-Recheck source inventory and revisions after export; changes during
-capture require reconciliation and a fresh verified export.
+full reads. Export and import operate on **materialized canonical objects**,
+ensuring the transfer is lossless at the logical level. For executive objects,
+the manifest captures the fully materialized object resulting from applying
+active deltas to the base. Journal lineage (stored deltas history, base,
+and `context-head`) is optional metadata; omitting delta history does not by
+itself make an export incomplete, but claiming lineage was preserved when it
+was dropped fails verification. Prior monolithic executive objects (from
+contract 1.0.0 or legacy flat layouts) are read and imported as an implicit
+base with zero deltas (`seq: 0`). When imported into a target of archetype
+`record-store`, an object with zero deltas initializes as an implicit base
+with `seq: 0`; when imported into `document-tree`, it materializes directly
+as the destination document. Declare namespace and list all contexts in the
+selected scope, including contexts with no objects; each object records its
+own category and context. Preserve stable logical IDs and original source
+revision evidence. Recheck source inventory and revisions after export;
+changes during capture require reconciliation and a fresh verified export.
 
 Import stages into separately identified destination roots. Keep the source
 authoritative and intact. Preserve logical IDs, types, full content, unknown

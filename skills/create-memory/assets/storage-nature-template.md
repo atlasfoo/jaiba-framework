@@ -2,7 +2,7 @@
 
 Unexecuted template for a **backend-specific filled profile**. Filling
 it in does not certify a backend, an adapter, or `jaiba-memory-surface`
-**1.0.0**. A profile that is still `unfilled`, `hypothesis-only`,
+**1.1.0**. A profile that is still `unfilled`, `hypothesis-only`,
 `incomplete`, or `discrepant` is a diagnosis at most. Even `contrasted`
 only means documentation and observation were compared. Depend on a
 physical claim only when the derivation section names that claim and
@@ -26,8 +26,9 @@ profile-status: unfilled
 # unfilled | hypothesis-only | incomplete | discrepant | contrasted
 # contrasted is not certification. Empty sufficiency list => depend on nothing.
 contract-id: jaiba-memory-surface
-contract-version: "1.0.0"
+contract-version: "1.1.0"
 logical-guarantees-changed: no
+archetype: unknown # document-tree | record-store | unknown (unknown strictly blocks derivation)
 factory-procedure-locator: "<generation-time resolved procedure locator; provenance only>"
 factory-procedure-revision: "<identified revision or exact source digest>"
 factory-procedure-resolved-at: "<date>"
@@ -81,6 +82,7 @@ when the procedure marks that claim sufficient.
 
 | Id | Dimension | Claim | State | Documentary source | Observation locator | Depends-on blocked? |
 |---|---|---|---|---|---|---|
+| A-archetype | Archetype | `<document-tree (editable Markdown documents, direct in-document patch) vs record-store (database/records, mandatory executive journal); unknown strictly blocks derivation>` | unknown | `<or none>` | `<or none>` | yes |
 | A-unit | Native unit | `<which record a write accepts>` | unknown | `<or none>` | `<or none>` | yes |
 | A-atom-payload | Atomic scope | `<payload commits with what>` | unknown | | | yes |
 | A-atom-meta | Atomic scope | `<metadata>` | unknown | | | yes |
@@ -193,6 +195,7 @@ An artificial cap is not a justification.
 
 | Control | Gap it closes | Assertion ids | Cost (records / calls / bytes) | Enumerated and reconstructed how | Authorized? |
 |---|---|---|---|---|---|
+| Archetype mapping | `<document-tree: in-document patch, trivial materialization; record-store: mandatory executive journal (base+deltas+context-head); unknown strictly blocks>` | `<ids>` | `<cost>` | `<document edit vs journaled deltas>` | no |
 | Single native unit for payload + ownership | `<fits and verifies, or not shown>` | `<ids>` | `<cost>` | `<readback method>` | no |
 | Minimal own index | `<only if native enumeration is unavailable>` | | `<shared vs per-object>` | `<not FTS>` | no |
 | Payload/index reconciliation | `<non-atomic pair; preserves last guaranteed version>` | | | `<finite recovery; no second logical object>` | no |
@@ -207,7 +210,7 @@ Sufficient guarantees (the only physical claims a mapping may depend on):
 Blocked guarantees (mapping and conformant generation must not depend
 on these):
 
-- `<every necessary guarantee still unknown, inferred, documented-only, or discrepant>`
+- `<every necessary guarantee still unknown, inferred, documented-only, or discrepant; archetype unknown strictly blocks derivation>`
 
 Logical collisions that block, regardless of suggestions: namespace,
 project, category, context when present, logical id, owner, revision,
@@ -216,7 +219,7 @@ No automatic judgments. Host personal judgment protocol: independent,
 not resolved here.
 
 Multi-object migration journal: retained. Logical contract version:
-unchanged at **1.0.0**.
+unchanged at **1.1.0**.
 
 ## 6. Non-claims
 

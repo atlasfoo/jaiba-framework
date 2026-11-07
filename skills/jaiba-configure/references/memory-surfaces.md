@@ -2,7 +2,7 @@
 
 This is machine setup guidance, not a second surface contract. Resolve the
 current host's effective `create-memory` installation and read its canonical
-`references/memory-surface-contract.md` (`jaiba-memory-surface` 1.0.0),
+`references/memory-surface-contract.md` (`jaiba-memory-surface` 1.1.0),
 `resolution.md` and `filesystem-surface.md`. Use its interchange reference
 only to explain transfer requirements, not to perform migration here.
 Missing, ambiguous or unsupported definitions block dependent work. Never
@@ -25,8 +25,18 @@ resolve by sibling paths, a source checkout or another host's installation.
   when `category: memory-surface`. `memory-surface-draft` is not a
   conforming selectable mutable adapter. The first-party Engram package
   `jaiba-engram-memory` is `memory-surface` with verified conformance on
-  finite trial evidence (T-086/T-087); bounded trial evidence does not certify
-  other hosts or production scopes.
+  finite trial evidence (T-086/T-087). That certification is package-scoped:
+  another host does not re-run it or edit the package. Bounded trial evidence
+  still does not certify production scopes beyond the trial.
+- Separate package conformance from session readiness. Conformance is certified
+  once on the package: the claim envelope covers backend, tool versions,
+  physical protocol and contract (`jaiba-memory-surface` 1.1.0). The certifying
+  host is provenance, not scope. Session readiness is this host's non-destructive
+  preflight: map `mcp:<server>` plus the published tool name to this host's
+  exposure, then probe and read the exact catalogue. A missing canonical tool is
+  `missing-capability` for this host and tool; it does not change conformance
+  and is not a fallback. An incompatible contract major is `unsupported-version`.
+  Do not persist a host exposure prefix in the package or the binding.
 - Report exact ID/version, effective local/global path, host visibility,
   contract compatibility, required tools/permissions and verification limits.
   Check this agent's actual callable schemas and authorized non-destructive
@@ -53,7 +63,11 @@ level require explicit human choice. Do not choose a lower level to escape
 ambiguity. Recompute precedence: a remembered binding may retain a confirmed
 choice for an unchanged candidate set, but is not an override or fifth level.
 A changed set needs confirmation. Selected-adapter failure never permits
-silent fallback, another project/context or a new empty brain.
+silent fallback, another project/context or a new empty brain. Package
+conformance does not depend on which agent is resolving; session readiness
+does. A verified package this host cannot call stays unusable here without
+becoming non-conforming. A readiness failure is not absence and not permission
+to select filesystem.
 
 Global adapter installation is a desired skill destination, not automatic
 migration or authorization to supersede existing local memory. Installation
@@ -113,8 +127,15 @@ these obstacles without applying overrides or changing bindings.
 Inspection never mutates routing bindings. Registration, registry aliases and
 constitutive creation belong to `jaiba-init`, not machine configuration. Any
 separately authorized future machine-routing change is limited to sanitized
-IDs/locators/versions under `~/.jaiba/memory/`, keyed by exact host identity
-and normalized absolute work root. Apply the canonical root/origin, exact
+IDs/locators/versions at
+`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` (format v2),
+keyed only by the normalized canonical work root — absolute, `/` separators,
+no trailing `/` unless the path is exactly `/`. `host-agent-id` is not a
+directory or file key. Legacy `~/.jaiba/memory/<host-agent-id>/` records are
+compatibility inputs: consolidate agreeing blocking fields into v2 with
+readback and keep the originals; disagreement needs an explicit human choice,
+not host order. A pending executive journal or unverified mutation blocks
+dependent writes until reconciled. Apply the canonical root/origin, exact
 registry lookup and stable project/context rules; do not guess IDs from a
 basename, branch, session or latest search result. That separate authorization
 must name the routing fields/diff and verify readback; no payloads, raw remote
@@ -141,11 +162,15 @@ Migration involving populated stores requires the separately resolved effective
 init's explicit `migrate-surface` procedure and canonical neutral interchange,
 even with an override or saved binding. Require complete source/target catalogues
 and full reads, actual writer pause, explicit no-merge collision decisions, a
-durable same-transaction journal for unknown outcomes, full staged verification
-and separate human activation with routing/active readback. Preserve source;
-no automatic purge, dual-write or retirement. Source-outage recovery requires
-init's qualified stale-snapshot decision and later-write reconciliation, never
-silent empty fallback or an invented current-source verification. Hand off to
+durable same-transaction journal for unknown outcomes and full staged
+verification before the cut. A verified stage presents one cut gate with two
+explicit consents, asked together: activate the exact verified manifest, and
+separately retire the source store and local `.ai/` plus the JAIBA marker.
+Those remain separate decisions; declining either leaves the source
+authoritative. Never an automatic purge, dual-write or failback. Configure
+does not run the cut. Source-outage recovery requires init's qualified
+stale-snapshot decision and later-write reconciliation, never silent empty
+fallback or an invented current-source verification. Hand off to
 `jaiba-init` for authorized registration/instrumentation or explicit migration
 and `jaiba-doctor` for diagnostics; mention them, do not invoke or perform their
 work inline.

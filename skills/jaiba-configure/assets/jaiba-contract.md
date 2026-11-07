@@ -15,15 +15,14 @@ project** on this machine. It says nothing about any one project —
 for that, read the project's identity concepts (`constitution.md` in
 the legacy flat layout; see §1).
 
-A project is JAIBA-instrumented when its selected memory surface has a
-verified constitutive brain (§1). Filesystem instrumentation retains its
-minimal root `AGENTS.md` pointer and `.ai/` brain; external instrumentation
-requires a valid binding and real, readable constitutive catalogue and entry
-concepts, not a marker, probe, search hit or empty catalogue. External mode
-may omit `AGENTS.md` and `.ai/` entirely. Resolve before declaring a project
-uninstrumented: access or resolution failure is not an absent brain. For a
-confirmed uninstrumented project this contract is dormant until authorized
-`jaiba-init` instrumentation; never manufacture memory to bypass a failure.
+A project is JAIBA-instrumented when its selected memory surface has a verified
+constitutive brain (§1). Filesystem mode retains its minimal root `AGENTS.md`
+and `.ai/` brain; external mode needs a valid binding plus real, readable
+constitutive catalogue and entry concepts — not a marker, probe, search hit or
+empty catalogue — and may omit `AGENTS.md` and `.ai/`. Resolve before declaring
+uninstrumented: access or resolution failure is not an absent brain. Confirmed
+uninstrumented projects stay dormant until authorized `jaiba-init`; never
+manufacture memory to bypass a failure.
 
 JAIBA is tool-agnostic: nothing in this file assumes a specific IDE,
 agent runtime, or model provider.
@@ -44,7 +43,7 @@ storage requirements; external surfaces address the same concepts logically.
 
 ### Surface resolution and identity
 
-The `jaiba-memory-surface` **1.0.0** contract is declarative guidance
+The `jaiba-memory-surface` **1.1.0** contract is declarative guidance
 interpreted by the agent, not a resolver runtime or storage schema. Resolve the
 **current host agent's effective `create-memory` installation** and its
 `references/memory-surface-contract.md`, `resolution.md` and
@@ -58,11 +57,15 @@ host-visible global `memory-surface` skill → built-in filesystem. Visibility i
 to this agent. Local beats global for the same ID; unresolved copies or
 different IDs at the winning level need an explicit human choice. A remembered
 choice is not a precedence level. A missing, failed or unavailable selected
-adapter blocks work: never empty memory, never silent fallback. Validate
-contract version, callable tools, permissions, capabilities and limits
-non-destructively; installation or an ATL entry is not operational evidence.
-Only a package with `category: memory-surface` is a conforming selectable
-mutable adapter. Draft categories are not conforming selectable mutable adapters.
+adapter blocks work: never empty memory, never silent fallback. Package
+conformance certifies backend, tool versions, protocol and contract; the host
+is provenance, not scope — do not re-certify or edit the package. Session
+readiness is a non-destructive preflight of callable tools by canonical MCP
+names (`mcp:<server>` plus the published name). `missing-capability` blocks
+that host only and does not alter package conformance or fall back.
+Installation or an ATL entry is not operational evidence. Only a package with
+`category: memory-surface` is a conforming selectable mutable adapter.
+Draft categories are not conforming selectable mutable adapters.
 `jaiba-engram-memory` remains `memory-surface-draft` until its package metadata
 says otherwise; this contract names no adapter's evidence.
 
@@ -83,14 +86,19 @@ category is `constitutive` or `executive`, with a context for executive
 objects. Namespace ownership must be exact and checkable; ordinary
 host/backend memory is not JAIBA memory because a hit or title resembles it.
 
-Persist routing-only bindings under `~/.jaiba/memory/`, keyed by exact host-agent
-identity and absolute work root: sanitized identifiers, versions and locators
-only, never payloads, credentials or an `.ai/` mirror. Read back saved routing;
-if persistence fails, get explicit session-only consent or stop. The executive
-context ID persists per root independent of branch, session or model;
-clones/worktrees default to independent contexts, and resuming elsewhere needs
-exact owned lookup plus a single-writer handoff. Filesystem keeps `.ai/work/`
-per checkout.
+Persist format-v2 routing-only bindings, shared across agents of this user on
+this machine for one normalized canonical work root, at
+`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`. No
+`host-agent-id` directory or key. Sanitized IDs, versions and locators only;
+never payloads, credentials or an `.ai/` mirror. Legacy
+`~/.jaiba/memory/<host-agent-id>/` records consolidate into v2 with readback
+when blocking fields agree; keep the originals. Disagreement needs a human
+choice, not host order. Read back saved routing; if persistence fails, get
+explicit session-only consent or stop. A pending executive journal or
+unverified mutation blocks dependent writes until reconciled. Context ID
+persists per root independent of branch, session or model; clones/worktrees
+default independent. Resuming elsewhere needs exact owned lookup plus a
+single-writer handoff. Filesystem keeps `.ai/work/` per checkout.
 
 ### Catalogue, verification and authority
 
@@ -120,7 +128,7 @@ clear-work; unexpected or changed objects block cleanup. No namespace-wide
 purge or side effects outside the resolved ownership. Backend permission never
 expands workflow authority or replaces human approval.
 
-### Transition — migration capability gate
+### Transition — migration capability gate and cut gate
 
 Setup, `jaiba-init`, `jaiba-doctor` and `jaiba-configure` may resolve/probe
 external surfaces within approved scope; probing is not activation or mutation
@@ -136,36 +144,32 @@ override or a binding never approves migration; offer the `filesystem`
 override rather than silent fallback. Require complete source/target
 inventories, full payloads, paused writers, explicit collision decisions (no
 merge/overwrite), staged lossless import and full-readback verification;
-recheck revisions before separate human approval to activate the exact verified
-manifest, then verify routing and inventory. The source stays authoritative
-until that switch and after it; retirement needs separate exact-scope consent;
-no auto purge, dual-write or failback. Journal intent and exact outcomes
-durably; interrupted transfers reopen the same transaction. Outage is not
-absence: retry, stop, or request init's qualified stale-snapshot recovery from
-a verified neutral snapshot with a separate loss/divergence decision and fresh
-activation approval. Target integrity, reconciliation and writer pause are
-never waived; never replace missing evidence with an empty brain.
+recheck revisions, then one cut gate asks both consents together: activate the
+exact verified manifest, and separately retire the source store, local `.ai/`
+and JAIBA marker. Declining activation leaves the source authoritative. Never
+an automatic purge, dual-write or failback; then verify routing and inventory.
+Journal intent and exact outcomes durably; interrupted transfers reopen the same
+transaction. Outage is not absence: retry, stop, or request init's qualified
+stale-snapshot recovery from a verified neutral snapshot, with a separate
+loss/divergence decision and fresh activation approval. Target integrity,
+reconciliation and writer pause are never waived; never replace missing
+evidence with an empty brain.
 
 ### Concept and filesystem layout resolution
 
-**Resolve by concept, not by path.** In constitutive memory you do not
-assume a filename or backend record title. A concept declares an OKF `type:`
-(file frontmatter in the concept bundle), and you ask for the type you need —
-`quality-gate`,
-`decision`, `reference`, `sub-unit` — letting the brain tell you where
-it lives. Never cite a section number (`constitution.md §6`): section
-numbers are not addresses and do not resolve. The closed `type:`
-vocabulary, the bundle layout and the per-type frontmatter are
-documented in the effective `jaiba-init` installation's
-`references/okf-pattern.md`; resolve it independently through the host, not a
-sibling path. Executive contents remain owned by effective `conduct` templates.
-Unavailable or ambiguous definitions block dependent work. For external
-instrumentation, verify the real catalogue and required constitutive entry
-concepts by full reads, not just a binding or successful probe.
+**Resolve by concept, not by path.** Do not assume a filename or backend record
+title. A concept declares an OKF `type:` (file frontmatter in the concept
+bundle); ask for `quality-gate`, `decision`, `reference` or `sub-unit` and let
+the brain say where it lives. Never cite a section number (`constitution.md §6`):
+section numbers are not addresses. Closed `type:` vocabulary, bundle layout and
+per-type frontmatter live in the effective `jaiba-init` `references/okf-pattern.md`;
+resolve it through the host, not a sibling path. Executive contents stay owned by
+effective `conduct` templates. Unavailable or ambiguous definitions block work.
+For external instrumentation, verify the real catalogue and required entry
+concepts by full reads, not a binding or successful probe.
 
-**Dual resolution (filesystem).** A repository may carry either the concept bundle
-or the older flat layout, and both are supported. Determine which one
-you are in *before* reading anything from `.ai/memory/`:
+**Dual resolution (filesystem).** A repository may carry the concept bundle or the
+older flat layout; both are supported. Determine which *before* reading `.ai/memory/`:
 
 | What `.ai/memory/` holds | Layout | What you do |
 |---|---|---|
@@ -174,11 +178,10 @@ you are in *before* reading anything from `.ai/memory/`:
 | both `index.md` and `constitution.md` | ambiguous | **Stop and surface it to the human.** Do not silently pick one — a half-migrated brain read from the wrong half is worse than no brain. |
 | neither, after successful filesystem access/resolution | no brain | No filesystem brain is resolved. Route to `jaiba-init`; do not improvise memory or infer absence on another surface. |
 
-If a concept you need is absent or empty in whichever layout you
-resolved, say so before acting on assumptions about its contents.
-Preserve historical flat documents/entries and unknown fields losslessly;
-do not invent frontmatter, split shared source documents into independently
-writable concepts, or force migration merely to read a supported brain.
+If a needed concept is absent or empty in the resolved layout, say so before
+acting on assumptions. Preserve historical flat documents, entries and unknown
+fields losslessly; do not invent frontmatter, split shared sources into
+independently writable concepts, or migrate merely to read a supported brain.
 `.atl/tool-layout.md` is **always filesystem-local** at the work root, never
 external memory; `.ai/vendored/` is not a concept store.
 

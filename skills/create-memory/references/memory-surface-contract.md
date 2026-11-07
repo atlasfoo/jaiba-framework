@@ -1,6 +1,7 @@
 # JAIBA logical memory surface contract
 
-Contract identifier: `jaiba-memory-surface`. Version: **1.0.0**.
+Contract identifier: `jaiba-memory-surface`. Version: **1.1.0**
+(`contract-version: "1.1.0"`).
 
 This is a declarative contract, not an SDK, driver, runtime, storage
 schema, or dependency on an OKF implementation. Its canonical copy is
@@ -15,6 +16,14 @@ physical representation from those guarantees. Read this installation's
 That procedure is not a second contract, and a profile produced from it
 is not conformance evidence.
 
+This version is a minor, additive increment over **1.0.0**. Rules below
+that are not amended remain in force, including for a `1.0.x` adapter.
+`executive-journal.md` in this installation is the normative detail for
+the `executive-journal` capability. It is not a second contract, a
+storage schema, or a writer runtime. If that reference is missing or
+ambiguous, do not invent journal semantics: a consumer that needs
+`patch` stops, while a `1.0.x` adapter remains usable under §1.
+
 ## 1. Version and ownership
 
 The surface's declaration names the contract identifier and supported
@@ -26,6 +35,21 @@ additive optional capabilities a minor version; clarifications a patch.
 Unknown optional extensions may be ignored but must survive round trips.
 An unknown required extension blocks use. No implicit compatibility or
 fallback to filesystem, another project, context, or backend is allowed.
+
+A consumer implementing **1.1.0** accepts an adapter of this identifier
+declaring `1.0.x` or `1.1.x`. A different major is `unsupported-version`,
+not an empty brain. A greater minor than the consumer implements
+(`1.2.x` or above, for a 1.1.0 consumer) is also `unsupported-version`.
+Acceptance of `1.0.x` is not symmetric: a consumer that implements only
+1.0.0 is not required to accept a 1.1 adapter. A `1.0.x` adapter has no
+`patch` and no `executive-journal` obligation. The 1.1 consumer then
+applies the authorized change with full `update`, still under §4
+verification, and records an efficiency warning. That warned `update`
+is the compatibility path for a missing `patch`; it is not a fallback
+to another surface. `executive-journal.md` defines the warning and the
+rules the consumer must still enforce, including draft-only criterion
+edits. A 1.1 `record-store` adapter that lacks the capability is
+`missing-capability`, not a candidate for that path (§5).
 
 This contract owns logical addressing, operations and safety invariants.
 Resolve the effective `jaiba-init` installation through the host's skill
@@ -85,6 +109,7 @@ this contract does not require rewriting those links to backend URIs.
 | Executive | `prd`, `plan`, `tasks`, `walkthrough` |
 
 These are the sixteen existing first-party types, not new backend types.
+The 1.1.0 executive journal does not add a type.
 The logical catalogue includes every object in scope, including log
 entries and objects not linked individually from an index. Optional
 types such as `snippet` and `sub-unit` need not have instances.
@@ -116,6 +141,16 @@ for changes before destructive work. Unstable enumeration is not proof.
 and revision evidence, with an explicit completeness indication.
 Chunked content is acceptable only with deterministic reconstruction
 and an explicit end; a summary or truncated tool preview is not a read.
+A journaled executive object is complete only when `read` returns the
+materialized canonical object in `executive-journal.md` (base plus
+deltas in sequence order). Returning the base alone, a delta, a
+`context-head`, or a partially applied journal is not a successful read;
+an invalid delta fails the read as `invalid-object`.
+
+Deltas are not logical objects. A `context-head` record is not a
+logical object either. `catalog` does not list them, and they never
+satisfy enumeration of the sixteen types. Catalogue completeness is
+still completeness of logical objects, not of journal bookkeeping.
 
 An exact `not-found` result is absence evidence only within the fully
 resolved, readable ownership scope. Complete authoritative enumeration
@@ -137,8 +172,38 @@ surface and exact ownership scope; requests and results must state it.
 | `create` | Create a previously absent logical address after authoritative pre-read/absence check; never overwrite on collision. Return mutation receipt and verify by exact readback. |
 | `update` | Read the existing object/revision, preserve unmodified and unknown fields, apply the authorized change, return receipt and verify full readback. Never upsert an absent object implicitly. |
 | `append-log` | Append an immutable constitutive `log-entry`, using a stable close/change identifier as idempotency key. Same key and same complete payload returns the existing verified receipt; same key and different payload is a conflict. Corrections are new entries, not edits. |
-| `archive` / `clear-work` | Archive verifies a closing log and returns evidence binding it to an exact executive inventory. Clear-work consumes that evidence and removes only the known, unchanged objects of that context, under §7. No category-wide or project-wide purge. |
+| `archive` / `clear-work` | Archive verifies a closing log and returns evidence binding it to an exact executive inventory. Clear-work consumes that evidence and removes only the known, unchanged objects of that context, plus journal records §7 binds to them. No category-wide or project-wide purge. |
 | `export` / `import` | Export a complete scoped inventory with full objects, relations, unknown fields, logical IDs and source revision evidence. Import stages and verifies it without destructive overwrite; activation follows §8. |
+
+### Optional executive `patch`
+
+`patch(address, expected-head, ops[])` and `compact(address,
+expected-head)` are optional operations of the `executive-journal`
+capability. They apply only to the executive category, and only to the
+types `prd`, `plan`, `tasks`, and `walkthrough`. They do not add a
+writer: §6 still allows one executive writer per context.
+`expected-head` (sequence plus chain digest) is a pre-check under that
+single writer. Comparing it is not atomic compare-and-swap, and this
+contract does not add a lock protocol. Without the existing
+single-writer discipline, block mutation, as for any other write.
+
+The closed op vocabulary, deterministic materialization, head
+computation, and the draft-only rule for `update-criterion` and
+`remove-criterion` live in `executive-journal.md`. Do not treat a
+partial name list as that vocabulary. Ops cover `tasks` checkbox and
+task-block edits, `plan`/`prd` frontmatter and section splices, PRD
+criterion edits, and walkthrough append. One invariant is restated
+because a missed refusal would drop permanent identifiers: while a
+PRD's materialized `status` is not `draft`, `remove-criterion` fails
+with `conflict` or `invalid-object` as that reference assigns those
+codes, and the patch is not applied. `update-criterion` is likewise
+draft-only. `replace-section` may correct a draft, and may edit other
+sections, but it is not a way around that refusal.
+
+A surface without `patch` is not thereby non-conformant to 1.0.0. The
+1.1 consumer uses the §1 compatibility path only for a `1.0.x` adapter.
+`compact` is part of the capability; invoking it is optional. It is not
+implicit on `read` or `patch`.
 
 ### Mutation receipts and revision semantics
 
@@ -156,7 +221,12 @@ or a declared deterministic fingerprint of the full logical object
 (metadata, content and relations). The binding declares what is covered,
 its comparison rules and any normalization. A timestamp or truncated
 content fingerprint alone is insufficient. Imported source revisions
-are provenance, not valid target revision tokens.
+are provenance, not valid target revision tokens. For a journaled
+executive object the logical revision is the fingerprint of the
+materialized object, not of an unapplied base and not of
+`expected-head`. Compaction may change the head while leaving that
+logical revision unchanged. `expected-head` does not become a target
+concurrency token for a different binding.
 
 Before mutation compare the current revision to the pre-read revision;
 after mutation read back and compare the complete intended object,
@@ -176,8 +246,10 @@ depends on actual single-writer/serialized access, not optimistic claims
 that a race cannot happen. If that discipline cannot be established,
 block mutation. Native CAS conflicts also block dependent operations.
 Absence of CAS does not authorize a different physical topology, extra
-per-object controls, or a claim of distributed exclusion. §11 keeps
-those distinctions.
+per-object controls, or a claim of distributed exclusion. An
+`expected-head` match is one of those single-writer checks, not
+distributed exclusion and not CAS, even when a binding also has native
+CAS on its head record. §11 keeps those distinctions.
 
 ## 5. Required and optional capabilities
 
@@ -198,10 +270,30 @@ must be reported as such, not advertised as a complete surface.
 
 Optional capabilities include semantic/full-text search, native CAS,
 transactions, snapshots, native locks/leases, history, batch operations,
-streaming/chunking, attachments and coordination. Declare each as
-supported, unsupported or unverified, with its actual guarantees.
-Optional absence is not a failure unless a consumer requires it for the
-requested operation; it cannot weaken a mandatory guarantee.
+streaming/chunking, attachments, coordination, and `executive-journal`.
+Declare each as supported, unsupported or unverified, with its actual
+guarantees. Optional absence is not a failure unless a consumer requires
+it for the requested operation; it cannot weaken a mandatory guarantee.
+
+`executive-journal` adds `patch` and `compact`. Detail is in
+`executive-journal.md`; the following is only how the capability
+attaches. It is optional relative to 1.0.0 conformance: a `1.0.x`
+adapter need not declare it, and a 1.1 consumer then uses the §1
+full-`update` path with an efficiency warning. A binding that declares
+`1.1.x` attaches the capability by archetype. `record-store` requires
+the stored journal (base, ordered deltas, and one `context-head` per
+executive context); omitting it is `missing-capability`, and the
+full-`update` path must not paper over that gap. `document-tree`
+realizes `patch` as an edit of the executive document; it does not
+require a stored delta chain or a `context-head`. A `1.1.x`
+`document-tree` that does not realize `patch` is `missing-capability`;
+the §1 full-`update` path does not cover it. `unknown`
+(insufficient evidence) blocks derivation of a conformant mapping. Do
+not infer either archetype from a backend name. These names exist here
+only so the capability can attach. They are not the archetype
+dimension: this contract does not define its states, experiments, or
+profile fields (`storage-nature.md` remains the procedure). A `1.0.x`
+adapter that declares no archetype is pre-dimension, not `unknown`.
 
 Limits must specify content encoding/format, maximum object/request and
 response/page sizes (with units), metadata/relation restrictions and any
@@ -256,6 +348,17 @@ is not required. Uncontrolled concurrent writers make mutation unsafe.
    retry only unchanged residual objects. Never erase the verified log
    or reach into another context to make a retry appear successful.
 
+When a frozen executive object has an executive journal, archive
+evidence also binds that object's base, its active deltas, and, on
+`record-store`, the context's `context-head`. `clear-work` retires
+those with the frozen logical inventory and retires nothing else.
+Journal records are not extra logical objects to catalogue, and they
+are not unexpected objects to ignore. Retiring them does not erase the
+verified constitutive log. `compact` (new base, active deltas retired,
+logical object unchanged) is not archive and is not a substitute for
+this sequence. Compaction is optional and is never implied by `read`
+or `patch`. Rules are in `executive-journal.md`.
+
 No archive/cleanup transaction is assumed. A verified log with retained
 work is a recoverable state; cleared work without a verified log is not.
 
@@ -284,14 +387,29 @@ verified activation; any later source retirement is a separate explicit
 decision, never import's implicit cleanup. No silent fallback or
 dual-writing after a failed activation.
 
+Executive journal interchange, which `interchange.md` will realize
+later, is lossless at the logical level when the materialized object
+is transferred. Export and import operate on that materialized object.
+Journal lineage (base, deltas, heads) is optional metadata, not a
+logical object and not required for a complete export. Dropping lineage
+does not by itself make an export incomplete; claiming lineage was
+preserved when it was not is a failed verification. A prior monolithic
+object, including a `1.0.x` object, is imported and read as an implicit
+base with no deltas. This executive journal is not the migration
+transaction journal this section already requires, and simplifying one
+does not remove the other.
+
 ## 9. Errors and fail-closed outcomes
 
 Results distinguish at least: `not-found`, `ambiguous`, `unavailable`,
 `permission-denied`, `unsupported-version`, `missing-capability`,
 `invalid-object`, `conflict`, `limit-exceeded`, `partial`, `truncated`,
-and `verification-failed`. Include affected scope/address, operation,
+and `verification-failed`. Journal refusals use those codes, as
+`executive-journal.md` assigns them; this version does not add a
+journal error code. Include affected scope/address, operation,
 completion status, safe retry/reconciliation evidence and any verified
-partial effects. An unknown write outcome must be reported as unknown,
+partial effects. A refused `patch` has no partial op effects. An
+unknown write outcome must be reported as unknown,
 not retried as a fresh create/append. Redact secret-bearing backend data.
 
 Only authoritative `not-found` means absence. Partial/truncated reads,
@@ -315,10 +433,12 @@ mandatory memory capabilities.
 ## 11. Logical contract and physical representation
 
 This section restates the logical/physical boundary already implied by
-§§1–5 and §§7–8. Operation guarantees are unchanged, and the contract
-version remains **1.0.0**. Physical facts belong in a nature profile,
-not in a second copy of this contract and not in one backend's topology
-imposed on every other.
+§§1–5 and §§7–8. It does not add a physical schema. Operation
+guarantees of **1.0.0** remain in force; **1.1.0** adds the
+`executive-journal` capability in §5 without making a physical topology
+universal. Its mandatoriness follows §5, not this boundary. Physical facts belong in a nature profile, not in a second
+copy of this contract and not in one backend's topology imposed on
+every other.
 
 `storage-nature.md` in this installation is the procedure: assertion
 states, dimensions, the finite experiment, the independent residue gate,
@@ -343,7 +463,9 @@ observed.
 
 Block dependent mapping and conformant generation when a necessary
 guarantee lacks sufficient evidence, or when current documentation and
-observation materially disagree. Keep both sides of a discrepancy. Do
+observation materially disagree. Archetype evidence of `unknown` is
+insufficient for a 1.1 journal realization (§5). Do not fill that
+dimension in here. Keep both sides of a discrepancy. Do
 not choose the convenient source. A diagnosis or an explicitly incomplete
 profile may remain; it must not be labeled a conforming surface.
 
@@ -417,4 +539,6 @@ representation at or below it, conditional lossless chunking above it.
 Guarantees a backend does not offer (CAS, multi-record transactions,
 physical delete) are `absent / not-assumed`; they neither weaken this
 contract nor, alone, justify extra records. Logical operations and
-guarantees remain at **1.0.0**.
+guarantees of **1.0.0** remain in force. **1.1.0** adds `patch` and
+`executive-journal` as specified in §4 and §5; it does not turn absent
+backend guarantees into assumed ones.

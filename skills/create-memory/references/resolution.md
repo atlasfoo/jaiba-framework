@@ -2,12 +2,21 @@
 
 This reference specifies selection and identity for the
 [logical memory surface contract](memory-surface-contract.md),
-`jaiba-memory-surface` **1.0.0**. Resolve this reference and its sibling
-contract from the effective `create-memory` installation, not from a
-backend's alternative copy. It is a declarative workflow, not a resolver
-runtime or permission to install tools, migrate memory, or change authority.
-The [binding template](../assets/binding-template.md) records only routing
-metadata; it is not a brain.
+`jaiba-memory-surface` **1.1.0**. It is additive over **1.0.0**: rules
+below that are not amended remain in force, including how a `1.0.x`
+adapter is still accepted by a 1.1 consumer. Resolve this reference and
+its sibling contract from the effective `create-memory` installation,
+not from a backend's alternative copy. It is a declarative workflow,
+not a resolver runtime or permission to install tools, migrate memory,
+or change authority. The [binding template](../assets/binding-template.md)
+records only routing metadata; it is not a brain, a conformance record,
+or a per-agent configuration.
+
+Package conformance and session readiness are different claims.
+Conformance is certified once, on the package. Readiness is this
+session's non-destructive preflight. A binding is shared by canonical
+work root across agent runtimes of this user. Neither claim is rewritten
+because a different host is resolving.
 
 ## 1. Discover, select, then validate
 
@@ -33,6 +42,9 @@ value against the built-in name or an exact declared ID. Duplicate or
 conflicting override declarations are ambiguous; do not choose by line
 order. An explicit external ID may identify a visible local or global
 adapter; an invisible, unknown, or unavailable selected ID is an error.
+That error means this host cannot see the selected adapter. It does not
+edit the package and does not change a conformance status recorded on
+another copy.
 
 At each installed level, collapse copies with the **same ID** using host
 installation resolution; for the same ID at local and global levels,
@@ -42,7 +54,9 @@ copies of one ID at the same level need explicit disambiguation. Multiple
 not alphabetical order, version order, popularity, tool readiness, or the
 first skill discovered. Do not select from a lower level to escape that
 ambiguity. A confirmed binding can remember that explicit selection for
-the same candidate set; a changed set must be presented for confirmation.
+the same candidate set. The memory is the shared v2 binding for this
+canonical work root, so every agent runtime of this user sees the same
+choice. A changed set must be presented for confirmation.
 
 A saved binding is not a fifth precedence level. Recompute precedence on
 each resolution. A new explicit override always wins over a remembered
@@ -53,16 +67,127 @@ adapter that disappears or fails remains an unresolved/failed selection,
 not a reason to silently use filesystem or another adapter. Explicitly
 resolve or replace that binding with the human.
 
-After selecting, validate actual callable tools and permissions using
-the adapter's declared requirements and non-destructive probes. File
-presence and `.atl/tool-layout.md` are discovery evidence, not a successful
-tool call. Probe the selected contract/version, exact ownership scope,
-complete catalogue and full reads; establish the required mutation,
-revision, receipt, archive and portability guarantees before advertising
-a mutable surface. Do not create test memory merely to probe without
-authorization. Report unverified capabilities honestly and block dependent
-operations. Missing requirements, failed probes, unavailable services,
-permissions and unsupported versions are failures, **not absence**.
+After selecting, separate package conformance from session readiness
+(below). Do not treat a readiness failure, a missing tool, or an
+unreadable catalogue as absence, as an empty brain, or as a reason to
+rewrite the package. An unsupported contract version is
+`unsupported-version`, not a conformance re-run. File presence and
+`.atl/tool-layout.md` are discovery evidence, not a successful tool
+call. An `mcp:` row indexed there as unverified is not preflight
+success.
+
+### Package conformance
+
+Package conformance is a property of the installed adapter package, not
+of the host that happens to be resolving and not of the machine binding.
+The built-in filesystem surface has no external package and no claim
+envelope. An external package is selectable as a mutable surface only
+when its recorded conformance status is verified **and** this session's
+readiness preflight passes. A draft or unverified package stays
+unselectable. Session readiness never upgrades that status.
+
+The claim envelope certifies exactly these, together:
+
+- backend identity and version
+- tool versions, named by canonical server and published tool name
+- physical protocol identifier and version
+- contract identifier and version (`jaiba-memory-surface` and the
+  declared `contract-version`)
+
+The host that ran that certification is **provenance, not scope**. A
+package certified on one agent remains certified for every other agent
+that can select it. Do not re-run the conformance suite because the
+resolving host changed. Do not edit package files, conformance status,
+or procedure locators during resolution, preflight, binding reuse, or
+legacy consolidation.
+
+Persisted procedure identity is `procedure-provenance` only: the
+generation-time locator, revision or digest, date, and resolution
+method, kept as history. `active-procedure-reference` is not a
+persisted field. Do not write it into the package, the profile, the
+mapping, the conformance record, or the binding. If an older package
+still contains it, ignore it. It is not the procedure to open, not a
+compatibility key, and not authority. Do not rewrite the package to
+delete it during resolution; removal belongs to generation or an
+authorized upgrade, not to this workflow.
+
+Each session resolves its own compatible `create-memory` and reads the
+contract and this reference from that installation. Compatibility is
+the contract that installation implements, not the skill's distribution
+`version:` frontmatter and not a path stored in the package. Required
+version is the package's declared `contract-version`, unless the claim
+envelope names a higher minimum of the same contract. The resolved
+installation must implement the same major and a minor greater than or
+equal to that required minor. A different major, or a required minor
+greater than this installation implements, is `unsupported-version`.
+Acceptance is not symmetric with the contract's adapter rule: a 1.1
+consumer may accept a `1.0.x` adapter, but a `create-memory` that
+implements only 1.0.0 does not satisfy a package that requires 1.1.
+Do not rewrite the package down to the older contract. If no
+compatible installation is visible, or several remain ambiguous, stop.
+Name the unresolved dependency. Do not open `procedure-provenance` as
+if it still pointed at the procedure, and do not assume a sibling
+directory.
+
+### Canonical tool names
+
+An external package declares MCP requirements as `requires:` entries of
+the form `mcp:<server>` plus each required tool's name **as that server
+publishes it**. The published name is the tool name a client calls on
+that server. It is not a host exposure prefix, not a skill name, and
+not an alias invented by an agent product.
+
+Mapping a published name to the name this host exposes is session
+preflight duty. It is never hardcoded in the package. Claude Code's
+`mcp__engram__mem_save` is an exposure of server `engram`, tool
+`mem_save`, on that host only. A package that lists the exposure as the
+requirement has not declared the canonical tool. Resolution does not
+repair that declaration and does not change conformance status. Stop
+and name the package; upgrade or repair is a separate authorized
+workflow.
+
+This session may treat a host-exposed tool as the published tool only
+when **this session's** tool catalogue shows that the exposure refers
+to that server and published name. A remembered prefix table in the
+package, a previous host's inventory, or a guessed `mcp__` spelling is
+not that proof. If the alias cannot be proved, the tool is not visible.
+
+### Session readiness
+
+Readiness is a non-destructive preflight of the already selected
+surface. It does not certify the package, invalidate it, or edit it.
+Failure does not fall back to filesystem or to another adapter.
+
+Run, in order, and stop at the first failure:
+
+1. Resolve a compatible `create-memory` as above. Do not persist the
+   path you resolved.
+2. Confirm each required canonical tool is visible on **this** host,
+   after the exposure mapping above. Filesystem declares no `mcp:`
+   requirement; do not invent one. A required tool that is not visible
+   is `missing-capability`. The result names this host-agent identity
+   and the canonical tool (`mcp:<server>` plus the published tool
+   name). It does not name a guessed exposure as the requirement. It
+   does not set or clear the package's conformance status.
+3. Probe the selected surface: contract/version, exact ownership,
+   capabilities, limits, and permissions the contract's `probe` /
+   `resolve` require. Do not create test memory. Probe success alone
+   does not prove a complete read.
+4. Read the exact catalogue of the bound scope. Search is not this
+   read. An access failure, truncation, or incomplete page is not an
+   empty brain and is not a conformance failure.
+
+Other preflight failures use the contract's existing codes
+(`unavailable`, `permission-denied`, `verification-failed`, and the
+rest). They likewise leave package conformance unchanged. Do not
+collapse every failure into `missing-capability`. Reserve that code,
+here, for a required capability or canonical tool this host does not
+expose, including a 1.1 `record-store` that lacks the executive journal
+the contract already classifies that way.
+
+A passed preflight means this session may operate the selected surface.
+It is not a new certification and not permission to write while a
+pending journal or unknown mutation blocks writes (§4).
 
 ### Selection examples
 
@@ -73,9 +198,12 @@ permissions and unsupported versions are failures, **not absence**.
 | Override `team-store`; skill or required tool missing | Stop with selected-adapter failure; no fallback. |
 | Local `team-store` v1; global same ID v2 | Local v1; incompatible contract blocks use, not fallback to v2. |
 | Local `team-store`; global `personal-store` | Local `team-store`; existing data still needs authority checks. |
-| Local `alpha` and `beta` | Ask which ID; retain the confirmed choice in the binding. |
+| Local `alpha` and `beta` | Ask which ID; retain the confirmed choice in the shared binding. |
 | No adapters or override, no failed prior binding | Built-in filesystem. |
 | Saved `alpha`; new override `beta` | Select `beta`, then resolve data authority before activation. |
+| Verified package; this host sees the canonical tools and a compatible `create-memory` | Selectable. Do not re-run conformance or edit the package. |
+| Verified package; a required MCP tool is not exposed here | `missing-capability` names this host and the canonical tool. Conformance status unchanged. No fallback. |
+| Package requires a contract major this `create-memory` does not implement, or a higher minor | `unsupported-version`. Do not rewrite the package. |
 
 ## 2. Work root and project identity
 
@@ -84,7 +212,49 @@ or worktree root, not its common Git directory. If there is no Git root,
 use the absolute host workspace root. Multiple workspace roots or an
 unknown root require a human choice. Do not infer a project from the
 current directory's basename, a sibling folder, a branch, or a tool's
-default project.
+default project. Do not compute a binding path until this root is
+established. An unconfirmed root is not hashed.
+
+### Canonical work root
+
+The canonical work root is the machine-local binding key. Surface
+`binding-path` calculations and the global contract use this formula
+and no other. This reference is that definition. Do not hash a URI, the
+Git common directory, a relative path, a path with a trailing slash, or
+a host-specific display name.
+
+Given the established work root `R`:
+
+1. Make `R` absolute. A relative path is not canonical. Do not accept a
+   basename, a branch name, or a remote path in its place.
+2. Resolve `.` and `..` and symbolic links to the local directory the
+   filesystem opens for `R` (the POSIX `realpath` of that directory, or
+   the host equivalent). This resolution is local. Do not contact a
+   network, a Git host, or an SSH alias. If resolution fails, the path
+   is not a directory, or two resolutions disagree, stop. Do not hash a
+   partially resolved path and do not fall back to the unresolved
+   spelling.
+3. Normalize every native separator to `/`. Collapse repeated separators
+   to one. Preserve a drive or volume prefix exactly as resolution
+   returned it. Do not case-fold, Unicode-normalize, or percent-decode.
+4. Remove a trailing `/` unless the path is exactly `/`.
+5. The canonical string is that result. Encode it as UTF-8 with no BOM,
+   no surrounding quotes, and no trailing newline. `sha256` is SHA-256
+   of those bytes, written as 64 lowercase hexadecimal characters with
+   no algorithm prefix.
+
+The binding file name is that digest plus `.yaml`.
+
+This canonicalization is only the binding key. It does not prove two
+remotes are one project, does not collapse distinct Git worktrees, and
+does not make paths equivalent across machines. Two checkouts whose
+resolved directories differ are different work roots even when they
+share a remote. Case folding remains not evidence of identity.
+
+Known vector, formula lock only: the canonical string
+`/srv/checkouts/App` hashes to
+`4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63`.
+Do not hash `/srv/checkouts/App/` or `file:///srv/checkouts/App`.
 
 For a Git project, use its configured `origin` as the preferred identity
 candidate. Inspect metadata locally without fetching, contacting a host,
@@ -121,6 +291,10 @@ an instruction to connect to that address:
   components; do not assume cross-machine or symlink equivalence. Include
   the local host identity for local-path identities; a nonlocal file
   authority or unclear path semantics needs explicit clarification.
+  When that local path is on this machine, use the canonical work-root
+  formula above so the identity path and the binding key do not diverge
+  by spelling. That still does not make a different machine's path the
+  same identity.
 
 Use an unambiguous structured representation such as
 `{kind: git-remote, host: code.example, path: Group/App}` rather than a
@@ -128,12 +302,15 @@ concatenated basename. Local remotes use
 `{kind: local-remote, host-id: <host>, path: <absolute-path>}`.
 These are routing identifiers, not connection URLs.
 
-If no origin exists, use the normalized absolute Git work root as a
-fallback candidate; without Git, use the host workspace root. Represent
-it with kind `git-root` or `workspace-root`, host ID and absolute path.
-Canonicalize only what local metadata establishes; unresolved symlinks,
-case folding or path aliases are not evidence of equivalence. A fallback
-is nonportable and must be visibly labeled as such.
+If no origin exists, use the canonical work root as a fallback candidate
+when the root is a Git checkout; without Git, use the same canonical
+form of the host workspace root. Represent it with kind `git-root` or
+`workspace-root`, host ID and that canonical path. A fallback is
+nonportable and must be visibly labeled as such. Unresolved symlinks,
+case folding, or path aliases are not evidence that two fallback
+identities are the same project. The binding key may still collapse two
+spellings of one directory on this machine; that file sharing is not a
+registry merge.
 
 The candidate is looked up by exact identity in the selected surface's
 JAIBA project registry. The binding retains the stable resolved
@@ -162,29 +339,34 @@ an alias; one identity must not silently map to two projects.
 | SSH nickname `work-git:Group/App.git` vs `code.example/Group/App` | No assumed equivalence; confirm registry alias. |
 | Local remote `../shared/App.git` from `/srv/checkouts/dev` | Local host plus `/srv/checkouts/shared/App`, not a hosted repository identity. |
 | Origin changes from `Group/App` to `Platform/App` | Stop automatic reassociation; confirm rename/alias or a different project. |
-| No origin; checkout moves from `/srv/a` to `/srv/b` | New fallback candidate; explicit association required. |
+| No origin; checkout moves from `/srv/a` to `/srv/b` | New fallback candidate and a new binding key; explicit association required. |
 | Two roots named `App` | Never merge by basename. |
+| `/srv/checkouts/App` and a symlink that resolves to it | Same binding file on this machine. Not, by itself, the same portable project identity. |
 
 Even when a changed origin already names another registered project,
 reconcile the old binding explicitly before switching. A moved root or
 changed origin must not inherit a former binding by heuristic. Clones
 with the same normalized remote may resolve the same constitutive project,
-but that fact does not select their executive context.
+but that fact does not select their executive context. Distinct canonical
+work roots keep distinct binding files.
 
 ## 3. Executive contexts
 
 Resolve constitutive memory at `(namespace, project-id, constitutive)`.
 Resolve executive memory at `(namespace, project-id, executive, context-id)`.
-The context ID is a stable opaque identifier persisted **per work root**,
-independent of branch, session, model or terminal. A new branch in the
-same checkout does not automatically create or select a context.
+The context ID is a stable opaque identifier persisted **per canonical
+work root**, independent of branch, session, model, terminal, or which
+agent last verified the binding. A new branch in the same checkout does
+not automatically create or select a context. A different agent opening
+the same canonical root does not create one either.
 
 By default, clones and Git worktrees share the resolved constitutive
 project and have **independent executive contexts**. On first association
 with an external surface, confirm creating a fresh context or explicitly
-selecting an existing one. Preserve the resulting ID in the binding.
-Never choose the latest plan, a matching branch name, the first search
-result or another checkout's context because it appears active.
+selecting an existing one. Preserve the resulting ID in the shared v2
+binding. Never choose the latest plan, a matching branch name, the first
+search result, another checkout's context, or another agent's private
+legacy file because it appears active.
 
 To resume elsewhere, the human explicitly selects the existing context
 after an authoritative context lookup. Verify namespace/project ownership
@@ -192,6 +374,10 @@ and establish the single executive writer handoff before writes; two
 roots bound to the same context do not grant concurrent writer rights.
 Context-ID collisions or multiple possible contexts block selection.
 Switching contexts retains the old work; it is not clear-work permission.
+This reference does not add a lock protocol. A different
+`last-verified-by` is not a second writer and is not a reason to ask
+again. An uncommitted journal or an unknown mutation outcome is the
+write barrier in §4.
 
 Filesystem keeps `.ai/work/` **per checkout**, with its existing executive
 filenames and layout unchanged. Its logical context denotes that checkout's
@@ -202,37 +388,254 @@ explicit supported transfer, not a path rewrite. See the effective
 
 ## 4. Machine binding persistence
 
-Store machine routing configuration beneath `~/.jaiba/memory/`, keyed by
-the current host-agent identity and normalized absolute work root. Host
-identity here distinguishes agents/installations; local-path project
-identities additionally need a machine discriminator. These are locators,
-not credentials. An implementation may use encoded keys or nested files,
-but exact key comparison must retain the full root and host identity;
-basename keys are insufficient.
+Store the machine routing record at:
 
-A binding records only identifiers, sanitized locators and versions:
-adapter/contract, namespace, stable project/context IDs, sanitized origin
-or fallback, registry locator, and any confirmed candidate selection.
+`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+
+`~` is this user's home directory. The file is shared by every agent
+runtime of this user for that canonical work root. It is not shared
+across users. `host-agent-id` is **not** a directory, a file name, or a
+lookup key. The only key is the canonical-work-root digest from §2.
+`bindings` is a fixed directory name, not a host id. Do not write a new
+record under `~/.jaiba/memory/<host-agent-id>/`.
+
+These paths are locators, not credentials. Basename keys, branch names,
+and host names are insufficient. An implementation does not choose a
+different encoding for v2: the path above is the standard path. Exact
+comparison uses the canonical string and the lowercase digest, not a
+display path.
+
+A binding records only identifiers, sanitized locators, versions, and
+routing provenance:
+
+- `binding-format-version: "2"`
+- `last-verified-by`: the host-agent id that last completed a successful
+  routing readback. Provenance, not a key.
+- timestamps of creation and last verification
+- `machine-id`: a non-secret machine discriminator for local-path
+  project identities. Not a file key.
+- work root: canonical path and its sha256
+- sanitized remote identity candidate, or the labeled nonportable
+  fallback
+- surface selection: adapter id, adapter version, contract version,
+  category `memory-surface`
+- namespace, stable `project-id`, executive `context-id`
+- sanitized registry and context locators, confirmed candidate ids, and
+  an optional confirmed alias id
+- consolidation provenance: legacy locators read, and which record was
+  chosen if a human had to choose
+
 It must contain **no memory payload**, concept summaries, executive work,
-receipts containing payloads, raw tool responses, passwords, tokens or
-credential-bearing endpoints. A backend locator must be safe to disclose;
-authentication stays in the host's existing credential mechanism. This is
-not an `.ai/` mirror, shared project configuration, or synchronization layer.
+journal bodies, receipts containing payloads, raw tool responses,
+passwords, tokens, or credential-bearing endpoints. It does not copy
+`conformance-status`, a claim envelope, or `procedure-provenance`.
+Those stay in the package. It does not store `active-procedure-reference`
+or a host-specific installation path. A stored installation path would
+make another agent treat a shared binding as stale. Each session
+resolves its own visible installation. A backend locator must be safe to
+disclose; authentication stays in the host's existing credential
+mechanism. This is not an `.ai/` mirror, shared project configuration,
+or synchronization layer.
 
-Validate an existing binding against current precedence, root, origin,
-adapter version and exact registry ownership before reuse. A stale or
-invalid record is not proof that a project is absent. Readback of a safely
+`surface.category` in the binding is the adapter category
+(`memory-surface`), not the logical memory category. Constitutive versus
+executive remains the address category, not a second binding file.
+
+### Read and reuse
+
+On each resolution, after the canonical work root is known:
+
+1. Compute the v2 path. Do not create the file merely to test it.
+2. If that file exists, parse it and read it back against this session's
+   canonical string and digest. A valid v2 record has
+   `binding-format-version` `"2"`, a `work-root.canonical` equal to this
+   session's canonical string, and a `work-root.sha256` equal both to
+   the filename stem and to the digest of that string. Reuse its
+   `project-id` and `context-id` without asking, including when
+   `last-verified-by` names a different agent. Still recompute
+   precedence and run readiness. A valid v2 record is authoritative
+   over legacy files. Do not re-open a legacy disagreement, and do not
+   merge a later legacy file over it.
+3. If the file exists but fails those checks, stop. Do not overwrite it
+   from legacy, from this host's memory, or from a guess. Retain it for
+   explicit reconciliation. Do not print secret-bearing values. Legacy
+   files are not a silent fallback for a malformed v2 record.
+4. If the file does not exist, read legacy locations for compatibility
+   as specified under legacy read and consolidation. Do not treat
+   absence of v2 as absence of a project.
+
+Validate a reusable binding against current precedence, root, origin,
+adapter identity, and exact registry ownership before writes. A stale or
+invalid record is not proof that a project is absent. Another agent's
+verification is not a skipped ownership check. Readback of a safely
 written binding must match the intended routing fields before claiming
-persistence. Do not overwrite a malformed or conflicting record blindly;
-retain it for explicit reconciliation without exposing sensitive values.
+persistence. Routing-field comparison is semantic for quoting; the
+canonical path and digest are exact strings.
+
+After a successful readiness preflight, this host may update
+`last-verified-by`, `last-verified-at`, and the adapter version it
+actually read, without asking. That update is routing provenance. It
+must itself be read back. It must not change `project-id`, `context-id`,
+adapter id, namespace, or the identity candidate. Those changes require
+the human decisions this reference already requires. Do not update them
+because this host is new.
+
+### Legacy read and consolidation
+
+Legacy 1.0.0 records live under `~/.jaiba/memory/<host-agent-id>/`, or
+an equivalent 1.0.0 encoding that keyed a record by host-agent identity
+plus work root. They are compatibility inputs, not the standard path.
+
+Enumerate only immediate child directories of `~/.jaiba/memory/` other
+than `bindings`. Do not follow a symlink out of that directory. Do not
+search the rest of the filesystem. Do not treat `bindings` as a host
+id. Within each legacy directory, consider `*.yaml` records.
+
+A legacy record matches this work root only when its stored work root,
+passed through the §2 formula, equals this session's canonical string.
+A filename stem equal to the digest is additional evidence, not a match
+by itself. If the stem equals the digest and the body is missing, does
+not canonicalize, or canonicalizes to a different path, stop. That
+record is a conflict for this root. Do not adopt it, delete it, or
+ignore it. A record with no comparable work root and a different
+filename is not a match. Leave it unread as authority and do not delete
+it.
+
+If no legacy record matches, this is first association for this root.
+Apply the identity and context rules, then write v2 directly. Do not
+also write a host-keyed legacy file.
+
+If one or more legacy records match and they agree on every blocking
+field below, consolidate once:
+
+- Write a v2 record at the standard path from those agreed routing
+  fields.
+- `last-verified-by` is the host performing consolidation, and only
+  after readback succeeds.
+- List every legacy locator in consolidation provenance. Locators are
+  sanitized paths under `~/.jaiba/memory/`, not file bodies.
+- Read the v2 file back. Every persisted routing field, the canonical
+  path, and the digest must match the intended record. If readback
+  fails, do not claim consolidation, do not delete or rewrite legacy
+  files, and stop.
+- Preserve each original legacy file byte for byte as backup and as
+  the fallback used only when the v2 file is absent. Do not rewrite
+  legacy files in place, rename them over v2, or delete them after
+  success.
+
+Blocking fields, compared after the identity normalization in §2:
+
+- `project-id`
+- `context-id`
+- adapter id
+- namespace
+- sanitized identity candidate (`kind`, host or host-id, path, and any
+  non-default port)
+- contract major (`jaiba-memory-surface` major). A `1.x` record and a
+  `2.x` record do not agree.
+
+A missing `surface.category` on a 1.0 record is not a conflict with
+`memory-surface`. Adapter-version skew, contract minor or patch skew
+within the same major, timestamps, host ids, installation paths, and
+`last-verified-by` are not blocking. Record those differences in
+provenance. Do not ask solely because they differ. If adapter versions
+disagree, the consolidated record uses the version this session
+actually reads from the selected visible package. Contract version in
+the new record is the version that package declares. Note the legacy
+values in provenance; do not leave the binding on a stale minor when
+the declaration was read. Built-in filesystem has no external package. Its consolidated
+`contract.version` is the version the resolved `create-memory`
+implements, and only when that major agrees with the legacy records.
+A 1.1 session and legacy major `1` therefore record `1.1.0`, with the
+legacy value kept in provenance. Do not bump a major. If an external
+package was selected and this session cannot read its declaration, do
+not invent a version and do not write v2. Do not consolidate ahead of
+selection.
+
+`confirmed-candidate-ids` is not a blocking field. If several non-empty
+lists disagree, keep them in provenance and set the field to their
+intersection when that intersection is non-empty. If the intersection
+is empty, stop and ask which remembered candidate set remains in force.
+Do not union them. An empty list beside a non-empty list keeps the
+non-empty list.
+
+If any blocking field differs across matching legacy records, stop.
+Present the differing fields and the legacy locators. Require an
+explicit human choice of one record, or an explicit new association.
+Do not pick by host name, directory order, mtime, lexical order, which
+agent is running, or which file was found first. Do not write v2 until
+that choice is made. After the choice, consolidate from the chosen
+record only, read it back, and preserve every legacy file, including
+the ones not chosen. Record which locator was chosen. The next agent
+reads v2 and does not ask again.
+
+### Binding examples
+
+| State | Result |
+|---|---|
+| Valid v2 file for this canonical root | Same file, same `project-id` and `context-id`, any agent. Do not ask. |
+| v2 absent; one legacy file, or several that agree | Consolidate to the v2 path with readback. Leave every legacy file in place. |
+| v2 absent; legacy files disagree on a blocking field (`project-id`, `context-id`, adapter, namespace, identity, or contract major) | Stop. Human choice. Do not pick by host order. |
+| v2 valid, and a disagreeing legacy file also exists | v2 wins. Do not re-consolidate. |
+| v2 present but digest or canonical path disagrees | Stop. Do not repair from legacy. |
+| Pending journal or unknown mutation on the bound context | Block dependent writes. Do not change conformance or mint a context. |
+
+### Pending journal and unknown mutation
+
+A shared binding does not grant a write. Before any dependent write —
+create, update, patch, append-log, archive, clear-work, import
+activation, or a binding change that switches project, context, or
+adapter — establish that no transaction is still open for this scope.
+
+Block dependent writes when any of the following is true:
+
+- The effective `jaiba-init` migration or recovery journal has an open
+  transaction, an uncommitted effect, or an unknown outcome for this
+  project or context. That journal is not the executive journal. See
+  §6. This reference does not perform the migration.
+- The executive journal for this context, when the selected surface
+  provides `executive-journal`, has an uncommitted transaction: a base,
+  delta, or head write whose receipt is missing, whose readback does
+  not match, or whose outcome is unknown. Classify the outcome with
+  `executive-journal.md`, including its retry rule. Do not invent a
+  second journal model here. A `document-tree` edit with an unknown
+  outcome is the same barrier; absence of a stored delta chain does
+  not mean the write is known.
+- Any mutation by any agent, including this one, has an unknown outcome
+  for an address this write would touch, including shared constitutive
+  data.
+
+An unreadable journal is not an empty journal. If the check cannot be
+completed, mutation state is unknown and dependent writes stay blocked.
+Name the pending journal or mutation, the `context-id`, and the other
+agent when its identity is known. That identity is not authority to
+proceed. Do not mint a context, fall back, start a local `.ai/` cache,
+or change package conformance because a write is blocked. The binding's
+`project-id` and `context-id` stay as recorded.
+
+Non-destructive preflight may still run. Consolidation that only copies
+already agreed routing fields into a missing v2 file may still run: it
+does not switch identity and it does not write memory. Do not
+consolidate by choosing a context while a conflict or an unknown
+mutation is unresolved.
+
+A different `last-verified-by` with no pending journal and no unknown
+outcome is ordinary reuse. It is not a lockout. Writes remain under the
+contract's single-writer rules. This reference defines no distributed
+lock.
+
+### Unwritable machine configuration
 
 If machine configuration is inaccessible or unwritable, report that fact
-and offer an **explicit session-only binding** with the same selection and
-identity checks. Say that the choice will not survive the session; do not
-claim it was saved, write a substitute under `.ai/`, or silently mint a
-different context each time. If the human does not accept session-only
-operation, stop. A later durable binding needs confirmed association to
-the same project/context rather than automatic recreation.
+and offer an **explicit session-only binding** with the same selection,
+identity, and pending-write checks. Say that the choice will not survive
+the session and will not be visible to other agents. Do not claim it was
+saved, write a substitute under `.ai/`, write a host-keyed legacy file,
+or silently mint a different context each time. If the human does not
+accept session-only operation, stop. A later durable binding needs
+confirmed association to the same project and context rather than
+automatic recreation. Session-only state uses the same routing fields
+and must not be described as the v2 file.
 
 ## 5. Existing data and instrumentation
 
@@ -242,15 +645,17 @@ under contract §8 or an explicit filesystem exception (normally the
 `filesystem` override). Preserve both supported filesystem brain layouts;
 both concept and legacy entry layouts present is itself ambiguous.
 Do not silently ignore local work, migrate merely to read it, or dual-write.
+A shared v2 binding is not that approval.
 
 If filesystem and external scopes are both populated, obtain an explicit
 authority and collision decision. Inventory both completely, identify
 project/context/address collisions, and keep the source authoritative
 until a staged transfer is verified and activation approved. Neither
-newer timestamps, a saved binding nor override text authorizes overwrite,
-merge, retirement or cleanup. Surface failure while checking either side
-does not prove that side empty. Follow the effective `create-memory`
-interchange reference and contract §8; this reference performs no migration.
+newer timestamps, a saved binding, another agent's `last-verified-by`,
+nor override text authorizes overwrite, merge, retirement or cleanup.
+Surface failure while checking either side does not prove that side
+empty. Follow the effective `create-memory` interchange reference and
+contract §8; this reference performs no migration.
 
 External instrumentation requires a valid resolved binding **and a real,
 readable constitutive catalogue** in the selected owned project scope.
@@ -259,7 +664,8 @@ catalogue alone is not instrumentation. Verify the catalogue and required
 constitutive entry concepts by full reads; an empty confirmed scope routes
 to authorized `jaiba-init`, whereas access failure blocks work. External
 mode may omit project `AGENTS.md` and `.ai/` entirely. Do not create a local
-`.ai/` cache or marker as proof of external instrumentation.
+`.ai/` cache or marker as proof of external instrumentation. Do not treat
+a passed cross-agent preflight as instrumentation by itself.
 
 `.atl/tool-layout.md` always remains local at the work root, regardless of
 surface or context. It is machine/toolchain evidence, never constitutive
@@ -273,7 +679,9 @@ or backend, permission denial, incomplete data, unsupported capability and
 unknown mutation outcome from authoritative absence. None authorizes init of
 an empty brain, a new context, a lower-priority adapter or a local `.ai/` cache.
 Draft/unverified adapters remain unselectable until required operational
-conformance is established; an outage is no waiver.
+conformance is established; an outage is no waiver. A readiness failure does
+not change package conformance. A pending journal does not invalidate the
+v2 binding.
 
 Offer the human **retry the selected source after restoration**, **stop and
 retain pending work**, or **explicitly request fallback/recovery**. Retry means
@@ -285,6 +693,9 @@ an offline service does not prove other writers stopped. Record exact pending
 request IDs, known receipts/locators, prior/intended revisions and residuals in
 the owning workflow's recoverable evidence, never in routing-only bindings.
 If that evidence cannot be durably retained, stop before further side effects.
+Another agent resolving the same v2 binding observes that barrier by the
+journal and unknown-outcome checks in §4. It does not clear the barrier by
+being a different host.
 
 Fallback is **not** a resolver branch. Resolve the effective `jaiba-init`
 installation independently and use `references/surface-migration.md` and its
@@ -309,3 +720,4 @@ request outcomes are reconciled; do not assume either store is safely writable.
 After verified activation, update only approved routing fields and hand off one
 authority. When the old backend returns, reconcile possible later writes with
 the human before resuming any writer or proposing a separate transfer back.
+Consolidation of a legacy binding is not activation and not that handoff.
