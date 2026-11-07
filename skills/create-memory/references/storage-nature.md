@@ -3,7 +3,7 @@
 Factory procedure for characterizing a backend **before** a physical
 mapping. It lives in the effective `create-memory` installation, beside
 the canonical [logical contract](memory-surface-contract.md)
-(`jaiba-memory-surface` **1.0.0**). Contract §11 restates the
+(`jaiba-memory-surface` **1.1.0**). Contract §11 restates the
 logical/physical boundary; operation guarantees and that version are
 unchanged. This file is that procedure, not a filled profile and not a
 backend topology. Instantiate this installation's
@@ -88,7 +88,7 @@ committing together, or freedom from interleaving. Those stay
 
 ## 3. Evidence
 
-Name the contract version **1.0.0**, the backend, tool, and schema
+Name the contract version **1.1.0**, the backend, tool, and schema
 versions actually used, the documentation identifiers and the date they
 were read, the host and environment without secrets, the experiment
 date, the exact disposable namespace, physical project, and location,
@@ -125,6 +125,29 @@ Filesystem and every other backend use these same questions. Do not
 attribute unobserved atomicity, history, or locking to a filesystem
 because another backend needed a control, and do not import another
 backend's publication chain into it.
+
+### Storage archetype
+
+Characterize whether the backend natively organizes memory as a tree of
+editable documents or as discrete records in a store:
+
+- `document-tree`: The backend represents each logical object as an editable
+  Markdown document (filesystem directory trees, vaults, Notion pages, etc.).
+  Objects map as-is to documents. The `patch` operation on executive objects
+  is realized directly as surgical in-document edits (updating headings,
+  frontmatter, task checklist items, or section splices) without rewriting
+  unrelated sections. Deterministic materialization is trivial because the
+  document itself is the materialized state; a stored delta journal or
+  `context-head` is not required on physical storage.
+- `record-store`: The backend represents memory as database rows, key-value
+  pairs, discrete observations, or vector/FTS embeddings. Full-document
+  rewrites on minor task or status updates are disruptive or costly. Under
+  contract **1.1.0**, the executive journal (`base` + ordered `deltas` +
+  `context-head`) is **mandatory** for 1.1.0 adapters of this archetype to
+  support `patch` and `compact` without rewriting the base on every delta.
+- `unknown`: Insufficient evidence to classify the backend into either
+  archetype. An `unknown` archetype **strictly blocks** adapter derivation.
+  Do not infer or guess an archetype from product, tool, or vendor names.
 
 ### Native unit and atomic scope
 
@@ -366,13 +389,24 @@ and does not perform this retirement.
 ## 7. Derivation
 
 Derive only from guarantees the contrasted profile marks sufficient.
-Keep the logical contract at **1.0.0** while those guarantees are
+Keep the logical contract at **1.1.0** while those guarantees are
 unchanged. Do not universalize one backend's topology onto another: a
 file, a single native record, and a graph of control records are
 observations about particular stores, not a default. Derivation does
 not install, activate, migrate, retire, or change logical operations,
 closure, or portability. Optional coordination remains contract §10:
 record whether it was observed, and do not infer it or define a mission.
+
+Derivation requires a resolved archetype (`document-tree` or `record-store`).
+Archetype evidence of `unknown` strictly blocks adapter derivation: do not
+proceed to package generation with an unclassified backend. For
+`document-tree`, derivation maps objects as-is to documents; `patch` is
+realized as direct, surgical in-document edits with trivial materialization,
+and no delta journal or `context-head` is introduced on physical storage.
+For `record-store`, derivation under contract **1.1.0** must implement the
+executive journal (base, ordered deltas, and one `context-head` per
+executive context) to support `patch` and `compact` without rewriting the
+base on every delta.
 
 When the profile shows that one native unit can hold the complete object
 payload and its ownership, and that the result can be verified, use that
