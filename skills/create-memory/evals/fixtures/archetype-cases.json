@@ -1,0 +1,47 @@
+{
+  "fixture_kind": "archetype_classification_cases",
+  "purpose": "Verify classification of document-tree vs record-store archetypes, patch obligations, and unknown blocking (MSV-004).",
+  "archetypes": [
+    {
+      "archetype": "document-tree",
+      "definition": "Executive artifacts are structured documents in a directory or hierarchy (e.g., POSIX filesystem).",
+      "patch_realization": "In-place document edits of the executive document.",
+      "context_head_required": false,
+      "compact_behavior": "No-op success when no deltas exist.",
+      "conforming_scenarios": [
+        "Editing specific sections or criteria of an executive document in-place.",
+        "Preserving unaffected documents within the executive context untouched."
+      ],
+      "nonconforming_scenarios": [
+        "Rewriting unaffected documents across the context.",
+        "Introducing quadratic write amplification or full context directory rewrites."
+      ]
+    },
+    {
+      "archetype": "record-store",
+      "definition": "Discrete observations, items, or records storing memory (e.g., Engram MCP, KV store, SQLite record table).",
+      "patch_realization": "Executive journal: base record + ordered deltas + context-head slot.",
+      "context_head_required": true,
+      "context_head_cardinality": "Exactly one context-head per executive context.",
+      "compact_behavior": "Rolls up deltas into a new base and updates context-head.",
+      "conforming_scenarios": [
+        "Appending a single delta record to the journal and updating the context-head pointer slot.",
+        "Leaving base record, catalogue, other contexts, and other executive bodies unchanged during patch."
+      ],
+      "nonconforming_scenarios": [
+        "Monolithic full-object overwrites of executive artifacts on spec draft iterations or execute task updates.",
+        "Rewriting the patched object's base record on every patch operation.",
+        "Relying on contract 1.0.x full-update compatibility path to evade journal requirements in a 1.1.0 package."
+      ]
+    },
+    {
+      "archetype": "unknown",
+      "definition": "Unclassified, contradictory, or absent archetype in a 1.1.0 package.",
+      "handling": "Stop immediately; no conforming mapping can be generated.",
+      "rules": [
+        "Do not infer document-tree or record-store from backend name, tool server name, or vendor.",
+        "Pre-dimension 1.0.x packages must be explicitly classified during upgrade; unknown blocks 1.1.0 certification."
+      ]
+    }
+  ]
+}

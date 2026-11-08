@@ -43,3 +43,15 @@ The separately approved comparative evaluation should use the same
 requirements, tools, and profiles with and without the skill, save complete
 outputs and grading, and include viewer-based human review. No such generation,
 run, grading, or viewer review occurred here. Valid JSON is not conformity.
+
+## Contract 1.1.0 extensions
+
+Additional fixtures support 1.1.0 capabilities and conformance gates:
+- `cross-host-portability.json`: Claim envelope portability (backend, tools, protocol, contract); host provenance vs scope; agent-agnostic tool exposure mapping (`MSV-001`).
+- `binding-v2-cases.json`: Binding v2 path formula (`~/.jaiba/memory/bindings/<sha256>.yaml`), Step 0 O(1) discovery, agreeing legacy consolidation, and conflict blocking (`MSV-002`).
+- `multihost-installation-cases.json`: Discovery of JAIBA-configured hosts, multi-selection, timestamped backups (`.bak-<timestamp>`) on collision, and readback verification (`MSV-003`).
+- `archetype-cases.json`: Classification of `document-tree` (in-place edits, no context-head) vs `record-store` (journaled base + deltas + context-head), and `unknown` blocking (`MSV-004`).
+- `script-ast-validation.json` & `validate_scripts_ast.py`: Static AST validation of package scripts asserting Python 3 standard library imports only, zero pip dependencies, declared transport modes, and canonical subcommands (`MSV-006`).
+- `efficiency-gate-cases.json`: Efficiency Gate evaluating 5 SDD lifecycle scenarios with $O(\delta)$ deltas in `spec` draft adjustments, execute waves, plan approval, and marking monolithic full-object overwrites on `record-store` as NONCONFORMING (`MSV-007`).
+- `upgrade-repair-cases.json`: Upgrade/repair workflow covering 1.0.x audit, contrasted profile preservation, dropping host locks, canonical tool normalization, incremental conformance, and multi-host reinstallation (`MSV-009`).
+

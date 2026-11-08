@@ -1,7 +1,7 @@
 {
   "skill_name": "conduct",
   "filesystem_scoped_eval_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-  "surface_scope_note": "The listed pre-surface cases explicitly select built-in filesystem. Retain their stated bundle or legacy fixtures; path expectations do not apply to external adapters. Cases 24–26 cover surface integration. See README.md for actual exercised evidence and its limits.",
+  "surface_scope_note": "The listed pre-surface cases explicitly select built-in filesystem. Retain their stated bundle or legacy fixtures; path expectations do not apply to external adapters. Cases 24–31 cover surface integration. See README.md for actual exercised evidence and its limits.",
   "evals": [
     {
       "id": 1,
@@ -574,6 +574,78 @@
         "Any real transfer/activation requires the effective init migration procedure, full target verification and separate activation approval; source remains retained."
       ],
       "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"]
+    },
+    {
+      "id": 28,
+      "name": "limit-awareness-unchunked-budget-dimensioning",
+      "phase_under_test": "spec (limit awareness)",
+      "prompt": "Draft the PRD and plan for this complex requirement on the external surface.",
+      "context": {
+        "selected_surface": "External surface with direct payload limit of 30,000 bytes; lossless chunking reassembly unverified",
+        "requirement": "Cross-cutting multi-unit service requirement"
+      },
+      "expected_output": [
+        "Checks operating payload limits from binding or surface contract before first create of prd or plan (MSV-017)",
+        "Dimensions draft PRD and plan to fit the unchunked direct payload budget (30,000 bytes)",
+        "Preserves every required template section and the fenced criteria schema verbatim; tightens prose and examples rather than omitting schema or required sections",
+        "If intended artifact would still exceed budget, stops with limit-exceeded and does not mutate storage",
+        "Never silently truncates content, summarizes away fields, or drops criteria schema to fit"
+      ],
+      "files": []
+    },
+    {
+      "id": 29,
+      "name": "step0-binding-first-discovery-conduct",
+      "phase_under_test": "propose+spec (binding-first discovery)",
+      "prompt": "Let's plan the new reporting dashboard.",
+      "context": {
+        "repo_state": "Work root /work/dashboard with no .ai/ directory and no AGENTS.md marker (traceless mode)",
+        "binding_state": "Valid binding v2 at ~/.jaiba/memory/bindings/<sha256(/work/dashboard)>.yaml pointing to external surface with project-id prj-dash and context-id ctx-dash-1"
+      },
+      "expected_output": [
+        "Executes Step 0 Binding-First discovery: computes sha256 of canonical work root and resolves binding v2 before testing or looking for .ai/",
+        "Identifies external surface selection and active executive context in O(1) from binding v2",
+        "Does not require a local AGENTS.md marker or .ai/ folder to proceed",
+        "Does not fall back to filesystem or create a local .ai/ mirror/cache",
+        "Loads constitutive concepts directly from external memory and proceeds with proposal shaping"
+      ],
+      "files": []
+    },
+    {
+      "id": 30,
+      "name": "sdd-lifecycle-patch-mutations-and-permanence",
+      "phase_under_test": "spec+execute+validate+summarize (lifecycle patch mutations)",
+      "prompt": "Execute the approved feature through the SDD lifecycle on the record-store surface.",
+      "context": {
+        "selected_surface": "External record-store surface with executive-journal capability (1.1.0)",
+        "lifecycle_stages": "Draft spec revisions, plan approval, task execution wave, criteria validation, and context closure"
+      },
+      "expected_output": [
+        "In spec drafting, emits surgical O(delta) patch operations (replace-section, append-section, append-to-section, set-frontmatter, add-criterion, update-criterion, remove-criterion) against draft PRD/plan without monolithic object overwrites",
+        "On plan approval, sets status to approved; enforces criterion ID permanence where subsequent remove-criterion or destructive edits on existing criteria fail with conflict (MSV-005)",
+        "In execute phase, emits check-task and appends walkthrough entries as discrete journal deltas rather than rewriting full task list",
+        "In validate phase, updates criteria outcomes via set-criterion-status patch operations",
+        "In summarize phase, executes compact operation to fold base and deltas into a new exec-base at seq: 0 before archiving context",
+        "All mutations use expected-head revision validation, preventing lost updates or split-brain divergence"
+      ],
+      "files": []
+    },
+    {
+      "id": 31,
+      "name": "deterministic-rendering-without-search",
+      "phase_under_test": "conduct orientation / artifact display",
+      "prompt": "Show me the current plan and task status.",
+      "context": {
+        "selected_surface": "External memory surface with executive journal",
+        "binding": "Valid binding v2 with exact project-id and context-id"
+      },
+      "expected_output": [
+        "Resolves active plan and tasks through canonical binding and exact logical address slots (MSV-008)",
+        "Invokes package script render subcommand to deterministically extract and display Markdown artifacts from base and deltas",
+        "Prohibits full-text search sweeps (mem_search) for locating or displaying project artifacts or decisions",
+        "Repeated invocations produce bit-identical deterministic Markdown output without token bloat or candidate scans"
+      ],
+      "files": []
     }
   ]
 }

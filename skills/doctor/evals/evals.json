@@ -118,6 +118,27 @@
         "surface_variants": "also exercise both index.md and constitution.md present (ambiguous), and a supported legacy-flat-only layout"
       },
       "expected_output": "Does not call binding or partial listing a brain; distinguishes partial/unreadable, context mismatch and authoritative absence. Blocks dependent diagnostics without falling back, while independently refreshing local .atl/tool-layout.md. Filesystem dual markers are ambiguous and never auto-selected; supported legacy-flat-only layout is not degraded or converted. Doctor diagnoses only, does not repair backend, binding or memory."
+    },
+    {
+      "id": 13,
+      "name": "binding-v2-step0-and-agent-agnostic-preflight",
+      "prompt": "Run a jaiba health check on this project.",
+      "context": {
+        "repo_state": "git repo at /work/gateway, no local .ai/ directory",
+        "binding_state": "valid binding v2 at ~/.jaiba/memory/bindings/<sha256(/work/gateway)>.yaml pointing to external surface acme-memory 1.1.0",
+        "tooling": "package declares canonical tool requirements (mcp:acme-memory with catalogue, get, put, patch); host runtime exposes tools with prefix mcp__acme_memory__"
+      },
+      "expected_output": "Executes Step 0 Binding-First discovery: resolves binding v2 at ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml before checking .ai/ or assuming filesystem. Validates binding v2 format, canonical work root hash, and agreeing legacy binding consolidation. Performs agent-agnostic tool preflight (MSV-001): dynamically maps canonical published tool requirements (mcp:<server> plus tool names) to current host runtime tool exposure (mcp__acme_memory__*) without relying on hardcoded host prefixes. Validates session tool readiness without modifying certified package conformance status. Diagnostic verifies complete catalogue and full reads on the external surface."
+    },
+    {
+      "id": 14,
+      "name": "traceless-mode-atl-git-exclusion",
+      "prompt": "Check jaiba health in this repository.",
+      "context": {
+        "repo_state": "Git repo at /work/service; external memory surface selected via binding v2 (traceless mode: no AGENTS.md, no .ai/ in worktree)",
+        "git_info_exclude": "git rev-parse --git-path info/exclude exists but does not yet contain .atl/"
+      },
+      "expected_output": "Recognizes traceless mode from external memory surface selection and absent local .ai/ (MSV-012). Refrains from creating AGENTS.md, .ai/, or .atl/.gitignore in the repository worktree. Resolves Git exclude path via git rev-parse --git-path info/exclude and ensures .atl/ is appended there, preserving existing exclude entries. Refreshes .atl/tool-layout.md locally. Confirms worktree remains completely clean with zero untracked or modified repository files. Health report reflects coherent traceless external brain and local ATL health."
     }
   ]
 }
