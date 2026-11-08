@@ -91,13 +91,33 @@ read that installation's `references/executive-journal.md`. An unavailable
 or ambiguous dependency blocks use. If the journal reference is missing or
 ambiguous, do not invent journal semantics: stop when `patch` is required;
 a `1.0.x` adapter remains usable only on the compatibility path below. Do
-not assume sibling installation paths. Resolve the exact work root, selected
-adapter, namespace, stable project ID and executive context ID before phase
-selection. Follow canonical precedence, callable-tool probes, binding
-validation, authority checks and explicit context selection; never pick a
-latest plan, branch-named context or another checkout's work. A changed
-binding is not migration permission. No silent fallback, dual-write or
-local memory cache.
+not assume sibling installation paths.
+
+**Binding-First (Step 0).** Before reading or listing `.ai/`, or assuming
+filesystem, establish canonical work root `R` and inspect
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (v2). Do not create the file
+to test it. The procedure is `resolution.md` Step 0; do not re-derive it.
+A valid record is this checkout's registration: `surface.adapter-id`,
+`surface.namespace`, `project.project-id`, `executive.context-id`.
+Identity is O(1) from those fields — no backend search, no questionnaire.
+It governs unless `AGENTS.md` has an explicit `jaiba-memory-surface:`
+override. No such field, or no `AGENTS.md` (traceless), and the binding
+wins. When the active surface is external, do not test, list, or read
+`.ai/` paths. A missing v2 file is not a filesystem default: check an
+`AGENTS.md` pin, then the sanitized `{kind: git-remote, host, path}`
+lookup of `origin` in the external registry, before any fallback or
+create. A hit is a link for `jaiba-init` to write; conduct does not
+persist that binding and does not fall back. Only an authoritative miss
+continues to a local `.ai/` check (unbound filesystem or legacy). If there
+is no pin, no `.ai/`, and no registry hit, the checkout is authoritatively
+uninstrumented. Do not invent memory.
+
+Resolve the selected adapter, namespace, stable project ID and executive
+context ID before phase selection. Follow Step 0, then installed-skill
+precedence only on the no-binding miss path, plus callable-tool probes
+and authority checks. Never pick a latest plan, branch-named context or
+another checkout's work. A changed binding is not migration permission.
+No silent fallback, dual-write or local memory cache.
 
 **Portable binding v2.** The machine routing record is
 `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
@@ -107,8 +127,11 @@ with the resolution formula, or the surface script's `binding-path` when
 the binding ships one. Do not hash a URI, a trailing slash, or a relative
 path, and do not create the file merely to test it. A valid v2 record for
 this canonical root is reused without asking, including when
-`last-verified-by` names another agent: same `project-id` and `context-id`.
-Still recompute precedence and run readiness. A malformed v2 record stops;
+`last-verified-by` names another agent: same `project-id` and `context-id`,
+O(1), no registry search. Re-read only an explicit `AGENTS.md` override;
+do not recompute installed-skill precedence over a binding that governs.
+Still run readiness. When that surface is external, do not read `.ai/`.
+A malformed v2 record stops;
 do not repair it from legacy or from this host's memory. If v2 is absent,
 consolidate agreeing legacy `~/.jaiba/memory/<host-agent-id>/` records into
 v2 with readback and leave the originals byte for byte. Disagreeing blocking
@@ -200,7 +223,8 @@ content, applicable sub-units, and the standing decision/reference records.
 An empty authoritative scope routes to `jaiba-init`; incomplete templates
 route to its initialize path. Missing concepts are surfaced, not invented.
 External instrumentation needs neither a local marker nor local memory/work
-files: do not test `.ai/` paths to decide its state.
+files: Step 0 forbids testing, listing, or reading `.ai/` paths when the
+active binding declares an external surface.
 
 **Filesystem branch only:** read the effective `create-memory`
 `references/filesystem-surface.md`. Built-in filesystem is archetype

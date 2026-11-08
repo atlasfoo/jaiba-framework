@@ -125,15 +125,34 @@ developer means rather than guessing.
 
 ### Surface, binding and identity procedure — all modes
 
-1. Select: explicit `AGENTS.md` data field
-   `jaiba-memory-surface: filesystem` or an exact adapter ID → installed
-   **host-visible project-local** `memory-surface` skill → host-visible
-   global `memory-surface` skill → built-in filesystem. Same-ID local
-   wins over global; unresolved copies or multiple different IDs at the
-   winning level require human choice. Conflicting/duplicate overrides
-   block. Recompute precedence; saved choice is not a fifth level and a
-   changed candidate set needs confirmation. An unavailable/failed selected
-   adapter blocks, never falls back. A package is selectable only when
+1. **Binding-First (Step 0),** then select. Before reading or listing
+   `.ai/`, or assuming filesystem, establish canonical work root `R` and
+   inspect `~/.jaiba/memory/bindings/<sha256(R)>.yaml` (v2). Do not create
+   the file to test it. Follow the effective `resolution.md` Step 0; do
+   not re-derive the digest. A valid record is this checkout's
+   registration: `surface.adapter-id`, `surface.namespace`,
+   `project.project-id`, `executive.context-id`. Identity is O(1) from
+   those fields — no backend search, no questionnaire. It governs unless
+   `AGENTS.md` has an explicit `jaiba-memory-surface:` override
+   (`filesystem` or an exact adapter ID). No such field, or no `AGENTS.md`
+   (traceless), and the binding wins. When the active surface is external,
+   do not test, list, or read `.ai/` paths. An unavailable/failed selected
+   adapter blocks, never falls back.
+   No v2 file (and no agreeing legacy record to consolidate) is not a
+   filesystem default. Check an `AGENTS.md` pin. Before any fallback or
+   new project, derive `{kind: git-remote, host, path}` from local
+   `origin` and look it up in the external surface's owned registry. A
+   hit links and writes binding `v2` with a fresh per-root `context-id`,
+   no search and no ≤4-question form. Only an authoritative miss continues.
+   Then a local `.ai/` directory is unbound filesystem or legacy. If there
+   is no pin, no `.ai/`, and no registry hit, the checkout is
+   authoritatively uninstrumented — do not invent memory. Installed-skill order
+   (host-visible project-local `memory-surface`, then global, then
+   filesystem) chooses which external surface to query only when no
+   binding and no pin exist. Same-ID local wins over global; unresolved
+   copies or multiple different IDs at the winning level require human
+   choice. Conflicting/duplicate overrides block. Do not recompute that
+   list over a binding that governs. A package is selectable only when
    `category: memory-surface`. `memory-surface-draft` is not a conforming
    selectable mutable adapter; isolated historical evidence does not
    certify general mutable use. Do not bootstrap through a draft.
@@ -157,11 +176,16 @@ developer means rather than guessing.
    malformed origin is an error, not permission to fall back.
 4. Resolve exact namespace ownership and identity against the surface-owned
    project registry; never adopt ordinary notes, titles, search hits or the
-   backend's default project. Keep its stable `project-id`. No exact match
-   needs human-approved association or authorized new project creation.
-   When this identity is not in the registry and no reusable binding
-   already names it, bootstrap collects that approval in **one**
-   questionnaire of at most four questions — adapter confirmation,
+   backend's default project. A valid binding `v2` already names
+   `project.project-id` and `executive.context-id`: that identification is
+   O(1). Do not search to re-identify, and do not run the questionnaire.
+   With no local binding, derive the sanitized `git-remote` candidate from
+   `origin` (`{kind: git-remote, host, path}`) and look it up before any
+   fallback or create. An exact hit links that registered project and
+   writes binding `v2` with a fresh per-root context, without search and
+   without prompting. Keep its stable `project-id`. The ≤4-question
+   questionnaire runs only on an authoritative miss, and only when no
+   reusable binding already names the project: adapter confirmation,
    namespace (sibling-binding suggestion as the default when one exists),
    stable project-id (link an existing project or create), and inventory
    depth (minimal vs full). Do not drip those decisions across turns or
@@ -172,11 +196,14 @@ developer means rather than guessing.
    Filesystem without a registry retains its supported layout; canonical
    filesystem identity/locator mapping must not introduce required metadata
    or a hidden mirror merely to read existing files.
-5. For external association, confirm a fresh executive `context-id` or exact
-   existing owned context lookup with single-writer handoff. When the
-   not-in-registry questionnaire runs, that confirmation is part of its
-   project-id question, not a fifth question. A valid binding `v2` already
-   carrying `context-id` is reused without asking. The persistent
+5. For external association, a `git-remote` registry hit does not ask:
+   write a fresh per-root `context-id` with the link. Do not borrow another
+   checkout's context. Any other first association confirms a fresh
+   executive `context-id` or an exact existing owned context lookup with
+   single-writer handoff. When the not-in-registry questionnaire runs, that
+   confirmation is part of its project-id question, not a fifth question. A
+   valid binding `v2` already carrying `context-id` is reused without
+   asking. The persistent
    ID is **per absolute work root**, independent of branch/session/model;
    clones/worktrees may share constitutive identity but default to separate
    contexts. Creating an empty context registry identity is allowed when

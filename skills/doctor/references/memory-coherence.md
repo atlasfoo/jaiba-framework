@@ -25,32 +25,62 @@ validation is needed, resolve effective `conduct` templates without invoking
 its unadapted external workflow. These names identify dependencies, not
 sibling paths. Missing/ambiguous definitions block dependent checks.
 
-1. **Selection.** Apply explicit `AGENTS.md` selection data → host-visible
-   local adapter → host-visible global adapter → built-in filesystem.
-   Validate exact IDs; same-ID local beats global, unresolved copies or
-   different IDs at the winning level require human choice. Duplicate or
-   conflicting overrides stop resolution. Recompute precedence and validate
-   remembered choices against the current candidate set. A failed, missing
-   or unavailable selected adapter is a blocked selection, not permission
-   to choose another or claim an empty brain. A package is selectable only
-   when `category: memory-surface`. `memory-surface-draft` is not a
-   conforming selectable mutable adapter; isolated historical evidence
-   does not certify general mutable use.
+0. **Binding-First.** Before path or `.ai/` checks, establish the exact
+   checkout/worktree root (step 2's formula; an unknown root stops) and
+   inspect `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`.
+   Do not create the file to test it. Do not list `.ai/` to decide whether
+   to look. A valid v2 record is this checkout's registration:
+   `surface.adapter-id`, `surface.namespace`, `project.project-id`,
+   `executive.context-id`. Identity is O(1) from those fields — no backend
+   search. It governs unless `AGENTS.md` has an explicit
+   `jaiba-memory-surface:` override (`filesystem` or an exact adapter ID).
+   No such field, or no `AGENTS.md`, and the binding wins; do not apply
+   the installed-skill list over it. When the active surface is external,
+   do not test, list, or read `.ai/` paths. A missing, failed or
+   unavailable selected adapter blocks; it is not an empty brain and not
+   permission to choose another surface.
+1. **Selection, only when Step 0 has no governing binding.** An explicit
+   `AGENTS.md` pin, else host-visible local adapter, else host-visible
+   global adapter, and built-in filesystem only when a local `.ai/`
+   directory is an unbound filesystem brain or the pin names `filesystem`.
+   Do not assume filesystem because nothing else matched. Before that
+   fallback or any new-project conclusion, look up the sanitized
+   `{kind: git-remote, host, path}` candidate from `origin` in the
+   external surface's owned registry. A hit is a link for `jaiba-init`
+   (no questionnaire, no search); doctor reports it and does not write
+   the binding. Only an authoritative miss, with no pin and no `.ai/`,
+   is authoritatively uninstrumented. Validate exact IDs; same-ID local
+   beats global, unresolved copies or different IDs at the winning level
+   require human choice. Duplicate or conflicting overrides stop
+   resolution. Do not recompute installed-skill precedence over a valid
+   binding. A failed, missing or unavailable selected adapter is a blocked
+   selection, not permission to choose another or claim an empty brain. A
+   package is selectable only when `category: memory-surface`.
+   `memory-surface-draft` is not a conforming selectable mutable adapter;
+   isolated historical evidence does not certify general mutable use.
 2. **Root and project.** Establish the exact checkout/worktree root (not
    common Git directory), or absolute host workspace root without Git.
-   Unknown/multiple roots stop association. Inspect configured origin locally
-   without printing raw URLs or making network requests. Apply canonical
-   SSH/SCP/HTTP(S)/local normalization: sanitized host plus full case-preserved
-   namespace/path, normalized separators/default ports/terminal `.git`, no
-   userinfo, credentials, query or fragment; preserve meaningful encoding and
-   custom ports. Do not guess SSH aliases. Ambiguous/malformed origin blocks
-   association; selection-affecting sanitization needs confirmation. Only no
-   origin permits the canonical absolute-root plus host-ID nonportable fallback.
-   Exact owned registry lookup must resolve one stable project ID, not a
-   basename/title/search ranking. Unknown identity needs explicit association
-   or authorized init; multiple matches conflict. Changed origin/root/aliases
-   require human reconciliation via init even if the new origin already maps
-   to another project. Do not create a duplicate brain.
+   Unknown/multiple roots stop association. When Step 0 already has a valid
+   v2 binding, `project.project-id` and `executive.context-id` are the
+   identity. Do not search the registry to re-identify. Inspect configured
+   origin locally without printing raw URLs or making network requests only
+   when no binding exists, or to detect an origin change against the bound
+   candidate. Apply canonical SSH/SCP/HTTP(S)/local normalization: sanitized
+   host plus full case-preserved namespace/path, normalized separators/default
+   ports/terminal `.git`, no userinfo, credentials, query or fragment;
+   preserve meaningful encoding and custom ports. Represent a hosted origin
+   as `{kind: git-remote, host, path}`. Do not guess SSH aliases.
+   Ambiguous/malformed origin blocks association; selection-affecting
+   sanitization needs confirmation. Only no origin permits the canonical
+   absolute-root plus host-ID nonportable fallback. On a new machine or fresh
+   clone with no local binding, that `git-remote` candidate is looked up in
+   the external surface's owned registry before any fallback or creation. An
+   exact hit links; doctor does not write v2 and does not start C3. Only an
+   authoritative miss needs explicit association or authorized init, and only
+   then may `jaiba-init` run the ≤4-question form. Multiple matches conflict.
+   Never infer identity from basename, title or search ranking. Changed
+   origin/root/aliases require human reconciliation via init even if the new
+   origin already maps to another project. Do not create a duplicate brain.
 3. **Binding and context (format `v2`).** Verify routing-only metadata at the
    standard v2 machine binding location:
    `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`

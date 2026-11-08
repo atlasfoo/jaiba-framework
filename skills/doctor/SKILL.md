@@ -50,12 +50,26 @@ doctor is a *maintenance* action — it presumes a brain to inspect.
 | Developer just wants to *know what the brain says* | Read-only question | `ask` through its effective surface procedure and verified read capability; stop on failure, never silently fall back |
 | Brain exists and the developer wants a *health check* | — | **Continue here** |
 
-Resolve the surface before deciding whether a brain exists. External mode
-needs neither `AGENTS.md` nor `.ai/`; a binding, ordinary backend note,
-search hit, probe success or empty catalogue is not a brain. Failed access
-is not absence. (A brain full of bare `[brackets]` is a
-*finding*, not a stop condition — that's exactly the kind of incoherence
-this skill reports.)
+Resolve the surface before deciding whether a brain exists. **Binding-First
+(Step 0):** before reading or listing `.ai/`, or assuming filesystem,
+establish canonical work root `R` and inspect
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (v2). Do not create the file
+to test it. A valid record names `surface.adapter-id`, `surface.namespace`,
+`project.project-id` and `executive.context-id`; identity is O(1), with no
+backend search. It governs unless `AGENTS.md` has an explicit
+`jaiba-memory-surface:` override. No such field, or no `AGENTS.md`, and
+the binding wins. When that surface is external, do not test, list, or
+read `.ai/` paths — missing `.ai/` is expected, not absence. A missing v2
+file is not a filesystem default: an `AGENTS.md` pin, then the sanitized
+`git-remote` lookup of `origin`, before any fallback. A registry hit is a
+link for `jaiba-init`; doctor does not write the binding and does not
+treat the checkout as uninstrumented or as filesystem. Only an
+authoritative miss, with no pin and no `.ai/`, is authoritatively
+uninstrumented. External mode needs neither `AGENTS.md` nor `.ai/`; a
+binding, ordinary backend note, search hit, probe success or empty
+catalogue is not a brain. Failed access is not absence. (A brain full of
+bare `[brackets]` is a *finding*, not a stop condition — that's exactly
+the kind of incoherence this skill reports.)
 
 ## Universal preconditions
 
@@ -68,20 +82,27 @@ reflect the repository, not the prompt's assumptions.
    operationalizes both as checks — and the contract's own
    presence/drift is itself part of diagnostic 1.
 2. **Resolve selection, identity, bindings, and readable memory.** Follow
-   diagnostic 1's resolution preflight under `jaiba-memory-surface` **1.1.0**
-   before brain-dependent checks. Read the effective host-visible `create-memory`
-   canonical contract, resolution and filesystem mapping, and resolve
-   `jaiba-init`'s OKF reference independently. Missing, ambiguous or
-   incompatible definitions block dependent checks; never assume sibling
-   installation paths. Filesystem is built in, not an adapter/MCP installation
-   requirement. Verify standard machine binding v2 persistence at
+   diagnostic 1's resolution preflight under `jaiba-memory-surface` **1.1.0**,
+   starting at Binding-First (Step 0), before brain-dependent checks. Read the
+   effective host-visible `create-memory` canonical contract, resolution and
+   filesystem mapping, and resolve `jaiba-init`'s OKF reference independently.
+   Missing, ambiguous or incompatible definitions block dependent checks; never
+   assume sibling installation paths. Filesystem is built in, not an adapter/MCP
+   installation requirement, and not the default when Step 0 has no binding, no
+   pin and no `.ai/`. Verify standard machine binding v2 persistence at
    `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
-   (`binding-format-version: "2"`), inspect legacy binding resolution
-   (`~/.jaiba/memory/<host>/...`) and consolidation status, and perform the
+   (`binding-format-version: "2"`) before any `.ai/` probe. When that binding
+   declares an external surface and `AGENTS.md` does not override it, do not
+   test `.ai/` paths. Inspect legacy binding resolution
+   (`~/.jaiba/memory/<host>/...`) only when v2 is absent, and perform the
    agent-agnostic preflight (MSV-001: mapping canonical `mcp:<server>` tool
    requirements to current host runtime exposure without altering package
-   conformance status). Verify the selected owned catalogue and full
-   constitutive entry reads; filesystem alone uses the supported dual layout.
+   conformance status). A fresh clone with no local binding is identified by
+   the sanitized `git-remote` candidate against the surface registry before
+   any fallback; a hit routes the link to `jaiba-init` without a questionnaire
+   and without doctor writing the binding. Verify the selected owned catalogue
+   and full constitutive entry reads; filesystem alone uses the supported dual
+   layout.
 3. **Locate every skills directory in play.** JAIBA skills can be
    installed project-locally, globally (e.g. `~/.claude/skills/`,
    `~/.agents/skills/`), or split across both — `jaiba-configure` step 3
@@ -117,7 +138,7 @@ into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Are selection, v2 bindings (`~/.jaiba/memory/bindings/<sha256>.yaml`) and legacy consolidation, canonical tool requirements (MSV-001), project/context ownership, catalogue and full reads verified under `jaiba-memory-surface` 1.1.0, and is the brain coherent with the repo? Filesystem also checks its marker and dual layout. | `references/memory-coherence.md` | No — routes to `jaiba-init` (repo/brain) / `jaiba-configure` (machine) |
+| 1 | **Memory coherence** | Are Binding-First (Step 0), v2 bindings (`~/.jaiba/memory/bindings/<sha256>.yaml`) and legacy consolidation, canonical tool requirements (MSV-001), project/context ownership, catalogue and full reads verified under `jaiba-memory-surface` 1.1.0, and is the brain coherent with the repo? Filesystem also checks its marker and dual layout. | `references/memory-coherence.md` | No — routes to `jaiba-init` (repo/brain) / `jaiba-configure` (machine) |
 | 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference` concept (or `reference-index.md` entry in the legacy flat layout) reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
