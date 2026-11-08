@@ -59,21 +59,29 @@ and records. This applies to every surface, not just `.ai/` files.
 ## Memory scope and role access
 
 Resolve the effective `create-memory` installation through the host's skill
-resolution and use its `references/memory-surface-contract.md` and
-`references/resolution.md` (`jaiba-memory-surface` 1.0.0). Conduct passes
-the selected binding, not permission for a child to select another backend.
-Every memory-bearing invocation identifies:
+resolution and use its `references/memory-surface-contract.md`,
+`references/resolution.md`, and, when executive mutation or display is in
+scope, `references/executive-journal.md`. Conduct is a
+`jaiba-memory-surface` **1.1.0** consumer. Conduct passes the selected v2
+binding (or the labeled session-only binding), not permission for a child
+to select another backend, recompute a binding path, or consolidate legacy
+records. Every memory-bearing invocation identifies:
 
-- Contract/version, adapter ID/version (or built-in filesystem), sanitized
-  binding locator, namespace, stable `project-id`, absolute work root and
-  resolved `context-id` when executive memory is involved. Constitutive
-  addresses omit context; executive addresses require it.
+- Contract/version (`1.1.0` consumer; the adapter's declared `1.0.x` or
+  `1.1.x`), adapter ID/version (or built-in filesystem), archetype,
+  whether `executive-journal` is supported, sanitized v2 binding locator,
+  namespace, stable `project-id`, absolute work root and resolved
+  `context-id` when executive memory is involved. Constitutive addresses
+  omit context; executive addresses require it.
 - Required concepts/objects by exact logical address, category/type,
-  direct-read locator, revision evidence and completeness status; the
-  bounded question or task explains why each is needed.
-- Available operation mappings, relevant tool schemas and non-destructive
-  probes, permissions/limits, and the provenance of supplied content and
-  gate commands. No credentials or raw secret-bearing responses.
+  direct-read locator, revision, `expected-head` when executive, and
+  completeness status; the bounded question or task explains why each is
+  needed. Display and follow-up reads are catalogue → exact ID → `render`.
+  Search is not a read.
+- Declared `limits` and chunking (supported, unsupported, or unverified),
+  available operation mappings, relevant tool schemas and non-destructive
+  probes, permissions, and the provenance of supplied content and gate
+  commands. No credentials or raw secret-bearing responses.
 
 The child checks **its own** exposed tools, schemas, callable probes and
 permissions against the selected scope before using the backend. Parent
@@ -81,26 +89,32 @@ MCP availability, an installed definition, ATL inventory, or a successful
 parent probe does not prove child inheritance or access. Use actual
 non-destructive scoped catalogue/read calls where direct access is needed;
 consume all pages and reconstruct chunks to their explicit end. Summaries,
-search hits and truncated previews are not full reads or absence evidence.
+search hits and truncated previews are not `render`s or absence evidence.
 Report access errors as errors, not an empty brain. Never create test
 memory to probe, change binding, or fall back to another surface.
 
-**Analysts and verifier:** read the exact JAIBA-owned external references
+**Analysts and verifier:** `render` the exact JAIBA-owned references
 assigned to their question/target in full, with complete metadata,
 relations and revisions. Discover additional needed concepts through the
-scoped catalogue, not fuzzy project/context selection. Own-tool or
-permission failure blocks the affected analysis/verification; return the
-specific operation, scope and observed error for conduct's role-local
-fallback. A parent summary is not a substitute for these direct reads.
+scoped catalogue, then exact ID, not fuzzy project/context selection and
+not search. Own-tool or permission failure blocks the affected
+analysis/verification; return the specific operation, scope and observed
+error for conduct's role-local fallback. A parent summary is not a
+substitute for these direct reads. Verifier reports are evidence;
+`set-criterion-status` stays with conduct.
 
-**Executors:** conduct supplies minimal **full excerpts** of governing
-objects, with source addresses, revisions, excerpt boundaries and
+**Executors:** conduct supplies minimal **rendered excerpts** of governing
+objects, with source addresses, revisions, heads, excerpt boundaries and
 provenance, plus the vetted gates. Excerpts are task context, not a claim
 to have read a whole object. An executor need not access the backend when
 that envelope suffices; explicitly report backend access as not required,
 not verified. If more memory is needed, request a scoped follow-up from
 conduct; if direct reads are authorized, first check its own tools/probes
-and permissions. Never write executive or constitutive JAIBA memory.
+and permissions, then `render` by exact ID. Never write executive or
+constitutive JAIBA memory. Never emit `patch`, `compact`, `check`,
+`uncheck`, or `append-entry`. Those ops are conduct's, applied from the
+returned report. A `1.0.x` efficiency warning is conduct's receipt, not
+the child's.
 
 **Filesystem branch only:** resolve the bundle through `.ai/memory/index.md`
 or, without that index, the legacy `constitution.md`, `adr-log.md`,
@@ -266,11 +280,14 @@ An executor receives exactly three things — and no more:
 2. **Minimal context** — the plan excerpt that governs the task, the
    concrete files/paths owned by this executor, and any constraint the
    plan or governing concepts impose on this specific change. Include the
-   surface/project/context identifiers and task-relevant full excerpts,
-   revisions and provenance under Memory scope and role access. State that other
-   workers may be active, identify concurrent ownership, and require the
-   executor to accommodate their edits without reverting them. Not the whole plan,
-   not the walkthrough, not the PRD.
+   v2 binding locator, contract `1.1.0`, archetype, `executive-journal`
+   support, declared limits, and task-relevant rendered excerpts with
+   revisions, heads, and provenance under Memory scope and role access.
+   State that other workers may be active, identify concurrent ownership,
+   and require the executor to accommodate their edits without reverting
+   them. State that conduct, not the executor, will `patch` (`check` /
+   `append-entry`) from the report. Not the whole plan, not the
+   walkthrough, not the PRD.
 3. **The gate** — the Phase gate commands from
    `tasks.md § Gate Commands`, verbatim.
 
@@ -298,16 +315,18 @@ inside the subagent.
   time.
 - **Single-writer rule.** Subagents write source code only. Every
   executive object, on any surface, has exactly one writer — conduct:
-  it flips the checkboxes, writes one walkthrough entry per completed
-  task from the executor's report, and records decisions the report
-  surfaced. Parallel executors appending to the walkthrough themselves
-  would interleave garbage. Backend write permission never overrides this
-  rule or permits constitutive writes by a subagent. Conduct rechecks
-  source revisions before integrating a report; changed governing context
-  requires reconciliation or a scoped follow-up, not stale blind writes.
+  it `check`s completed IDs, `append-entry`s one walkthrough entry per
+  completed task from the executor's report, and records decisions the
+  report surfaced. Parallel executors appending to the walkthrough
+  themselves would interleave garbage; parallel `patch` calls would too.
+  Backend write permission never overrides this rule, never authorizes a
+  child `patch`, and never permits constitutive writes by a subagent.
+  Conduct rechecks source revisions and executive heads before integrating
+  a report; changed governing context requires reconciliation or a scoped
+  follow-up, not stale blind writes.
 - **Reintegration before the next wave.** A wave is closed when every
-  result is reviewed (report + `git diff`), logged in the walkthrough,
-  and its checkboxes flipped. Only then does the next wave launch.
+  result is reviewed (report + `git diff`), logged with `append-entry`,
+  and its IDs `check`ed. Only then does the next wave launch.
 
 ## Fallback: a concrete dispatch blocker
 
@@ -327,8 +346,8 @@ never the chain's correctness requirements.
 - **Fat envelopes.** Handing an executor the whole plan, PRD and
   walkthrough defeats the purpose — conduct's context stays
   small precisely because the subagent's inputs are minimal.
-- **Letting subagents write executive or constitutive memory.** One writer. Reports flow
-  up; conduct records.
+- **Letting subagents write executive or constitutive memory, or emit
+  `patch`.** One writer. Reports flow up; conduct `patch`es.
 - **Parallelizing on hope.** "They're probably different files" is not
   a partition. Confidently disjoint or serialized.
 - **Treating the fallback as degraded correctness.** Sequential inline

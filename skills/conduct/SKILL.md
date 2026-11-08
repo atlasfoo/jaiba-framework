@@ -85,18 +85,116 @@ A continuation cue never grants design approval. A draft plan stays in
 
 Resolve the effective `create-memory` installation through host skill
 resolution, then read its canonical `references/memory-surface-contract.md`
-and `references/resolution.md` (contract `jaiba-memory-surface` 1.0.0).
-An unavailable or ambiguous dependency blocks use; do not assume sibling
-installation paths. Resolve the exact work root, selected adapter,
-namespace, stable project ID and executive context ID before phase selection.
-Follow canonical precedence, callable-tool probes, binding validation,
-authority checks and explicit context selection; never pick a latest plan,
-branch-named context or another checkout's work. A changed binding is not
-migration permission. No silent fallback, dual-write or local memory cache.
+and `references/resolution.md`. Conduct is a **1.1.0** consumer of
+`jaiba-memory-surface`. Before any executive `patch` or `compact`, also
+read that installation's `references/executive-journal.md`. An unavailable
+or ambiguous dependency blocks use. If the journal reference is missing or
+ambiguous, do not invent journal semantics: stop when `patch` is required;
+a `1.0.x` adapter remains usable only on the compatibility path below. Do
+not assume sibling installation paths. Resolve the exact work root, selected
+adapter, namespace, stable project ID and executive context ID before phase
+selection. Follow canonical precedence, callable-tool probes, binding
+validation, authority checks and explicit context selection; never pick a
+latest plan, branch-named context or another checkout's work. A changed
+binding is not migration permission. No silent fallback, dual-write or
+local memory cache.
+
+**Portable binding v2.** The machine routing record is
+`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+(`binding-format-version: "2"`). The only key is that canonical-work-root
+digest; `host-agent-id` is not a directory or lookup key. Compute the path
+with the resolution formula, or the surface script's `binding-path` when
+the binding ships one. Do not hash a URI, a trailing slash, or a relative
+path, and do not create the file merely to test it. A valid v2 record for
+this canonical root is reused without asking, including when
+`last-verified-by` names another agent: same `project-id` and `context-id`.
+Still recompute precedence and run readiness. A malformed v2 record stops;
+do not repair it from legacy or from this host's memory. If v2 is absent,
+consolidate agreeing legacy `~/.jaiba/memory/<host-agent-id>/` records into
+v2 with readback and leave the originals byte for byte. Disagreeing blocking
+fields (`project-id`, `context-id`, adapter, namespace, identity, or
+contract major) need an explicit human choice, not host order. A valid v2
+record wins over a later disagreeing legacy file. The binding stores routing
+only — no payloads, journal bodies, or receipts that contain them. A pending
+executive journal or unverified mutation blocks dependent writes until
+reconciled. If persistence fails, get explicit session-only consent or stop;
+a session-only binding is not the v2 file. The procedure is `resolution.md`
+§4; do not re-derive it here.
+
+**Limit awareness.** During discovery, inspect declared `limits` and
+chunking: content encoding, maximum object/request and response/page sizes
+with units, and chunking as supported, unsupported, or unverified. Unknown
+stays unknown. A sample that fit is not a maximum. Name a documented limit,
+an observed sample, and any chosen operating cap separately. When the
+surface lacks lossless chunking, or the direct payload limit is the budget
+that applies, dimension `prd` and `plan` to that unchunked budget from the
+first draft (`references/spec-mode.md`). Do not write long and then trim.
+Use an operating cap only when the binding already declares one; do not
+invent an 80% cap. Required template sections and the criteria schema stay;
+shrink prose, not the contract. If the intended object would still exceed,
+report `limit-exceeded` before mutation. Never silently truncate, summarize,
+or drop fields. The same refusal applies to any later executive write,
+including a `patch` whose materialized result would exceed.
+
+**Deterministic reading.** Display and routing reads go binding → complete
+catalogue of the selected scope → exact logical IDs → `render` of the
+materialized object. Do not use search, FTS, or ranked hits to show a plan,
+PRD, tasks, walkthrough, or a constitutive concept, and do not use them as
+proof of absence, uniqueness, or catalogue completeness. When the binding
+ships a helper script, `render` is that script's `render` subcommand: do
+not decode envelopes or fold deltas in model tokens. On filesystem and other
+`document-tree` surfaces whose materialized object is the document, the
+document is the render. A journaled object is complete only when `render` /
+`read` returns the base plus deltas in sequence. A digest mismatch,
+incomplete catalogue, truncated reconstruction, base-only read, or a delta
+returned as the object is a read error: report it and show no partial
+content.
+
+**Executive journal.** After probe, record contract version, archetype, and
+whether `executive-journal` is supported. `patch` and `compact` apply only
+to executive `prd`, `plan`, `tasks`, and `walkthrough`, and only after the
+object exists. `patch` never creates. The first authorized write of an
+absent object is `create` (the base; a prior monolith is an implicit base).
+Every later authorized executive mutation uses
+`patch(address, expected-head, ops[])` when the surface realizes the
+capability. `expected-head` (sequence plus chain digest) is the single-writer
+pre-check, not CAS and not a lock. Closed op names live in
+`executive-journal.md`; do not invent ops or send a partial name list.
+
+| Declaration | What conduct does |
+|---|---|
+| `1.1.x` + `record-store` with the capability | `patch` appends one delta and updates that object's `context-head` slot. O(delta). Do not rewrite the base, the catalogue, or sibling objects. Omitting the stored journal is `missing-capability`; do not hide it with a full `update`. |
+| `1.1.x` + `document-tree` | `patch` is a direct in-place edit of the executive document. No stored delta chain or `context-head` is required. `compact` with no deltas is a no-op success. A 1.1 `document-tree` that does not realize `patch` is `missing-capability`, not the 1.0 path. |
+| `1.1.x` + unknown or absent archetype | Do not issue `patch` or invent the realization. `create` / `update` only under existing write rules if the surface otherwise supports them. Do not claim O(delta). |
+| Adapter `1.0.x` (no archetype, no `patch`) | Do not send `patch` or `compact`. Apply the same ordered ops locally, including every refusal, then `update` the complete object. Record `efficiency-warning: full-update-without-patch` on the receipt. The warning is not an error, not `missing-capability`, and not permission to skip verification. Skipping compaction does not fail the work. |
+
+ID permanence is exact: while materialized frontmatter `status` is not
+`draft`, `remove-criterion` and `update-criterion` fail (`conflict` when the
+ID is present, `invalid-object` when it is not or the criteria block cannot
+be spliced). `set-frontmatter` that would set `status` back to `draft` from
+a non-draft status is `conflict`. `replace-section` is not a way around that
+refusal. Phase ops are in the mode references. Out-of-band adjustments
+belong to `fast` and use the same closed ops; this skill does not define
+that procedure.
+
+A refused `patch` has no partial op effects. Retain the previous head, pass
+it as `expected-head`, and verify the materialized object and resulting head
+by exact readback. The same request identifier and the same canonical
+payload returns the existing receipt and does not append a second delta.
+After an unknown outcome, re-read: head advanced and object matches means
+the write happened; an unchanged head may retry with the same
+`expected-head`; head advanced and object differs is `conflict`. Do not
+invent a compensating delta. When the declared
+`executive-journal.compaction-threshold` is a known delta count and the
+active count is strictly greater, compact that object at the next phase
+boundary. The suggestion is advisory: exceeding it does not fail `patch` or
+the phase gate, and `read` / `patch` must not compact implicitly. An unknown
+threshold does not fire the suggestion. An explicit `compact` remains
+allowed on a surface that has the capability.
 
 **External surface branch:** validate the selected owned scope and obtain
-the complete constitutive catalogue (all pages), then full-read required
-entry concepts. A binding, probe, marker or search hit is not instrumentation.
+the complete constitutive catalogue (all pages), then `render` required
+entry concepts by exact ID. A binding, probe, marker or search hit is not instrumentation.
 Require real project/architecture/purpose/scope/quality-gate/convention
 content, applicable sub-units, and the standing decision/reference records.
 An empty authoritative scope routes to `jaiba-init`; incomplete templates
@@ -105,7 +203,11 @@ External instrumentation needs neither a local marker nor local memory/work
 files: do not test `.ai/` paths to decide its state.
 
 **Filesystem branch only:** read the effective `create-memory`
-`references/filesystem-surface.md`. Require a non-empty JAIBA `AGENTS.md`
+`references/filesystem-surface.md`. Built-in filesystem is archetype
+`document-tree`: `patch` is the surgical in-document edit defined there,
+the file is the materialized render, and `compact` is a no-op.
+Do not invent a byte cap the reference does not declare. Require a
+non-empty JAIBA `AGENTS.md`
 marker at the selected work root and resolve `.ai/memory/` there, never
 relative to the skill installation. With `index.md` only, resolve the entry
 concepts above through that index; with `constitution.md` only, retain the
@@ -128,7 +230,7 @@ Use `(namespace, project-id, executive, context-id, logical-id)` for work,
 and `(namespace, project-id, constitutive, logical-id)` for brain concepts.
 Catalogue the selected executive context completely before deciding what
 is active; resolve `prd`, `plan`, `tasks` and `walkthrough` by type and exact
-address, then full-read the objects needed for routing. Multiple candidate
+address, then `render` the objects needed for routing. Multiple candidate
 plans or conflicting identities block selection. Search results, summaries,
 catalogue previews and truncated content are never a plan or PRD read.
 
@@ -141,12 +243,17 @@ filesystem). No backend record ID or guessed URI substitutes for an address.
 Conduct is the single executive writer per context. Analysts/executors
 receive exact scope, addresses, full necessary content and revision
 provenance, and return reports; they do not write executive memory.
-Establish serialized access before writes. For every create/update, check
-authoritative absence/current full revision, preserve unknown metadata and
-relations, retain the mutation receipt, and verify the complete intended
-object by exact readback. A conflict or unknown/unverified outcome blocks
-dependent writes; reconcile before retrying. Do not claim atomic CAS unless
-the adapter supplies it. Persisted approval is subject to these same rules.
+Establish serialized access before writes. For every `create`, `update`,
+and `patch`, check authoritative absence or the current full revision and
+`expected-head`, preserve unknown metadata and relations, retain the
+mutation receipt, and verify the complete materialized object by exact
+readback. A conflict or unknown/unverified outcome blocks dependent writes;
+reconcile before retrying. Do not claim atomic CAS unless the adapter
+supplies it. `expected-head` match is not that claim. Persisted approval
+is subject to these same rules. Prefer `patch` after the base exists
+whenever the surface realizes `executive-journal`; a full `update` of an
+existing executive object is the `1.0.x` compatibility path, not the
+default on a 1.1 surface.
 
 ## Triage: how deep does the chain run?
 
@@ -202,7 +309,8 @@ the design approval gate and command provenance boundary still apply.
 
 Load per phase — not universally — to minimize tokens. By this point
 Brain Discovery has already resolved the surface, project and context.
-Load concepts by type from its constitutive catalogue and full-read them.
+Load concepts by type from its constitutive catalogue and `render` them
+by exact ID. Search is not a load.
 The physical examples below apply **only to the filesystem branch**;
 they are never external discovery prerequisites.
 
@@ -255,10 +363,12 @@ the filesystem archive script:
 | `.ai/work/<slug>-summary.md` | `summarize` (draft) | moved by `scripts/archive.sh` |
 | `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` | `summarize` (via `scripts/archive.sh`) | permanent |
 
-Templates live in `assets/`. **Use them verbatim** — the shared
-structure is what keeps work legible across sessions:
+Templates live in `assets/`. **Use their structure verbatim** — the
+shared sections and schemas are what keep work legible across sessions:
 `prd-template.md`, `plan-template.md`, `tasks-template.md`,
-`walkthrough-template.md`, `plan-summary-template.md`.
+`walkthrough-template.md`, `plan-summary-template.md`. Prose volume still
+yields to declared surface limits (`references/spec-mode.md`); do not
+drop a required section to fit, and do not pad past the unchunked budget.
 
 **Multisession by design.** The selected context survives between sessions; a
 fresh session picks the chain up from wherever `tasks.md` says it is.
@@ -319,8 +429,11 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - `summarize` is one step: present the summary, propose ADRs (enacting
   them is `jaiba-init:update-brain`'s job), verify archive, then selectively
   clear the resolved context — with explicit confirmation before cleanup.
-  Filesystem paths/scripts are not external operations; contract closure
-  guarantees must be established before claiming safe cleanup.
+  `compact` may be suggested or invoked at that closure; it is not archive.
+  `clear-work` also retires active and residual deltas and the
+  `context-head` bound to that inventory. Filesystem paths/scripts are not
+  external operations; contract closure guarantees must be established
+  before claiming safe cleanup.
 
 ## Common failure modes
 
@@ -334,3 +447,11 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - **Writing constitutive memory directly.** Only `summarize` has the
   append-log exception for closure. Constitution/ADR/reference changes are proposals for
   `jaiba-init:update-brain`.
+- **Rewriting a whole executive object when `patch` is realized.** After
+  the base exists, splice with the closed ops. A full `update` on a 1.1
+  `record-store` or `document-tree` is not the efficiency path.
+- **Showing an artifact from search.** Binding, catalogue, exact ID,
+  `render`. A ranked hit is not the plan.
+- **Removing or rewriting a criterion after `status` leaves `draft`.**
+  That patch fails `conflict`. Do not set `status` back to `draft` to
+  force it through.

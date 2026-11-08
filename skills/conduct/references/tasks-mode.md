@@ -9,7 +9,7 @@ are shorthand for those logical objects; only filesystem maps them into
 
 ## Preconditions
 
-- Resolve the binding and complete executive catalogue, then exact full-read
+- Resolve the v2 binding and complete executive catalogue, then `render`
   the selected `plan` with persisted `status: approved` (and full `prd` at
   spec depth, with its original criteria YAML). No approved plan ⇒ back to
   `spec`. A search hit, summary, truncated preview or chat approval is not
@@ -19,9 +19,10 @@ are shorthand for those logical objects; only filesystem maps them into
   readable — this is the phase that copies gate commands and TDD
   posture into `tasks.md`, so `execute` never needs the brain for
   them again. Resolve exact addresses from the selected constitutive
-  catalogue and full-read the concepts. **Filesystem only:** use the
-  bundle index or supported legacy flat mapping per the effective
-  `create-memory` filesystem reference, without migration.
+  catalogue and `render` the concepts. Do not search for them.
+  **Filesystem only:** use the bundle index or supported legacy flat
+  mapping per the effective `create-memory` filesystem reference,
+  without migration.
 - If either concept is authoritatively absent or empty in the selected
   scope, **stop and surface it** — name the concept and surface
   — before writing `tasks.md`. Access/availability/truncation failures
@@ -74,9 +75,10 @@ chronology. Each phase:
 
 ## Flow
 
-1. **Full-read `plan`** (and `prd` when present) by exact address and
-   retain revisions. Verify approval and citation targets using
-   `spec-mode.md § Citing the brain`; no preview substitutes for content.
+1. **`render` `plan`** (and `prd` when present) by exact address and
+   retain revisions and heads. Verify approval and citation targets using
+   `spec-mode.md § Citing the brain`; no search hit or preview substitutes
+   for content.
 2. **Read the `quality-gate` and `convention` concepts** (resolved as
    in the preconditions); copy the Phase Gate and Plan Gate commands
    **verbatim** into `tasks.md § Gate Commands` (the actual CLI
@@ -96,16 +98,26 @@ chronology. Each phase:
    At design depth, check every Scope (In) deliverable has task coverage
    without inventing PRD criteria or changing the `covers: —` convention.
 5. **Create `tasks`** from the template; **create the walkthrough stub**
-   from its template in this context only. Check exact authoritative
-   absence first; existing work is not overwritten or regenerated. Conduct
-   remains the single executive writer; delegates only report. Apply
+   from its template in this context only. Those first writes are `create`:
+   they are the bases. Check exact authoritative absence first; existing
+   work is not overwritten or regenerated. Conduct remains the single
+   executive writer; delegates only report and do not `patch`. Apply
    canonical pre-read/revision checks, mutation receipts and exact complete
-   readback, preserving unknown metadata/relations. Partial or unknown
-   outcomes block handoff: reconcile exact addresses before retrying, never
-   recreate an already-created object or switch contexts to bypass a clash.
-   Keep the complete template body, frontmatter and task/criteria schemas;
-   only citations/locators vary by surface. Record gate source addresses
-   and revisions alongside copied commands without altering the commands.
+   `render` readback, preserving unknown metadata/relations. Partial or
+   unknown outcomes block handoff: reconcile exact addresses before
+   retrying, never recreate an already-created object or switch contexts
+   to bypass a clash. Keep the complete template body, frontmatter and
+   task/criteria schemas; only citations/locators vary by surface. Record
+   gate source addresses and revisions alongside copied commands without
+   altering the commands.
+   Later amendments of an existing `tasks` object use `patch`, not a
+   regenerated file: `add-task` to append a new `T-NNN` block, `amend-task`
+   to replace one existing block in place. There is no `remove-task`. Do
+   not renumber, and do not drop another ID inside an `amend-task` block.
+   `check` / `uncheck` belong to `execute`, not to this phase's graph
+   edit. On `1.0.x`, apply those ops locally and `update` the complete
+   object with `efficiency-warning: full-update-without-patch`. A 1.1
+   surface that should `patch` and does not is `missing-capability`.
 6. **Show the graph summary** (phases, task count, any long
    dependency chains) and confirm the developer is ready to execute.
    This is a light confirmation, not a second approval gate — the
@@ -127,4 +139,5 @@ chronology. Each phase:
 - **Uncovered criteria.** A PRD criterion no task covers will fail
   `validate` at the end — catch it here where it's cheap.
 - **Regenerating tasks for an amended plan from scratch.** Amend the
-  graph: keep completed task IDs, append new ones, adjust edges.
+  graph with `add-task` and `amend-task`: keep completed task IDs, append
+  new ones, adjust edges. Never renumber.

@@ -60,19 +60,25 @@ Only `conduct` keeps an explicit override (`/conduct
 `.agents/skills/`) or **globally** (e.g. `~/.claude/skills/`), shared
 across every repository you work in. Resolve memory through the effective
 `create-memory` installation's `references/resolution.md` and
-`references/memory-surface-contract.md`, never relative to this skill's installation.
+`references/memory-surface-contract.md` (`jaiba-memory-surface` contract version **1.1.0**), never relative to this skill's installation.
 The built-in filesystem surface maps to the selected checkout; external
-surfaces use their resolved binding and owned catalogue and need not have
+surfaces use their resolved standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present) and owned catalogue and need not have
 local `.ai/` files or an `AGENTS.md` marker.
 
 Orienting cold (see `references/orientation.md`) includes resolving the
 current project's memory surface. Resolve the effective `create-memory`
 installation's `references/resolution.md` and
-`references/memory-surface-contract.md`. On filesystem, resolve its
+`references/memory-surface-contract.md` (contract version `1.1.0`). On filesystem, resolve its
 supported concept-bundle or legacy layout. On an external surface, require
-a valid binding, readable owned catalogue, exact project/context scope and
+a valid binding (`v2` locator), readable owned catalogue, exact project/context scope and
 required full reads; a marker, probe, search result or empty catalogue alone
-is not authoritative. `ask` is read-only for JAIBA-owned data: it must not
+is not authoritative.
+
+Follow the deterministic rendering path (`MSV-008`):
+`binding` → read context/project catalogue → exact logical addresses/IDs → invoke package script `render` subcommand (or read materialized content directly in `document-tree`).
+Strictly prohibit using full-text `search` (`mem_search`) to locate or display project artifacts or decisions; full-text search is only for exploratory discovery when the concept address is completely unknown.
+
+`ask` is read-only for JAIBA-owned data: it must not
 persist a JAIBA binding/namespace change or perform JAIBA adapter or memory
 operations that mutate owned data. Ordinary host-required memory/session
 bookkeeping remains independent, is not JAIBA evidence, and is not used as
@@ -106,9 +112,9 @@ prior session or pre-training (`AGENTS.md` §2.1):
 | Domain | Typical questions | Primary sources |
 |---|---|---|
 | **Code** | "what does this endpoint do?", "explain this module", "where is X handled?", "why does this break?" | The source files, their tests, `git log`/`git blame` for the *why-historical*. |
-| **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | Filesystem: `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`. External: exact executive context catalogue and full reads of the relevant logical objects. |
-| **Active PRD** | "what does the PRD cover?", "which criteria are still unmet?", "what's out of scope?" | Filesystem: `.ai/work/PRD.md` (exists only at `spec` depth). External: exact executive context catalogue and full read of the PRD object, when present. |
-| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | Filesystem: `decision` via `.ai/memory/index.md` or legacy `.ai/memory/adr-log.md`, `.ai/memory/log/`, then `walkthrough.md`. External: exact constitutive catalogue/full reads for decisions and log entries, plus the resolved executive context for walkthrough. |
+| **Active plan** | "what tasks are left?", "why does the plan do X first?", "is this already in the plan?" | Filesystem: `.ai/work/plan.md`, `tasks.md`, `walkthrough.md`. External: deterministic path via binding `v2` → exact executive context catalogue → exact logical IDs (`plan`, `tasks`, `walkthrough`) → package script `render` subcommand (or direct read in `document-tree`). No search. |
+| **Active PRD** | "what does the PRD cover?", "which criteria are still unmet?", "what's out of scope?" | Filesystem: `.ai/work/PRD.md` (exists only at `spec` depth). External: deterministic path via binding `v2` → exact executive context catalogue → exact logical ID (`prd`) → package script `render` subcommand (or direct read in `document-tree`), when present. No search. |
+| **Decisions** | "why did we decide to use Z?", "what alternatives did we reject?", "what happened in the last piece of work?" | Filesystem: `decision` via `.ai/memory/index.md` or legacy `.ai/memory/adr-log.md`, `.ai/memory/log/`, then `walkthrough.md`. External: deterministic path via binding `v2` → exact constitutive catalogue → exact logical IDs of decisions/log entries → package script `render` subcommand (or direct read in `document-tree`), plus resolved executive context for walkthrough. No search. |
 
 A question can span domains ("does the plan cover criterion AUTH-002
 from the PRD?") — read what the question needs from each, no more.
@@ -124,9 +130,8 @@ the question drive the reads:
   not need the brain at all.
 - **Plan / PRD / decision question** → read the corresponding artifacts
   (table above). Filesystem requires the actual selected files. External
-  memory requires complete enumeration of the exact owned scope, then exact
-  full reads of relevant logical objects; search previews, summaries and
-  snippets are not authoritative content. Respect relation targets and
+  memory requires following the deterministic path (`MSV-008`): resolve binding
+  `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present), complete enumeration of the exact owned catalogue scope, exact logical addresses/IDs, and invoke the adapter package script's `render` subcommand (or read materialized content directly on `document-tree`). Strictly prohibit full-text search (`mem_search`) to locate or display project artifacts or decisions; search is restricted to exploratory discovery when the concept address is completely unknown. Search previews, summaries and snippets are not authoritative content. Respect relation targets and
   unresolved-relation findings rather than inventing links. Cite external
   facts by stable logical address and available revision/receipt evidence,
   not a transient record ID or a local `.ai/` path. If the needed catalogue,
@@ -233,3 +238,6 @@ applies here.
   filesystem check or authoritative external enumeration? Say so, scoped
   to that checkout/context. On external access failure, report the failure;
   don't reconstruct a hypothetical plan or claim absence.
+- **Using full-text search to locate known artifacts.** Searching with `mem_search`
+  to find `plan`, `prd`, or decisions violates deterministic orientation. Always
+  follow `binding` → catalogue → exact ID → `render`.

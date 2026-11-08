@@ -10,8 +10,8 @@ blocked) for `summarize`.
 ## Preconditions
 
 1. Catalogue the resolved executive context completely and resolve
-   `plan` and `tasks` by exact logical address. Full-read both artifacts,
-   including their revision evidence; a preview, summary or search result
+   `plan` and `tasks` by exact logical address. `render` both artifacts,
+   including revision and head; a preview, summary or search result
    is not a read. Only in the explicit filesystem branch do these names
    map to `.ai/work/plan.md` and `tasks.md`. Unavailable, partial,
    truncated, permission-filtered or ambiguous results are failures, not
@@ -39,8 +39,8 @@ never assumed.
 ## Step 2 — delivery verification (both depths)
 
 Resolve `prd` (when present) and `walkthrough` by exact address in the
-same context and full-read the required content and revisions before
-building the verification input. At spec depth, the PRD is required;
+same context and `render` the required content, revisions, and heads
+before building the verification input. At spec depth, the PRD is required;
 absence or unavailable reads must be established by authoritative scoped
 catalogue evidence, not inferred from a local filename. At design depth,
 use the approved plan. Filesystem logical names map to `.ai/work/` only in
@@ -79,15 +79,22 @@ possible partial writes before retrying or fallback. Missing tools or roles
 do not lower the evidence standard. Record dispatch or fallback and the
 verdicts in the walkthrough, then report the verdict table to the developer.
 
-- **All met:** conduct alone updates PRD criteria `status: open` →
-  `status: delivered`, when a PRD exists. Before updating, compare its
-  current full revision with the pre-read revision and preserve unknown
-  metadata and relations. Retain the mutation receipt and verify the
-  complete intended PRD by exact full readback, including resulting
-  revision, before claiming delivery or allowing dependent progress. A
-  conflict, missing receipt/readback, unknown outcome or mismatch blocks
-  completion and requires reconciliation. At design depth, record scope
-  verdicts without inventing criterion statuses.
+- **All met:** conduct alone sets each met criterion `status: open` →
+  `status: delivered`, when a PRD exists, with `patch` op
+  `set-criterion-status`. That op is legal after approval. It does not
+  remove the item, change its `id`, or rewrite the PRD. Pass the
+  pre-read `expected-head`. One request may set several criteria if each
+  op names one ID; a refusal fails the whole patch with no partial
+  effects. On `1.0.x`, apply the same status splices locally and
+  `update` the complete PRD with
+  `efficiency-warning: full-update-without-patch`. Before mutating,
+  compare the current head with the pre-read head and preserve unknown
+  metadata and relations. Retain the mutation receipt and `render` the
+  complete intended PRD, including the resulting head, before claiming
+  delivery or allowing dependent progress. A conflict, missing
+  receipt/readback, unknown outcome or mismatch blocks completion and
+  requires reconciliation. At design depth, record scope verdicts
+  without inventing criterion statuses.
 - **Any not met or not verifiable:** name the gap and return to `execute`
   for corrective work or request the developer's explicit documented
   waiver. Do not clear validation on unresolved or partial evidence.
@@ -102,12 +109,15 @@ met (or its explicit waiver documented):
 > and archive?"
 
 Conduct is the single executive writer for the context; verifier reports
-are evidence, not artifact writes or authority to change criteria. Any
-walkthrough verdict/update follows the same exact-address, revision,
-receipt and full-readback requirements. Do not use local filesystem paths
-outside the explicit filesystem branch. These persistence checks do not
-replace or modify the Plan gate, verification rules, approval policy or
-criterion-status authority.
+are evidence, not artifact writes, `patch` calls, or authority to change
+criteria. Record verdicts with `append-entry` on `walkthrough` when the
+capability is realized — not a rewrite of that object. The same
+exact-address, `expected-head`, receipt and `render` readback
+requirements apply. Do not use local filesystem paths outside the
+explicit filesystem branch. These persistence checks do not replace or
+modify the Plan gate, verification rules, approval policy or
+criterion-status authority. `set-criterion-status` is the only criterion
+mutation this phase emits.
 
 `summarize` may follow in the same conversation on the developer's
 yes, but never uninvited.
@@ -128,4 +138,6 @@ yes, but never uninvited.
   any actual fallback blocker; design depth also requires `verify`.
 - **Treating `verify`'s report as the flip.** The subagent reports;
   the developer sees the verdict table; only then does this phase
-  flip `status: delivered` — and only for fully met criteria.
+  `set-criterion-status` to `delivered` — and only for fully met criteria.
+- **Rewriting the PRD to flip one status.** `set-criterion-status` is
+  the op. A full `update` is the `1.0.x` warning path only.

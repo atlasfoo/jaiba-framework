@@ -1,6 +1,6 @@
 ---
 name: jaiba-doctor
-description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence (incl. global behavioral-contract presence/drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
+description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence under jaiba-memory-surface 1.1.0 (incl. v2 bindings, legacy consolidation, agent-agnostic tool preflight, and global contract drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
 version: 3.3.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -67,13 +67,20 @@ reflect the repository, not the prompt's assumptions.
    drift-&-gaps and toolchain-awareness sections: doctor
    operationalizes both as checks — and the contract's own
    presence/drift is itself part of diagnostic 1.
-2. **Resolve selection, identity and readable memory.** Follow diagnostic 1's
-   resolution preflight before brain-dependent checks. Read the effective
-   host-visible `create-memory` canonical contract, resolution and filesystem
-   mapping, and resolve `jaiba-init`'s OKF reference independently. Missing,
-   ambiguous or incompatible definitions block dependent checks; never assume
-   sibling installation paths. Filesystem is built in, not an adapter/MCP
-   installation requirement. Verify the selected owned catalogue and full
+2. **Resolve selection, identity, bindings, and readable memory.** Follow
+   diagnostic 1's resolution preflight under `jaiba-memory-surface` **1.1.0**
+   before brain-dependent checks. Read the effective host-visible `create-memory`
+   canonical contract, resolution and filesystem mapping, and resolve
+   `jaiba-init`'s OKF reference independently. Missing, ambiguous or
+   incompatible definitions block dependent checks; never assume sibling
+   installation paths. Filesystem is built in, not an adapter/MCP installation
+   requirement. Verify standard machine binding v2 persistence at
+   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+   (`binding-format-version: "2"`), inspect legacy binding resolution
+   (`~/.jaiba/memory/<host>/...`) and consolidation status, and perform the
+   agent-agnostic preflight (MSV-001: mapping canonical `mcp:<server>` tool
+   requirements to current host runtime exposure without altering package
+   conformance status). Verify the selected owned catalogue and full
    constitutive entry reads; filesystem alone uses the supported dual layout.
 3. **Locate every skills directory in play.** JAIBA skills can be
    installed project-locally, globally (e.g. `~/.claude/skills/`,
@@ -110,7 +117,7 @@ into the single report described under "The health report".
 
 | # | Diagnostic | What it answers | Reference | Writes? |
 |---|---|---|---|---|
-| 1 | **Memory coherence** | Are selection, binding, project/context ownership, catalogue and full reads verified, and is the brain coherent with the repo? Filesystem also checks its marker and dual layout. | `references/memory-coherence.md` | No — routes to `jaiba-init` (repo/brain) / `jaiba-configure` (machine) |
+| 1 | **Memory coherence** | Are selection, v2 bindings (`~/.jaiba/memory/bindings/<sha256>.yaml`) and legacy consolidation, canonical tool requirements (MSV-001), project/context ownership, catalogue and full reads verified under `jaiba-memory-surface` 1.1.0, and is the brain coherent with the repo? Filesystem also checks its marker and dual layout. | `references/memory-coherence.md` | No — routes to `jaiba-init` (repo/brain) / `jaiba-configure` (machine) |
 | 2 | **Tool state** | Are the CLI tools the installed skills / subagents / hooks declare actually present on this machine — plus a full Agent Layers inventory of every scanned skill/subagent/hook, and an `[UNVERIFIED]` state for what it can't check (MCP deps, jq-missing hooks)? | `references/tool-state.md` | **Yes** — refreshes `.atl/tool-layout.md` |
 | 3 | **External-reference health** | Is every `reference` concept (or `reference-index.md` entry in the legacy flat layout) reachable: MCPs/CLIs installed, remote specs live, vendored copies present and fresh? | `references/reference-health.md` | No — routes to fixes |
 
@@ -211,7 +218,10 @@ Rules for the report:
   enacts. The one thing it writes is `.atl/tool-layout.md` (machine
   state, §6), never selected memory, routing bindings or vendored files.
   Constitutive changes belong to `jaiba-init`; executive writes belong to
-  `conduct`, subject to the transition gates.
+  `conduct`, subject to the transition gates. In traceless mode (external surface
+  selected or absent local `.ai/`), doctor registers `.atl/` in Git `info/exclude`
+  without creating `.atl/.gitignore`, introducing zero tracked or untracked repository
+  files. Filesystem mode retains `.atl/.gitignore`.
 - **Maintenance, not bootstrap.** An authoritatively absent selected brain
   is `jaiba-init`'s job. Missing `.ai/` alone says nothing in external mode.
 - **Carry your own tools.** Skills package independently — doctor's

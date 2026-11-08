@@ -1,9 +1,10 @@
 # Diagnostic 1 — Memory coherence
 
-**Question:** are surface selection, ownership, project/context and the
-behavioral contract verified, and is the selected constitutive brain
-(including append-only logs) complete, and consistent both with **each other**
-and with the **repository**?
+**Question:** are surface selection, v2 bindings, legacy consolidation,
+canonical tool requirements, ownership, project/context and the
+behavioral contract verified under `jaiba-memory-surface` 1.1.0, and is the
+selected constitutive brain (including append-only logs) complete, and consistent
+both with **each other** and with the **repository**?
 
 This diagnostic is **read-only**. doctor never edits selected memory or bindings.
 Constitutive reconciliation belongs to `jaiba-init:update-brain` (`AGENTS.md` §2.9). Every brain
@@ -18,7 +19,7 @@ act on**, not to fix it.
 
 Resolve the current host's effective `create-memory` and read its canonical
 `references/memory-surface-contract.md`, `resolution.md` and
-`filesystem-surface.md` (`jaiba-memory-surface` **1.0.0**). Independently
+`filesystem-surface.md` (`jaiba-memory-surface` **1.1.0**). Independently
 resolve effective `jaiba-init/references/okf-pattern.md`; if executive content
 validation is needed, resolve effective `conduct` templates without invoking
 its unadapted external workflow. These names identify dependencies, not
@@ -50,25 +51,63 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
    or authorized init; multiple matches conflict. Changed origin/root/aliases
    require human reconciliation via init even if the new origin already maps
    to another project. Do not create a duplicate brain.
-3. **Binding and context.** Read routing-only metadata under
-   `~/.jaiba/memory/`, keyed by exact host-agent identity and normalized root;
-   validate selected adapter/version, namespace ownership, registry, sanitized
-   identity and stable context. No payload cache or `.ai/` mirror. Missing,
-   malformed, inaccessible or conflicting binding is not empty memory; doctor
-   reports it without saving/replacing it. Session-only operation requires
-   explicit consent through the owning setup workflow, not a claim of durable
-   persistence. Clones/worktrees may share constitutive identity but default
-   to independent executive contexts per root, stable across branch/session/
-   model changes. Unknown context or collision stops executive checks; never
-   select latest work or another root's context. Existing-context resumption
-   needs exact lookup and single-writer handoff. Inspect only the resolved
-   namespace/project/category/context; switching is not cleanup authority.
-4. **Operational access.** Validate contract/version, actual callable tools,
-   permissions, limits and exact scope with non-destructive probes. Installed
-   files/ATL are not runtime evidence. Separate unsupported version, missing
-   capability, unavailable service, denied access and ownership conflict.
-   Optional search/MCP/CAS absence is not a mandatory-core defect. Verify
-   selected backend tools and scopes in the current runtime; child sessions
+3. **Binding and context (format `v2`).** Verify routing-only metadata at the
+   standard v2 machine binding location:
+   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+   where `canonical-work-root` is computed with canonical path normalization
+   (absolute, `/` separators, no trailing `/` unless root). Verify
+   `binding-format-version: "2"`, `work-root.canonical` equals this session's
+   canonical work root, and `work-root.sha256` matches both the filename stem
+   and the sha256 digest of that canonical string. Validate selected
+   adapter/version, namespace ownership, stable `project-id`, and stable
+   executive `context-id`. The binding contains no memory payload, credentials,
+   or `.ai/` mirror. A valid v2 record is authoritative over legacy locations;
+   do not re-open legacy disagreements or merge legacy files over it.
+   **Legacy binding resolution and consolidation:** When no v2 binding exists
+   for this canonical root, check legacy 1.0.0 locations under
+   `~/.jaiba/memory/<host-agent-id>/` (immediate child directories of
+   `~/.jaiba/memory/` other than `bindings/`). When matching legacy records
+   exist (stored work root canonicalizes to this root):
+   - If matching legacy records agree on all blocking fields (`project-id`,
+     `context-id`, adapter id, namespace, sanitized identity candidate,
+     and contract major `1`), consolidation into v2 is eligible (performed by
+     owning setup/init workflows with readback; doctor verifies this state
+     without mutating bindings).
+   - If matching legacy records differ or conflict on any blocking field,
+     consolidation is blocked: doctor surfaces the conflict and differing
+     legacy locators as a diagnostic finding and routes to explicit human
+     resolution (never pick by host name, directory order, mtime, or running
+     agent).
+   A missing, corrupt, malformed or inaccessible binding (including a v2 file
+   that fails canonical path/digest checks) is surfaced as a diagnostic finding;
+   it is not empty memory and legacy files are not a silent fallback for a
+   corrupt v2 record. Doctor reports binding defects without saving or
+   replacing them. Session-only operation requires explicit consent through
+   the owning setup workflow, not a claim of durable persistence.
+   Clones/worktrees default to independent executive contexts per root.
+   Unknown context or collision stops executive checks; never select latest
+   work or another root's context.
+4. **Operational access & agent-agnostic preflight (`MSV-001`).** Validate
+   contract/version (`jaiba-memory-surface` 1.1.0), actual callable tools,
+   permissions, limits, and exact scope with non-destructive probes. Installed
+   files/ATL are not runtime evidence. For any package declaring canonical tool
+   requirements (`mcp:<server>` plus published tool names):
+   - Execute the agent-agnostic preflight: map each required canonical published
+     tool name to the current host runtime exposure (e.g. Claude Code's
+     `mcp__<server>__<tool>` or other host-specific naming) using this session's
+     actual tool catalogue. Do not rely on guessed exposure prefixes or
+     hardcoded host mappings.
+   - If a required canonical tool is not exposed in the current runtime, report
+     `missing-capability` naming this host-agent identity and the canonical
+     tool (`mcp:<server>` plus published tool name).
+   - This preflight validates session readiness on the current host **without
+     altering package conformance status**; package conformance is certified
+     once for the package claim envelope and is not modified or invalidated
+     by host-local tool visibility or readiness failures.
+   Separate `unsupported-version` (incompatible contract major), `missing-capability`
+   (unexposed canonical tool or capability), `unavailable` service, `permission-denied`,
+   and ownership `conflict`. Optional search/MCP/CAS absence is not a mandatory-core defect.
+   Verify selected backend tools and scopes in the current runtime; child sessions
    do not automatically inherit backend access or ownership. Report their
    unverified scope without delegating unsupported external consumers.
 5. **Real brain and coverage.** A valid binding plus complete, real owned
@@ -121,9 +160,10 @@ not an automatic transfer, activation, binding edit, merge, dual-write or retire
 A successful diagnostic is not activation or adapter conformance; draft Engram
 remains nonselectable until required operational conformance, not installation,
 probe, authoring or fixture success.
-Route machine dependency/configuration defects to `jaiba-configure`; repo
-identity, binding association and constitutive defects to `jaiba-init` with
-human approval. Backend permissions never authorize brain repair.
+Route machine dependency, host toolchain exposure and configuration defects to
+`jaiba-configure`; repo identity, unassociated roots, legacy binding conflicts,
+and constitutive defects to `jaiba-init` with human approval. Backend permissions
+never authorize brain repair.
 
 ## What to check
 

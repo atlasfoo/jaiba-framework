@@ -605,6 +605,54 @@ if [ -n "${REJECTED_COUNT[*]+set}" ] && [ "${#REJECTED_COUNT[@]}" -gt 0 ]; then
 fi
 
 mkdir -p "$ROOT/.atl"
+
+# Gitignore handling: traceless mode vs filesystem mode.
+# Traceless mode applies when an external memory surface is selected or there is no local .ai/ directory.
+is_traceless=0
+if [ ! -d "$ROOT/.ai" ]; then
+  is_traceless=1
+elif [ -f "$ROOT/AGENTS.md" ]; then
+  surface="$(sed -n -E 's/^[[:space:]]*jaiba-memory-surface:[[:space:]]*([^[:space:]]+).*/\1/p' "$ROOT/AGENTS.md" | head -n 1)"
+  if [ -n "$surface" ] && [ "$surface" != "filesystem" ]; then
+    is_traceless=1
+  fi
+fi
+
+if [ "$is_traceless" -eq 1 ]; then
+  # Traceless mode: DO NOT create or modify .atl/.gitignore.
+  # Instead, check if .atl/ (or .atl) is in info/exclude; append .atl/ if absent.
+  exclude_path="$(git -C "$ROOT" rev-parse --path-format=absolute --git-path info/exclude 2>/dev/null || true)"
+  if [ -z "$exclude_path" ]; then
+    exclude_rel="$(git -C "$ROOT" rev-parse --git-path info/exclude 2>/dev/null || true)"
+    if [ -n "$exclude_rel" ]; then
+      if [[ "$exclude_rel" = /* ]]; then
+        exclude_path="$exclude_rel"
+      elif [ -f "$exclude_rel" ]; then
+        exclude_path="$exclude_rel"
+      else
+        exclude_path="$ROOT/$exclude_rel"
+      fi
+    fi
+  fi
+  if [ -n "$exclude_path" ]; then
+    if [ -f "$exclude_path" ]; then
+      if ! grep -qE '^\.atl/?$' "$exclude_path" 2>/dev/null; then
+        if [ -s "$exclude_path" ] && [ -n "$(tail -c 1 "$exclude_path" 2>/dev/null)" ]; then
+          printf '\n' >> "$exclude_path"
+        fi
+        printf '.atl/\n' >> "$exclude_path"
+      fi
+    else
+      mkdir -p "$(dirname "$exclude_path")" 2>/dev/null || true
+      printf '.atl/\n' > "$exclude_path"
+    fi
+  fi
+else
+  # Filesystem mode: retain existing behavior of maintaining .atl/.gitignore
+  if [ ! -f "$ROOT/.atl/.gitignore" ]; then
+    printf '*\n' > "$ROOT/.atl/.gitignore"
+  fi
+fi
 {
   echo "# Toolchain Layout"
   echo
