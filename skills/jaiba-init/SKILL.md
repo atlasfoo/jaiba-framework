@@ -1,6 +1,6 @@
 ---
 name: jaiba-init
-description: "Project-scoped JAIBA setup and constitutive memory maintenance on the resolved surface. Preserves filesystem bootstrap and legacy layouts; registers or links verified external brains without an `.ai/` mirror. Populates concepts, applies approved ADRs and fixes drift; machine setup belongs to jaiba-configure."
+description: "Project-scoped JAIBA setup and constitutive memory maintenance on the resolved surface (jaiba-memory-surface 1.1.0). Preserves filesystem bootstrap and legacy layouts. Traceless onboarding instruments an external brain with no repository files: AGENTS.md and .ai/ are omitted; only machine binding v2 is saved. Links verified brains, populates concepts, applies approved ADRs and fixes drift; machine setup belongs to jaiba-configure."
 version: 3.3.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -19,9 +19,12 @@ The **repo-scoped** half of JAIBA setup, and the framework's long-term
 memory owner. `jaiba-init` provides three entry points:
 
 - **Bootstrap** (`jaiba-init`, bare) — instrument *this project* on the
-  selected surface: filesystem marker and skeleton as before, or an
-  authorized external registry association and real constitutive brain;
-  then the first `jaiba-doctor` checkup. ATL always stays local.
+  selected surface: filesystem marker and skeleton as before, or a
+  **traceless** external association. Traceless instruments a verified
+  or newly authorized external brain without writing any repository
+  file: `AGENTS.md` and `.ai/` are omitted; the only machine write is
+  binding `v2`. Then the first `jaiba-doctor` checkup. ATL always stays
+  local.
 - **Maintain** (`jaiba-init:update-brain`) — keep the brain true to the
   repository for the rest of the project's life.
 - **Surface migration** (`jaiba-init:migrate-surface`) — explicitly transfer
@@ -72,9 +75,10 @@ Absence of local files is never evidence of an absent external brain.
 
 Bare `jaiba-init` means bootstrap; `jaiba-init:update-brain` selects the
 maintenance mode, which then picks `initialize` or `update` from the two
-rows above. A new bootstrap enters `initialize` itself — that transition
-is internal, not a hand-off. Linking a verified existing external brain
-does not initialize it again.
+rows above. A new filesystem bootstrap, and a traceless bootstrap whose
+inventory depth is **full**, enters `initialize` itself — that transition
+is internal, not a hand-off. Linking a verified existing external brain,
+or a traceless **minimal** bootstrap, does not initialize.
 
 ## Universal Preconditions
 
@@ -87,8 +91,10 @@ ground truth before writing a word.
    effective `create-memory` installation** and read its
    `references/memory-surface-contract.md`, `resolution.md`,
    `filesystem-surface.md` and, for a requested surface transition,
-   `interchange.md`. These define `jaiba-memory-surface` **1.0.0**;
-   this skill interprets them declaratively, not through a new runtime.
+   `interchange.md`. These define `jaiba-memory-surface` **1.1.0**;
+   this skill is a **1.1.0** consumer and interprets them declaratively,
+   not through a new runtime. Do not re-derive binding, identity, or
+   interchange rules that those references already own.
    Never assume a sibling skill directory in an installation. Missing,
    ambiguous or incompatible definitions block dependent operations.
    Filesystem is built in; retaining it needs no adapter or MCP install.
@@ -100,6 +106,15 @@ ground truth before writing a word.
    marker is expected before filesystem bootstrap; with a filesystem
    skeleton flag the missing marker and offer bootstrap repair without
    blocking authorized population. External mode requires no marker.
+   **Traceless** onboarding is that external path: instrument the owned
+   brain without writing any file into the repository. `AGENTS.md` and
+   `.ai/` are omitted. The only machine write is binding `v2` at
+   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+   (`binding-format-version: "2"`), per the effective installation's
+   `references/resolution.md`. Do not create the marker, a skeleton, or
+   `.atl/.gitignore` to prove instrumentation. The file rule, Git
+   `info/exclude` step, and the single ≤4-question questionnaire live
+   in `references/bootstrap-mode.md`.
 3. **The repository itself** — for `initialize`, the whole evidence
    sweep (see its reference); for `update`, the slice that changed.
    Bootstrap defers this to the `initialize` step it ends in.
@@ -143,31 +158,56 @@ developer means rather than guessing.
 4. Resolve exact namespace ownership and identity against the surface-owned
    project registry; never adopt ordinary notes, titles, search hits or the
    backend's default project. Keep its stable `project-id`. No exact match
-   needs human-approved association or authorized new project creation;
-   multiple matches block. Aliases, changed origins, moved roots and registry
+   needs human-approved association or authorized new project creation.
+   When this identity is not in the registry and no reusable binding
+   already names it, bootstrap collects that approval in **one**
+   questionnaire of at most four questions — adapter confirmation,
+   namespace (sibling-binding suggestion as the default when one exists),
+   stable project-id (link an existing project or create), and inventory
+   depth (minimal vs full). Do not drip those decisions across turns or
+   add a fifth question. Multiple matches block. Aliases, changed origins,
+   moved roots and registry
    edits require explicit approval and collision checks here, even if the
    new identity already names another project. Do not create a second brain.
    Filesystem without a registry retains its supported layout; canonical
    filesystem identity/locator mapping must not introduce required metadata
    or a hidden mirror merely to read existing files.
 5. For external association, confirm a fresh executive `context-id` or exact
-   existing owned context lookup with single-writer handoff. The persistent
+   existing owned context lookup with single-writer handoff. When the
+   not-in-registry questionnaire runs, that confirmation is part of its
+   project-id question, not a fifth question. A valid binding `v2` already
+   carrying `context-id` is reused without asking. The persistent
    ID is **per absolute work root**, independent of branch/session/model;
    clones/worktrees may share constitutive identity but default to separate
    contexts. Creating an empty context registry identity is allowed when
    authorized; writing PRD, plan, tasks or walkthrough is not. Switching
    retains old work. Filesystem keeps `.ai/work/` per checkout unchanged.
-6. Persist routing-only bindings under `~/.jaiba/memory/`, keyed by exact
-   host-agent identity and normalized absolute work root: sanitized IDs,
-   versions and locators only, no payloads, credentials, summaries, receipts
-   containing payloads or `.ai/` cache. Validate existing root/origin,
-   precedence and registry ownership before reuse. Read back saved routing
-   fields before claiming persistence; preserve conflicts for reconciliation.
-   If persistence is unavailable, report it and obtain explicit **session-only**
-   consent (same identity checks, no durable claim), or stop. Never mint a
-    new context silently on every session.
+6. Persist the routing-only binding `v2` at
+   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+   (`binding-format-version: "2"`). The only key is that canonical-work-root
+   digest from `resolution.md` §2 and §4. `host-agent-id` is not a directory,
+   a file name, or a lookup key. Do not write a new record under
+   `~/.jaiba/memory/<host-agent-id>/`. Store sanitized IDs, versions, and
+   locators only — no payloads, credentials, summaries, journal bodies, or
+   receipts that contain payloads, and no `.ai/` cache. Do not create the
+   file merely to test the path, and do not hash a URI, a trailing slash,
+   or a relative path. Reuse a valid v2 record for this canonical root
+   without asking, including when `last-verified-by` names another agent.
+   A malformed v2 record stops; do not repair it from legacy or from memory.
+   If v2 is absent, consolidate agreeing legacy records into v2 per
+   `resolution.md` §4 and leave the originals byte for byte. Validate
+   existing root/origin, precedence, and registry ownership before reuse.
+   Read back saved routing fields before claiming persistence; preserve
+   conflicts for reconciliation. If persistence is unavailable, report it
+   and obtain explicit **session-only** consent (same identity checks, no
+   durable claim), or stop. A session-only selection is not the v2 file.
+   Never mint a new context silently on every session.
    During migration these are proposed target fields only: do not persist
    them as effective authority before verified, human-approved activation.
+   In traceless mode this binding is the only JAIBA record saved. When Git
+   is present, also append `.atl/` to the worktree exclude file from
+   `git rev-parse --git-path info/exclude`. That path is Git metadata, not
+   a committed file. No work-tree file is created.
 7. Enumerate the exact owned constitutive catalogue completely, including
    all pages, logs, unindexed and malformed objects; support unfiltered and
    exact type-filtered enumeration. Require explicit completion/consistency,
@@ -243,7 +283,9 @@ The destinations below are **filesystem locators**. On external surfaces
 use the same content with logical IDs/relations through the selected adapter;
 no `.ai/` directory, mirror or cache is created. `assets/AGENTS.md` is the
 **filesystem-only marker**, never an external instrumentation requirement.
-An external `AGENTS.md` selection override is optional and human-approved.
+Traceless mode does not create it. An `AGENTS.md` override is not the
+default; only an explicit human request to leave traceless for that one
+file may write it, and that write is reported as a repository edit.
 
 | Concept `type:` | Template | Filesystem instance written to |
 |---|---|---|
@@ -259,7 +301,9 @@ An external `AGENTS.md` selection override is optional and human-approved.
 | `reference` (one per external surface) | `assets/concepts/reference.md` | `.ai/memory/references/<slug>.md` |
 | `log-entry` (append-only) | `assets/log-entry-template.md` | `.ai/memory/log/<YYYY-MM-DD>-<slug>.md` |
 
-Plus the bootstrap files, which aren't concepts at all:
+Plus the bootstrap files, which aren't concepts at all. These rows are
+**filesystem bootstrap only**. Traceless external bootstrap writes none
+of them — not `AGENTS.md`, not `.ai/.gitignore`, not `.atl/.gitignore`.
 
 | File written | Lives in | Written by | Template |
 |---|---|---|---|
@@ -503,9 +547,12 @@ Per `AGENTS.md` §3.5:
   contract and subagent battery exist and, if not, names
   `jaiba-configure` as the prerequisite the developer should run.
 - **bootstrap → `initialize` is internal.** Laying the skeleton and
-  filling the brain are two modes of *this* skill, so bootstrap
-  transitions into `initialize` directly rather than handing off. The
-  artifact templates have always belonged here.
+  filling the brain are two modes of *this* skill, so a filesystem
+  bootstrap, and a traceless bootstrap at full inventory depth, transition
+  into `initialize` directly rather than handing off. Traceless minimal
+  depth and a verified existing brain do not. The artifact templates have
+  always belonged here. On an external surface they are logical content,
+  not a requirement to create local files.
 - **`jaiba-init` → `jaiba-doctor`.** Bootstrap's closing hand-off: the
   first checkup and the local toolchain probe (`.atl/tool-layout.md`).
   A real cross-skill boundary, never a cross-skill file path (skills
@@ -533,16 +580,23 @@ Per `AGENTS.md` §3.5:
 External hand-offs to `ask`, `conduct`, `fast` or the battery require their
 surface-aware operation contracts and a verified active binding; an init or
 doctor probe alone does not certify a consumer. `.atl/tool-layout.md` always remains
-local at the work root. If ignoring ATL must avoid tracked repository edits,
-use the worktree's local Git exclusion file (resolve with Git), preserving
-all prior entries; never create `.ai/` for ATL. Outside Git report that
-exclusion is unavailable rather than claiming it is ignored.
+local at the work root. In traceless mode, exclude `.atl/` by checking and
+appending `.atl/` to `$(git rev-parse --git-path info/exclude)`, preserving
+every prior entry; never create `.atl/.gitignore`, `AGENTS.md`, `.ai/`, or
+any other repository file. Filesystem bootstrap may still write
+`.atl/.gitignore`. Outside Git report that exclusion is unavailable rather
+than claiming `.atl/` is ignored.
 
 ## Common failure modes
 
 - **Bootstrapping an instrumented repo.** A populated `.ai/memory/` or an
   existing `AGENTS.md` is the developer's; check state before laying
-  anything down (bootstrap-mode's "When NOT to bootstrap" table).
+  anything down (bootstrap-mode's "When NOT to bootstrap" table). Missing
+  local files are not proof that an external brain is absent.
+- **Writing repository files in traceless mode.** Creating `AGENTS.md`,
+  `.ai/`, `.atl/.gitignore`, or any other work-tree file while instrumenting
+  an external brain. Traceless saves only binding `v2` and excludes `.atl/`
+  via Git `info/exclude`. Zero repository files are committed or dirtied.
 - **Doing `jaiba-configure`'s job.** Installing a global contract, a
   skillset or the subagent battery from here re-creates the coupling
   this skill was split to remove. Detect, report, route.
