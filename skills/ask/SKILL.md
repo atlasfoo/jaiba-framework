@@ -61,18 +61,37 @@ Only `conduct` keeps an explicit override (`/conduct
 across every repository you work in. Resolve memory through the effective
 `create-memory` installation's `references/resolution.md` and
 `references/memory-surface-contract.md` (`jaiba-memory-surface` contract version **1.1.0**), never relative to this skill's installation.
-The built-in filesystem surface maps to the selected checkout; external
-surfaces use their resolved standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present) and owned catalogue and need not have
-local `.ai/` files or an `AGENTS.md` marker.
 
-Orienting cold (see `references/orientation.md`) includes resolving the
-current project's memory surface. Resolve the effective `create-memory`
-installation's `references/resolution.md` and
-`references/memory-surface-contract.md` (contract version `1.1.0`). On filesystem, resolve its
-supported concept-bundle or legacy layout. On an external surface, require
-a valid binding (`v2` locator), readable owned catalogue, exact project/context scope and
-required full reads; a marker, probe, search result or empty catalogue alone
-is not authoritative.
+**Binding-First (Step 0).** Before reading or listing `.ai/`, or assuming
+filesystem, establish canonical work root `R` and inspect
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (v2). Do not create the file
+to test it. Follow `resolution.md` Step 0; do not re-derive it. A valid
+record is the checkout's registration: `surface.adapter-id`,
+`surface.namespace`, `project.project-id`, `executive.context-id`.
+Identity is O(1) from those fields — no backend search. It governs unless
+`AGENTS.md` has an explicit `jaiba-memory-surface:` override. No such
+field, or no `AGENTS.md` (traceless), and the binding wins. When the
+active surface is external, do not test, list, or read `.ai/` paths.
+External surfaces need not have local `.ai/` files or an `AGENTS.md`
+marker. A missing v2 file is not a filesystem default: check an
+`AGENTS.md` pin, then the sanitized `{kind: git-remote, host, path}`
+lookup of `origin` against the external registry, before any fallback.
+A hit is a registered project. `ask` does not persist the binding and
+does not run the ≤4-question questionnaire; route that link to
+`jaiba-init` and do not answer as if the brain were absent or filesystem.
+Only an authoritative miss continues to a local `.ai/` check (unbound
+filesystem or legacy). If there is no pin, no `.ai/`, and no registry
+hit, the checkout is authoritatively uninstrumented. Legacy
+`~/.jaiba/memory/<host>/...` is a compatibility input only when v2 is
+absent, not a reason to skip Step 0.
+
+Orienting cold (see `references/orientation.md`) includes Step 0 above.
+On filesystem — only after Step 0 selects it — resolve its supported
+concept-bundle or legacy layout. On an external surface, require a valid
+binding (`v2` locator), readable owned catalogue, exact project/context
+scope and required full reads; a marker, probe, search result or empty
+catalogue alone is not authoritative. Do not open `.ai/` to orient when
+the active binding is external.
 
 Follow the deterministic rendering path (`MSV-008`):
 `binding` → read context/project catalogue → exact logical addresses/IDs → invoke package script `render` subcommand (or read materialized content directly in `document-tree`).

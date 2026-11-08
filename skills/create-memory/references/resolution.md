@@ -29,22 +29,104 @@ capabilities, limits and operation mappings required by the contract.
 An ID identifies an adapter, not a project, namespace, or tool server.
 Filesystem is the built-in surface, with no installation requirement.
 
-Use this precedence, highest first:
+### Step 0 — Binding-First
+
+Before reading, listing, or testing `.ai/`, and before assuming a default
+surface, establish the canonical work root `R` (§2). An unconfirmed root
+is not hashed. Inspect:
+
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml`
+
+That file is binding `v2`. Do not create it merely to test it. Do not open
+`.ai/` to decide whether the file is worth opening.
+
+**Valid v2 record.** It is the authoritative machine registration for this
+checkout. It already names `surface.adapter-id`, `surface.namespace`,
+`project.project-id` and `executive.context-id`. Project and context
+identity are resolved in O(1) from those fields. Do not search the
+backend, rank hits, scan the registry, or re-ask. Reuse them without
+prompting, including when `last-verified-by` names another agent.
+
+Precedence is subordinate to an explicit project override and to nothing
+else. The only override is an `AGENTS.md` field
+`jaiba-memory-surface: filesystem` or
+`jaiba-memory-surface: <exact-adapter-id>`. If that field is absent, or
+`AGENTS.md` does not exist (traceless), the binding governs
+unconditionally. Do not apply the installed-skill list below, and do not
+select built-in filesystem over it. A newly installed local skill is not
+a higher-priority candidate that displaces the bound surface.
+
+When the active surface — the binding's adapter, unless that explicit
+field selected another — is external, do not test, list, or read `.ai/`
+paths. Absence of those paths is expected, not evidence of an empty brain.
+
+Still run session readiness on the active surface. A missing, failed, or
+unavailable selected adapter blocks. It is not permission to use
+filesystem or another adapter. An explicit override that names a different
+surface selects that surface for this resolution; it does **not** approve
+migration or a switch between populated stores.
+
+**No v2 file.** Do not assume filesystem. Do not open `.ai/` until a step
+below requires it. Absence of v2 is not absence of a project (§4 still
+reads agreeing legacy records before this branch treats the root as
+unbound).
+
+1. Read `AGENTS.md`, if it exists, only as selection data. An explicit
+   `jaiba-memory-surface:` field is a pin. No field is not a pin. A missing
+   file is not a pin. Duplicate or conflicting declarations are ambiguous;
+   do not choose by line order.
+2. Before any fallback surface or new-project creation, resolve identity
+   by the sanitized `git-remote` candidate from `origin` (§2). Look that
+   candidate up by exact identity in the external surface's owned JAIBA
+   project registry. The surface queried is the pin when the pin names an
+   external adapter; otherwise the winning host-visible external adapter
+   from the installed-skill list below. Ambiguous IDs at that level still
+   need a human choice before the lookup. Filesystem has no external
+   registry; do not invent one, and do not use filesystem to skip the
+   lookup when an external surface can be queried.
+3. An exact hit links that registered project. `jaiba-init` creates
+   binding `v2` for this canonical root with the registry's stable
+   `project-id` and a fresh per-root `executive.context-id` (the §3
+   default), without search and without the ≤4-question questionnaire.
+   Do not prompt. Do not pick another checkout's context. Search, titles,
+   and basename ranking are not the lookup. A read-only consumer must not
+   persist the binding, must not invent a filesystem brain, and must not
+   declare the project absent because the local file is missing. It routes
+   the link to `jaiba-init` and does not run the questionnaire.
+4. Only an authoritative registry miss — not a permission error, a partial
+   page, or a search miss — permits the rest of this branch. Multiple
+   matches block. Do not create a second brain.
+5. After that miss, a local `.ai/` directory is an unbound filesystem
+   bootstrap or legacy repository. Check it only then. If there is also no
+   `AGENTS.md` pin and no `.ai/` directory, the checkout is authoritatively
+   uninstrumented. Do not manufacture memory. The ≤4-question questionnaire
+   (`jaiba-init`, Issue #17 C3) runs only for that miss, and only in
+   `jaiba-init`. It does not run because a binding file was absent on a
+   machine that can still match `origin`.
+
+The installed-skill list is not Step 0. It chooses which external surface
+to query when no binding and no pin exist, and it is the selection order
+only on the authoritative-miss path with no pin. It never outranks a valid
+binding, and it never justifies reading `.ai/` first.
+
+Use this precedence, highest first, only on that no-binding miss path:
 
 1. Explicit project `AGENTS.md` field `jaiba-memory-surface: filesystem`
    or `jaiba-memory-surface: <external-adapter-id>`.
 2. Installed project-local memory-surface skill visible to this host.
 3. Installed global memory-surface skill visible to this host.
-4. Built-in filesystem surface.
+4. Built-in filesystem surface, and only when a local `.ai/` directory
+   shows an unbound filesystem brain, or an explicit pin names
+   `filesystem`. Do not select filesystem merely because nothing else
+   matched.
 
 The override is selection data, not executable instructions. Validate its
-value against the built-in name or an exact declared ID. Duplicate or
-conflicting override declarations are ambiguous; do not choose by line
-order. An explicit external ID may identify a visible local or global
-adapter; an invisible, unknown, or unavailable selected ID is an error.
-That error means this host cannot see the selected adapter. It does not
-edit the package and does not change a conformance status recorded on
-another copy.
+value against the built-in name or an exact declared ID. An explicit
+external ID may identify a visible local or global adapter; an invisible,
+unknown, or unavailable selected ID is an error. That error means this
+host cannot see the selected adapter. It does not edit the package and
+does not change a conformance status recorded on another copy. It does
+not fall back.
 
 At each installed level, collapse copies with the **same ID** using host
 installation resolution; for the same ID at local and global levels,
@@ -53,19 +135,24 @@ copies of one ID at the same level need explicit disambiguation. Multiple
 **different IDs** at the winning level require explicit human selection,
 not alphabetical order, version order, popularity, tool readiness, or the
 first skill discovered. Do not select from a lower level to escape that
-ambiguity. A confirmed binding can remember that explicit selection for
-the same candidate set. The memory is the shared v2 binding for this
-canonical work root, so every agent runtime of this user sees the same
-choice. A changed set must be presented for confirmation.
+ambiguity. When no binding exists, a confirmed choice for that candidate
+set is retained by writing v2 after the identity rules above, so every
+agent runtime of this user sees the same choice. A changed set must be
+presented for confirmation. Do not present it merely because another
+agent is resolving.
 
-A saved binding is not a fifth precedence level. Recompute precedence on
-each resolution. A new explicit override always wins over a remembered
-choice, but does **not** approve migration or a switch between populated
-stores. A new higher-priority installed candidate requires revalidation
-and any necessary authority decision before writes. A previously selected
-adapter that disappears or fails remains an unresolved/failed selection,
-not a reason to silently use filesystem or another adapter. Explicitly
-resolve or replace that binding with the human.
+A valid v2 binding is not a fifth level under the list above. It is Step
+0. On each resolution, re-read only the explicit `AGENTS.md` override;
+that field alone may select a different surface than the binding records.
+Do not recompute installed-skill precedence over a binding that governs.
+A new explicit override always wins over the bound surface, but does
+**not** approve migration or a switch between populated stores. When no
+binding exists, a new higher-priority installed candidate requires
+revalidation and any necessary authority decision before writes. A
+previously selected adapter that disappears or fails remains an
+unresolved/failed selection, not a reason to silently use filesystem or
+another adapter. Explicitly resolve or replace that binding with the
+human.
 
 After selecting, separate package conformance from session readiness
 (below). Do not treat a readiness failure, a missing tool, or an
@@ -193,13 +280,19 @@ pending journal or unknown mutation blocks writes (§4).
 
 | Visible state | Result |
 |---|---|
-| Override `filesystem`; local adapter `team-store` | Filesystem selected; no automatic export/import. |
+| Valid v2 binding; no `jaiba-memory-surface:` field, or no `AGENTS.md` | Binding governs. O(1) `project-id` and `context-id`. Do not read `.ai/`. Do not fall through to filesystem. |
+| Valid v2 external binding; explicit override `filesystem` | Override selects filesystem. Not migration approval. Do not treat the override as a silent switch of populated stores. |
+| Valid v2 binding for `alpha`; local skill `beta` newly visible | `alpha` still governs. A new local skill does not displace Step 0. |
+| Override `filesystem`; local adapter `team-store`; no binding | Filesystem selected; no automatic export/import. |
 | Override `team-store`; only its global skill visible | Global `team-store`, after real tool validation. |
 | Override `team-store`; skill or required tool missing | Stop with selected-adapter failure; no fallback. |
-| Local `team-store` v1; global same ID v2 | Local v1; incompatible contract blocks use, not fallback to v2. |
-| Local `team-store`; global `personal-store` | Local `team-store`; existing data still needs authority checks. |
-| Local `alpha` and `beta` | Ask which ID; retain the confirmed choice in the shared binding. |
-| No adapters or override, no failed prior binding | Built-in filesystem. |
+| No binding; local `team-store` v1; global same ID v2 | Local v1 is the surface to query. Incompatible contract blocks use, not fallback to v2. |
+| No binding; local `team-store`; global `personal-store` | Query local `team-store`. Existing data still needs authority checks. |
+| No binding, no pin; local `alpha` and `beta` | Ask which ID before the registry lookup; do not pick by discovery order. |
+| No binding; `origin` matches one registry project | Link and write v2. No search. No ≤4 questionnaire. Fresh per-root context. |
+| No binding; `origin` not in the registry (authoritative miss) | Then pin / `.ai/` / uninstrumented. Questionnaire only in `jaiba-init`. |
+| No binding, no pin, no `.ai/`, registry miss or no external surface to query | Authoritatively uninstrumented. Do not assume filesystem. |
+| No adapters, no pin, no binding, no `.ai/` | Uninstrumented. Built-in filesystem is not a silent default. |
 | Saved `alpha`; new override `beta` | Select `beta`, then resolve data authority before activation. |
 | Verified package; this host sees the canonical tools and a compatible `create-memory` | Selectable. Do not re-run conformance or edit the package. |
 | Verified package; a required MCP tool is not exposed here | `missing-capability` names this host and the canonical tool. Conformance status unchanged. No fallback. |
@@ -312,13 +405,29 @@ identities are the same project. The binding key may still collapse two
 spellings of one directory on this machine; that file sharing is not a
 registry merge.
 
-The candidate is looked up by exact identity in the selected surface's
-JAIBA project registry. The binding retains the stable resolved
-`project-id` and sanitized candidate, not a display-name guess. A complete
-authoritative registry lookup can establish an unknown identity; fuzzy
-search cannot. No match requires explicit association with an existing
-project or authorization for `jaiba-init` to create one. Multiple matches
-are an identity conflict. Do not create a second brain to bypass it.
+When a valid v2 binding exists for this canonical root, identification is
+already finished. `project.project-id` and `executive.context-id` are the
+identity. That read is O(1). Do not search the backend, rank titles, or
+re-query the registry to confirm who the checkout is. Still run readiness.
+An explicit `AGENTS.md` override may select a different surface; it does
+not replace those IDs and does not approve a store switch.
+
+When no local binding exists — a new machine, or a fresh clone — derive
+the sanitized `git-remote` candidate from `origin`
+(`{kind: git-remote, host, path}`, §2). Look that candidate up by exact
+identity in the external surface's owned JAIBA project registry before
+any fallback surface or new-project creation. Fuzzy search cannot
+establish the hit. An exact hit links that project: `jaiba-init` writes
+binding `v2` with the registry `project-id` and a fresh per-root
+`context-id`, without search and without prompting. The ≤4-question
+questionnaire does not run. A read-only consumer does not write the file
+and does not fall back while that link is outstanding. Only an
+authoritative miss — not a permission error, a partial page, or a search
+miss — requires explicit association or authorization for `jaiba-init`
+to create a project, and only then does the ≤4-question questionnaire
+(C3) trigger. Multiple matches are an identity conflict. Do not create a
+second brain to bypass it. The binding retains the stable resolved
+`project-id` and sanitized candidate, not a display-name guess.
 
 ### Aliases, renames and identity examples
 
@@ -361,12 +470,16 @@ not automatically create or select a context. A different agent opening
 the same canonical root does not create one either.
 
 By default, clones and Git worktrees share the resolved constitutive
-project and have **independent executive contexts**. On first association
-with an external surface, confirm creating a fresh context or explicitly
-selecting an existing one. Preserve the resulting ID in the shared v2
-binding. Never choose the latest plan, a matching branch name, the first
-search result, another checkout's context, or another agent's private
-legacy file because it appears active.
+project and have **independent executive contexts**. A `git-remote`
+registry hit on a root with no binding does not ask: write a fresh
+per-root `context-id` with the link. Do not prompt, and do not borrow
+another checkout's context. An explicit human request to resume an
+existing context is the only reason to select one, and it is not part of
+that link. On any other first association, confirm creating a fresh
+context or explicitly selecting an existing one. Preserve the resulting
+ID in the shared v2 binding. Never choose the latest plan, a matching
+branch name, the first search result, another checkout's context, or
+another agent's private legacy file because it appears active.
 
 To resume elsewhere, the human explicitly selects the existing context
 after an authoritative context lookup. Verify namespace/project ownership
@@ -451,26 +564,37 @@ On each resolution, after the canonical work root is known:
    `binding-format-version` `"2"`, a `work-root.canonical` equal to this
    session's canonical string, and a `work-root.sha256` equal both to
    the filename stem and to the digest of that string. Reuse its
-   `project-id` and `context-id` without asking, including when
-   `last-verified-by` names a different agent. Still recompute
-   precedence and run readiness. A valid v2 record is authoritative
-   over legacy files. Do not re-open a legacy disagreement, and do not
-   merge a later legacy file over it.
+   `project.project-id` and `executive.context-id` without asking,
+   including when `last-verified-by` names a different agent. Identity
+   is that O(1) read. Do not search the registry to re-identify the
+   checkout. Re-read only an explicit `AGENTS.md` override (Step 0); do
+   not recompute installed-skill precedence over a binding that governs.
+   Still run readiness. When the active surface is external, do not test,
+   list, or read `.ai/` paths. A valid v2 record is authoritative over
+   legacy files. Do not re-open a legacy disagreement, and do not merge a
+   later legacy file over it.
 3. If the file exists but fails those checks, stop. Do not overwrite it
    from legacy, from this host's memory, or from a guess. Retain it for
    explicit reconciliation. Do not print secret-bearing values. Legacy
    files are not a silent fallback for a malformed v2 record.
 4. If the file does not exist, read legacy locations for compatibility
    as specified under legacy read and consolidation. Do not treat
-   absence of v2 as absence of a project.
+   absence of v2 as absence of a project. If no legacy record matches,
+   this is not yet "uninstrumented": apply Step 0's no-binding branch.
+   Derive the sanitized `git-remote` candidate and look it up before any
+   filesystem fallback or new-project creation. An exact hit is a link,
+   not a questionnaire. Only an authoritative miss, with no pin and no
+   `.ai/` directory, is an authoritatively uninstrumented checkout.
 
-Validate a reusable binding against current precedence, root, origin,
-adapter identity, and exact registry ownership before writes. A stale or
-invalid record is not proof that a project is absent. Another agent's
-verification is not a skipped ownership check. Readback of a safely
-written binding must match the intended routing fields before claiming
-persistence. Routing-field comparison is semantic for quoting; the
-canonical path and digest are exact strings.
+Validate a reusable binding against the explicit `AGENTS.md` override,
+root, origin, adapter identity, and exact registry ownership before
+writes. Do not recompute installed-skill precedence over a valid v2
+record; that list does not outrank Step 0. A stale or invalid record is
+not proof that a project is absent. Another agent's verification is not
+a skipped ownership check. Readback of a safely written binding must
+match the intended routing fields before claiming persistence.
+Routing-field comparison is semantic for quoting; the canonical path
+and digest are exact strings.
 
 After a successful readiness preflight, this host may update
 `last-verified-by`, `last-verified-at`, and the adapter version it
@@ -501,9 +625,14 @@ ignore it. A record with no comparable work root and a different
 filename is not a match. Leave it unread as authority and do not delete
 it.
 
-If no legacy record matches, this is first association for this root.
-Apply the identity and context rules, then write v2 directly. Do not
-also write a host-keyed legacy file.
+If no legacy record matches, this root has no machine registration yet.
+That is not permission to assume filesystem or to open the questionnaire.
+Apply Step 0's no-binding branch: pin, then the sanitized `git-remote`
+lookup, then `.ai/` only after an authoritative miss. An exact registry
+hit writes v2 as that link, with a fresh per-root context and no
+questionnaire. An authoritative miss follows the identity and context
+rules, and only then may `jaiba-init` run C3. Do not also write a
+host-keyed legacy file.
 
 If one or more legacy records match and they agree on every blocking
 field below, consolidate once:
@@ -573,7 +702,8 @@ reads v2 and does not ask again.
 
 | State | Result |
 |---|---|
-| Valid v2 file for this canonical root | Same file, same `project-id` and `context-id`, any agent. Do not ask. |
+| Valid v2 file for this canonical root | Same file, same `project-id` and `context-id`, any agent. O(1). Do not ask. Do not search. Do not read `.ai/` when the active surface is external. |
+| v2 absent; no matching legacy; `origin` matches one registry project | Link. Write v2. No search. No questionnaire. |
 | v2 absent; one legacy file, or several that agree | Consolidate to the v2 path with readback. Leave every legacy file in place. |
 | v2 absent; legacy files disagree on a blocking field (`project-id`, `context-id`, adapter, namespace, identity, or contract major) | Stop. Human choice. Do not pick by host order. |
 | v2 valid, and a disagreeing legacy file also exists | v2 wins. Do not re-consolidate. |
@@ -639,8 +769,14 @@ and must not be described as the v2 file.
 
 ## 5. Existing data and instrumentation
 
-Selection is not activation. Before using an external surface for a root
-with existing `.ai/` memory/work, present either an approved migration
+Selection is not activation. Step 0 does not inventory `.ai/` when a
+valid binding declares an external surface: do not test, list, or read
+those paths to discover the surface or to decide instrumentation. The
+populated-store check below is not Step 0. It runs on an explicit
+transition request, or on first association when no binding exists and,
+after the `git-remote` registry lookup, a local `.ai/` directory is
+present. Before using an external surface for a root with existing
+`.ai/` memory/work in that case, present either an approved migration
 under contract §8 or an explicit filesystem exception (normally the
 `filesystem` override). Preserve both supported filesystem brain layouts;
 both concept and legacy entry layouts present is itself ambiguous.

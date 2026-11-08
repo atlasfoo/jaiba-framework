@@ -51,54 +51,56 @@ interpreted by the agent, not a resolver runtime or storage schema. Resolve the
 backend-specific contract copy. Missing, ambiguous or incompatible definitions
 are explicit resolution failures. Filesystem is built in and needs no adapter.
 
-Select in this order: `AGENTS.md` field `jaiba-memory-surface: filesystem` or
-`<exact-adapter-id>` → host-visible project-local `memory-surface` skill →
-host-visible global `memory-surface` skill → built-in filesystem. Visibility is
-to this agent. Local beats global for the same ID; unresolved copies or
-different IDs at the winning level need an explicit human choice. A remembered
-choice is not a precedence level. A missing, failed or unavailable selected
-adapter blocks work: never empty memory, never silent fallback. Package
-conformance certifies backend, tool versions, protocol and contract; the host
-is provenance, not scope — do not re-certify or edit the package. Session
-readiness is a non-destructive preflight of callable tools by canonical MCP
-names (`mcp:<server>` plus the published name). `missing-capability` blocks
-that host only and does not alter package conformance or fall back.
-Installation or an ATL entry is not operational evidence. Only a package with
-`category: memory-surface` is a conforming selectable mutable adapter.
-Draft categories are not conforming selectable mutable adapters.
-`jaiba-engram-memory` remains `memory-surface-draft` until its package metadata
-says otherwise; this contract names no adapter's evidence.
+**Binding-First (Step 0).** Before reading or listing `.ai/`, or assuming a default surface,
+establish canonical work root `R` — the Git checkout/worktree root, or the absolute workspace
+root without Git; ambiguity requires a choice — and inspect
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (v2). Do not create the file to test it. A valid
+record is this checkout's registration: `surface.adapter-id`, `surface.namespace`,
+`project.project-id`, `executive.context-id`. Identity is O(1) from those fields — no backend
+search. It governs unless `AGENTS.md` has an explicit `jaiba-memory-surface:` override
+(`filesystem` or an exact adapter ID). Absent that field, or absent `AGENTS.md` (traceless), the
+binding wins; do not fall through to installed skills or filesystem. An external active surface
+forbids testing, listing or reading `.ai/` paths. A missing, failed or unavailable selected
+adapter blocks: never empty memory, never silent fallback.
 
-Establish the exact Git checkout/worktree root, or the absolute workspace root
-without Git; ambiguity requires a choice. Prefer the local `origin` identity
-(no network, no raw URLs): normalize to sanitized host plus full path (drop
-userinfo, credentials, query/fragment, one `.git`; lowercase host; keep path
-case and non-default ports). Unsupported or ambiguous parsing blocks automatic
-association. With no origin, use the absolute root plus host identity, labeled
-nonportable. Look the candidate up in the surface's owned project registry and
-retain its stable `project-id`; never infer identity from basename, title or
-search ranking. No match needs explicit association or authorized init;
-multiple matches block. Aliases, moved roots and identity changes need human
-confirmation and `jaiba-init` authority. Never create a second brain.
+A missing v2 file is not permission to assume filesystem. Check an `AGENTS.md` pin, then — only
+after the registry check — a local `.ai/` directory (unbound filesystem or legacy). If there is
+no pin, no `.ai/`, and no registry hit, the checkout is authoritatively uninstrumented: do not
+invent memory.
+Before any fallback or new project, derive `{kind: git-remote, host, path}` from local `origin`
+(no network, no raw URLs; drop userinfo, credentials, query/fragment, one `.git`; lowercase
+host; keep path case and non-default ports) and look it up in the external surface's owned
+registry. A hit links that project and creates binding v2 with no search and no questionnaire;
+`jaiba-init` owns that write. Read-only lanes do not persist it and do not fall back. Only an
+authoritative miss triggers `jaiba-init`'s ≤4-question form. Multiple matches block. Ambiguous
+origin parsing blocks association. No origin uses the absolute root plus host identity, labeled
+nonportable. Never infer identity from basename, title or search ranking. Aliases, moved roots
+and identity changes need human confirmation and `jaiba-init` authority. Never create a second
+brain. Installed-skill order (project-local, then global, then filesystem) chooses which
+external surface to query only when no binding and no pin exist. Visibility is to this agent.
+Local beats global for the same ID; unresolved copies or different IDs need a human choice.
 
-Logical addresses are `(namespace, project-id, category, context-id?, logical-id)`;
-category is `constitutive` or `executive`, with a context for executive
-objects. Namespace ownership must be exact and checkable; ordinary
-host/backend memory is not JAIBA memory because a hit or title resembles it.
+Package conformance certifies backend, tool versions, protocol and contract; the host is
+provenance, not scope — do not re-certify or edit the package. Session readiness preflights
+canonical MCP names (`mcp:<server>` plus the published name). `missing-capability` blocks that
+host only and does not change conformance or fall back. Installation or an ATL entry is not
+operational evidence. Only `category: memory-surface` is a conforming selectable mutable
+adapter. Draft categories are not. `jaiba-engram-memory` remains `memory-surface-draft` until
+its package metadata says otherwise; this contract names no adapter's evidence.
 
-Persist format-v2 routing-only bindings, shared across agents of this user on
-this machine for one normalized canonical work root, at
-`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`. No
-`host-agent-id` directory or key. Sanitized IDs, versions and locators only;
-never payloads, credentials or an `.ai/` mirror. Legacy
-`~/.jaiba/memory/<host-agent-id>/` records consolidate into v2 with readback
-when blocking fields agree; keep the originals. Disagreement needs a human
-choice, not host order. Read back saved routing; if persistence fails, get
-explicit session-only consent or stop. A pending executive journal or
-unverified mutation blocks dependent writes until reconciled. Context ID
-persists per root independent of branch, session or model; clones/worktrees
-default independent. Resuming elsewhere needs exact owned lookup plus a
-single-writer handoff. Filesystem keeps `.ai/work/` per checkout.
+Logical addresses are `(namespace, project-id, category, context-id?, logical-id)`; category is
+`constitutive` or `executive`, with a context for executive objects. Namespace ownership must be
+exact and checkable; ordinary host/backend memory is not JAIBA memory because a hit or title
+resembles it.
+
+Bindings are routing-only, shared by this user's agents for one canonical root: sanitized IDs
+and locators, never payloads, credentials or an `.ai/` mirror. No `host-agent-id` key. Legacy
+`~/.jaiba/memory/<host-agent-id>/` records consolidate into v2 with readback when blocking
+fields agree; keep the originals. Disagreement needs a human choice, not host order. Read back
+saved routing; if persistence fails, get explicit session-only consent or stop. A pending
+journal or unknown mutation blocks dependent writes. Context ID persists per root, independent
+of branch, session or model; clones/worktrees default independent. Resuming elsewhere needs
+exact owned lookup plus a single-writer handoff. Filesystem keeps `.ai/work/` per checkout.
 
 ### Catalogue, verification and authority
 

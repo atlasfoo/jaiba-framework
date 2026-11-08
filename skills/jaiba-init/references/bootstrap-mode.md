@@ -22,12 +22,19 @@ The behavioral contract, skillset, and subagent battery belong to
 
 Apply SKILL.md's Universal Preconditions, binding/identity procedure,
 mutation discipline and effective capability checks **before** the filesystem
-sequence.
+sequence. **Binding-First (Step 0)** is that procedure's first act: canonical
+work root `R`, then
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml`, before any `.ai/` test and
+before assuming filesystem. A valid v2 record governs unless `AGENTS.md`
+has an explicit `jaiba-memory-surface:` override. No such field, or no
+`AGENTS.md`, and the binding wins; identity is O(1) from
+`project.project-id` and `executive.context-id`. When that surface is
+external, do not test, list, or read `.ai/` paths.
 Resolve canonical definitions from the host-effective `create-memory`
 installation, not a checkout or assumed sibling directory. Binding path,
 digest, and consolidation rules are `references/resolution.md` §2 and §4.
-Do not re-derive them. These are declarative operations using already
-available tools, not service setup.
+Step 0 is the same reference. Do not re-derive them. These are declarative
+operations using already available tools, not service setup.
 
 For an **external** selection, run this branch instead of filesystem
 steps 1–3 below. Do not use the filesystem "When NOT to bootstrap" table
@@ -81,9 +88,15 @@ filesystem-mode mechanism only. It is not used here.
    consumes contract **1.1.0**; a selected package whose contract major is
    not 1, or whose required capabilities are missing, blocks. Do not fall
    back to filesystem.
-2. Resolve the sanitized origin/full path identity (absolute-root + host
-   fallback only without origin). Inspect existing local memory/work
-   without changing it. A populated-store transition is not fresh
+2. Resolve identity before touching `.ai/`. A valid binding `v2` already
+   names the project and context: do not search, and do not inspect `.ai/`
+   to confirm it. With no local binding, derive
+   `{kind: git-remote, host, path}` from `origin` (absolute-root + host
+   fallback only without origin) and look that candidate up in the owned
+   registry before any fallback or create. An exact hit is step 5's link,
+   not a reason to open `.ai/`. Inspect existing local memory/work only
+   after an authoritative miss, or when the human has requested a
+   populated-store transition. A populated-store transition is not fresh
    initialization: route an explicit migration request to `migrate-surface`
    (`references/surface-migration.md`), or offer the explicit filesystem
    exception. Require verified endpoint capabilities and separate
@@ -92,32 +105,39 @@ filesystem-mode mechanism only. It is not used here.
    or `AGENTS.md` to make the checkout look traceless.
 3. Apply the traceless file rule and Git exclusion above before any later
    step that could cause `jaiba-doctor` to write `.atl/`.
-4. Look up the exact identity in the owned registry. A valid binding `v2`
-   for this canonical root is reused without asking, including when
-   `last-verified-by` names another agent; still recompute precedence and
-   verify registry ownership. A malformed v2 record for this root stops.
-   Do not repair it from legacy or from a sibling binding. If v2 is absent,
-   consolidate agreeing legacy records for **this** root per
-   `resolution.md` §4 before treating the project as unknown. Disagreeing
-   legacy blocking fields need an explicit human choice, not a new project.
-5. **Link.** If the identity already resolves a real external brain, verify
-   the complete catalogue, full index and entry concepts, then link. Do not
-   seed or overwrite. Do not run the questionnaire below. Obtain explicit
-   approval for a new alias or root association and check collisions first.
-   Ordinary backend notes, titles, and search hits are never a brain to
-   adopt. A verified existing brain is not initialized again. Inventory
-   depth does not apply: full must not overwrite it. Reuse the binding's
-   `context-id` when v2 is valid. If this root has no context yet, confirm
-   a fresh per-root context or an explicitly selected existing one — that
-   single question is not the four-question form.
+4. Look up the exact identity in the owned registry only when Step 0 has
+   no valid v2 record. A valid binding `v2` for this canonical root is
+   reused without asking, including when `last-verified-by` names another
+   agent. Identity is O(1) from `project.project-id` and
+   `executive.context-id`. Re-read only an explicit `AGENTS.md` override;
+   do not recompute installed-skill precedence over a binding that governs.
+   Still verify registry ownership before writes. A malformed v2 record for
+   this root stops. Do not repair it from legacy or from a sibling binding.
+   If v2 is absent, consolidate agreeing legacy records for **this** root
+   per `resolution.md` §4 before treating the project as unknown.
+   Disagreeing legacy blocking fields need an explicit human choice, not a
+   new project. With no v2 and no matching legacy, derive the sanitized
+   `git-remote` candidate from `origin` and look it up by exact identity.
+   Do not use search.
+5. **Link.** If the `git-remote` candidate, or a valid binding, already
+   resolves one real external brain, verify the complete catalogue, full
+   index and entry concepts, then link. Do not seed or overwrite. Do not
+   run the questionnaire below. Do not prompt. A registry hit with no local
+   binding writes v2 at step 8 with the registry `project-id` and a fresh
+   per-root `context-id` — no context question, and no other checkout's
+   context. Obtain explicit approval only for a new alias or a changed
+   origin, and check collisions first. Ordinary backend notes, titles, and
+   search hits are never a brain to adopt. A verified existing brain is not
+   initialized again. Inventory depth does not apply: full must not
+   overwrite it. Reuse the binding's `context-id` when v2 is valid.
 6. **Not in the registry.** Skip this step, step 7, and step 9 when step 5
    linked a verified brain; persist at step 8 if needed, then hand off.
-   If this identity is unknown, no reusable v2 or
-   agreeing legacy record names a project, and the lookup is an
+   The questionnaire runs only when the `git-remote` lookup is an
    authoritative miss — not a permission error, partial page, or search
-   miss — run the single questionnaire in the next section. Multiple
-   matches, partial/template state, or unknown ownership stop for
-   reconciliation. Do not create a second brain to get past a collision.
+   miss — and no reusable v2 or agreeing legacy record names a project.
+   Run the single questionnaire in the next section. Multiple matches,
+   partial/template state, or unknown ownership stop for reconciliation.
+   Do not create a second brain to get past a collision.
 7. After the questionnaire, use the project-id and context choice already
    given in its third question. Do not ask either again. Only authorized
    registry identities may be created here. Initial executive content
@@ -161,9 +181,11 @@ human left traceless for `AGENTS.md`.
 
 ### Issue #17 C3 — one questionnaire, at most four questions
 
-Run this only when the project is **not** in the registry and no reusable
-binding already names it. Ask once. Use `ask_user_input_v0` if available,
-otherwise one chat message. All four questions go in that single
+Run this only when the sanitized `git-remote` candidate is an
+authoritative registry miss and no reusable binding already names the
+project. A registry hit never reaches this form. Ask once. Use
+`ask_user_input_v0` if available, otherwise one chat message. All four
+questions go in that single
 questionnaire. Do not drip them across turns. Do not add a fifth question.
 One topic per question. Unanswered questions block the action that needs
 them. Closed options where the answer space is closed.
