@@ -463,6 +463,172 @@
         "Does not perform transfer, cleanup, or real migration; no actual adapter/Engram conformance is asserted."
       ],
       "files": ["../../create-memory/evals/fixtures/transfer-recovery-cases.json", "../../create-memory/evals/fixtures/run_transfer_recovery.py"]
+    },
+    {
+      "id": 23,
+      "name": "traceless-bootstrap-zero-repo-files",
+      "mode_under_test": "bootstrap:external-traceless",
+      "prompt": "Set up JAIBA for this project using external memory in traceless mode.",
+      "context": {
+        "repo_state": "Plain git repo at /work/analytics, no .ai/, no .atl/, no AGENTS.md; origin https://git.example/acme/analytics.git",
+        "surface": "Host-visible conforming external adapter acme-memory 1.1.0; empty scope",
+        "authorization": "Developer authorizes traceless bootstrap on external surface"
+      },
+      "expected_output": [
+        "Executes traceless bootstrap without writing any file into the repository (MSV-012)",
+        "Does NOT create AGENTS.md, .ai/, .ai/.gitignore, .gitkeep, or .atl/.gitignore in the repository worktree",
+        "Resolves local Git exclude file via `git rev-parse --git-path info/exclude` and appends `.atl/` line if absent, leaving the tracked and untracked worktree completely clean",
+        "Writes only the machine routing binding v2 at ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml",
+        "After bootstrap, git status shows zero modified or untracked repository files",
+        "Hands off to jaiba-doctor for local tool layout checkup without dirtying the repository"
+      ],
+      "files": []
+    },
+    {
+      "id": 24,
+      "name": "step0-binding-first-discovery",
+      "mode_under_test": "bootstrap:binding-first",
+      "prompt": "jaiba-init",
+      "context": {
+        "repo_state": "Git repo at /work/billing, no AGENTS.md and no .ai/ in worktree",
+        "binding_state": "Valid binding v2 exists at ~/.jaiba/memory/bindings/<sha256(/work/billing)>.yaml pointing to external surface acme-memory with registered project-id prj-billing and context-id ctx-billing-1"
+      },
+      "expected_output": [
+        "Applies Step 0 Binding-First discovery: computes sha256 of canonical work root and checks ~/.jaiba/memory/bindings/<sha256>.yaml before checking .ai/ or assuming filesystem",
+        "Immediately recognizes active binding v2 and its registered external project-id and context-id in O(1)",
+        "Does not treat missing .ai/ or missing AGENTS.md as uninstrumented greenfield state requiring bootstrap or skeleton creation",
+        "Does not fall back to filesystem or create local .ai/ directory or mirror",
+        "Routes directly to update-brain maintenance or conduct execute without re-laying repo files"
+      ],
+      "files": []
+    },
+    {
+      "id": 25,
+      "name": "onboarding-single-questionnaire-under-four-questions",
+      "mode_under_test": "bootstrap:external-questionnaire",
+      "prompt": "Adopt jaiba with external memory on this repository.",
+      "context": {
+        "repo_state": "Git repo at /work/orders, no local marker or .ai/",
+        "surface": "External adapter selected; authoritative registry miss, no reusable binding"
+      },
+      "expected_output": [
+        "Presents exactly one single questionnaire with at most four questions (C3, MSV-014): 1. Adapter/backend confirmation, 2. Namespace confirmation, 3. Stable project-id and context (link vs create), 4. Inventory depth (minimal vs full)",
+        "Does not drip questions across turns and does not add a fifth question",
+        "Asks all four questions together with closed options where applicable",
+        "Waits for single response rather than prompting iteratively"
+      ],
+      "files": []
+    },
+    {
+      "id": 26,
+      "name": "onboarding-sibling-namespace-suggestion",
+      "mode_under_test": "bootstrap:external-sibling-namespace",
+      "prompt": "Set up JAIBA with the external memory adapter.",
+      "context": {
+        "repo_state": "Git repo /work/billing; origin git@git.example:acme/billing.git",
+        "existing_bindings": "Sibling binding ~/.jaiba/memory/bindings/<sha256(/work/payments)>.yaml exists with origin git@git.example:acme/payments.git and configured namespace jaiba/v4/a1b2c3d4e5f67890/"
+      },
+      "expected_output": [
+        "Inspects sibling routing bindings across ~/.jaiba/memory/bindings/*.yaml and legacy paths before Question 2 (C4, MSV-015)",
+        "Identifies acme/payments as a remote sibling sharing the same host git.example and group acme",
+        "Suggests the exact sibling namespace `jaiba/v4/a1b2c3d4e5f67890/` as the default for Question 2 with sibling identity and adapter id shown",
+        "Does not synthesize a new random namespace and does not copy the sibling's project-id or context-id",
+        "Requires developer confirmation before adopting the suggested namespace"
+      ],
+      "files": []
+    },
+    {
+      "id": 27,
+      "name": "initialize-grouped-concept-verification",
+      "mode_under_test": "update-brain:initialize-grouped-verification",
+      "prompt": "Initialize the brain on the external memory surface.",
+      "context": {
+        "surface": "External conforming adapter; authorized empty scope",
+        "concepts": "Batch creation of identity concepts (project, architecture, purpose, scope, quality-gate, conventions) and seed ADR-001"
+      },
+      "expected_output": [
+        "Batches creations of independent constitutive concepts sequentially under single-writer discipline",
+        "Executes a grouped verification pass over all created objects (verifying exact readback and canonical receipts for every created concept) before index publication (C0, MSV-013)",
+        "Eliminates excessive roundtrip latency across individual concepts while guaranteeing integrity before catalogue exposure",
+        "Creates index concept last only after grouped verification succeeds and verifies complete catalogue",
+        "Reports exact counts and full-read evidence in closing"
+      ],
+      "files": []
+    },
+    {
+      "id": 28,
+      "name": "initialize-minimal-inventory-and-cost-disclosure",
+      "mode_under_test": "update-brain:initialize-inventory-depth",
+      "prompt": "Initialize the brain for this repository using the external adapter.",
+      "context": {
+        "surface": "External adapter selected",
+        "code_facts": "Monolithic backend calling 6 external third-party APIs, 2 datastores, CI tooling"
+      },
+      "expected_output": [
+        "Discloses estimated storage and token costs for the external adapter (call counts, roundtrip operations, payload bytes across concepts) and explicitly reminds of the zero-cost built-in filesystem alternative (C5-C6, MSV-014)",
+        "Offers explicit choice between full initial inventory and minimal inventory (C1, MSV-014)",
+        "When minimal inventory is chosen, creates only essential identity concepts and seed decision ADR-001",
+        "Defers non-critical external integrations (third-party APIs, datastores, tooling) as pending [MISSING] gaps in relations and closing report for later update-brain reconciliation",
+        "Obtains human approval for the chosen inventory depth before creating concepts"
+      ],
+      "files": []
+    },
+    {
+      "id": 29,
+      "name": "initialize-consolidated-downstream-reference",
+      "mode_under_test": "update-brain:initialize-downstream",
+      "prompt": "Initialize the brain for this repository.",
+      "context": {
+        "code_facts": "Service is called by checkout-service, mobile-app, and portal, but none have contract schemas or vendored OpenAPI files in the repo"
+      },
+      "expected_output": [
+        "Inspects downstream consumers and finds no locatable local contract files or OpenAPI schemas in the repository (C2, MSV-016)",
+        "Avoids creating multiple speculative empty reference stubs",
+        "Consolidates all contractless downstream consumers into a single reference concept (references/downstream-consumers.md, tier: code-scope, kind: external-api, role: downstream) with resource: [MISSING]",
+        "Annotates known caller names (checkout-service, mobile-app, portal) as gap annotations in the reference body and closing report",
+        "Links the consolidated reference from purpose.md relations without duplicating inventory prose"
+      ],
+      "files": []
+    },
+    {
+      "id": 30,
+      "name": "migration-single-cutover-gate",
+      "mode_under_test": "migrate-surface:cutover-gate",
+      "prompt": "The staged migration has been verified. Cut over to the target memory surface.",
+      "context": {
+        "migration_state": "staging-verified barrier complete; cutover-pending",
+        "source": "local filesystem .ai/ store",
+        "target": "external memory surface"
+      },
+      "expected_output": [
+        "Presents the single cutover gate (MSV-011) as one questionnaire with two distinct decisions: 1. Activation decision (authorizing switch of active authority to staged manifest and updating binding v2), 2. Retirement decision (separate consent for retiring the local source .ai/ tree)",
+        "Does not split decisions across turns and does not infer retirement consent from activation approval",
+        "Records both decisions in journal.yaml before executing any routing or cleanup write",
+        "Updates binding v2 to point to target surface only after activation is authorized",
+        "Executes retirement of local .ai/ tree only when both retirement is authorized and activation reached active-verified",
+        "Leaves source untouched if activation is declined or partial"
+      ],
+      "files": []
+    },
+    {
+      "id": 31,
+      "name": "protocol-migration-jaiba3-to-jaiba4",
+      "mode_under_test": "migrate-surface:jaiba3-to-jaiba4",
+      "prompt": "Migrate memory store from JAIBA3 to JAIBA4.",
+      "context": {
+        "source_store": "jaiba-engram-storage/3 (JAIBA3 prefix), monolithic executive objects",
+        "target_protocol": "jaiba-engram-storage/4 (JAIBA4 prefix)"
+      },
+      "expected_output": [
+        "Decodes legacy JAIBA3. records strictly read-only without modifying or relabeling source records (MSV-010)",
+        "Stages migration under an exclusive target namespace jaiba/v4/<ns16>/",
+        "Re-encodes retained snapshot bytes under JAIBA4 prefix with sha256 checksums",
+        "Converts monolithic executive objects into exec-base records at seq: 0 under the base key without inventing artificial deltas",
+        "Creates initial context-head records at jaiba/v4/<ns16>/ctx/<ctx_sha24> with slot entries at seq: 0",
+        "Preserves all constitutive objects, catalogue, chunks, and immutable log payloads losslessly with identical logical IDs",
+        "Refuses write attempts to unmigrated JAIBA3 store until migration cutover completes"
+      ],
+      "files": []
     }
   ]
 }

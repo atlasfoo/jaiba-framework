@@ -222,6 +222,104 @@
         "No per-batch call cap of three or turn-time abort applies; the finite declared plan governs.",
         "A local stdlib packaging/hash utility is allowed; a backend client, SDK, codec, writer, service or supervisor is not."
       ]
+    },
+    {
+      "id": 17,
+      "prompt": "Evaluate cross-host portability for an external memory-surface adapter certified on Claude Code. Does changing the host to OpenCode or Codex require re-running the conformance suite? And how should missing tool exposure on Codex be reported?",
+      "expected_output": "The claim envelope certifies the 4-tuple: backend, canonical tools, protocol, and contract (1.1.0). The certifying host is provenance only, not scope; a certified package is portable across all agent hosts without re-running conformance. On Codex where a tool is missing from runtime exposure, preflight reports missing-capability naming the host and canonical tool, while package conformance status remains verified and unchanged.",
+      "files": [
+        "evals/fixtures/cross-host-portability.json"
+      ],
+      "assertions": [
+        "The claim envelope binds backend, canonical tools, protocol, and contract version together.",
+        "The certifying host is recognized as provenance only, not a scope restriction or portability boundary.",
+        "Resolving on a new host does not re-run the conformance suite or modify package conformance status.",
+        "A missing host tool exposure triggers session-level missing-capability without altering package conformance."
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Using the binding-v2 fixture, explain the canonical work root hashing formula and standard binding path. Then assess Step 0 discovery when a valid v2 exists versus when only legacy bindings exist, detailing when legacy records consolidate and when differing fields block.",
+      "expected_output": "The canonical work root R is resolved via realpath, normalized with '/' separators, trailing slash stripped, and hashed to SHA-256 (64 hex chars) at standard path ~/.jaiba/memory/bindings/<sha256>.yaml. Valid v2 resolves project-id and context-id in O(1) without touching .ai/. In the absence of v2, agreeing legacy records in ~/.jaiba/memory/<host>/ consolidate once to v2 with locators in provenance, verified readback, and byte-for-byte legacy preservation. Conflicting blocking fields (project-id, context-id, adapter-id, namespace) stop and block v2 generation, requiring human choice.",
+      "files": [
+        "evals/fixtures/binding-v2-cases.json"
+      ],
+      "assertions": [
+        "The standard binding path is ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml.",
+        "Step 0 achieves O(1) resolution of project-id and context-id without inspecting .ai/ or assuming filesystem.",
+        "Legacy records agreeing on blocking fields consolidate once to v2 with readback verification and byte-for-byte legacy preservation.",
+        "Conflicting legacy blocking fields (project-id, context-id, adapter-id) stop and block v2 creation, requiring explicit human choice."
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Evaluate the multi-host installation procedure using the multihost fixture. Show which candidate host roots qualify as JAIBA-configured, how destination selection operates, what collision backup naming rule applies, and how readback failures are handled.",
+      "expected_output": "Discovery checks known agent roots (~/.agents, ~/.claude, ~/.codex, ~/.config/opencode); a root qualifies only if it contains jaiba-contract.md or existing JAIBA skills in skills/. The user may select any subset, including multiple global hosts simultaneously; it does not install to all by default. On collision, user confirms replacement and the existing install is moved to a timestamped backup <path>.bak-<timestamp> (local YYYYMMDDTHHMMSS, no colons). Readback verifies each destination independently; failure at one destination is reported individually without silent rollback of successful ones.",
+      "files": [
+        "evals/fixtures/multihost-installation-cases.json"
+      ],
+      "assertions": [
+        "Host roots qualify only with jaiba-contract.md or existing JAIBA skills; unconfigured directories are rejected.",
+        "Multiple host destinations can be selected and confirmed in a single operation, without installing to all by default.",
+        "Collisions require replacement confirmation and create a timestamped backup .bak-YYYYMMDDTHHMMSS with no colons.",
+        "Readback is verified per destination; single-destination failure is reported without rolling back successful installs."
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "Compare the document-tree and record-store archetypes in jaiba-memory-surface 1.1.0 using the archetype fixture. Detail how patch is realized, context-head cardinality, compact behavior, and what happens when the archetype is unknown or absent.",
+      "expected_output": "document-tree realizes patch as in-place document edits, requires no context-head or delta chain, and compact is a no-op success. record-store realizes patch via an executive journal (base + ordered deltas + context-head slot), requiring exactly one context-head per executive context. An unknown, missing, or unclassified archetype in 1.1.0 stops immediately with no conforming mapping, and cannot be inferred from tool or vendor names.",
+      "files": [
+        "evals/fixtures/archetype-cases.json"
+      ],
+      "assertions": [
+        "document-tree implements patch via in-place document edits without a delta chain or context-head.",
+        "record-store requires an executive journal with base, ordered deltas, and exactly one context-head per executive context.",
+        "Monolithic full-object overwrites on record-store are nonconforming.",
+        "An unknown or unclassified archetype stops and blocks conforming mapping derivation."
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "Evaluate package scripts using the AST validation fixture. What import constraints govern package scripts in scripts/, what transport modes may be declared, and which subcommands are strictly prohibited from performing backend I/O?",
+      "expected_output": "Package scripts must be Python 3 standard library only (json, hashlib, base64, argparse, pathlib, etc.) with zero third-party pip packages. Declared transport mode must be exactly one of local-cli, local-http, or agent-relay. In agent-relay, direct network and subprocess calls are completely prohibited. Canonical subcommands encode, decode, delta, materialize, render, binding-path, and cost must never perform backend I/O regardless of transport mode.",
+      "files": [
+        "evals/fixtures/script-ast-validation.json"
+      ],
+      "assertions": [
+        "Scripts must use Python 3 standard library only, with zero third-party pip dependencies.",
+        "Declared transport mode is constrained to local-cli, local-http, or agent-relay.",
+        "In agent-relay transport, direct backend network I/O and subprocess calls are strictly forbidden.",
+        "Pure subcommands (encode, decode, delta, materialize, render, binding-path, cost) must never perform backend I/O."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Grade the 5 canonical SDD lifecycle scenarios under the Efficiency Gate using the efficiency-gate fixture. Focus on iterative spec draft revisions, execute waves, plan approval, and explain why monolithic full-object overwrites on a record-store are graded NONCONFORMING.",
+      "expected_output": "The 5 scenarios (initialize, spec draft revisions, execute wave, plan approval, and in-session read/display) require O(delta) operations transmitting payload bytes proportional to the delta rather than O(N) cumulative artifact size. In spec drafting, replace-section, update-criterion, and remove-criterion must transmit delta payloads only. On record-store, monolithic full-object executive overwrites during spec drafting or task execution violate journal requirements and are graded NONCONFORMING, causing the overall conformance verdict to fail.",
+      "files": [
+        "evals/fixtures/efficiency-gate-cases.json"
+      ],
+      "assertions": [
+        "All 5 SDD scenarios must demonstrate O(delta) call and payload byte efficiency.",
+        "Spec draft adjustments (replace-section, update-criterion, remove-criterion) transmit delta-proportional bytes without full-object rewrites.",
+        "Monolithic full-object executive overwrites on record-store are graded NONCONFORMING.",
+        "Any nonconforming scenario or monolithic overwrite causes the overall conformance verdict to fail as NONCONFORMING."
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "Trace the upgrade/repair workflow for a 1.0.x adapter using the upgrade-repair fixture. How are alien packages rejected, when can a contrasted profile be preserved without repeating native experiments, how are host locks dropped, what incremental conformance checks run, and how is multi-host reinstall offered?",
+      "expected_output": "Audit verifies category memory-surface and contract-id jaiba-memory-surface; alien packages are terminally rejected without mutation or backup. A contrasted profile is preserved without re-running native experiments if backend, tool versions, and limits are unchanged with no unknown/discrepant necessary guarantees. Host locks (active-procedure-reference, absolute install paths) are deleted, retaining procedure-provenance as history, and host exposures are replaced with canonical mcp:<server> tokens. Incremental conformance tests patch atomic semantics, determinism, and the Efficiency Gate. Reinstallation offers discovery of configured hosts, multi-selection, collision backups (.bak-<timestamp>), and independent readback.",
+      "files": [
+        "evals/fixtures/upgrade-repair-cases.json"
+      ],
+      "assertions": [
+        "Alien packages lacking valid category or contract-id are terminally rejected without mutation.",
+        "Contrasted profiles are preserved without re-running native experiments when backend, tools, and limits are unchanged.",
+        "Host locks (active-procedure-reference, absolute paths) are dropped, keeping procedure-provenance as history.",
+        "Incremental conformance validates patch semantics, determinism, and the Efficiency Gate before multi-host reinstall."
+      ]
     }
   ]
 }

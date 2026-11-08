@@ -1,0 +1,78 @@
+{
+  "fixture_kind": "cross_host_portability_cases",
+  "contract_version": "1.1.0",
+  "purpose": "Certify that claim envelope binds backend + tool/schema + protocol + contract (1.1.0), host is provenance only, portable across all agent hosts (MSV-001).",
+  "cases": [
+    {
+      "id": "claim-envelope-tuple",
+      "description": "Claim envelope binds exact 4-tuple; host identity is provenance only",
+      "claim_envelope": {
+        "backend": {
+          "id": "mock-record-engine",
+          "version": "2.1.0"
+        },
+        "tools": [
+          {"server": "mock_engine", "tool": "record_read", "version": "1.0"},
+          {"server": "mock_engine", "tool": "record_write", "version": "1.0"},
+          {"server": "mock_engine", "tool": "record_enumerate", "version": "1.0"}
+        ],
+        "protocol": {
+          "id": "jaiba-mock-storage/1",
+          "version": "1.0.0"
+        },
+        "contract": {
+          "id": "jaiba-memory-surface",
+          "version": "1.1.0"
+        },
+        "provenance": {
+          "certified_on_host": "claude-code",
+          "certified_at": "2026-11-01T12:00:00Z",
+          "conformance_status": "verified"
+        }
+      },
+      "resolving_hosts": [
+        {
+          "host_id": "opencode",
+          "runtime_catalogue": [
+            {"server": "mock_engine", "published_name": "record_read", "host_exposure": "tools[\"mock_engine\"][\"record_read\"]"},
+            {"server": "mock_engine", "published_name": "record_write", "host_exposure": "tools[\"mock_engine\"][\"record_write\"]"},
+            {"server": "mock_engine", "published_name": "record_enumerate", "host_exposure": "tools[\"mock_engine\"][\"record_enumerate\"]"}
+          ],
+          "expected_preflight": "passed",
+          "expected_conformance_status": "verified",
+          "re_run_conformance": false
+        },
+        {
+          "host_id": "codex",
+          "runtime_catalogue": [
+            {"server": "mock_engine", "published_name": "record_read", "host_exposure": "mcp__mock_engine__record_read"}
+          ],
+          "expected_preflight": "missing-capability:codex:mcp:mock_engine/record_write",
+          "expected_conformance_status": "verified",
+          "re_run_conformance": false
+        }
+      ],
+      "assertions": [
+        "Package conformance status remains verified regardless of resolving host.",
+        "Preflight missing-capability on codex does not alter package conformance status.",
+        "Host certified_on_host is provenance only and not a scope restriction."
+      ]
+    },
+    {
+      "id": "preflight-exposure-mapping",
+      "description": "Session preflight maps canonical published names without hardcoding host prefixes in package",
+      "package_declared_requires": [
+        "mcp:mock_engine"
+      ],
+      "mapping_declared_tools": [
+        "record_read",
+        "record_write"
+      ],
+      "host_runtimes": {
+        "claude-code": {"exposed_as": "mcp__mock_engine__record_read"},
+        "opencode": {"exposed_as": "tools[\"mock_engine\"][\"record_read\"]"}
+      },
+      "expected_behavior": "Session preflight resolves mapping dynamically from session catalogue; package does not hardcode mcp__ or tools[] syntax."
+    }
+  ]
+}

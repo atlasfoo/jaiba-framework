@@ -1,0 +1,84 @@
+{
+  "fixture_kind": "multihost_installation_cases",
+  "purpose": "Test discovery of JAIBA hosts, multi-selection, collision backups (.bak-<timestamp>), and destination readback (MSV-003).",
+  "candidate_roots": [
+    {
+      "path": "~/.agents",
+      "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct", "create-memory"]},
+      "is_jaiba_configured": true
+    },
+    {
+      "path": "~/.claude",
+      "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct"]},
+      "is_jaiba_configured": true
+    },
+    {
+      "path": "~/.codex",
+      "markers": {"jaiba_contract": false, "jaiba_skills": ["create-memory"]},
+      "is_jaiba_configured": true
+    },
+    {
+      "path": "~/.config/opencode",
+      "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct", "fast", "jaiba-doctor"]},
+      "is_jaiba_configured": true
+    },
+    {
+      "path": "~/.other_agent",
+      "markers": {"jaiba_contract": false, "jaiba_skills": []},
+      "is_jaiba_configured": false,
+      "reason": "Missing both jaiba-contract.md and JAIBA skills; rejected as destination"
+    }
+  ],
+  "selection_scenarios": [
+    {
+      "id": "multi-host-select-two",
+      "discovered_roots": ["~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
+      "user_selection": ["~/.claude", "~/.config/opencode"],
+      "expected_targets": [
+        "~/.claude/skills/mock-memory-surface",
+        "~/.config/opencode/skills/mock-memory-surface"
+      ],
+      "install_to_all_by_default": false
+    },
+    {
+      "id": "draft-only-selection",
+      "discovered_roots": ["~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
+      "user_selection": [],
+      "expected_targets": [],
+      "expected_action": "draft-only:no-installation"
+    }
+  ],
+  "collision_and_backup_scenarios": [
+    {
+      "id": "collision-with-backup",
+      "target_path": "~/.claude/skills/mock-memory-surface",
+      "exists_prior_installation": true,
+      "user_confirmation": "replace",
+      "timestamp": "20261107T143000",
+      "expected_backup_path": "~/.claude/skills/mock-memory-surface.bak-20261107T143000",
+      "delete_backup": false,
+      "format_rule": "Timestamp must be local YYYYMMDDTHHMMSS with no colons"
+    },
+    {
+      "id": "collision-backup-name-exists-disambiguation",
+      "target_path": "~/.claude/skills/mock-memory-surface",
+      "exists_prior_installation": true,
+      "timestamp": "20261107T143000",
+      "existing_backup_path": "~/.claude/skills/mock-memory-surface.bak-20261107T143000",
+      "expected_disambiguated_backup": "~/.claude/skills/mock-memory-surface.bak-20261107T143000-1",
+      "overwrite_existing_backup": false
+    }
+  ],
+  "readback_scenarios": [
+    {
+      "id": "independent-destination-readback",
+      "targets": [
+        {"path": "~/.claude/skills/mock-memory-surface", "readback_status": "success"},
+        {"path": "~/.config/opencode/skills/mock-memory-surface", "readback_status": "failed:missing-file"}
+      ],
+      "expected_outcome": "report-destination-failure",
+      "rollback_claude": false,
+      "rule": "Failure at one destination is reported individually and does not silently roll back successful destinations"
+    }
+  ]
+}

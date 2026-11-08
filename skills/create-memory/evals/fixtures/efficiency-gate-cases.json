@@ -1,0 +1,168 @@
+{
+  "fixture_kind": "efficiency_gate_cases",
+  "contract_version": "1.1.0",
+  "purpose": "Evaluate 5 SDD lifecycle scenarios with O(delta) deltas in spec draft adjustments, execute waves, plan approval, and mark monolithic full-object overwrites on record-store as NONCONFORMING (MSV-007).",
+  "rules": [
+    "Updates to executive artifacts during iterative drafting, task execution waves, and state transitions must transmit payload bytes and require calls proportional to the modified delta O(delta), not cumulative size O(N).",
+    "Surfaces declaring archetype record-store MUST support patch via the executive journal (base + ordered deltas + context-head). Monolithic full-object executive overwrites during spec draft iterations or execute task updates MUST be graded NONCONFORMING in 1.1.0.",
+    "Surfaces declaring archetype document-tree implement patch as in-place document edits. Rewriting unaffected documents across the context or quadratic write amplification is NONCONFORMING.",
+    "Any scenario exhibiting nonconforming efficiency, or any record-store resorting to monolithic executive overwrites, makes the overall conformance verdict NONCONFORMING."
+  ],
+  "scenarios": [
+    {
+      "id": "scenario-1-initialize",
+      "lifecycle_phase": "initialize",
+      "description": "Batch creation of initial constitutive and executive objects",
+      "operations": ["batch create", "atomic pipeline"],
+      "evaluations": [
+        {
+          "archetype": "record-store",
+          "strategy": "Direct batch creation of initial concepts without quadratic re-writes",
+          "calls": 2,
+          "transmitted_bytes": 4500,
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "archetype": "document-tree",
+          "strategy": "Write initial files directly to checkout structure without repeated directory rebuilds",
+          "calls": 2,
+          "transmitted_bytes": 4500,
+          "efficiency_verdict": "conforming"
+        }
+      ]
+    },
+    {
+      "id": "scenario-2-spec-draft-revisions",
+      "lifecycle_phase": "spec",
+      "description": "Iterative draft revisions in spec: modify draft PRD/plan using replace-section, update-criterion, remove-criterion",
+      "specimen": {
+        "cumulative_artifact_size_bytes": 12500,
+        "delta_modification_bytes": 180,
+        "operations": [
+          {"op": "replace-section", "target": "section-scope-in", "payload_bytes": 120},
+          {"op": "update-criterion", "target": "AC-002", "payload_bytes": 40},
+          {"op": "remove-criterion", "target": "AC-005", "payload_bytes": 20}
+        ]
+      },
+      "evaluations": [
+        {
+          "archetype": "record-store",
+          "strategy": "Append journal deltas for replace-section, update-criterion, remove-criterion and update context-head slot",
+          "calls": 1,
+          "transmitted_bytes": 220,
+          "efficiency_verdict": "conforming",
+          "notes": "O(delta) calls and transmitted payload bytes proportional to modified delta"
+        },
+        {
+          "archetype": "record-store",
+          "strategy": "Monolithic full-object replacement of entire 12,500-byte draft PRD on each criterion change",
+          "calls": 1,
+          "transmitted_bytes": 12680,
+          "efficiency_verdict": "NONCONFORMING",
+          "overall_conformance_effect": "NONCONFORMING",
+          "notes": "Monolithic full-object executive overwrites during spec draft iterations violate 1.1.0 journal requirements"
+        },
+        {
+          "archetype": "document-tree",
+          "strategy": "In-place edit of the specific draft document sections without touching unaffected documents",
+          "calls": 1,
+          "transmitted_bytes": 220,
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "archetype": "document-tree",
+          "strategy": "Re-writing all documents in the executive context directory for a single criterion edit",
+          "calls": 6,
+          "transmitted_bytes": 45000,
+          "efficiency_verdict": "NONCONFORMING",
+          "overall_conformance_effect": "NONCONFORMING",
+          "notes": "Quadratic write amplification across context"
+        }
+      ]
+    },
+    {
+      "id": "scenario-3-execute-wave",
+      "lifecycle_phase": "execute",
+      "description": "Continuous task execution updates: check, amend-task, append-entry",
+      "specimen": {
+        "completed_tasks_cumulative_bytes": 18000,
+        "task_update_delta_bytes": 150,
+        "operations": [
+          {"op": "check", "task_id": "T-004"},
+          {"op": "amend-task", "task_id": "T-005", "note": "Updated contract reference"},
+          {"op": "append-entry", "target": "walkthrough", "entry": "Completed phase 1 gate checks"}
+        ]
+      },
+      "evaluations": [
+        {
+          "archetype": "record-store",
+          "strategy": "Append discrete task/walkthrough delta to journal and update context-head",
+          "calls": 1,
+          "transmitted_bytes": 190,
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "archetype": "record-store",
+          "strategy": "Monolithic rewrite of the full 18,000-byte task plan on every task completion",
+          "calls": 1,
+          "transmitted_bytes": 18190,
+          "efficiency_verdict": "NONCONFORMING",
+          "overall_conformance_effect": "NONCONFORMING"
+        }
+      ]
+    },
+    {
+      "id": "scenario-4-plan-approval",
+      "lifecycle_phase": "plan approval",
+      "description": "Plan approval: update frontmatter status to approved",
+      "specimen": {
+        "plan_body_bytes": 22000,
+        "status_mutation_bytes": 45,
+        "operation": "set-frontmatter status: approved"
+      },
+      "evaluations": [
+        {
+          "archetype": "record-store",
+          "strategy": "Append single frontmatter delta to journal and update context-head slot",
+          "calls": 1,
+          "transmitted_bytes": 60,
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "archetype": "document-tree",
+          "strategy": "In-place frontmatter edit of plan document without re-transmitting entire body",
+          "calls": 1,
+          "transmitted_bytes": 60,
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "archetype": "record-store",
+          "strategy": "Full re-serialization and transmission of 22,000-byte plan body to flip frontmatter status",
+          "calls": 1,
+          "transmitted_bytes": 22060,
+          "efficiency_verdict": "NONCONFORMING",
+          "overall_conformance_effect": "NONCONFORMING"
+        }
+      ]
+    },
+    {
+      "id": "scenario-5-in-session-read-display",
+      "lifecycle_phase": "read/display",
+      "description": "In-session read / display: deterministic formatting via render without FTS or token bloat",
+      "evaluations": [
+        {
+          "strategy": "Deterministic projection via render subcommand returning structured view",
+          "calls": 1,
+          "token_bloat": "none",
+          "efficiency_verdict": "conforming"
+        },
+        {
+          "strategy": "Full-text search sweeps across unindexed records with full candidate payloads",
+          "calls": 5,
+          "token_bloat": "severe",
+          "efficiency_verdict": "NONCONFORMING"
+        }
+      ]
+    }
+  ]
+}

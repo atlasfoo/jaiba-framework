@@ -1,0 +1,144 @@
+{
+  "fixture_kind": "binding_v2_discovery_and_consolidation",
+  "purpose": "Verify binding v2 resolution, canonical work root formula, Step 0 discovery, legacy consolidation, and conflict blocking (MSV-002).",
+  "canonical_work_root_vectors": [
+    {
+      "input_root": "/srv/checkouts/App",
+      "canonical_string": "/srv/checkouts/App",
+      "expected_sha256": "4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63",
+      "expected_binding_path": "~/.jaiba/memory/bindings/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml"
+    },
+    {
+      "input_root": "/srv/checkouts/App/",
+      "canonical_string": "/srv/checkouts/App",
+      "expected_sha256": "4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63",
+      "expected_binding_path": "~/.jaiba/memory/bindings/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml"
+    },
+    {
+      "input_root": "/srv//checkouts///App",
+      "canonical_string": "/srv/checkouts/App",
+      "expected_sha256": "4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63",
+      "expected_binding_path": "~/.jaiba/memory/bindings/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml"
+    }
+  ],
+  "step_0_discovery_scenarios": [
+    {
+      "id": "step0-v2-exists",
+      "description": "Valid v2 binding exists: resolve project-id and context-id in O(1) without reading .ai/ or scanning backend",
+      "work_root": "/srv/checkouts/App",
+      "v2_binding": {
+        "binding-format-version": "2",
+        "last-verified-by": "claude-code",
+        "work-root": {
+          "canonical": "/srv/checkouts/App",
+          "sha256": "4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63"
+        },
+        "surface": {
+          "adapter-id": "jaiba-mock-storage",
+          "adapter-version": "1.0.0",
+          "contract-version": "1.1.0",
+          "category": "memory-surface",
+          "namespace": "org-core"
+        },
+        "project": {
+          "project-id": "prj-12345"
+        },
+        "executive": {
+          "context-id": "ctx-98765"
+        }
+      },
+      "expected_action": "reuse-binding-o1",
+      "inspect_ai_directory": false,
+      "scan_backend_registry": false
+    },
+    {
+      "id": "step0-v2-external-no-ai",
+      "description": "Valid v2 binding points to external adapter; local .ai/ directory does not exist",
+      "work_root": "/srv/checkouts/App",
+      "has_ai_directory": false,
+      "expected_action": "proceed-with-bound-external-adapter",
+      "treat_as_empty_brain": false
+    }
+  ],
+  "legacy_consolidation_scenarios": [
+    {
+      "id": "agreeing-legacy-records",
+      "description": "Two legacy records in ~/.jaiba/memory/<host-agent-id>/ agree on all blocking fields; consolidate once to v2",
+      "work_root": "/srv/checkouts/App",
+      "legacy_records": [
+        {
+          "locator": "~/.jaiba/memory/claude/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {
+            "work-root": "/srv/checkouts/App",
+            "adapter-id": "mock-adapter",
+            "namespace": "mock-ns",
+            "project-id": "prj-alpha",
+            "context-id": "ctx-shared-root",
+            "candidate-identity": {"kind": "git-remote", "host": "code.example", "path": "Team/App"},
+            "contract-version": "1.0.0",
+            "last-verified-by": "claude"
+          }
+        },
+        {
+          "locator": "~/.jaiba/memory/opencode/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {
+            "work-root": "/srv/checkouts/App",
+            "adapter-id": "mock-adapter",
+            "namespace": "mock-ns",
+            "project-id": "prj-alpha",
+            "context-id": "ctx-shared-root",
+            "candidate-identity": {"kind": "git-remote", "host": "code.example", "path": "Team/App"},
+            "contract-version": "1.0.0",
+            "last-verified-by": "opencode"
+          }
+        }
+      ],
+      "expected_outcome": "consolidate-to-v2",
+      "expected_v2_path": "~/.jaiba/memory/bindings/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+      "consolidation_provenance": [
+        "~/.jaiba/memory/claude/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+        "~/.jaiba/memory/opencode/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml"
+      ],
+      "preserve_legacy_files_byte_for_byte": true,
+      "delete_legacy_files": false
+    },
+    {
+      "id": "conflicting-legacy-records-project-id",
+      "description": "Legacy records disagree on project-id; stop and block v2 generation, requiring human choice",
+      "work_root": "/srv/checkouts/App",
+      "legacy_records": [
+        {
+          "locator": "~/.jaiba/memory/claude/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {"project-id": "prj-alpha", "context-id": "ctx-1", "adapter-id": "mock-adapter", "namespace": "ns-1"}
+        },
+        {
+          "locator": "~/.jaiba/memory/codex/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {"project-id": "prj-beta", "context-id": "ctx-1", "adapter-id": "mock-adapter", "namespace": "ns-1"}
+        }
+      ],
+      "expected_outcome": "stop:conflicting-legacy-records",
+      "blocking_field": "project-id",
+      "write_v2": false,
+      "require_human_choice": true
+    },
+    {
+      "id": "conflicting-legacy-records-context-id",
+      "description": "Legacy records disagree on context-id; stop and block v2 generation",
+      "work_root": "/srv/checkouts/App",
+      "legacy_records": [
+        {
+          "locator": "~/.jaiba/memory/claude/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {"project-id": "prj-alpha", "context-id": "ctx-main", "adapter-id": "mock-adapter", "namespace": "ns-1"}
+        },
+        {
+          "locator": "~/.jaiba/memory/opencode/4c0e89ce280a2f213662e9e260df1380403db27e2096fedba7db3bc5c530ec63.yaml",
+          "content": {"project-id": "prj-alpha", "context-id": "ctx-worktree", "adapter-id": "mock-adapter", "namespace": "ns-1"}
+        }
+      ],
+      "expected_outcome": "stop:conflicting-legacy-records",
+      "blocking_field": "context-id",
+      "write_v2": false,
+      "require_human_choice": true
+    }
+  ]
+}

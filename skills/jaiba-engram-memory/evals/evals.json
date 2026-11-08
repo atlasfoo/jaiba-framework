@@ -3,13 +3,13 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Run the local JAIBA3 stdlib validator and report what it establishes and what it does not.",
+      "prompt": "Run the local JAIBA4 stdlib validator and report what it establishes and what it does not.",
       "expected_output": "Static byte and structure checks pass on synthetic data; not backend execution or conformance.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
-        "Reports pass for direct wire, framing 9 vs 10 lines, truncation, censorship, chunks, ownership and reconcile.",
+        "Reports pass for direct wire, chunked reassembly, executive journal folding, ID permanence, render, legacy read & write refusal, lossless migration, and canonical binding path.",
         "States the result is static and not operational conformance."
       ]
     },
@@ -18,11 +18,11 @@
       "prompt": "A saved observation read returns content with leading whitespace trimmed, `<private>` replaced by [REDACTED], or a '... [truncated]' suffix. What does the adapter do?",
       "expected_output": "Fail closed with verification-failed or truncated; never decode approximately.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "Any whitespace, redaction marker, angle bracket or truncation suffix fails decode.",
-        "The single-line JAIBA3 wire is shown to be immune to TrimSpace and private-tag redaction."
+        "The single-line JAIBA4 wire is shown to be immune to TrimSpace and private-tag redaction."
       ]
     },
     {
@@ -30,7 +30,7 @@
       "prompt": "A mem_get_observation(id) response has Project: another-project, or two Scope lines. May the adapter use it?",
       "expected_output": "No: every read requires exactly one wire, Project and Scope line matching the binding.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "Foreign Project/Scope, missing or duplicate labels block use.",
@@ -59,7 +59,7 @@
       "prompt": "An observation shows Suggestion: judgment_required for a candidate. Should the adapter judge, read the candidate or block?",
       "expected_output": "No: advisory metadata only; verify by Project/Scope, address and sha256.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "mem_judge and mem_judge_many are never called and candidates are never read.",
@@ -71,7 +71,7 @@
       "prompt": "A write is interrupted after the object saved but before the catalogue update. How does retry proceed?",
       "expected_output": "Adopt the existing object by address and digest, update the catalogue, read back; no second logical object.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "Order is object/chunks, readback, catalogue, readback.",
@@ -83,7 +83,7 @@
       "prompt": "A binding declares storage-profile jaiba-engram-storage/2 or the content starts with JAIBA2. What happens?",
       "expected_output": "Blocked as unsupported-version; no decoding, relabeling or migration.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "JAIBA1 and JAIBA2 prefixes fail decode.",
@@ -95,12 +95,65 @@
       "prompt": "A logical snapshot is 56,065 raw bytes. Describe the representation, topic keys, and verification.",
       "expected_output": "Two chunks of at most 30,000 raw bytes plus a chunked-object main record; keys <= 60 chars; full reassembly verified.",
       "files": [
-        "evals/fixtures/run_jaiba3_static.py"
+        "evals/fixtures/run_jaiba4_static.py"
       ],
       "assertions": [
         "Direct path applies only at <= 30,000 raw bytes; above it chunks are used.",
         "Chunk list holds index, obs_id, topic_key, bytes, sha256 and logical_sha256; a corrupt, missing or reordered chunk fails closed.",
-        "topic_key forms jaiba/v3/<ns16>/{cat,obj,chk} are at most 60 characters."
+        "topic_key forms jaiba/v4/<ns16>/{cat,obj,chk,ctx,base,del} are at most 60 characters."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Verify the JAIBA4 wire protocol framing (< 30,000 bytes direct) and deterministic chunking (> 30,000 bytes). How is integrity and reassembly enforced?",
+      "expected_output": "Direct payloads use a single ASCII wire line JAIBA4.<sha256>.<base64> immune to redaction. Oversized payloads (> 30,000 raw bytes) are sliced into deterministic <= 30,000 byte chunks with a chunked-object manifest, reassembled byte-for-byte, failing closed on corruption, missing slices, or order mismatch.",
+      "files": [
+        "evals/fixtures/run_jaiba4_static.py"
+      ],
+      "assertions": [
+        "Wire roundtrip strictly preserves CRLF, Unicode, and private tags as raw bytes.",
+        "Framing extracts the wire line from 9-line or 10-line Engram responses while verifying Project and Scope labels.",
+        "Chunked objects produce <= 60 char topic keys in jaiba/v4/<ns16>/chk/ and fail closed on any slice corruption or reordering."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "How does the executive journal handle incremental deltas across spec and execute phases, and how is criterion ID permanence enforced after plan approval (MSV-005)?",
+      "expected_output": "Executive objects begin as exec-base at seq: 0; spec and execute emit surgical delta operations folded deterministically in sequence order. Once status transitions to approved, existing criteria are permanently frozen and remove-criterion or destructive mutations are rejected with conflict.",
+      "files": [
+        "evals/fixtures/run_jaiba4_static.py"
+      ],
+      "assertions": [
+        "Deltas apply strictly in sequence order (seq: 1, 2, ...); gaps or out-of-order delta lists are rejected.",
+        "Duplicate request_id with identical ops returns idempotently; duplicate request_id with changed payload raises conflict.",
+        "On prd with status: approved, remove-criterion fails closed with conflict: criterion id is permanent."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "How are project artifacts rendered from external memory without relying on full-text search (MSV-008)?",
+      "expected_output": "Artifacts are resolved via canonical binding and context-head slots, materializing the base and active deltas to extract Markdown content deterministically via the render command with zero reliance on mem_search.",
+      "files": [
+        "evals/fixtures/run_jaiba4_static.py"
+      ],
+      "assertions": [
+        "render subcommand extracts the exact Markdown content deterministically from materialized base and delta sequence.",
+        "Repeated render invocations produce bit-identical Markdown output.",
+        "Prohibits mem_search for locating or displaying project artifacts, maintaining O(1) deterministic access."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "How does the JAIBA4 adapter interact with legacy JAIBA3 stores, and how is migration JAIBA3 → JAIBA4 performed without data loss (MSV-010)?",
+      "expected_output": "Legacy JAIBA3 stores are strictly read-only: decode accepts JAIBA3. lines without relabeling, while mutations against jaiba-engram-storage/3 are rejected with unsupported-version. Migration converts monolithic JAIBA3 snapshots into JAIBA4 exec-base at seq: 0 and initial context-head slots with zero loss of content, metadata, or relations.",
+      "files": [
+        "evals/fixtures/run_jaiba4_static.py"
+      ],
+      "assertions": [
+        "decode accepts legacy JAIBA3. wires and returns prefix JAIBA3 without relabeling to JAIBA4.",
+        "Write attempts against unmigrated JAIBA3 stores fail with unsupported-version directing to jaiba-init:migrate-surface.",
+        "Migration converts legacy objects to exec-base at seq: 0, preserving all address fields, content, custom metadata, and relations losslessly.",
+        "Canonical binding path resolves strictly to ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml."
       ]
     }
   ]

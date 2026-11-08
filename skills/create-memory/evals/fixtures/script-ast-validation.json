@@ -1,0 +1,69 @@
+{
+  "fixture_kind": "script_ast_validation_cases",
+  "purpose": "Define rules and test specimens for AST validation of package scripts (MSV-006): Python 3 stdlib only, zero pip dependencies, declared transport modes, and canonical subcommands.",
+  "canonical_subcommands": [
+    {"name": "encode", "backend_io": "never", "description": "Canonical bytes of one logical object or envelope from neutral input"},
+    {"name": "decode", "backend_io": "never", "description": "Exact bytes in, logical object out"},
+    {"name": "delta", "backend_io": "never", "description": "One journal delta, or explicit refusal if archetype stores no delta"},
+    {"name": "materialize", "backend_io": "never", "description": "Base plus ordered deltas to canonical logical object"},
+    {"name": "render", "backend_io": "never", "description": "Materialized object for agent or readback comparison"},
+    {"name": "binding-path", "backend_io": "never", "description": "Canonical binding path from established work root"},
+    {"name": "cost", "backend_io": "never", "description": "Records, calls, data bytes, control bytes for stated operation"},
+    {"name": "batch-prepare", "backend_io": "allowed_in_local_modes", "description": "Finite batch transport will apply; Direct I/O in local-cli/local-http only"},
+    {"name": "batch-verify", "backend_io": "allowed_in_local_modes", "description": "Expected vs observed receipts; Direct I/O in local-cli/local-http only"}
+  ],
+  "transport_modes": [
+    {
+      "mode": "agent-relay",
+      "rules": [
+        "Script must NEVER contact backend directly via network, sockets, or CLI execution.",
+        "batch-prepare and batch-verify must only format payloads/arguments for the agent to call.",
+        "Imports of socket, urllib.request, http.client, or subprocess are forbidden."
+      ]
+    },
+    {
+      "mode": "local-cli",
+      "rules": [
+        "Backend interaction is executed via local subprocess calls in batch-prepare and batch-verify only.",
+        "encode, decode, delta, materialize, render, binding-path, and cost must not spawn subprocesses."
+      ]
+    },
+    {
+      "mode": "local-http",
+      "rules": [
+        "Backend interaction is executed via standard library HTTP (urllib.request or http.client) in batch-prepare and batch-verify only.",
+        "encode, decode, delta, materialize, render, binding-path, and cost must not perform HTTP calls."
+      ]
+    }
+  ],
+  "specimens": [
+    {
+      "id": "conforming-agent-relay-script",
+      "declared_transport": "agent-relay",
+      "code": "import sys\nimport json\nimport hashlib\nimport base64\nimport argparse\nfrom pathlib import Path\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument('subcommand', choices=['encode', 'decode', 'delta', 'materialize', 'render', 'binding-path', 'cost', 'batch-prepare', 'batch-verify'])\n    args = parser.parse_args()\n    if args.subcommand == 'binding-path':\n        print('path')\n\nif __name__ == '__main__':\n    main()\n",
+      "expected_verdict": "conforming",
+      "imported_modules": ["sys", "json", "hashlib", "base64", "argparse", "pathlib"],
+      "pip_packages": []
+    },
+    {
+      "id": "nonconforming-pip-import",
+      "declared_transport": "agent-relay",
+      "code": "import json\nimport requests\nfrom pydantic import BaseModel\n\ndef main():\n    pass\n",
+      "expected_verdict": "nonconforming",
+      "violations": [
+        "Third-party pip package imported: requests",
+        "Third-party pip package imported: pydantic"
+      ]
+    },
+    {
+      "id": "nonconforming-io-in-pure-subcommand",
+      "declared_transport": "agent-relay",
+      "code": "import json\nimport urllib.request\n\ndef encode(payload):\n    urllib.request.urlopen('http://backend.internal/encode')\n",
+      "expected_verdict": "nonconforming",
+      "violations": [
+        "Backend network I/O in agent-relay mode",
+        "Backend I/O in pure subcommand 'encode'"
+      ]
+    }
+  ]
+}

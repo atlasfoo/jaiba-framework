@@ -1,0 +1,116 @@
+{
+  "fixture_kind": "upgrade_repair_cases",
+  "purpose": "Test audit, profile preservation, dropping host locks, stdlib scripts/journal generation, incremental conformance, and multi-host reinstall in upgrade/repair mode (MSV-009).",
+  "steps": [
+    {
+      "step": 1,
+      "name": "audit_and_package_verification",
+      "test_cases": [
+        {
+          "id": "valid-1.0-adapter",
+          "skill_md": {
+            "category": "memory-surface",
+            "contract-id": "jaiba-memory-surface",
+            "contract-version": "1.0.0",
+            "adapter-id": "mock-kv-adapter"
+          },
+          "files_present": [
+            "references/storage-nature.md",
+            "references/backend-mapping.md",
+            "references/conformance.md"
+          ],
+          "expected_outcome": "audit-passed:proceed-to-profile-preservation"
+        },
+        {
+          "id": "alien-package-rejection",
+          "skill_md": {
+            "category": "workflow",
+            "contract-id": "custom-tool-contract"
+          },
+          "expected_outcome": "terminal-rejection",
+          "rules": [
+            "Missing contract-id or non-memory-surface category causes immediate terminal stop.",
+            "Write nothing: do not create backups, wrap, or modify alien package."
+          ]
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "name": "profile_preservation",
+      "test_cases": [
+        {
+          "id": "preserve-contrasted-profile",
+          "profile_status": "contrasted",
+          "backend_version_changed": false,
+          "tools_changed": false,
+          "physical_limits_changed": false,
+          "has_unknown_or_discrepant_necessary_guarantees": false,
+          "expected_outcome": "preserve-profile-assertions",
+          "re_run_native_experiments": false,
+          "notes": "Preserve empirical assertions, limits, and evidence locators without re-running native experiments"
+        },
+        {
+          "id": "re-characterize-fallen-dimension",
+          "profile_status": "contrasted",
+          "backend_version_changed": true,
+          "tools_changed": false,
+          "physical_limits_changed": false,
+          "expected_outcome": "scoped-recharacterization",
+          "notes": "Re-characterize only fallen dimensions under storage-nature procedure; do not routine-repeat still-valid claims"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "name": "diff_and_patch",
+      "actions": [
+        {
+          "action": "drop_host_locks",
+          "remove_fields": ["active-procedure-reference", "persisted_absolute_install_path"],
+          "retain_fields": ["procedure-provenance"],
+          "rule": "Do not persist active-procedure-reference or session install path; retain procedure-provenance as historical record"
+        },
+        {
+          "action": "canonical_mcp_tools",
+          "transform_requires": {"before": "mcp__engram__mem_save", "after": "mcp:engram"},
+          "transform_mapping": {"published_tool_name": "mem_save"}
+        },
+        {
+          "action": "archetype_and_scripts",
+          "archetype": "record-store",
+          "scripts_generation": {
+            "language": "Python 3 stdlib only",
+            "pip_packages": 0,
+            "transport_mode": "agent-relay",
+            "canonical_subcommands": ["encode", "decode", "delta", "materialize", "render", "binding-path", "cost", "batch-prepare", "batch-verify"]
+          }
+        },
+        {
+          "action": "contract_bump",
+          "contract_version": "1.1.0",
+          "conformance_status": "unverified",
+          "rule": "Bump to 1.1.0 does not automatically certify; incremental conformance must pass"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "name": "incremental_conformance",
+      "checks": [
+        {"name": "patch_atomic_semantics", "status": "verified"},
+        {"name": "codec_determinism", "status": "verified"},
+        {"name": "efficiency_gate_5_sdd_scenarios", "status": "verified"}
+      ],
+      "overall_conformance_status": "verified"
+    },
+    {
+      "step": 5,
+      "name": "multi_host_reinstallation",
+      "discover_hosts": ["~/.claude", "~/.config/opencode"],
+      "user_selection": ["~/.claude"],
+      "collision_handling": "move to mock-kv-adapter.bak-20261107T150000",
+      "readback": "verified"
+    }
+  ]
+}
