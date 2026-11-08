@@ -82,10 +82,10 @@ ask the developer; don't silently over- or under-scope
 > **globally** (e.g. `~/.claude/skills/`), shared across every
 > repository. Resolve memory via the effective `create-memory`
 > installation's `references/resolution.md` and
-> `references/memory-surface-contract.md`, never
+> `references/memory-surface-contract.md` (`jaiba-memory-surface` contract version **1.1.0**), never
 > relative to this skill's installation. The built-in filesystem surface
 > maps to the selected checkout; an external surface uses its exact
-> binding and owned catalogue and may omit local `.ai/` and `AGENTS.md`.
+> standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present) and owned catalogue and may omit local `.ai/` and `AGENTS.md`.
 >
 > A missing/unavailable binding, catalogue, page, or required read is a
 > failure, not proof of missing instrumentation or an empty plan. Stop any
@@ -123,28 +123,34 @@ Context loaded depends on execution context — detect which applies (see
    Skip entirely if the change touches no indexed integrations.
    
    Resolve the effective `create-memory` installation's
-   `references/resolution.md` and `references/memory-surface-contract.md`;
-   use exact binding/project/context and complete authoritative catalogues,
+   `references/resolution.md` and `references/memory-surface-contract.md` (contract version `1.1.0`);
+   use exact binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, falling back to legacy `~/.jaiba/memory/<host>/...` when present), project/context, and complete authoritative catalogues,
    never previews or guessed paths.
 
 **Plan adjustment** (an approved plan exists in the selected executive
 context and the change falls within its scope):
 1. **Project instructions** — read `AGENTS.md` when present; external
    surfaces need not have one.
-2. **Resolve and catalogue** — revalidate the selected binding and exact
+2. **Resolve and catalogue** — revalidate the selected binding `v2` and exact
    project/context, completely enumerate its executive catalogue, then
    exact full-read the plan, tasks, walkthrough and gate instructions that
    exist. On filesystem, this maps to `.ai/work/plan.md` and companion
    files; on external surfaces, use logical objects, never local-path
    assumptions. Confirm the plan is approved/executing and establish its
    scope from these reads.
-3. **Record the read baseline** — retain revision evidence for every
+3. **Record the read baseline** — retain revision/head evidence (`expected-head`) for every
    executive object that may be amended. Before any authorized write,
-   re-read and compare those revisions; after the write, exact-read and
+   re-read and compare those revisions/heads; after the write, exact-read and
    verify complete intended content and relations. On external memory,
    `conduct` owns executive writes and the single-writer handoff; fast
-   reports the confirmed adjustment and evidence to conduct instead of
-   writing the backend or its executive objects itself.
+   reports the confirmed adjustment and baseline evidence to conduct instead of
+   writing the backend or its executive objects itself. For surfaces with
+   the `executive-journal` capability (`MSV-005`), emit surgical `patch` operations
+   rather than requesting a monolithic full rewrite (tasks: `add-task{after, block}`,
+   `amend-task{id, block}`; plan: `append-to-section{heading: "Plan amendments", content: "..."}`
+   or `append-section{after, heading, content}`). If the surface lacks `patch` (legacy 1.0.x),
+   hand off the full updated object to conduct's single-writer update path with
+   `efficiency-warning: full-update-without-patch`.
 
 > For plan adjustments, the selected executive context is re-resolved and
 > fully read; gate commands and TDD posture come from the exact tasks
@@ -217,7 +223,14 @@ pollute an unrelated plan or silently expand its approved scope.
       local work artifacts per `references/plan-adjustment.md`. For an
       external context, after confirmation hand off the evidence and
       approved amendment to `conduct`, which alone performs serialized,
-      revision-checked, fully verified executive writes. On any backend
+      revision-checked, fully verified executive writes. On surfaces with
+      the `executive-journal` capability (`MSV-005`), emit surgical `patch`
+      operations (`add-task{after, block}`, `amend-task{id, block}`,
+      `append-to-section{heading, content}`, `append-section{after, heading, content}`,
+      `append-entry{content}`) rather than requesting a monolithic full rewrite.
+      If the surface lacks `patch` (legacy 1.0.x), hand off the full updated
+      object to conduct's single-writer update path with
+      `efficiency-warning: full-update-without-patch`. On any backend
       access or verification failure, make no JAIBA-owned memory changes
       and report the failure.
 8. **Suggest a commit, don't run it.** Propose a conventional-commit

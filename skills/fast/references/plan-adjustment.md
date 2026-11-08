@@ -3,8 +3,8 @@
 When a change request arrives while an approved plan is active in the
 selected executive context and the work wasn't contemplated by the plan,
 it is **out-of-band**. For filesystem this plan is `.ai/work/plan.md`; for
-an external surface, resolve its exact binding/context and use the complete
-owned executive catalogue and full logical reads. What
+an external surface, resolve standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present), exact context, and use the complete
+owned executive catalogue and full logical reads under `jaiba-memory-surface` contract version **1.1.0**. What
 happens next depends on the size the shared triage measured
 (`conduct/references/triage.md`, consumed with default/floor
 `inline`):
@@ -40,8 +40,10 @@ expanding — the human stays in the loop on every scope change
 
 - The selected context's plan exists and is approved/executing, established
   by authoritative reads (filesystem: `.ai/work/plan.md`; external:
-  resolved exact binding/context, complete executive catalogue, and exact
-  full reads of plan/tasks and relevant walkthrough objects).
+  resolved standard binding `v2` at `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+  with legacy fallback to `~/.jaiba/memory/<host>/...` when present, exact context,
+  complete executive catalogue, and exact full reads of plan/tasks and relevant
+  walkthrough objects under contract `jaiba-memory-surface` **1.1.0**).
 - The change triaged `inline` (shared triage).
 - The change falls inside or adjacent to the plan's scope. If it's
   unrelated to the plan, treat it as **free-standing** instead — don't
@@ -49,14 +51,14 @@ expanding — the human stays in the loop on every scope change
 
 For an external surface, do not interpret an unavailable binding, incomplete
 catalogue, partial/truncated read, permission failure, ambiguous context or
-missing revision evidence as an absent plan. Stop plan-dependent work; make
+missing revision/head evidence as an absent plan. Stop plan-dependent work; make
 no memory changes and do not route around the selected surface. Before an
-approved adjustment is recorded, retain full-read revision evidence for the
+approved adjustment is recorded, retain full-read revision and head baseline evidence (`expected-head`) for the
 plan, tasks and walkthrough objects to be changed. `fast` is not the
 executive writer: after the developer confirms the completed change,
-handoff the proposed amendment and evidence to `conduct`. Conduct must
-establish its single-writer authority/handoff, compare current revisions to
-the recorded pre-read revisions, perform the authorized write, then exact-
+handoff the proposed amendment operations and baseline evidence to `conduct`. Conduct must
+establish its single-writer authority/handoff, compare current revisions/heads to
+the recorded pre-read revisions/heads, perform the authorized write or patch, then exact-
 read and verify complete content, relations and receipt/revision evidence.
 If any check or verification fails, stop with no further memory writes and
 report the known outcome; never claim an unverified update succeeded.
@@ -76,9 +78,11 @@ report the known outcome; never claim an unverified update succeeded.
 3. **On confirmation, record the amendment.** Keep edits surgical —
    you're annotating, not rewriting. The filesystem procedure below is for
    its local work artifacts. For an external context, hand off the proposed
-   updates to conduct under the preceding revision-check and verification
-   requirements; `fast` does not write executive memory.
+   amendment operations and baseline evidence to conduct under the preceding
+   revision-check and verification requirements; `fast` does not write
+   executive memory directly.
 
+   **Filesystem layout:**
    - **`tasks.md`** — append the new task to the phase it belongs to,
      already checked, with the next free `T-NNN` ID (never renumber
      existing tasks) and tagged so it's traceable as an out-of-band
@@ -110,6 +114,22 @@ report the known outcome; never claim an unverified update succeeded.
      T-014 under Phase 2.
      **Gate.** Pass.
      ```
+
+   **External memory surface (`MSV-005`):**
+   When recording an approved unplanned adjustment to an active plan:
+   - **Surfaces with `executive-journal` capability:**
+     Emit targeted `patch` operations rather than requesting a monolithic full rewrite:
+     - **Task changes:**
+       - Adding a task: `add-task{after: "<anchor>", block: "<task-block>"}`. The anchor `after` is an existing task ID (e.g. `T-013`) or heading. The block contains the checked task line with next free `T-NNN` ID.
+       - Modifying an existing planned task: `amend-task{id: "<T-NNN>", block: "<modified-block>"}`.
+     - **Plan amendments:**
+       - Appending to existing section: `append-to-section{heading: "Plan amendments", content: "..."}` with the dated amendment bullet.
+       - Inserting the section if absent: `append-section{after: "<anchor-heading>", heading: "Plan amendments", content: "..."}`.
+     - **Walkthrough:**
+       - `append-entry{content: "<Out-of-band change block>"}`.
+   - **Surfaces lacking `patch` (legacy 1.0.x adapters):**
+     If the resolved surface lacks `patch`, hand off the full updated object to conduct's single-writer update path with:
+     `efficiency-warning: full-update-without-patch`.
 
 4. **Suggest a commit.** A `fast` adjustment mid-plan usually folds
    into the current phase's WIP commit. Suggest either amending the
@@ -150,9 +170,11 @@ spin up a parallel plan around it. Instead:
 
    - **Fold it into the active plan as a new phase.** The work joins
      the plan explicitly: hand off to the `conduct` chain scoped
-     to the addition — it designs the phase, appends it to `tasks.md`
-     (new `T-NNN` tasks, `depends on:` the appropriate phases), and
-     records a dated bullet in `plan.md § Plan amendments` describing
+     to the addition — it designs the phase, appends tasks to `tasks`
+     (on `executive-journal` surfaces, using `add-task` ops; on filesystem,
+     to `tasks.md`; new `T-NNN` tasks, `depends on:` the appropriate phases), and
+     records a dated bullet via `append-to-section{heading: "Plan amendments", content: "..."}`
+     (or `append-section{after, heading, content}`) describing
      the scope extension. The developer approves the amended design
      before any of it executes. Choose this when the new work shares
      the plan's subject and can ride its checkpoints.

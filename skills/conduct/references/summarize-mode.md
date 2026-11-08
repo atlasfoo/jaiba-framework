@@ -10,11 +10,12 @@ shortcut. Amendments require re-presentation and renewed confirmation.
 
 - `validate` passed (gate green; criteria delivered or waivers recorded).
   Otherwise return to validate; summarize never substitutes for it.
-- Use conduct's resolved surface, namespace, stable project ID and exact
-  executive context. Resolve the effective `create-memory` installation
-  through host skill resolution and read its canonical
-  `references/memory-surface-contract.md` (§7 governs closure) and the
-  selected binding instructions. Never assume sibling installations.
+- Use conduct's resolved v2 binding, namespace, stable project ID and
+  exact executive context. Resolve the effective `create-memory`
+  installation through host skill resolution and read its canonical
+  `references/memory-surface-contract.md` (§7 governs closure),
+  `references/executive-journal.md` (§12 binds journal retirement), and
+  the selected binding instructions. Never assume sibling installations.
 - Require complete catalogue, full reads, revisions, immutable idempotent
   append-log, archive evidence and selective clear-work. Establish actual
   serialized executive and shared constitutive writers. Missing capability,
@@ -32,13 +33,16 @@ surfaces. No constitutive editing is authorized beyond append-log.
 
 ## Flow
 
-1. **Catalogue and fully read the exact executive context.** Read the
-   entire plan, tasks, walkthrough and PRD when present, with completion
-   evidence; `cat`/complete reads on filesystem, not search snippets or a
-   truncated preview. Include malformed/unexpected objects in enumeration;
-   surface them and stop cleanup. Freeze known addresses, full source
-   payload/revision evidence, and the scope. Filesystem `.gitignore` is a
-   preserved control file, not an executive concept.
+1. **Catalogue and `render` the exact executive context.** Read the
+   entire materialized plan, tasks, walkthrough and PRD when present,
+   with completion evidence; binding → catalogue → exact IDs → `render`,
+   not search snippets or a truncated preview. On filesystem the document
+   is that render. Include malformed/unexpected logical objects in
+   enumeration; surface them and stop cleanup. Deltas and `context-head`
+   are not extra logical objects and are not unexpected objects to ignore.
+   Freeze known addresses, full source payload/revision/head evidence,
+   and the scope. Filesystem `.gitignore` is a preserved control file,
+   not an executive concept.
 2. **Draft the closing summary** using conduct's
    `assets/plan-summary-template.md`. A filesystem draft is
    `.ai/work/<slug>-summary.md`; an external draft may remain in the
@@ -70,11 +74,23 @@ surfaces. No constitutive editing is authorized beyond append-log.
 5. **Present and confirm.** Show the summary and its recoverable proposed
    log address, close ID, scope and exact cleanup inventory. Ask:
    *"Append this closing entry to <resolved log address>, verify its full
-   readback, then clear only this unchanged work inventory in <context>?
-   Proceed?"* One yes authorizes that payload and inventory only. After
+   readback, then clear only this unchanged work inventory in <context>,
+   including journal bases, active and residual deltas, and the
+   context-head bound to it? Proceed?"* One yes authorizes that payload
+   and inventory only. After
    changes, freeze again and re-present; never reuse a previously appended
    close ID for a changed payload.
-6. **Append, verify, then clear-work**, in that order:
+6. **Optionally `compact`, then append, verify, then clear-work**, in
+   that order. `compact` may be suggested or invoked at this closure for
+   each frozen executive object whose declared
+   `executive-journal.compaction-threshold` is a known count and whose
+   active delta count is strictly greater. It is advisory: declining it,
+   or an unknown threshold, does not block archive. `compact` is not
+   archive and is not required before `clear-work`. A `document-tree`
+   with no deltas returns no-op success. A `1.0.x` adapter has no
+   `compact`; skip it, note that on the receipt, and do not fail closure
+   for that absence. Do not send `compact` to a 1.1 surface that lacks
+   the capability — that is `missing-capability`. Then:
    - Append-log uses the stable close ID as idempotency key. Same ID and
      identical complete payload reuses the verified receipt. Different
      payload is a conflict, never overwrite or automatic `-2` suffix.
@@ -89,9 +105,20 @@ surfaces. No constitutive editing is authorized beyond append-log.
    - Re-enumerate the complete context and reread known revisions before
      clear-work. Unexpected files/objects, directories, symlinks, changed
      revisions or ownership block cleanup **even if the log exists**.
-   - Delete only those known, unchanged objects under serialized access,
-     checking revisions at deletion. Verify absence with exact reads and
-     complete enumeration, not search. No project/category-wide purge.
+   - `clear-work` removes only those known, unchanged logical objects
+     under serialized access, checking revisions at deletion, and retires
+     the journal state bound to them: each frozen object's base, active
+     deltas, residual retired deltas the binding can still enumerate,
+     and, on `record-store`, the context's `context-head` when no
+     executive object of that context remains. Unknown journal state
+     blocks cleanup the same way an unexpected logical object does. Do
+     not catalogue deltas as a seventeenth type, and do not erase the
+     verified constitutive log. On `document-tree` with no stored
+     journal, retirement is the document removal itself (filesystem:
+     the helper's selective file delete). Verify absence with exact
+     reads and complete enumeration, not search. No project/category-wide
+     purge. A verified log with retained journal state is recoverable;
+     do not report a clean clear when residuals cannot be enumerated.
 7. **Report and hand off.** Give the verified log's recoverable address,
    close ID/revision and exact cleanup outcome. Work is ready for the next
    task only after verified clearing; preserved control files are fine.
@@ -154,8 +181,10 @@ prepared payload, rechecks the frozen inventory, and removes only unchanged
 `.gitignore`. Any other entry (including a directory or symlink under a
 known name) blocks the operation. It supports bundle and legacy markers
 without editing either. It does not establish portable logical identity,
-resolve backend declarations, validate acceptance criteria, or replace
-conduct's full catalogue/read/confirmation obligations.
+resolve backend declarations, validate acceptance criteria, retire a
+`record-store` delta chain, or replace conduct's full catalogue/`render`/
+confirmation obligations. On filesystem, `compact` is a no-op and the
+files are the journal; do not invent delta files for the helper to delete.
 
 ## Recovery and limits
 
@@ -170,7 +199,9 @@ conduct's full catalogue/read/confirmation obligations.
   context, successful deletion, or permission to prepare a new close.
 - **Uncertain append or deletion:** reconcile the exact original request first.
   Partition the original inventory into verified cleared/retired by this close,
-  unchanged residuals, changed/new objects and unknown outcomes. Verify the same
+  unchanged residuals, changed/new objects and unknown outcomes. Residuals
+  include journal bases, active deltas, residual retired deltas, and the
+  `context-head` when the binding still enumerates them. Verify the same
   log in full and re-enumerate before clearing only unchanged residuals under
   the existing confirmation. Unknown outcomes remain pending; neither an ACK nor
   a prior partial enumeration establishes clearance. Report each set, retaining

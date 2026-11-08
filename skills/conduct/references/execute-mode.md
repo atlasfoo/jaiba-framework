@@ -24,14 +24,15 @@ execute for them.
 
 Run in order; stop and ask on any failure.
 
-1. **Resolve and read the context's executive artifacts.** Catalogue the
-   selected context completely; resolve `plan`, `tasks` and `walkthrough`
-   by exact logical address and full-read their content and revision
-   evidence. Read the entire artifacts, not previews or summaries. Only
-   in the explicit filesystem branch do these names mean
-   `.ai/work/plan.md`, `tasks.md` and `walkthrough.md`. An unavailable,
-   partial, truncated, ambiguous or permission-filtered result is not
-   absence: stop and surface it; never switch surfaces or contexts.
+1. **Resolve and `render` the context's executive artifacts.** Catalogue
+   the selected context completely; resolve `plan`, `tasks` and
+   `walkthrough` by exact logical address and `render` their materialized
+   content, revision, and head. Read the entire artifacts, not previews,
+   search hits, or summaries. Only in the explicit filesystem branch do
+   these names mean `.ai/work/plan.md`, `tasks.md` and `walkthrough.md`.
+   An unavailable, partial, truncated, ambiguous or permission-filtered
+   result is not absence: stop and surface it; never switch surfaces or
+   contexts.
 2. **Confirm approval, scope and resume point.** Check the verified plan
    approval, reconcile tasks against its scope, and use walkthrough
    entries together with task checkboxes to resume actual progress across
@@ -57,20 +58,40 @@ Run in order; stop and ask on any failure.
 ### Executive artifact writes and recovery
 
 Conduct is the only executive writer for this context. Establish
-serialized access and retain each object's exact address and full
-pre-read revision before updating it. Update existing `tasks` and
-`walkthrough` objects (never implicitly create or upsert); preserve
-unknown metadata and relations. Record each completed task's walkthrough
-entry and checkbox changes as authorized updates. Before any dependent
-checkbox or Phase-gate progress, retain the mutation receipt and verify
-the complete intended artifact by exact full readback, including its
-resulting revision. Acknowledgement without verified readback is not
-completion. On conflict, unknown outcome, missing receipt/readback, or
-mismatch, stop dependent progress and reconcile by exact reads before
-retrying. Filesystem names map to local paths only in the filesystem
-branch; elsewhere use logical addresses, never guessed paths or backend
-record IDs. These checks do not alter the existing Phase gate or task
-authority rules.
+serialized access and retain each object's exact address, materialized
+revision, and `expected-head` before mutating it. Do not implicitly
+create or upsert `tasks` or `walkthrough`. When `executive-journal` is
+realized, task transitions are `patch` ops, O(delta), not a rewrite of
+either artifact:
+
+| Transition | Address | Op |
+|---|---|---|
+| Task truly complete | `tasks` | `check` with those IDs |
+| Checkbox set in error, after reconciliation | `tasks` | `uncheck` with those IDs |
+| One compact walkthrough entry, or the phase-checkpoint block | `walkthrough` | `append-entry` |
+
+`check` of an already checked ID is a no-op, not a conflict. Only the
+checkbox character changes. Preserve unknown metadata and relations.
+On `record-store`, one accepted `patch` is one new delta plus that
+object's `context-head` slot — not a new base and not a catalogue
+rewrite. On `document-tree`, the same ops are a surgical edit of the
+document. Before any dependent checkbox or Phase-gate progress, retain
+the mutation receipt and `render` the complete intended artifact,
+including the resulting head. Acknowledgement without verified readback
+is not completion. On conflict, unknown outcome, missing receipt/readback,
+or mismatch, stop dependent progress and reconcile by exact `render`
+before retrying. Do not append a compensating delta. A `1.0.x` adapter
+gets the same ops applied locally, then a complete `update` with
+`efficiency-warning: full-update-without-patch`. Filesystem names map to
+local paths only in the filesystem branch; elsewhere use logical
+addresses, never guessed paths or backend record IDs. These checks do
+not alter the existing Phase gate or task authority rules.
+
+At a phase boundary, if `executive-journal.compaction-threshold` is a
+known delta count and the active count is strictly greater, `compact`
+that object. Exceeding the threshold does not fail the gate. An unknown
+threshold does not fire the suggestion. Do not compact inside `check` or
+`append-entry`. `1.0.x` has no `compact`; note that and continue.
 
 ### Surface outage or uncertain progress
 
@@ -118,17 +139,18 @@ blocker**, recorded in the walkthrough; keep delegating unaffected tasks:
    the walkthrough is built **change by change**, not reconstructed
    at the end. One compact entry per task (see the template): task
    ID, what changed, any decision taken. Two lines is usually enough;
-   save the analysis for decisions that actually need it. This is
-   what makes the work auditable mid-flight and resumable
-   mid-phase.
+   save the analysis for decisions that actually need it. Persist it
+   with `append-entry`, then `check` that task. This is what makes the
+   work auditable mid-flight and resumable mid-phase.
 3. **Run the Phase gate after each meaningful change.** If a gate
    command fails, fix it as part of the current task — don't
    accumulate red.
 4. **Flip checkboxes only on truly complete tasks.** Half-done is
    unchecked.
-5. **At the phase boundary, append the phase-checkpoint block** to
-   the walkthrough: outcome in 3–6 lines, decisions worth keeping,
-   deviations, ADR candidates, gate result.
+5. **At the phase boundary, `append-entry` the phase-checkpoint block**
+   to the walkthrough: outcome in 3–6 lines, decisions worth keeping,
+   deviations, ADR candidates, gate result. Then apply the compaction
+   rule above if the threshold says so.
 6. **Suggest a commit** — default `chore(wip): <phase name>` (the
    phase header carries a suggestion). The developer decides; run git
    only if asked.
@@ -165,12 +187,15 @@ fallback (`subagents.md § Dispatch and fallback accounting`).
    waves run in batches; overlap and a one-slot host serialize through
    executors. Dispatch a one-task wave too.
 4. **Reintegrate every result before the next wave.** Per returned
-   report: review it against `git diff`; write the task's walkthrough
-   entry yourself from the report (task ID, what changed, decisions —
-   conduct is the walkthrough's only writer); flip the
-   checkbox only if truly complete. An executor that reported an
+   report: review it against `git diff`; `append-entry` the task's
+   walkthrough entry yourself from the report (task ID, what changed,
+   decisions — conduct is the walkthrough's only writer); `check` the
+   ID only if truly complete. Closing a wave is one `check` of the
+   completed IDs plus one `append-entry` per completed task, not an
+   `update` of either object. An executor that reported an
    obstacle gets its task back in the pool — resolve the obstacle
-   (or surface it to the developer) before re-dispatching.
+   (or surface it to the developer) before re-dispatching. `uncheck`
+   only a box this phase set in error.
 5. **Repeat** — new wave from the newly unblocked tasks — until the
    phase has no unchecked tasks.
 6. **Close the phase as usual:** run the Phase gate yourself (executor
@@ -189,11 +214,13 @@ justify bypassing an available executor. Same walkthrough and gate apply.
   it, log it in the task's walkthrough entry.
 - **Structural drift** (a task needs a different approach; a new task
   surfaces; a "design"-depth change turns out to alter user-visible
-  behavior): stop, surface, ask. On agreement update `tasks.md`
-  (append new `T-NNN`s — never renumber), `plan.md § Plan
-  amendments`, and — if the drift is a fix the PRD needs to hold — a
-  **corrective criterion** in the PRD schema. The walkthrough records
-  the why.
+  behavior): stop, surface, ask. On agreement `add-task` new `T-NNN`s
+  — never renumber, never `remove-task` — `append-to-section` on the
+  plan's amendments heading, and — if the drift is a fix the PRD needs
+  to hold — `add-criterion` with the next ID and `corrective: true`.
+  Do not `update-criterion` or `remove-criterion` once `status` is not
+  `draft`; that fails `conflict`. The walkthrough records the why via
+  `append-entry`.
 
 Never silently rewrite the plan. Wanting to is the signal to stop and
 ask.
@@ -207,8 +234,8 @@ tasks template's example. Developer: *"continue"*.
    executors are callable and their prerequisites are green.
 2. Dispatch T-001 and T-004 concurrently to their matching load
    executors: they are independent tests with disjoint files. Review
-   both returned results, log each task in the walkthrough, and flip
-   each checkbox only when complete.
+   both returned results, `append-entry` each task in the walkthrough, and `check`
+   each ID only when complete.
 3. Dispatch T-002 to its matching load executor once T-001 is checked.
    After reviewing it, T-003 and T-005 are runnable (T-004 is already
    checked): dispatch them concurrently if their file footprints are
@@ -235,6 +262,9 @@ tasks template's example. Developer: *"continue"*.
   next wave before every result of the current one is reviewed,
   logged, and checked off. Waves are sequential; only their insides
   are parallel.
-- **Letting executors touch `.ai/work/`.** Reports flow up; you write
-  the walkthrough and flip the boxes (`subagents.md § Concurrency
+- **Letting executors touch `.ai/work/` or emit `patch`.** Reports flow
+  up; you `append-entry` and `check` (`subagents.md § Concurrency
   policy`).
+- **Rewriting `tasks` or `walkthrough` to flip one box.** `check` and
+  `append-entry` are the wave close. A full `update` is the `1.0.x`
+  warning path only.

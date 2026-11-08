@@ -18,21 +18,19 @@ look for.
 
 Three rows below touch constitutive memory. First resolve the effective
 `create-memory` installation and follow its `references/resolution.md` and
-`references/memory-surface-contract.md`; do not assume filesystem or discover a
+`references/memory-surface-contract.md` (`jaiba-memory-surface` contract version **1.1.0**); do not assume filesystem or discover a
 surface from this skill's location. For filesystem, apply the dual-layout
 rule in `jaiba-contract.md` §1 and use the appropriate column below. For
-an external surface, use its exact binding, owned catalogue and full reads
-as the authoritative source; search previews are discovery only. The
-`type:` vocabulary is the closed set in `jaiba-init/references/okf-pattern.md`.
+an external surface, resolve the standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present). Follow the deterministic path (`MSV-008`): `binding` → context/project catalogue → exact logical addresses/IDs → invoke package script `render` subcommand (or read materialized content directly in `document-tree`). Strictly prohibit using full-text `search` (`mem_search`) to locate or display project artifacts or decisions; search is only for exploratory discovery when the concept address is completely unknown. The `type:` vocabulary is the closed set in `jaiba-init/references/okf-pattern.md`.
 
 | Question is about… | Filesystem: concept bundle | Filesystem: legacy flat | External surface |
 |---|---|---|---|
 | A piece of code, a symbol, a behavior | Locate source. No brain read unless the *why* is historical. | Same. | Same; external memory is not a source-code substitute. |
-| "The plan" (tasks left, ordering, scope) | `.ai/work/` executive artifacts. | Same; `.ai/work/` is separate from constitutive layout. | Resolve exact executive context; completely enumerate its owned catalogue, then full-read the plan/tasks/walkthrough objects that exist. |
-| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` when present. | Same. | Exact executive context catalogue/full read of PRD object when present; verify linked logical objects as needed. |
-| A past decision ("why did we…") | `decision` by type via `.ai/memory/index.md`. | `.ai/memory/adr-log.md`. | Complete constitutive catalogue and full-read matching decision objects. |
-| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` entries. | Same. | Complete constitutive catalogue and full reads of relevant `log-entry` objects. |
-| The project in general (stack, conventions) | Relevant `project`, `architecture`, or `convention` concept via index. | `.ai/memory/constitution.md`. | Complete constitutive catalogue and full reads of relevant concepts. |
+| "The plan" (tasks left, ordering, scope) | `.ai/work/` executive artifacts. | Same; `.ai/work/` is separate from constitutive layout. | Deterministic path via binding `v2`: enumerate owned executive catalogue, then exact-read logical IDs (`plan`, `tasks`, `walkthrough`) and invoke package script `render` subcommand (or read directly in `document-tree`). No search. |
+| "The PRD" / "the spec" (coverage, criteria, scope) | `.ai/work/PRD.md` when present. | Same. | Deterministic path via binding `v2`: executive catalogue → exact logical ID `prd` → package script `render` subcommand (or direct read in `document-tree`), when present; verify linked logical objects as needed. No search. |
+| A past decision ("why did we…") | `decision` by type via `.ai/memory/index.md`. | `.ai/memory/adr-log.md`. | Deterministic path via binding `v2`: constitutive catalogue → exact logical IDs of decision objects → package script `render` subcommand (or direct read in `document-tree`). No search. |
+| Closed, past work ("what did we ship last week?") | `.ai/memory/log/` entries. | Same. | Deterministic path via binding `v2`: constitutive catalogue → exact logical IDs of relevant `log-entry` objects → package script `render` subcommand (or direct read in `document-tree`). No search. |
+| The project in general (stack, conventions) | Relevant `project`, `architecture`, or `convention` concept via index. | `.ai/memory/constitution.md`. | Deterministic path via binding `v2`: constitutive catalogue → exact logical IDs of relevant concepts → package script `render` subcommand (or direct read in `document-tree`). No search. |
 
 Either branch, a decision question that needs the tactical *why* behind
 a still-open call also reads `walkthrough.md`, not just the standing
@@ -41,13 +39,17 @@ decision.
 ## Step 2 — resolve and locate the active artifact
 
 For filesystem, use the selected checkout's physical paths below after
-resolving the supported layout. For an external surface, resolve the exact
-binding, project ID and executive context through the canonical references
-above. Enumerate the complete owned executive catalogue for that context
-(consume all pages and confirm completion/consistency); then exact-read the
-full logical objects needed for this question. Preserve relation targets
-and revision/receipt evidence for citations. A search result or preview may
-help discover candidates but cannot prove completeness or absence. If
+resolving the supported layout. For an external surface, resolve the standard
+binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`,
+with legacy fallback to `~/.jaiba/memory/<host>/...` when present), project ID
+and executive context through the canonical references above under contract version **1.1.0**.
+Enumerate the complete owned executive catalogue for that context
+(consume all pages and confirm completion/consistency). Follow the strict deterministic rendering path (`MSV-008`):
+`binding` → read context/project catalogue → exact logical addresses/IDs → invoke package script `render` subcommand (or read materialized content directly in `document-tree`).
+Strictly prohibit using full-text `search` (`mem_search`) to locate or display project artifacts or decisions;
+search is strictly for exploratory discovery when the concept address is completely unknown.
+Preserve relation targets and revision/receipt evidence for citations. A search result or preview may
+help discover candidates but cannot prove completeness or absence and must never be used to render artifacts. If
 binding, catalogue, page, exact read, or required relation is unavailable,
 ambiguous, partial, truncated, or permission-denied, report the failure and
 stop; none is evidence that the context or artifact is empty. `ask` must
@@ -74,10 +76,9 @@ On the filesystem surface, active work lives in `.ai/work/`. Check, in order:
 > Answer from the files that exist, note the drift, and suggest
 > `jaiba-doctor` — don't migrate anything from `ask`.
 
-On an external surface, use the authoritative full catalogue and exact
-reads described above. The unique logical `plan` object in the selected
+On an external surface, follow the deterministic path (`binding` → catalogue → exact logical ID → package script `render` subcommand, or direct read in `document-tree`). The unique logical `plan` object in the selected
 context is the active plan; read its related `tasks` and `walkthrough`
-objects as needed. Report an absent plan only after complete authoritative
+objects as needed via this same deterministic route. Strictly prohibit full-text search (`mem_search`) to locate or display the plan or tasks. Report an absent plan only after complete authoritative
 enumeration (or exact not-found in that fully resolved readable scope),
 never from a search miss. Check the plan's declared PRD relation/logical ID;
 read its full content and needed criteria relations. Cite stable logical
@@ -99,7 +100,7 @@ On filesystem, the PRD, when it exists, is an executive artifact next to the pla
 3. **Neither?** There is no active work in this checkout. For *past* work, the
     `.ai/memory/log/` entries are the record.
 
-On an external surface, report no PRD only when a complete catalogue/read
+On an external surface, locate the PRD via the deterministic path (binding `v2` → catalogue → exact logical ID `prd` → package script `render` subcommand or direct `document-tree` read; never via `mem_search`). Report no PRD only when a complete catalogue/read
 of the exact context and the plan's full relation data establishes that no
 PRD is present. A partial catalogue or failed read is not a no-PRD result.
 
@@ -121,6 +122,10 @@ that *is* part of the answer — surface it, and propose
 - **Not a license to assume.** "Active plan" means *the file exists and
   you read it*, not "there's probably a plan". If `plan.md` is absent,
   the answer is "there is no active plan", full stop.
+- **Not a search sweep.** Searching via `mem_search` or full-text queries
+  to locate the plan, PRD, tasks, or decisions is prohibited. Orientation
+  strictly follows the deterministic route: binding `v2` → catalogue → exact
+  logical IDs → `render`.
 
 ## Worked example — cold "what's left in the plan?"
 

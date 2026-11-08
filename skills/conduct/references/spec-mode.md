@@ -26,10 +26,12 @@ criteria it carries. This phase writes no source code and no tasks —
   Never silently overwrite an active plan.
 - Full context loaded (`SKILL.md § Context Loading`), including the
   landed requirement if `propose` ran in this conversation.
-- Binding, required capabilities and single executive writer verified.
-  Apply the canonical create/update revision, receipt and full-readback
-  rules to every artifact mutation; never upsert over existing work or
-  write a local shadow of an external artifact.
+- Binding v2, required capabilities, declared `limits`, archetype, and
+  single executive writer verified (`SKILL.md § Brain Discovery and
+  Validation`). Apply `create` for a new base and `patch` for every later
+  splice when `executive-journal` is realized; the `1.0.x` path is a full
+  `update` with `efficiency-warning: full-update-without-patch`. Never
+  upsert over existing work or write a local shadow of an external artifact.
 
 ## Analysis before either depth
 
@@ -69,8 +71,11 @@ depth:
    constitutive `log-entry` objects for prefix collisions — criteria IDs are
    referenced from tasks and the final summary, so they must stay
    unambiguous.
-5. **Create the context's `prd`** from `assets/prd-template.md`. One to
-   two screens: problem, goals/non-goals, users, proposed solution,
+5. **Create the context's `prd`** from `assets/prd-template.md`. This
+   first write is `create` — the base, not a `patch`. Size it to the
+   unchunked budget before that write (see **Limits and draft revisions**).
+   One to two screens when the budget allows: problem, goals/non-goals,
+   users, proposed solution,
    scope, assumptions, dependencies (one `reference` concept per
    external surface, cited as a link per **Citing the brain** below;
    an integration with no `reference` concept yet is flagged
@@ -97,7 +102,9 @@ depth:
    is explicitly out. Request only the follow-ups needed to decide.
 2. **Clarify remaining design-level questions** the same way — ask,
    resolve, then write.
-3. **Create the context's `plan`** from `assets/plan-template.md`:
+3. **Create the context's `plan`** from `assets/plan-template.md`. The
+   first write is `create` (the base). Size it to the same unchunked
+   budget. Later draft corrections are `patch`, not a second full write:
    - **Objective** — what and why, 2–4 sentences. At `design` depth
      this section carries the whole motivation (perf target,
      breaking-changes summary of the bump, refactor rationale).
@@ -124,7 +131,8 @@ steps, in order:
    needed type (`architecture`, `convention`, `quality-gate`, `scope`,
    `sub-unit`, `decision`, `reference`) from the resolved constitutive
    catalogue, consume all pages, select its exact logical address and
-   full-read it. Ambiguous matches require clarification. Analyst reports
+   `render` it. Do not search to display or to verify a citation.
+   Ambiguous matches require clarification. Analyst reports
    retain the scope, address and revision provenance of cited sources.
 2. **Serialize a verifiable citation for the selected surface.**
    - **Filesystem only:** resolve bundle concepts through the index, or
@@ -173,19 +181,70 @@ path, never silently drop the citation to make the artifact look
 clean. A dead citation the human cannot see is worse than a visible
 gap, because the next reader trusts it.
 
+## Limits and draft revisions
+
+`MSV-017`. Before the first `create` of `prd` or `plan`, apply the limits
+recorded at Brain Discovery. When lossless chunking is unsupported or
+unverified, or the direct payload limit is the budget that applies, the
+draft must fit that unchunked budget — documented maximum, or the
+operating cap the binding already declares, each named with its unit.
+Keep every required template section and, at spec depth, the fenced
+criteria schema. Shrink prose and examples; do not drop the schema to
+make the write fit. If the intended object would still exceed, stop with
+`limit-exceeded` and do not mutate. Never truncate, summarize away a
+field, or retry a smaller silent subset. Unknown limits are not a guessed
+cap and not permission to truncate. Chunking that the binding declares
+as lossless may carry an object above the direct unit; it does not waive
+`limit-exceeded` when reassembly is unverified.
+
+While materialized `status` is `draft`, iterative corrections are
+`patch` ops, not a rewrite of the base:
+
+| Change | Op |
+|---|---|
+| Prose section body | `replace-section` |
+| New sibling section | `append-section` |
+| Text added inside a section, including plan amendments | `append-to-section` |
+| One frontmatter key other than reopening `status` | `set-frontmatter` |
+| New criterion | `add-criterion` |
+| Criterion body while still `draft` | `update-criterion` |
+| Drop a criterion while still `draft` | `remove-criterion` |
+
+Pass the `expected-head` from the last verified `render`. One request
+is one delta on `record-store`, or one surgical document edit on
+`document-tree`. Do not `update` the whole `prd` or `plan` when the
+capability is realized. A refused op fails the whole patch; nothing is
+partially applied.
+
+On a `1.0.x` adapter, do not send `patch`. Apply those same ops locally,
+enforce the same refusals, then `update` the complete object and record
+`efficiency-warning: full-update-without-patch`. A 1.1 surface that
+should realize `patch` and does not is `missing-capability`, not this path.
+
 ## The approval gate
 
-Stop. Present the full design (and PRD, if produced), identify their
-context/addresses and reviewed revisions, and ask for explicit approval.
-They remain drafts until the developer says `"approved"` / `"go ahead"` /
-`"looks good"`. Re-read and compare those revisions before updating
-`status: approved` in the existing template frontmatter; preserve all other
-content/metadata, obtain receipts and full-read back each approved object.
-Approval is persisted in the selected context, not merely a chat claim,
-local cache or backend tag detached from the artifact. A changed revision,
-partial write or failed verification blocks handoff; reconcile and seek
-approval again if the design changed. Do not transition into `tasks` in
-this phase or write source code. If the developer amends, apply and re-ask.
+Stop. Present the full design (and PRD, if produced) from a deterministic
+`render`, identify their context/addresses, revisions, and heads, and ask
+for explicit approval. They remain drafts until the developer says
+`"approved"` / `"go ahead"` / `"looks good"`. Re-read and compare those
+heads before `set-frontmatter` with `key: status` and `value: approved`
+on each object being approved. That op preserves every other frontmatter
+key and the body. Obtain the patch receipt and `render` each approved
+object back; the materialized `status` must be `approved`. Approval is
+persisted in the selected context, not merely a chat claim, local cache,
+or backend tag detached from the artifact. A changed head, partial write,
+or failed verification blocks handoff; reconcile and seek approval again
+if the design changed. Do not transition into `tasks` in this phase or
+write source code.
+
+If the developer amends while `status` is still `draft`, apply the draft
+ops above and re-ask. Once `status` is not `draft`, `remove-criterion`
+and `update-criterion` are forbidden: a present ID fails `conflict`, and
+a missing ID or unspliceable criteria block fails `invalid-object`. Do
+not `set-frontmatter` `status` back to `draft` to reopen permanence —
+that attempt is `conflict`. A corrective criterion after approval is
+`add-criterion` with the next ID, not an edit of an existing one.
+`replace-section` must not change criteria-fence bytes once frozen.
 
 ## Worked example (TripNest)
 
@@ -237,3 +296,10 @@ is the gate plus the stated scope.
   decomposition belongs to `tasks`.
 - **Skipping the approval pause.** `spec` ends at "approved", not at
   "files written".
+- **Rewriting `prd` or `plan` on every draft comment.** After the base
+  exists, `replace-section` / criterion ops. A full `update` is the
+  `1.0.x` warning path only.
+- **Drafting past the declared limit, then truncating.** Size first.
+  `limit-exceeded` stops the write.
+- **Removing a criterion after approval.** Permanence already latched.
+  `add-criterion` for a new ID, or stop and ask.
