@@ -191,9 +191,12 @@ conversion, applied only in the approved staging target:
    snapshot bytes. History is retained: close IDs, retired catalogue
    entries, and log payloads. Do not decode `JAIBA1` or `JAIBA2`.
 4. Convert each monolithic executive object to an **implicit base at
-   seq 0**: an `exec-base` with no deltas and no `context-head` slot until
-   the first later `patch`. Do not invent a delta chain from history.
-   Logical revision is the fingerprint of that object, not a new token.
+   seq 0**: an `exec-base` under the `base` key with no deltas. For each
+   executive context receiving a converted base, create an initial
+   `context-head` at `jaiba/v4/<ns16>/ctx/<ctx_sha24>` with a `seq: 0`
+   slot matching that base, making the migrated context explicit. Do not
+   invent a delta chain from history. Logical revision is the fingerprint
+   of that object, not a new token.
 5. Activate only after the migrate-surface barrier. The activated binding
    uses namespace `jaiba/v4/<ns16>/` and
    `storage-profile: jaiba-engram-storage/4`. No dual-write. Source

@@ -30,7 +30,7 @@ default record graph. The architecture strictly separates three tiers:
 2. **Storage-nature profile:** characterizes empirical backend guarantees through
    a finite native experiment (`references/storage-nature.md`).
 3. **Physical adapter protocol:** derived serialization and wire mapping
-   (e.g., `JAIBA3` / `jaiba-engram-storage/3` single-observation envelope for
+   (e.g., `JAIBA4` / `jaiba-engram-storage/4` single-observation envelope for
    `jaiba-engram-memory`, `posix-file/1` one-file-per-object for vault trials, or
    directory tree for `filesystem`).
 
@@ -40,7 +40,7 @@ strictly opt-in (`category: memory-surface`, `conformance-status: verified` on
 bounded trial evidence `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`, outside
 `skills/jaiba-configure/assets/skillset.txt`), and repositories remain on
 `filesystem` by default. Migration across surfaces (`jaiba-init:migrate-surface`)
-was verified lossless across multi-hop trials (filesystem ↔ `JAIBA3` ↔ `posix-file/1`
+was verified lossless across multi-hop trials (filesystem ↔ Engram `JAIBA3`/`JAIBA4` ↔ `posix-file/1`
 under trial `6c90b698-39ba-441e-9c63-35ba9f9055c3`), observing limits: single-catalogue
 observation per `(namespace, project)`, direct objects `≤ 30,000` raw bytes, chunked
 objects `> 30,000` raw bytes (verified at 55,000 B across two chunks in `T-087`), absent

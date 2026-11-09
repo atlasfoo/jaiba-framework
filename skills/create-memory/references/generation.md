@@ -234,9 +234,8 @@ Instantiate this installation's
 [profile template](../assets/storage-nature-template.md) as the package's
 `references/storage-nature.md`. That file is a filled profile, not the
 procedure, and must not point at itself. Fill `procedure-provenance`
-per [procedure locator](#procedure-locator). Do not fill
-`active-procedure-reference`, even if the profile template still shows
-the key. Omit it. Replace placeholders with this
+per [procedure locator](#procedure-locator). Do not add or fill
+`active-procedure-reference`; omit the field. Replace placeholders with this
 run's facts or leave them `unknown`. Do not reuse a prior profile.
 
 States, blocking, and required evidence fields are
@@ -268,8 +267,9 @@ The pluggable surfaces architecture maintains three distinct layers:
    wire protocol matching backend characteristics.
 
 Characterized physical adapter protocols include:
-- `jaiba-engram-storage/3` (`JAIBA3`): Single-observation JSON+base64+SHA-256
-  envelope used by `jaiba-engram-memory`. Bounded limits verified in trial
+- `jaiba-engram-storage/4` (`JAIBA4`): Single-observation JSON+base64+SHA-256
+  envelope used by `jaiba-engram-memory` under contract 1.1.0 (with legacy `JAIBA3`
+  retained as read-only). Bounded limits verified in trial
   `efc16e3a-3764-4ae6-9454-4d9fd8bc7ac0`: single catalogue observation per
   `(namespace, project)`, direct objects `≤ 30,000` raw bytes, chunked objects
   `> 30,000` raw bytes (verified at 55,000 B across two chunks in `T-087`), absent

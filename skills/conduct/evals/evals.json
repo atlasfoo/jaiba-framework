@@ -623,7 +623,7 @@
       "expected_output": [
         "In spec drafting, emits surgical O(delta) patch operations (replace-section, append-section, append-to-section, set-frontmatter, add-criterion, update-criterion, remove-criterion) against draft PRD/plan without monolithic object overwrites",
         "On plan approval, sets status to approved; enforces criterion ID permanence where subsequent remove-criterion or destructive edits on existing criteria fail with conflict (MSV-005)",
-        "In execute phase, emits check-task and appends walkthrough entries as discrete journal deltas rather than rewriting full task list",
+        "In execute phase, emits check and appends walkthrough entries as discrete journal deltas rather than rewriting full task list",
         "In validate phase, updates criteria outcomes via set-criterion-status patch operations",
         "In summarize phase, executes compact operation to fold base and deltas into a new exec-base at seq: 0 before archiving context",
         "All mutations use expected-head revision validation, preventing lost updates or split-brain divergence"
