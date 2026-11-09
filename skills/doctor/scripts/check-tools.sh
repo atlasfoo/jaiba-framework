@@ -612,7 +612,21 @@ is_traceless=0
 if [ ! -d "$ROOT/.ai" ]; then
   is_traceless=1
 elif [ -f "$ROOT/AGENTS.md" ]; then
-  surface="$(sed -n -E 's/^[[:space:]]*jaiba-memory-surface:[[:space:]]*([^[:space:]]+).*/\1/p' "$ROOT/AGENTS.md" | head -n 1)"
+  surface="$(awk '
+    NR == 1 { if ($0 ~ /^---[[:space:]]*$/) { in_fm=1; next } else { exit } }
+    in_fm && /^---[[:space:]]*$/ { exit }
+    in_fm && /^[[:space:]]*jaiba-memory-surface:[[:space:]]*/ {
+      sub(/^[[:space:]]*jaiba-memory-surface:[[:space:]]*/, "")
+      sub(/[[:space:]]+#.*$/, "")
+      sub(/^[[:space:]]+/, "")
+      sub(/[[:space:]]+$/, "")
+      if ($0 ~ /^".*"$/ || $0 ~ /^\x27.*\x27$/) {
+        $0 = substr($0, 2, length($0) - 2)
+      }
+      print
+      exit
+    }
+  ' "$ROOT/AGENTS.md")"
   if [ -n "$surface" ] && [ "$surface" != "filesystem" ]; then
     is_traceless=1
   fi

@@ -274,8 +274,11 @@ target:
    Retain history: append-log close IDs, log payloads, and retired
    catalogue entries. Do not mint a second logical id.
 4. Convert each monolithic executive object to an implicit base at
-   **seq 0**: store it as `exec-base` under the `base` key, with no deltas
-   and no `context-head` slot. Do not invent ops from git history, from
+   **seq 0**: store it as `exec-base` under the `base` key, with no deltas.
+   For each executive context receiving a converted base, create an initial
+   `context-head` at `jaiba/v4/<ns16>/ctx/<ctx_sha24>` with a `seq: 0` slot
+   whose chain digest is that base with an empty delta list, plus the
+   materialized logical revision. Do not invent ops from git history, from
    Engram observation history, or from retired siblings. `read` of that
    base is the object. Logical revision is the fingerprint of that object.
 5. After the barrier and a new explicit activation approval, switch the
@@ -298,10 +301,10 @@ key before retry and never blind-retry through `mem_save`. A refused
 
 Local validation:
 
-- `python3 -B scripts/jaiba-engram-memory/evals/fixtures/run_jaiba3_static.py <evidence-dir>`
+- `python3 -B skills/jaiba-engram-memory/evals/fixtures/run_jaiba3_static.py <evidence-dir>`
   checks the legacy wire, framing, truncation, censorship, chunk
   reassembly, ownership, and reconciliation on synthetic bytes. Static. Not
   operational conformance. Not a JAIBA4 trial.
-- `python3 -B scripts/jaiba-engram-memory/scripts/jaiba_engram.py` is the
+- `python3 -B skills/jaiba-engram-memory/scripts/jaiba_engram.py` is the
   JAIBA4 codec. `encode` / `decode` / `delta` / `materialize` / `render` /
   `cost` are local. They do not certify a live Engram project.

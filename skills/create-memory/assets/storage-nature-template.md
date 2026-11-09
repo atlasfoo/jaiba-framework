@@ -33,7 +33,6 @@ factory-procedure-locator: "<generation-time resolved procedure locator; provena
 factory-procedure-revision: "<identified revision or exact source digest>"
 factory-procedure-resolved-at: "<date>"
 factory-procedure-resolution-method: "<host resolution or explicit disambiguation>"
-active-procedure-reference: null # Fill only after resolution on the current host.
 ```
 
 ## 1. Identity and evidence
@@ -45,7 +44,6 @@ invent a version, a unit, or a locator.
 |---|---|
 | Document role | Backend-specific filled profile, not the factory procedure. |
 | Factory procedure provenance | `<generation-time resolved locator, revision/digest, date and method; not a sibling or self path>` |
-| Active procedure reference | `<current-host resolved procedure, or absent; never assume the provenance path is still authoritative>` |
 | Backend / tools | `<names and versions actually used>` |
 | Schema and docs | `<identifiers, versions, date read>` |
 | Host / environment | `<sanitized; no secrets>` |

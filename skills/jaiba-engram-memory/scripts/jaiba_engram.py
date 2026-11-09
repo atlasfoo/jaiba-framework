@@ -59,6 +59,7 @@ TASK_ID_RE = re.compile(r"^T-\d+$")
 TASK_LINE_RE = re.compile(r"^- \[([ xX])\] \*\*(T-\d+)\*\*(.*)$")
 LOOSE_BOX_RE = re.compile(r"^- \[[^\]]*\]")
 HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.*)$")
+CODE_FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,}|~{3,})(.*)$")
 FENCE_OPEN_RE = re.compile(r"^```yaml[ \t]*$")
 FENCE_CLOSE_RE = re.compile(r"^```[ \t]*$")
 CRITERIA_RE = re.compile(r"^([ \t]*)criteria:[ \t]*$")
@@ -522,6 +523,20 @@ def iter_lines(text: str):
         i = end
 
 
+def frontmatter_region(text: str):
+    if not text.startswith("---"):
+        return None
+    rows = list(iter_lines(text))
+    if not rows:
+        return None
+    if rows[0][2].rstrip(" \t") != "---":
+        return None
+    for start, end, content, _nl in rows[1:]:
+        if content.rstrip(" \t") == "---":
+            return {"start": 0, "end": end, "close_start": start, "body_start": rows[0][1]}
+    return None
+
+
 def parse_heading(content: str):
     match = HEADING_RE.match(content)
     if not match:
@@ -534,7 +549,27 @@ def parse_heading(content: str):
 
 def heading_spans(text: str) -> list:
     spans = []
+    fm = frontmatter_region(text)
+    fm_end = fm["end"] if fm else 0
+    in_fence = None
     for start, end, content, _nl in iter_lines(text):
+        if start < fm_end:
+            continue
+        m = CODE_FENCE_RE.match(content)
+        if m:
+            marker, rest = m.group(1), m.group(2)
+            char = marker[0]
+            count = len(marker)
+            if in_fence is None:
+                if not (char == "`" and "`" in rest):
+                    in_fence = (char, count)
+                    continue
+            else:
+                if char == in_fence[0] and count >= in_fence[1] and rest.strip() == "":
+                    in_fence = None
+                    continue
+        if in_fence is not None:
+            continue
         parsed = parse_heading(content)
         if parsed:
             level, title = parsed
@@ -620,20 +655,6 @@ def append_entry(text: str, content: str) -> str:
     if text and not text.endswith("\n"):
         piece = nl + piece
     return text + piece
-
-
-def frontmatter_region(text: str):
-    if not text.startswith("---"):
-        return None
-    rows = list(iter_lines(text))
-    if not rows:
-        return None
-    if rows[0][2].rstrip(" \t") != "---":
-        return None
-    for start, end, content, _nl in rows[1:]:
-        if content.rstrip(" \t") == "---":
-            return {"start": 0, "end": end, "close_start": start, "body_start": rows[0][1]}
-    return None
 
 
 def frontmatter_entries(text: str):
@@ -2012,7 +2033,18 @@ def cmd_batch_verify(doc: dict) -> dict:
             if exp.get("prefix") and prefix[:-1] != exp["prefix"]:
                 raise JaibaError("verification-failed", "prefix mismatch")
         except JaibaError as exc:
-            code = "digest-mismatch" if "sha256" in exc.detail else "wire-mismatch" if "wire mismatch" in exc.detail else "foreign-project" if "Project" in exc.detail else "foreign-scope" if "Scope" in exc.detail else exc.code
+            if exc.detail == "foreign Project":
+                code = "foreign-project"
+            elif exc.detail == "foreign Scope":
+                code = "foreign-scope"
+            elif exc.detail == "sha256 mismatch":
+                code = "digest-mismatch"
+            elif exc.detail == "wire mismatch":
+                code = "wire-mismatch"
+            elif exc.detail == "prefix mismatch":
+                code = "prefix-mismatch"
+            else:
+                code = exc.code
             mismatches.append({"step": exp["step"], "code": code, "detail": exc.detail})
             continue
         verified.append(exp["step"])
