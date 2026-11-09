@@ -1,7 +1,7 @@
 ---
 name: jaiba-init
 description: "Project-scoped JAIBA setup and constitutive memory maintenance on the resolved surface (jaiba-memory-surface 1.1.0). Preserves filesystem bootstrap and legacy layouts. Traceless onboarding instruments an external brain with no repository files: AGENTS.md and .ai/ are omitted; only machine binding v2 is saved. Links verified brains, populates concepts, applies approved ADRs and fixes drift; machine setup belongs to jaiba-configure."
-version: 3.3.0
+version: 3.3.1
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git

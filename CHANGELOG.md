@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.3.1 (2026-11-09)
+
+### Fix
+
+- **memory-surfaces**: address PR #18 review findings and comments
+
 ## v3.3.0 (2026-11-02)
 
 ### Feat

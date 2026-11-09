@@ -2,7 +2,7 @@
 name: conduct
 description: >-
   Unified Spec-Driven-Development chain of JAIBA: propose → spec (PRD when depth demands it + design, human approval) → tasks → execute (phase by phase) → validate → summarize. Trigger when the developer describes work to shape or build, requests a PRD/design, or sends a continuation cue ("continue", "next", "go") with an active plan in the resolved executive context. Resolve logical constitutive/executive memory through the selected memory surface; filesystem retains .ai/memory/ and .ai/work/. Explicit override: /conduct [phase]. Not the host agent's native read-only plan mode: this workflow must persist full executive artifacts and approval before execution.
-version: 3.3.0
+version: 3.3.1
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
