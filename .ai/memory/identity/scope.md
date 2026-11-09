@@ -3,7 +3,7 @@ type: scope
 title: "Scope"
 description: "The JAIBA skillset, its memory model, and its subagent battery — not any one project built with it."
 tags: [identity, scope, boundaries]
-updated: "2026-09-15"
+updated: "2026-11-08"
 ---
 
 # Scope
@@ -21,12 +21,15 @@ updated: "2026-09-15"
   - The meta skills: `jaiba-configure` (machine-level setup: global
     contract, skillset, subagent battery), `jaiba-init` (repo-scoped
     bootstrap + `update-brain` modes: `initialize`, `update`,
-    `migrate`), `jaiba-doctor` (health checks: memory coherence, tool
-    state, reference health), `create-knowledge` (converts a skill into
-    a JAIBA knowledge plugin).
+    `migrate`, `migrate-surface`), `jaiba-doctor` (health checks: memory
+    coherence, tool state, reference health), `create-knowledge` (converts
+    a skill into a JAIBA knowledge plugin), `create-memory` (generates,
+    conforms, upgrades and installs memory-surface adapters).
+  - The first-party reference memory surface: `jaiba-engram-memory`
+    (optional adapter implementing protocol `JAIBA4` / `jaiba-engram-storage/4`).
   - The memory model itself: the concept-bundle and legacy-flat layouts
-    of `.ai/memory/`, the `.ai/work/` executive-memory shape, and the
-    dual-resolution rule between them.
+    of `.ai/memory/`, the `.ai/work/` executive-memory shape, external
+    surfaces under `jaiba-memory-surface` 1.1.0, and the dual-resolution rule.
   - The subagent battery: `executor-high/-medium/-low`, `code-analyst`,
     `business-analyst`, `verify` — their invocation contract and
     concurrency policy.
@@ -58,11 +61,12 @@ updated: "2026-09-15"
 
 ## Sub-units
 
-Single-unit repository: **"Single unit."** The seven skills
+Single-unit repository: **"Single unit."** The nine skills
 (`conduct`, `ask`, `fast`, `jaiba-configure`, `jaiba-init`,
-`jaiba-doctor`, `create-knowledge`) are components of one deliverable —
-the JAIBA skillset — not independently deliverable units with separate
-consumers, so `identity/units/` does not exist.
+`jaiba-doctor`, `create-knowledge`, `create-memory`,
+`jaiba-engram-memory`) are components of one deliverable — the JAIBA
+skillset — not independently deliverable units with separate consumers,
+so `identity/units/` does not exist.
 
 ## Relations
 

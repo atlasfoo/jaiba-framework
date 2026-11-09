@@ -3,7 +3,7 @@ type: architecture
 title: "Architecture"
 description: "Skill-based agentic framework: declarative Markdown skills, no traditional application layers or runtime service."
 tags: [identity, architecture, stack]
-updated: "2026-09-15"
+updated: "2026-11-08"
 ---
 
 # Architecture
@@ -17,23 +17,25 @@ updated: "2026-09-15"
 - **Architecture style:** Skill-based agentic framework. The unit of
   delivery is a `SKILL.md` (frontmatter + instructions) plus its
   `assets/` (templates), `references/` (loaded on demand), `scripts/`
-  (verification shell scripts) and `evals/` (eval fixtures). There is no
-  running service and no traditional layering (MVC/hexagonal/clean) —
+  (verification shell scripts and stdlib helpers) and `evals/` (eval fixtures).
+  There is no running service and no traditional layering (MVC/hexagonal/clean) —
   the "runtime" is the AI coding agent interpreting the skill at
   invocation time.
 - **Primary language:** Agent Skills (Markdown) for the skills
   themselves; Bash for verification/toolchain scripts
-  (`skills/*/scripts/*.sh`).
+  (`skills/*/scripts/*.sh`); Python 3 (standard library only) for package
+  codecs and surface helper CLIs (`skills/*/scripts/*.py`).
 - **Primary framework:** The Agent Skills convention (`SKILL.md` +
   `requires:`/`tags:` frontmatter). Built and dogfooded against Claude
   Code; the shipped subagent battery is deliberately model-agnostic
   (no hardcoded `model:` — see
   [ADR-007](../decisions/007-global-repo-local-setup-split.md)) so the
   framework is not tied to one vendor.
-- **Persistence:** None. Project state lives in the repository itself:
-  `.ai/memory/` (constitutive memory, this bundle, versioned) and
-  `.ai/work/` (executive memory — PRD/plan/tasks/walkthrough,
-  gitignored).
+- **Persistence:** Local repository files (`.ai/memory/` constitutive,
+  `.ai/work/` executive) or external pluggable memory surfaces governed by
+  `jaiba-memory-surface` 1.1.0 ([ADR-013](../decisions/013-pluggable-memory-surfaces-architecture.md),
+  [ADR-014](../decisions/014-pluggable-memory-surfaces-v1-1-architecture.md))
+  supporting document-tree or record-store archetypes and traceless operation.
 - **Key packages:** None — no traditional package manifest. The one
   external skill dependency this repo vendors (`skill-creator`) is
   tracked in `skills-lock.json` and installed via the `npx skills`
