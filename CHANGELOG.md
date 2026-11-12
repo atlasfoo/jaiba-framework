@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v3.3.2 (2026-11-12)
+
+### Fix
+
+- **doctor**: clarify local sibling brain read and skill-relative references
+- **doctor**: interview constitutive gaps instead of manual edits
+
 ## v3.3.1 (2026-11-09)
 
 ### Fix

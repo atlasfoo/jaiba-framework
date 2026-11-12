@@ -1,7 +1,7 @@
 ---
 name: jaiba-engram-memory
 description: "Optional first-party JAIBA memory-surface adapter for Engram MCP. Consult when explicitly reviewing, validating, or operating the selected jaiba-engram-memory surface, including owned catalogue reads, authorized concept or executive writes, immutable logs, executive-journal patch/compact, and selective work retirement. Not ordinary Engram bookkeeping, automatic installation, project registration, migration, or activation. Contract jaiba-memory-surface 1.1.0; archetype record-store; protocol JAIBA4 (jaiba-engram-storage/4). Executive journal uses the stdlib helper scripts/jaiba_engram.py. Unmigrated JAIBA3 stores are read-only; migration path is jaiba-init:migrate-surface JAIBA3 → JAIBA4. Selection requires an explicit binding; installation and activation are strictly opt-in and never automatic."
-version: 3.3.1
+version: 3.3.2
 author: atlasfoo<iscomejia15@outlook.com>
 category: memory-surface
 adapter-id: jaiba-engram-memory

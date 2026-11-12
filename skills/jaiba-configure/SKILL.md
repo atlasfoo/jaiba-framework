@@ -1,7 +1,7 @@
 ---
 name: jaiba-configure
 description: Machine-level setup and targeted updates for JAIBA on the host agent. Installs or refreshes the global behavioral contract, core skillset and host-native subagent battery; discovers host-visible memory surfaces and offers optional pinned first-party Engram installation without activation. Preserves explicit user configuration. Update mode refreshes the contract or battery and migrates exact model IDs. Project instrumentation belongs to jaiba-init.
-version: 3.3.1
+version: 3.3.2
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
