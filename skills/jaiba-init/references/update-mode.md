@@ -15,7 +15,9 @@ entry paths**, and a single run may involve either or both:
   slice and update.
 
 Same mode, two on-ramps. Pick the path from the developer's intent; ask
-if it's unclear.
+if it's unclear. An optional confirmed gap brief may arrive with either
+path, or as the only reason for the run. It is not a third path — see
+**Optional confirmed gap brief**.
 
 The bundle layout, the closed `type:` vocabulary, the per-type
 frontmatter and the link convention are **not restated here** —
@@ -123,9 +125,11 @@ that's *allowed* to write — but it still earns each write:
 1. **Show the diff in prose.** Before touching a file, tell the developer
    exactly what will change and why (which fact, which concept — or
    which flat section — from what to what).
-2. **Confirm.** Wait for explicit approval. A manual human edit to any
-   `.ai/` file is itself a final directive (`AGENTS.md` §2.8) — re-read
-   and realign if you find one.
+2. **Confirm.** Wait for explicit approval. A confirmed chosen row in
+   an optional gap brief is already that approval for that field only —
+   don't re-ask it (**Optional confirmed gap brief**). A manual human
+   edit to any `.ai/` file is itself a final directive (`AGENTS.md`
+   §2.8) — re-read and realign if you find one.
 3. **Enact, minimally.** Change only what the trigger justifies. Don't
    "tidy" untouched concepts; a noisy memory diff is hard to trust.
    Bump `updated:` on what you changed, and only on what you changed.
@@ -144,6 +148,49 @@ concept that exists but is not in the index is invisible to every skill
 that resolves through it, and a line pointing at a deleted concept is a
 broken-link finding for `jaiba-doctor`. The flat layout has no
 equivalent step: its indexes live inside the files themselves.
+
+## Optional confirmed gap brief
+
+Not a mode. Optional input: a chat-report list from `jaiba-doctor`'s
+gap interview (`skills/doctor/references/gap-interview.md`). Not a
+file. One row per asked gap — `address`, `marker`, `chosen` or
+`defer`, `origin` (a candidate path, `freeform`, or `none`),
+`confirmed` (`yes` only when the human answered). Silence is not a
+row.
+
+No brief → this section does not apply. Ask, or mark `[MISSING]`,
+as today. Don't require a brief.
+
+Brief present → write only a row with `confirmed: yes` and a human
+`chosen` value, not `defer`. That row is the change: replace the
+marker at `address` with `chosen`, and nothing else. Show the prose
+diff, don't ask again, then enact. The row needs no Path A proposal
+and no Path B contradiction. Resolve `address` the way this mode
+already resolves concepts; don't create a concept to hold the value.
+
+Don't write, and don't re-ask:
+
+- a row that is not `confirmed: yes`, including silence;
+- a `defer` row, even with `confirmed: yes` — leave the marker;
+- a row with both `chosen` and `defer`, or with neither;
+- any candidate the human did not pick. A quoted sibling or other
+  foreign value is writable only when that row's `chosen` is the
+  human's selection and `confirmed` is `yes`. Write `chosen`. Don't
+  open `origin` to enrich, correct, or extend it.
+
+Every other gap stays `[MISSING]`, `[NEEDS CLARIFICATION]`, or its
+unfilled `[bracket]`. Don't invent the rest. Don't fill unasked
+gaps. If the marker is not in the object you read, don't write
+that row.
+
+This does not block Path A or Path B work the developer actually
+requested. It only bounds gap fills.
+
+Still `update`. Don't skip the write verification, revision check,
+or readback this mode already requires — SKILL.md's mutation
+discipline, and read/compare revisions plus full readback/receipts
+after every write (external step 5). Still append the `brain-change`
+entry; name the brief as provenance.
 
 ## Path A — apply proposals
 
@@ -348,6 +395,10 @@ End every `update` run with a short report:
   `conduct`/`fast` fix, not a brain update.
 - **Inventing a consumption point** for a proposed integration instead of
   grounding it or marking `[MISSING]`.
+- **Applying a gap brief as a new mode, or past the rows the human
+  confirmed.** Optional input only. Write `confirmed: yes` + `chosen`.
+  Leave every other gap marked. Don't re-ask a confirmed chosen value,
+  and don't skip the revision check, readback, or receipt.
 - **Re-inventorying consumers inside `purpose.md` / `scope.md`** instead
   of creating (or removing) the `reference` concept that carries
   `role: downstream`. That duplication is exactly what the bundle

@@ -527,6 +527,11 @@ So the order is:
    ask the developer with a structured questionnaire (`ask_user_input_v0`
    if available, otherwise chat). One topic per question; closed options
    when the answer space is closed.
+
+   A confirmed gap brief from `jaiba-doctor` (`references/update-mode.md`,
+   "Optional confirmed gap brief") is already an answer. Do not ask
+   those `confirmed: yes` + `chosen` fields again. `defer` and every
+   other gap stay marked. This is not a new mode.
 2. **Mark, don't confabulate.** If the developer defers a question, leave
    the canonical placeholder — `[MISSING]` for an absent fact,
    `[NEEDS CLARIFICATION]` for an ambiguous one — rather than inventing a
