@@ -152,7 +152,7 @@ equivalent step: its indexes live inside the files themselves.
 ## Optional confirmed gap brief
 
 Not a mode. Optional input: a chat-report list from `jaiba-doctor`'s
-gap interview (`skills/doctor/references/gap-interview.md`). Not a
+gap interview (`references/gap-interview.md`). Not a
 file. One row per asked gap — `address`, `marker`, `chosen` or
 `defer`, `origin` (a candidate path, `freeform`, or `none`),
 `confirmed` (`yes` only when the human answered). Silence is not a
