@@ -332,6 +332,10 @@ Any of these → **Broken** if the file is essentially still a template
 (pervasive brackets), **Degraded** if it's mostly filled with a few gaps
 remaining. This is the §5.4 discipline: an incomplete brain the
 developer doesn't know about gets trusted as if it were complete.
+Route to `jaiba-init:update-brain`. When constitutive gaps remain
+(`[MISSING]`, `[NEEDS CLARIFICATION]`, or unfilled `[bracket]`),
+after the health report, run `references/gap-interview.md`. The route
+to `jaiba-init` stays. Doctor still does not write.
 
 > A file that is *all* brackets means initialize never finished (or never
 > ran). That's still a finding here, not a stop condition — report it and
@@ -426,5 +430,8 @@ useful than an exhaustive audit.
   → `jaiba-init:update-brain` **update**. Two layouts coexisting →
   `jaiba-init` for explicit reconciliation, not automatic conversion.
 - **Don't confabulate the fix content.** doctor says *what's wrong* and
-  *which skill fixes it*; it never drafts the corrected constitution text
-  — that would be patching the brain by the back door.
+  *which skill fixes it*; it still does not write or draft a rewritten
+  concept — that would be patching the brain by the back door. A
+  human-confirmed value may appear in the gap-interview brief
+  (`references/gap-interview.md`), but doctor still does not write the
+  concept.

@@ -1,6 +1,6 @@
 ---
 name: jaiba-doctor
-description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence under jaiba-memory-surface 1.1.0 (incl. v2 bindings, legacy consolidation, agent-agnostic tool preflight, and global contract drift), tool state, and external-reference health, then routes to fixes. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
+description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence under jaiba-memory-surface 1.1.0 (incl. v2 bindings, legacy consolidation, agent-agnostic tool preflight, and global contract drift), tool state, and external-reference health, then routes to fixes; interviews constitutive gaps for a confirmed brief routed to jaiba-init without writing memory. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
 version: 3.3.1
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -233,11 +233,28 @@ Rules for the report:
   pre-flight before the `conduct` chain. Don't manufacture
   findings to look busy.
 
+## Gap interview — after the health report
+
+The consolidated health report always comes first, keeping its same structure.
+After that report, if constitutive gaps remain (diagnostic 1, Layer 2:
+`[MISSING]`, `[NEEDS CLARIFICATION]`, or unfilled `[bracket]`), run
+`references/gap-interview.md`. Do not interview tool-state or
+reference-health findings.
+
+The interview offers options (leave the marker, untrusted candidates from
+already-read text or C4 siblings, or freeform) and emits a confirmed brief
+in the chat report. It names `jaiba-init:update-brain` as the writer.
+Doctor does not call the write and does not edit selected memory, bindings,
+or vendored files. The only write remains `.atl/tool-layout.md`. A confirmed
+value in the brief is not a memory write.
+
 ## Boundaries
 
 - **Diagnose and route — don't fix.** doctor proposes; the owning skill
   enacts. The one thing it writes is `.atl/tool-layout.md` (machine
   state, §6), never selected memory, routing bindings or vendored files.
+  A confirmed value in the gap-interview brief is not a memory write
+  (it is an evidence harvest routed to `jaiba-init:update-brain`).
   Constitutive changes belong to `jaiba-init`; executive writes belong to
   `conduct`, subject to the transition gates. In traceless mode (external surface
   selected or absent local `.ai/`), doctor registers `.atl/` in Git `info/exclude`
@@ -255,8 +272,9 @@ Rules for the report:
 ## Common failure modes
 
 - **Patching the brain instead of routing.** Editing `.ai/memory/` to
-  "fix" an incoherence doctor found violates §2.9. Report it and point
-  at `jaiba-init:update-brain`.
+  "fix" an incoherence doctor found violates §2.9. Recording confirmed values in
+  the gap brief is not a memory write; report the brief and route the write to
+  `jaiba-init:update-brain`.
 - **Passing an unchecked dependency as healthy.** No web tools doesn't
   mean a URL is reachable — mark it `[UNVERIFIED]`, don't green-light it.
 - **Confusing path absence with brain absence.** Resolve the selected
