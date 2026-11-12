@@ -61,7 +61,7 @@ Options, every time:
 Nothing is pre-selected. Do not invent a coverage threshold. Do
 not promote an `e.g.` inside a template bracket into an option or
 a default. The quality-gate template example `≥ 85%`
-(`skills/jaiba-init/assets/concepts/quality-gate.md`) is not an
+(`jaiba-init`'s `assets/concepts/quality-gate.md`) is not an
 option and not a default.
 
 ## Candidates
@@ -74,7 +74,7 @@ Active repo: quote only text this run already read. Do not walk
 the tree and do not infer a fact the text does not state.
 
 A sibling is the rule in
-`skills/jaiba-init/references/bootstrap-mode.md` Issue #17 C4 —
+`jaiba-init`'s `references/bootstrap-mode.md` Issue #17 C4 —
 the definition, not that file's namespace question:
 
 - Same sanitized host **and** same first path segment (the group)
@@ -93,8 +93,8 @@ root is not a root to open.
 
 Inside a sibling root, this closed list only, read-only:
 
-- that root's JAIBA constitutive brain (not selected as this
-  project's surface)
+- that root's local `.ai/memory/` JAIBA constitutive brain, if
+  present on disk (not selected as this project's surface)
 - `AGENTS.md`
 - `CLAUDE.md`
 - `.github/copilot-instructions.md`
