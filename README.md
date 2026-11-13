@@ -453,13 +453,13 @@ The unified workflow (it absorbed the former `planning` and `specification` skil
 Direct execution for small, well-scoped, low-risk changes — the sanctioned exception to "no blind coding". Not user-invocable: the routing rule triggers it on "quick fix" / "bump X" / "rename this" style requests.
 
 - **Shares conduct's triage** with default and floor `inline`: if the change triages `design` or deeper, `fast` refuses and routes into the chain.
-- **Free-standing:** acts directly, writes nothing to `.ai/work/`; git history plus a one-line recap is the record.
-- **Plan adjustment:** with an active plan, executes the out-of-band change and — after developer confirmation — records it into the plan artifacts.
+- **Free-standing:** delegates the code diff to a callable executor (inline fallback after alert if none is callable), writes nothing to `.ai/work/`; git history plus a one-line recap is the record.
+- **Plan adjustment:** with an active plan, a change outside the current tasks routes here even if the message does not say `fast`. Delegates the out-of-band change to a callable executor and — after developer confirmation — records it into the plan artifacts (`fast` remains the only writer of that amendment).
 - **Big out-of-band change during an active plan:** surfaces it and offers exactly two exits — fold it in as a new plan phase, or park-and-replan. Never builds a second plan silently.
 
 ### 💬 `ask` — implicit read-only lane
 
-Pure query mode, triggered by interrogative messages. Strictly read-only: reads, searches, explains; never edits code, never writes artifacts.
+Pure query mode, triggered by interrogative messages (including a side question the agent receives, such as `/btw`). Strictly read-only: dispatches `researcher` when callable (with no `model:` pin; inline fallback after alert if unavailable), reads, searches, explains; never edits code, never writes artifacts.
 
 - **Answers cold** — orients from the repository, so questions about the active work (`.ai/work/`) or past decisions (`.ai/memory/`) work on a session's first message.
 - **Four domains:** code, active plan, active PRD, decisions (`decision` concepts, or `adr-log.md` in the legacy flat layout, plus `memory/log/`).
@@ -500,16 +500,17 @@ The first-party memory-surface adapter for the Engram MCP — developed in the s
 
 ## 🤖 The subagent battery
 
-`jaiba-configure` installs six native subagent definitions into the agent's global `agents/` folder. Conduct **must dispatch applicable roles** when the host permits it, the roles are runtime-callable, and prerequisites are verified. The invocation contract (`conduct/references/subagents.md`) governs runtime and toolchain checks, concurrency, and fallback accounting. An exposed role is runtime evidence; doctor's detected files alone do not prove invocation support. Authorized first-party role calls need no separate approval.
+`jaiba-configure` installs seven native subagent definitions into the agent's global `agents/` folder. Conduct, `ask`, and `fast` **must dispatch applicable roles** when the host permits it, the roles are runtime-callable, and prerequisites are verified. The invocation contract (`conduct/references/subagents.md`) governs runtime and toolchain checks, concurrency, and fallback accounting. An exposed role is runtime evidence; doctor's detected files alone do not prove invocation support. Authorized first-party role calls need no separate approval.
 
-| Subagent | Role | Used in phase |
+| Subagent | Role | Used in phase / lane |
 |---|---|---|
-| `executor-high` | Design-heavy, multi-file tasks (`load: high`) | `execute` |
-| `executor-medium` | Bounded implementation tasks (`load: medium`) | `execute` |
-| `executor-low` | Mechanical, repetitive tasks (`load: low`) | `execute` |
+| `executor-high` | Design-heavy, multi-file tasks (`load: high`) | `execute`, `fast` |
+| `executor-medium` | Bounded implementation tasks (`load: medium`) | `execute`, `fast` |
+| `executor-low` | Mechanical, repetitive tasks (`load: low`) | `execute`, `fast` |
 | `code-analyst` | Code survey without loading conduct's context | `spec` (both depths), `propose` when code facts are needed |
 | `business-analyst` | Contrasts the requirement against the identity/decision/reference concepts (or constitution / adr-log / reference-index, legacy flat) | `propose`, `spec` |
 | `verify` | Checks PRD criteria or approved design scope; reports met / not met / not verifiable with evidence | `validate` (both depths) |
+| `researcher` | Read-only codebase, memory, and artifact investigation without a model pin | `ask` |
 
 **Parallelism:** independent read-only business and code analyses launch before either is awaited, within host capacity; current reports can be reused. `execute` launches file-disjoint tasks in **waves** from the `depends-on` graph, capped at min(3, available host child slots). A single task still uses its executor; overlapping tasks serialize through executors. Each invocation names file ownership and concurrent workers. Conduct alone writes `.ai/work/` and reintegrates results before the next wave.
 
@@ -672,7 +673,7 @@ Projects instrumented before the conduct unification use `planning`/`specificati
 | **Lane** | An implicit, routing-triggered skill: `ask` (read-only) or `fast` (inline execution) |
 | **Wave** | A set of file-disjoint tasks `execute` fans out to executor subagents in parallel (cap 3) |
 | **Skill** | An executable workflow with defined phases/modes and human validation checkpoints |
-| **Subagent battery** | The six globally-installed agents: three executors by cognitive load + `code-analyst`, `business-analyst`, `verify` |
+| **Subagent battery** | The seven globally-installed agents: three executors by cognitive load + `code-analyst`, `business-analyst`, `verify`, `researcher` |
 | **Human in the loop** | The principle that the human validates and approves before each significant stage |
 
 ---

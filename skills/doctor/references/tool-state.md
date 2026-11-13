@@ -79,7 +79,7 @@ unchanged and does not resolve or validate memory surfaces.
    - **Subagents** — every `<agent-folder>/agents/*.md` definition file.
      This includes the JAIBA battery `jaiba-configure` installs into the
      **global** agents folder (`executor-high/medium/low`, `code-analyst`,
-     `business-analyst`, `verify`) — the global skills dir passed to the probe
+     `business-analyst`, `verify`, `researcher`) — the global skills dir passed to the probe
      makes its parent's `agents/` get scanned, so the battery's declared tools
      gain provenance rows (`subagent:executor-high`, …) automatically, and
      their definition paths and detection status are recorded in `tool-layout.md`.

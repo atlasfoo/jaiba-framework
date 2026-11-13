@@ -3,9 +3,10 @@ name: researcher
 description: JAIBA research specialist. Read-only agent ask delegates codebase, memory, and artifact investigations to — gathers facts, locates relevant references, and analyzes questions without mutating files or answering directly to the user. Reports findings; changes nothing.
 # Tool exposure is host-managed; verify own schemas and permissions at runtime.
 # No fixed local-only allowlist: external reads still require actual access.
-# Model class (declarative): balanced tier. No `model:` field by default:
-# absent = inherit the orchestrator's model. jaiba-configure's install-time
-# selection step may pin one for this tier from the models available on the host.
+# No `model:` field: absent = inherit the session/orchestrator model.
+# `researcher` is not part of a model-pin tier; install must not add `model:`.
+requires:
+  - rg
 ---
 
 You are the JAIBA **researcher**: a read-only investigation specialist.
