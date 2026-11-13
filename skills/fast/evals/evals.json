@@ -146,7 +146,7 @@
         "failure_scenario": "simulated executive revision conflict on conduct handoff"
       },
       "expected_output": [
-        "Triage classifies the contained code change inline; fast edits code and exercises its test/Quality Gate before seeking confirmation",
+        "Triage classifies the contained code change inline; the code diff is delegated to a callable executor while fast still owns the amendment, exercising test/Quality Gate before seeking confirmation",
         "On refusal it makes no executive memory write; on confirmation it hands proposed task/amendment/walkthrough updates and captured full-read revisions to conduct",
         "Fast never writes JAIBA executive objects itself; conduct compares revisions and verifies full readback",
         "On simulated revision conflict, conduct stops and does not claim a successful update or retry blindly",
@@ -172,6 +172,61 @@
         "Emits append-to-section (or append-section) on plan for Plan amendments bullet and on walkthrough for the out-of-band record",
         "Supplies expected-head revision from last verified render to guarantee single-writer consistency",
         "Conduct verifies full readback and updates context-head slot, achieving O(delta) mutation efficiency"
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "delegation-with-inline-fallback",
+      "context_under_test": "executor-delegation",
+      "prompt": "quick fix: add null check to user display name in the profile component",
+      "context": {
+        "work_state": "active",
+        "triage_result": "inline",
+        "executor_status": "callable in primary run; unavailable / not callable in fallback scenario",
+        "quality_gate_present": "present"
+      },
+      "expected_output": [
+        "An inline code change is delegated to a callable executor (executor-low, executor-medium, or executor-high matching the change load)",
+        "Executor receives the change, allowed files, and gate commands with instructions not to write executive memory",
+        "Fast remains the only writer of the amendment; the executor does not write executive memory",
+        "If no executor is callable, fast alerts with the role and the concrete blocker (missing, not callable, or misconfigured)",
+        "After the alert, fast does the change inline and does not block"
+      ],
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "unnamed-amendment-enters-fast",
+      "context_under_test": "unnamed-plan-adjustment",
+      "prompt": "add a timeout configuration parameter to the webhook client call",
+      "context": {
+        "work_state": "active approved plan executing",
+        "prompt_phrasing": "change request outside current planned tasks without mentioning fast",
+        "triage_result": "inline"
+      },
+      "expected_output": [
+        "Active plan exists and the message is a change outside the current tasks that does not say fast",
+        "The change request still enters fast via the implicit routing rule",
+        "Fast triages the out-of-band change as inline and delegates the code change to a callable executor",
+        "Fast remains the only writer of the amendment, confirming with the developer before updating work artifacts"
+      ],
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "continue-does-not-enter-fast",
+      "context_under_test": "continuation-routing",
+      "prompt": "continue",
+      "context": {
+        "work_state": "active approved plan executing",
+        "prompt_type": "continuation cue (continue / next / go)"
+      },
+      "expected_output": [
+        "Prompt is 'continue' while an active approved plan exists",
+        "Request stays on conduct execute; fast does not take it",
+        "Routing rule does not trigger fast on continuation cues (continue / next / go)",
+        "Conduct continues execution of the active plan without entering fast"
       ],
       "files": []
     }

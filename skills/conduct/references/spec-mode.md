@@ -97,12 +97,16 @@ depth:
 
 ## Step 2 — design (`plan.md`, always)
 
+When a native plan client applies, follow
+`references/native-plan-client.md` before deciding the how.
+
 1. **Use the current analyst reports** (shared with define when it ran)
    and decide the *how*: approach, boundaries, integration points, what
    is explicitly out. Request only the follow-ups needed to decide.
 2. **Clarify remaining design-level questions** the same way — ask,
    resolve, then write.
-3. **Create the context's `plan`** from `assets/plan-template.md`. The
+3. **Create the context's `plan`** from `assets/plan-template.md`.
+   Follow `references/ticket-link.md` when creating or amending. The
    first write is `create` (the base). Size it to the same unchunked
    budget. Later draft corrections are `patch`, not a second full write:
    - **Objective** — what and why, 2–4 sentences. At `design` depth

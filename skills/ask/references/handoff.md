@@ -35,12 +35,17 @@ the framework routing rule — continuation → `execute`, question →
   options".
 - Hypotheticals: "if we changed X, what would break?" — analysis, not a
   request to change X.
+- A side question the agent actually receives (`/btw`, or a documented
+  equivalent delivered as a message). It enters `ask`. It does not
+  mutate executive work and does not follow `execute`.
 
 **Now an action (hand off):**
 - Imperatives that mutate state: "do…", "add…", "change…",
   "rename…", "bump the version".
 - Continuation cues against an approved plan: "continue", "next",
-  "advance", "go", "proceed".
+  "advance", "go", "proceed". `continue`, `next`, and `go` remain
+  continuation cues for `conduct`'s `execute` phase, not questions —
+  do not take them into `ask`.
 - Work-shaping requests: "let's plan this", "we need a feature
   that…", "help me spec this out".
 - A direct "yes, do it" / "ok, go" answering an offer you just made.
@@ -61,8 +66,31 @@ an explanation *and* a fix, and they're owed both, in that order.
 `ask`, like `fast`, is a pure routing lane — the developer never
 invokes any of these by command except `/conduct [phase]`, which
 remains the one explicit override when routing misfires or a phase
-must be forced. If the developer's intent is clear, route; don't tell
-them to type a command.
+must be forced. There is still no `/ask` command. If the developer's
+intent is clear, route; don't tell them to type a command.
+
+What the host does not deliver to the agent is a limit, not a hook:
+do not claim to have intercepted a command the agent never received.
+
+## Investigation is not a hand-off
+
+When `researcher` is callable, dispatch it for the investigation. Do
+not set `model:` on the dispatch — it inherits the session model. The
+role is read-only and returns a report; the parent agent drafts the
+user-facing answer from that report and does not repeat the delegated
+investigation inline. Neither `ask` nor `researcher` writes executive
+memory (`.ai/work/` or the executive category). Dispatching
+`researcher` stays inside `ask`; it is not a route to `execute`.
+
+A file at `skills/jaiba-configure/assets/agents/researcher.md` or
+`skills/jaiba-configure/assets/agents/opencode/researcher.md` is not
+proof the role is callable on this host. Callability is a runtime
+check.
+
+If `researcher` is missing, not callable, or misconfigured, alert with
+the role and the concrete blocker before that fallback, then answer
+inline and say so. Do not block the answer, and do not route that
+fallback to `execute`.
 
 ## How to hand off
 

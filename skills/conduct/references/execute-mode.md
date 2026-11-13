@@ -165,10 +165,11 @@ this section is the wave mechanics.
 **Preflight for delegation** (on top of the phase preflight): run the
 pre-invocation check from `subagents.md § Pre-invocation toolchain
 check` — host permission, exposed/callable roles, and verified tools.
-Detected definition files alone do not prove runtime support. Surface
-any gap with its role/task and record the reason for affected inline work;
-continue dispatching available tiers. An actual dispatch error requires
-review of child state and possible partial writes before safe retry or
+Detected definition files alone do not prove runtime support. When a
+needed role is missing, not callable, or misconfigured, alert first naming
+the role and concrete blocker before sequential fallback; do not block
+the chain, and continue dispatching available tiers. An actual dispatch error
+requires review of child state and possible partial writes before safe retry or
 fallback (`subagents.md § Dispatch and fallback accounting`).
 
 1. **Build the wave.** From the active phase's unchecked tasks, take
@@ -204,9 +205,12 @@ fallback (`subagents.md § Dispatch and fallback accounting`).
 
 **Fallback requires evidence.** Inline sequential execution is limited
 per role/task to the concrete blockers in `subagents.md § Dispatch and
-fallback accounting`. Record dispatched role or fallback reason beside
-each task's result. Convenience, task size, and overlapping files never
-justify bypassing an available executor. Same walkthrough and gate apply.
+fallback accounting`. When a needed role is missing, not callable, or
+misconfigured, alert first naming the role and concrete blocker before
+sequential fallback; do not block the chain. Record dispatched role or
+fallback reason beside each task's result. Convenience, task size, and
+overlapping files never justify bypassing an available executor. Same
+walkthrough and gate apply.
 
 ## Mid-phase deviations
 

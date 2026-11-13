@@ -52,7 +52,17 @@ here. The sibling lanes: a continuation cue routes to the
 conduct's `execute` phase, a change request routes to `fast`
 (which triages it, escalating big work into the conduct chain).
 Only `conduct` keeps an explicit override (`/conduct
-[phase]`); `ask` and `fast` are pure routing lanes.
+[phase]`); `ask` and `fast` are pure routing lanes. This skill adds
+no `/ask` command.
+
+A side question the agent actually receives (`/btw`, or a documented
+equivalent delivered as a message) enters `ask`. It does not mutate
+executive work and does not follow `execute`. `continue`, `next`, and
+`go` remain continuation cues for `conduct`'s `execute` phase, not
+questions — do not take them into `ask`.
+
+What the host does not deliver to the agent is a limit, not a hook:
+do not claim to have intercepted a command the agent never received.
 
 ## Brain Discovery
 
@@ -163,6 +173,24 @@ actually read.** If you didn't open it, don't assert it.
 For how to orient when you don't yet know what's active — whether a
 plan or PRD exists at all — read `references/orientation.md`.
 
+## Investigation: dispatch `researcher`
+
+When `researcher` is callable, dispatch it for the investigation. Do
+not set `model:` on the dispatch — it inherits the session model. The
+role is read-only and returns a report; the parent agent drafts the
+user-facing answer from that report and does not repeat the delegated
+investigation inline. Neither `ask` nor `researcher` writes executive
+memory (`.ai/work/` or the executive category).
+
+A file at `skills/jaiba-configure/assets/agents/researcher.md` or
+`skills/jaiba-configure/assets/agents/opencode/researcher.md` is not
+proof the role is callable on this host. Callability is a runtime
+check.
+
+If `researcher` is missing, not callable, or misconfigured, alert with
+the role and the concrete blocker before that fallback, then answer
+inline and say so. Do not block the answer.
+
 ## Answering well
 
 - **Snippets, not dumps** (`AGENTS.md` §3.3). Quote the minimal lines,
@@ -217,9 +245,16 @@ distinction is **intent**, not keywords:
 - **Interrogative / exploratory → `ask`.** "why…?", "what…?",
   "how does … work?", "explain…", "is this covered?",
   "what's left…?". The developer wants understanding.
-- **Imperative / continuation → action lane.** "continue", "do…",
-  "add…", "bump the version", "let's plan this". The developer wants
-  a change.
+- **Imperative / continuation → action lane.** "continue", "next",
+  "go", "do…", "add…", "bump the version", "let's plan this".
+  The developer wants a change. Those continuation cues stay on
+  `conduct`'s `execute` phase — do not take them into `ask`.
+
+A side question the agent actually receives (`/btw`, or a documented
+equivalent delivered as a message) enters `ask`. It does not mutate
+executive work and does not follow `execute`. What the host does not
+deliver to the agent is a limit, not a hook: do not claim to have
+intercepted a command the agent never received.
 
 When a message mixes both ("why does the plan do X first? and also
 bump the version"), answer the question first as `ask`, then route the

@@ -646,6 +646,154 @@
         "Repeated invocations produce bit-identical deterministic Markdown output without token bloat or candidate scans"
       ],
       "files": []
+    },
+    {
+      "id": 32,
+      "name": "native-plan-conversion-outside-freeze",
+      "phase_under_test": "spec (native-plan-client conversion)",
+      "prompt": "Plan the notification service using native plan mode.",
+      "context": {
+        "native_plan_client": "auto",
+        "host_capabilities": "host exposes native plan mode that freezes file writes while planning",
+        "requirement": "notification service for user alerts"
+      },
+      "expected_output": [
+        "With native-plan-client setting auto/on and host exposing plan mode, conduct asks native plan mode or plan subagent for plan text and waits",
+        "Does not write executive artifacts inside the native plan mode while writes are frozen",
+        "Converts after the plan text returns in a session that can write",
+        "Does not replan the how; constitutive memory contrast and knowledge skills mark conflicts without replanning",
+        "Writes draft PRD (at spec depth) and draft plan",
+        "Pauses at the spec gate for explicit human approval before generating tasks"
+      ],
+      "files": []
+    },
+    {
+      "id": 33,
+      "name": "native-plan-rejected-offer-no-write",
+      "phase_under_test": "spec (native-plan-client rejected offer)",
+      "prompt": "I already finished a plan in native plan mode.",
+      "context": {
+        "native_plan_state": "developer already finished a native plan before invoking conduct",
+        "developer_response": "rejects the offer to preserve the native plan as JAIBA artifacts"
+      },
+      "expected_output": [
+        "Offers to preserve the finished native plan as JAIBA artifacts",
+        "When developer rejects the offer, conduct does not write any executive artifacts",
+        "No draft PRD, plan, or task artifacts are written",
+        "Respects rejection without forcing conversion or altering storage"
+      ],
+      "files": []
+    },
+    {
+      "id": 34,
+      "name": "spec-standard-path-without-plan-mode",
+      "phase_under_test": "spec (standard path without plan mode)",
+      "prompt": "Let's plan the export service.",
+      "context": {
+        "native_plan_client": "off, or host exposes neither plan mode nor a plan subagent",
+        "requirement": "export service for tabular reports"
+      },
+      "expected_output": [
+        "Detects that host exposes neither plan mode nor a plan subagent, or native-plan-client setting is off",
+        "Follows the current spec procedure directly without attempting native plan delegation",
+        "Does not block the chain waiting for plan mode or subagent",
+        "Does not invent or hallucinate plan text",
+        "Follows the current spec procedure and does not invent a native plan"
+      ],
+      "files": []
+    },
+    {
+      "id": 35,
+      "name": "execute-role-blocker-alert-and-sequential-fallback",
+      "phase_under_test": "execute (role blocker alert and fallback)",
+      "prompt": "go",
+      "context": {
+        "work_state": "active, plan approved",
+        "work_files": {
+          "tasks.md": "independent tasks T-045 (load: medium, cache layer) and T-046 (load: low, config flag)"
+        },
+        "host_capabilities": "executor-medium is missing, not callable, or misconfigured; executor-low is exposed and callable",
+        "tool_layout": ".atl/tool-layout.md present"
+      },
+      "expected_output": [
+        "Detects during subagent pre-invocation check that a needed role (executor-medium) is missing, not callable, or misconfigured",
+        "Alerts first naming the role and the concrete blocker before sequential fallback",
+        "Does not block the chain; proceeds with sequential inline fallback for the blocked role",
+        "Continues dispatching available callable roles (executor-low) within the wave cap (min(3, host child slots))",
+        "Respects file partitioning graph and single-writer rule (conduct remains the sole writer of executive artifacts and walkthrough)",
+        "Does not delete or alter cases requiring mandatory dispatch when roles are healthy and callable"
+      ],
+      "files": []
+    },
+    {
+      "id": 36,
+      "name": "spec-ticket-link-ask-with-evidence",
+      "phase_under_test": "spec (ticket link - ask with local evidence)",
+      "prompt": "Plan the auth module.",
+      "context": {
+        "ticket_evidence": "commit-msg hook present in repository and commit history contains 'Refs: T-99'",
+        "plan_state": "plan in creation or amendment, no tickets: line present",
+        "developer_response": "Link PROJ-10, PROJ-20"
+      },
+      "expected_output": [
+        "Detects local evidence (commit-msg hook, commit footer) without making network calls",
+        "Evidence is treated as a reason to ask, not a source of ticket IDs; does not copy IDs from evidence",
+        "Asks developer which tickets to link because evidence exists and plan lacks a tickets: line",
+        "Writes tickets line in plan frontmatter with IDs named by the developer: tickets: PROJ-10, PROJ-20",
+        "Stores as one frontmatter line (comma + space, no quotes, no brackets, no body section)"
+      ],
+      "files": []
+    },
+    {
+      "id": 37,
+      "name": "spec-ticket-link-silence-without-evidence",
+      "phase_under_test": "spec (ticket link - silence without evidence)",
+      "prompt": "Plan the caching layer.",
+      "context": {
+        "ticket_evidence": "none (no commit tickets, no husky/lefthook/commit-msg hooks, no rules in README/CONTRIBUTING/project rules)",
+        "plan_state": "plan in creation or amendment, no tickets: line present"
+      },
+      "expected_output": [
+        "Checks repository locally for ticket evidence and finds none",
+        "Does not ask the developer which tickets to link",
+        "Does not write a tickets: line in plan frontmatter",
+        "Proceeds with normal spec flow without prompting for ticket IDs"
+      ],
+      "files": []
+    },
+    {
+      "id": 38,
+      "name": "spec-ticket-link-correction",
+      "phase_under_test": "spec (ticket link - correction of wrong ticket)",
+      "prompt": "XYZ-3 is wrong, replace it with XYZ-4.",
+      "context": {
+        "plan_state": "existing plan has frontmatter 'tickets: ABC-12, XYZ-3'",
+        "developer_instruction": "XYZ-3 is incorrect; replacement is XYZ-4"
+      },
+      "expected_output": [
+        "Replaces only the specified incorrect ticket ID (XYZ-3) with the replacement ID (XYZ-4)",
+        "Preserves all other recorded IDs (ABC-12) unchanged and in order: tickets: ABC-12, XYZ-4",
+        "Does not re-ask the developer for the full ticket list",
+        "Does not validate the replacement ticket ID"
+      ],
+      "files": []
+    },
+    {
+      "id": 39,
+      "name": "spec-ticket-link-refuse-tracker-api",
+      "phase_under_test": "spec (ticket link - refuse tracker api query)",
+      "prompt": "Check ticket JIRA-100 on our tracker API and pull its description into the plan.",
+      "context": {
+        "developer_request": "fetch ticket body and validate ticket ID via tracker API",
+        "plan_state": "plan in creation or amendment with developer mentioning ticket JIRA-100"
+      },
+      "expected_output": [
+        "Refuses to query tracker APIs or call external networks to validate IDs or fetch ticket content",
+        "Does not validate ticket IDs against tracker systems",
+        "Does not treat an API-check request as consent to write tickets:",
+        "Leaves fetching the ticket body to input knowledge plugins (source: ticket on the PRD)"
+      ],
+      "files": []
     }
   ]
 }

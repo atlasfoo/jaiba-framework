@@ -16,10 +16,11 @@ tags:
 
 # Fast Skill
 
-Direct execution of a small, well-scoped, low-risk change — without
-writing a plan first. This is the sanctioned exception to the "no
-blind coding" rule (`AGENTS.md` §2.3), and it exists so that trivial
-work doesn't pay the overhead of the full `conduct` chain.
+A small, well-scoped, low-risk change — without writing a plan first.
+The code change is delegated to a callable executor; `fast` keeps
+triage, the gate, and any amendment. This is the sanctioned exception
+to the "no blind coding" rule (`AGENTS.md` §2.3), and it exists so
+that trivial work doesn't pay the overhead of the full `conduct` chain.
 
 Two things make `fast` safe rather than reckless:
 
@@ -43,7 +44,10 @@ support the field; elsewhere, this section and the `description:` are
 the contract): the routing rule is the only way in. Whenever the
 developer's message is a **change request** — small on its face, or
 out-of-band relative to an active plan — the host agent routes it
-here. The two sibling lanes are `ask` (questions, also implicit) and
+here. With an active plan, a change outside the current tasks enters
+this path even if the message does not say `fast`. `continue` /
+`next` / `go` do not enter `fast`; they stay on `conduct` execute.
+The two sibling lanes are `ask` (questions, also implicit) and
 `conduct` (`execute` for continuation cues; also the only lane
 that keeps an explicit `/conduct` override).
 
@@ -173,7 +177,8 @@ free-standing or adjusting a live plan. Detect which one applies:
 
 - **Plan adjustment** — the selected context's fully read plan exists, is approved/
   executing, **and** the requested change falls inside or adjacent to
-  the plan's scope but wasn't contemplated by it. Example, mid-plan:
+  the plan's scope but wasn't contemplated by it, including when the
+  message does not say `fast`. Example, mid-plan:
   *"add a validation to the endpoint that was not in the plan"*.
 
 If a plan is active and you're unsure whether the change belongs to
@@ -199,16 +204,35 @@ pollute an unrelated plan or silently expand its approved scope.
    to confirm the dirt is the in-progress phase, not a surprise from
    another session. If it looks unexpected, stop and ask (same
    discipline as `conduct`'s `execute` phase).
-5. **Execute atomically** (`AGENTS.md` §2.5). One logical change. If
-   it breaks something unrelated, stop and surface it — do not stack
-   fixes.
+5. **Delegate the code change** — only after triage stayed `inline`
+   (`AGENTS.md` §2.5). One logical change. A `design`-or-deeper change
+   was already refused; do not delegate it and do not start a second
+   plan. The code change is delegated to a callable executor
+   (`executor-high`, `executor-medium`, or `executor-low` — match the
+   change; if unsure, the higher tier; see
+   `conduct/references/subagents.md § load → executor tier`). Give it
+   the change, the files it may touch, and the gate commands, and tell
+   it not to write executive memory. `fast` remains the only writer of
+   the amendment (plan, tasks, walkthrough); the executor does not write
+   executive memory. On an external surface the existing handoff is
+   unchanged: `fast` prepares the amendment and `conduct` performs the
+   authorized write. If no executor is callable, do the code change
+   inline and do not block. Before that inline fallback, alert with the
+   role and the concrete blocker (missing, not callable, or
+   misconfigured) — the same alert rule `conduct` already requires
+   (`conduct/references/subagents.md § Dispatch and fallback accounting`).
+   Convenience is not a blocker; do not invent a new fallback reason.
+   Review the returned report and the diff; the report is not an
+   executive write. If the change breaks something unrelated, stop and
+   surface it — do not stack fixes.
    - **Tests / TDD.** Honor the Quality Gate after the change. For a
      *behavioral* change with TDD `enabled`, add or adjust the test
      that covers it. Purely non-behavioral changes (dependency bump,
      rename, comment, formatting) don't need a new test. If the change
      would require building substantial new test scaffolding, that's a
      signal it wasn't `fast` work — reconsider triage.
-6. **Run the Phase Gate.** For plan adjustments use the commands from
+6. **Run the Phase Gate.** An executor's gate run does not replace this.
+   For plan adjustments use the commands from
    `tasks.md § Gate Commands`; for free-standing changes use the Phase
    Gate commands from the brain (`quality-gate` concept or `constitution.md §6`
    per layout). If it fails and the fix isn't itself atomic, stop and surface it.
@@ -218,8 +242,9 @@ pollute an unrelated plan or silently expand its approved scope.
       recap in chat. (Executive artifacts belong to `conduct`;
       creating an orphan `walkthrough.md` with no plan would be cleaned
       up by nothing.)
-    - **Plan adjustment:** execute first, then **ask the developer to
-      confirm the change is correct**. For filesystem, only then update
+    - **Plan adjustment:** after the delegated code change (inline only
+      if no executor is callable), **ask the developer to confirm the
+      change is correct**. For filesystem, only then update
       local work artifacts per `references/plan-adjustment.md`. For an
       external context, after confirmation hand off the evidence and
       approved amendment to `conduct`, which alone performs serialized,
@@ -290,6 +315,10 @@ using in the session.
 - **Skipping triage and discovering the size mid-change.** Estimate
   the blast radius *first*. The expensive mistake is a half-applied
   breaking change.
+- **Doing the diff inline while an executor is callable.** Inline is
+  the fallback when the role is missing, not callable, or
+  misconfigured — after the alert, not instead of it. Convenience is
+  not a blocker.
 - **Treating "small request" as "small change".** "Just bump
   requests to v5" is one sentence and potentially a hundred edits.
   Investigate, don't assume.

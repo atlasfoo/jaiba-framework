@@ -24,13 +24,19 @@ Its full read/write footprint:
 
 **Writes:**
 - `<global config root>/jaiba-contract.md` — installs/refreshes the contract
+- `<global config root>/jaiba-configure.yaml` — writes the consented
+  `native-plan-client` value (step 5); sibling of the contract, not
+  inside it
 - the vendor's global instructions file (e.g. `~/.claude/CLAUDE.md`) —
   appends a one-line reference to the contract, if not already present
 - `<global config root>/skills/` — installs missing skillset entries
   (global or project-local, per developer choice)
 - `<global config root>/agents/` — installs/refreshes the subagent battery
 - an installed subagent definition's own frontmatter — writes a `model:`
-  line per tier, if the developer opts in
+  line per tier, if the developer opts in, and an effort control beside
+  it only when that host's docs and version verify the exact field or
+  syntax (model selection, below). Never a placeholder, and never one
+  field name for every host
 - installed JAIBA subagent `model:` values — replaces exact model IDs
   when the developer invokes model migration in update mode
 - the explicitly approved host-visible local/global destination files for
@@ -50,6 +56,8 @@ Its full read/write footprint:
 - the existing `<global config root>/jaiba-contract.md` and
   `<global config root>/agents/*.md`, to compare against the packaged
   versions
+- `<global config root>/jaiba-configure.yaml`, if present, to set
+  `native-plan-client` without rewriting other keys (step 5)
 - the vendor's global instructions file, to check whether a contract
   reference line is already present
 - host-visible installed memory-surface declarations and their package-local
@@ -110,19 +118,20 @@ global config root as in the full configure flow. Offer two targets:
    the established dated backup first. This target does not update the
    global instructions file, skills, or agents.
 2. **Subagents** — offer either a packaged battery refresh or an exact
-   model-ID migration. A refresh uses the detected host's agent set and
-   the same identical/absent/different handling as the full configure
-   flow; a divergent file requires confirmation and a dated backup.
-   This target does not update the contract, global instructions file,
-   or skills.
+   model-ID migration. A refresh uses the detected host's agent set
+   (the six existing roles plus `researcher`) and the same
+   identical/absent/different handling as the full configure flow; a
+   divergent file requires confirmation and a dated backup. This target
+   does not update the contract, global instructions file, or skills.
 
    For a model-ID migration, ask for the exact current ID and its
    replacement. Inspect only the six JAIBA subagent filenames in the
    detected host's `agents/` folder; do not scan or modify other agent
    files: `executor-high.md`, `executor-medium.md`, `executor-low.md`,
-   `code-analyst.md`, `business-analyst.md`, `verify.md`. If the source
-   and replacement IDs are identical, or there are no exact matches,
-   report a no-op without discovery or changes. Otherwise validate the
+   `code-analyst.md`, `business-analyst.md`, `verify.md`. Do not include
+   `researcher.md`: `researcher` ships with no `model:` field and install
+   must not add one. If the source and replacement IDs are identical, or
+   there are no exact matches, report a no-op without discovery or changes. Otherwise validate the
    **destination** through **Shared model discovery and validation**
    below before offering the change; the retired source need not be in
    today's catalog. Show the exact old/new IDs, matching JAIBA agent
@@ -164,7 +173,7 @@ divergence is a question, not an assumption.
 
 Before anything else, tell the developer the jaiba-configure run has started.
 
-Then run the four steps below in order. Surface what you did at the end
+Then run the five steps below in order. Surface what you did at the end
 (see **Closing**).
 
 ### 1. Identify the host agent
@@ -190,6 +199,8 @@ the user's home directory: `~/.claude/`, `~/.agents/`, and so on. Create
 it if absent. Its subdirectories are the install targets:
 
 - `<global config root>/jaiba-contract.md` — the contract (step 2)
+- `<global config root>/jaiba-configure.yaml` — `native-plan-client`
+  (step 5)
 - `<global config root>/skills/` — globally installed skills (step 3)
 - `<global config root>/agents/` — the subagent battery (step 3)
 
@@ -415,8 +426,8 @@ versions/locks stay honest.
 the detected host: OpenCode uses `assets/agents/opencode/`; other hosts
 use `assets/agents/`. Copy every definition in that set (the three
 executors `executor-high/medium/low` plus the specialists `code-analyst`,
-`business-analyst`, `verify` — the battery
-`conduct/references/subagents.md` invokes) into the `agents/`
+`business-analyst`, and `verify` — the battery
+`conduct/references/subagents.md` invokes — and `researcher`) into the `agents/`
 subdirectory of the **global** config root from step 1 (e.g.
 `~/.claude/agents/`), creating it if absent. They install globally for
 the same reason the contract does: one battery serves every repo, and
@@ -429,6 +440,10 @@ per-project.
   `executor-high.md.bak-2026-09-15`), same policy and naming as step 2.
 - The host agent has no native subagent support → skip the copy, say so,
   and note that `conduct` will run its documented sequential fallback.
+- A file present in `agents/` is not proof the role is callable. Callability
+  is a runtime check: a present definition is not proof of invocability,
+  and `researcher` is no exception (having `researcher.md` present does not
+  prove the role is callable).
 
 **Then select a model per tier.** The packaged definitions ship with no
 `model:` field — absent means "inherit the orchestrator's model", the
@@ -441,7 +456,9 @@ selection isn't meaningful. Offer to pin one instead:
 2. **Ask once, per tier, not per agent.** Three tiers group the battery:
    **high** (`executor-high` alone — top reasoning), **medium**
    (`executor-medium`, `code-analyst`, `business-analyst`, `verify` —
-   balanced), **low** (`executor-low` alone — fast/cheap). A single
+   balanced), **low** (`executor-low` alone — fast/cheap). Do not add
+   `researcher` to a model-pin tier: `researcher` ships with no `model:`
+   field and install must not add one. A single
    structured question per tier, options built from step 1's discovery,
    plus **"leave blank — inherit the orchestrator's model"** always
    offered as a choice, never just an implied default. If no catalog is
@@ -457,6 +474,17 @@ selection isn't meaningful. Offer to pin one instead:
    step on an already-configured machine (§ Re-running is fine) shows the
    current per-tier state and asks again rather than silently preserving
    or silently overwriting it.
+4. **Effort is a recommendation beside the model, not a new tier.**
+   Read [Model discovery](references/model-discovery.md) §5 before
+   writing any effort control. Offer only a level that this host's docs
+   list for the selected model; the developer consents or declines. Do
+   not map the tier name, or the model name, onto a level. Write the
+   consented value into the installed copies only when that host's docs
+   **and** the version already established by discovery verify the exact
+   field or syntax. Otherwise omit the control — no placeholder, no
+   empty key — and say so. A doc from another version, or a field that
+   belongs to another host, is not verification. Do not add a probe
+   beyond the version/help discovery already allows.
 
 ### 4. Discover memory surfaces; offer optional installation
 
@@ -484,6 +512,43 @@ resolved effective init's explicit `migrate-surface` operation
 (`references/surface-migration.md`), not configure. Installation/probes/fixtures
 do not establish conformance or promote draft Engram. Never create `.ai/` as a
 mirror/cache or a compatibility workaround.
+
+### 5. Record `native-plan-client`
+
+Machine setting for this host, the same kind of choice as the model pin.
+Not a project fact. Update mode does not run this step. Do not probe the
+host for plan mode here — conduct applies that gate when it reads the
+setting (`conduct/references/native-plan-client.md`).
+
+Ask **once** per configure run, with **`auto` as the default**:
+
+- `auto` — active only if the host exposes plan mode or a plan
+  subagent; otherwise inactive, and conduct follows the current spec.
+- `on` — explicit opt-in. Same runtime gate: run the client only when
+  the host exposes plan mode or a plan subagent. Not a way to invent a
+  plan mode the host lacks.
+- `off` — conduct follows the current spec. Do not block the chain.
+
+Absent file, absent key, or unreadable is `auto` when the setting is
+read. That does not skip the question.
+
+Write **only the consented value** to
+`<global config root>/jaiba-configure.yaml`, sibling of the installed
+`jaiba-contract.md`. Not inside the contract. Not in `.ai/memory/`.
+Not in `~/.jaiba/memory/bindings/` — bindings stay routing-only. This
+file is not `settings*.json`.
+
+```yaml
+native-plan-client: "auto"
+```
+
+The key is exactly `native-plan-client`. The value is a quoted string:
+`"auto"`, `"on"`, or `"off"`. Quote them so a YAML 1.1 parse does not
+turn `on` / `off` into booleans. Create the file if it is absent. If it
+exists, set only that key and leave every other key untouched. If it is
+unreadable, do not overwrite it; report that and leave it. If the
+developer declines, write nothing. On a re-run, ask again — default
+still `auto` — and show any stored value before replacing it.
 
 ## Shared model discovery and validation
 
@@ -551,7 +616,10 @@ End with a short, honest report:
    prior copy; or that the host lacks subagent support and `conduct`
    will fall back to sequential execution. Include the per-tier model
    result — pinned model or "inherits the orchestrator's model" for each
-   of high/medium/low. For selection or migration, include catalog source
+   of high/medium/low — and, per tier, whether an effort control was
+   written (host, exact field or syntax, value, and the doc that
+   verified it) or left unset and why. For selection or migration,
+   include catalog source
    (CLI command or ACP launcher/field), host/version, fallback reason if
    any, and availability limits; distinguish rejected IDs, unverifiable
    discovery, cancellation and no-op from a successful pin change.
@@ -565,7 +633,11 @@ End with a short, honest report:
    effective consumer capability/approval and explicit init migration barriers
    (journal, actual writer pause, complete staged verification and separate human
    activation), and that no activation occurred.
-6. **Next step** — if the developer's intent is to set up JAIBA for a
+6. **Native plan client** — the consented `native-plan-client` value
+   written to `<global config root>/jaiba-configure.yaml`, or that the
+   question was declined or an unreadable file was left untouched. Not
+   stored in `.ai/memory/` or a binding.
+7. **Next step** — if the developer's intent is to set up JAIBA for a
    *specific project*, tell them to run **`jaiba-init`** from inside that
    repo: it resolves the selected surface, owns authorized registration and
    constitutive instrumentation (the `.ai/` skeleton and `AGENTS.md` marker
@@ -580,6 +652,10 @@ End with a short, honest report:
   `.atl/`, no `AGENTS.md`. That is `jaiba-init`'s job. The single
   exception is a project-local *skills* install the developer explicitly
   asked for.
+- **`native-plan-client` is not memory.** Write it only to
+  `<global config root>/jaiba-configure.yaml`. Not inside
+  `jaiba-contract.md`, not in `.ai/memory/`, not in
+  `~/.jaiba/memory/bindings/`. Bindings stay routing-only.
 - **Owns no brain templates.** The constitution / adr-log /
   reference-index templates belong to the repo-scoped skills.
   `jaiba-configure` never carries or writes them.
@@ -619,6 +695,10 @@ End with a short, honest report:
 - **Reinstalling an already-global skill "just in case."** If it's in
   `npx skills list -g`, leave it — point the developer at
   `npx skills update -g`.
+- **Writing an effort control you have not verified.** `effort:` is
+  not a universal key. If this host's docs and version do not name the
+  exact field or syntax, omit it and say so. Do not invent a Cursor
+  scaffold, and do not copy one host's field onto another.
 - **Finishing silently.** The developer needs the closing report —
   especially any drift they chose to keep, and the `jaiba-init` next
   step.
