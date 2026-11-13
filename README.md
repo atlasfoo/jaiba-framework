@@ -64,7 +64,7 @@ Adoption happens in **two independent runs**, because setup itself is split in t
 Install the machine-setup skill, then run it:
 
 ```bash
-npx skills add atlasfoo/jaiba-framework#v3.3.2 --skill jaiba-configure -g
+npx skills add atlasfoo/jaiba-framework#v3.4.0 --skill jaiba-configure -g
 ```
 
 The release-tag suffix pins the install to that git tag — the tag *is* the framework's version, and `jaiba-configure`/commitizen keep it in lockstep on every release.
@@ -87,7 +87,7 @@ It is **safe to re-run**: that is how a machine gets refreshed after a framework
 Prefer to install the skillset yourself? This still works, and `jaiba-configure` will simply report everything as already current:
 
 ```bash
-npx skills add -y atlasfoo/jaiba-framework#v3.3.2 -g
+npx skills add -y atlasfoo/jaiba-framework#v3.4.0 -g
 ```
 
 **Benefits of the global skillset:**
@@ -129,7 +129,7 @@ Skills are installed globally using `npx skills add` and are available across al
 
 | Aspect | Global |
 |--------|--------|
-| **Command** | `npx skills add -y atlasfoo/jaiba-framework#v3.3.2 --skill <skill-name>` |
+| **Command** | `npx skills add -y atlasfoo/jaiba-framework#v3.4.0 --skill <skill-name>` |
 | **Location** | `~/.agents/skills/` (user home directory) |
 | **Availability** | All projects automatically have access |
 | **Setup per project** | Only instrument the repo with `/jaiba-init` |
@@ -180,7 +180,7 @@ The framework distributes this layer as **two skills**, split core vs optional e
 `jaiba-configure` offers `jaiba-engram-memory` only after core setup, only as an explicit choice (decline / inspect the existing copy / install for inspection), pinned to the same release as everything else and using the same documented per-skill pattern — no new CLI syntax:
 
 ```bash
-npx skills add atlasfoo/jaiba-framework#v3.3.2 --skill jaiba-engram-memory
+npx skills add atlasfoo/jaiba-framework#v3.4.0 --skill jaiba-engram-memory
 ```
 
 Add `-g` for a global install, or choose *project-local* for one repository. Declining is a successful core-only configuration: no optional adapter installed — and no Engram MCP available — is normal core setup, never a core failure. Repositories stay on the built-in filesystem surface by default.

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v3.4.0 (2026-11-13)
+
+### Feat
+
+- **conduct**: consume native plans and route executive lanes
+
+### Fix
+
+- **configure**: align researcher frontmatter, doctor probe and scope docs
+
 ## v3.3.2 (2026-11-12)
 
 ### Fix

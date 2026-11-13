@@ -1,7 +1,7 @@
 ---
 name: jaiba-doctor
 description: Framework health-check meta-skill for JAIBA projects. Diagnoses brain coherence under jaiba-memory-surface 1.1.0 (incl. v2 bindings, legacy consolidation, agent-agnostic tool preflight, and global contract drift), tool state, and external-reference health, then routes to fixes; interviews constitutive gaps for a confirmed brief routed to jaiba-init without writing memory. Run before entering the conduct chain to catch drift. Diagnoses and routes only — doesn't bootstrap a repo or rebuild its brain (jaiba-init), configure the machine (jaiba-configure), or answer brain questions (ask).
-version: 3.3.2
+version: 3.4.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
   - git
