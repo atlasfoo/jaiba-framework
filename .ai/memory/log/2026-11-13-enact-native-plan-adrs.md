@@ -10,7 +10,7 @@ adr: ADR-015, ADR-016, ADR-017, ADR-018
 
 ## What happened
 
-Enacted the four proposals in [2026-11-10-executive-native-plan-client](2026-11-10-executive-native-plan-client.md). Added `decisions/015-native-plan-input.md`, `016-route-by-message.md`, `017-documented-effort-only.md`, and `018-local-ticket-link.md` at `status: accepted`. Regenerated the decision group in `index.md`. No prior decision was edited. No identity or reference concept changed.
+Enacted the four proposals in [2026-11-10-executive-native-plan-client](2026-11-10-executive-native-plan-client.md). Added `decisions/015-native-plan-input.md`, `016-route-by-message.md`, `017-documented-effort-only.md`, and `018-local-ticket-link.md` at `status: accepted`. Updated `identity/scope.md` to include `researcher` in the subagent battery. Regenerated the decision group in `index.md`. No prior decision was edited. No reference concept changed.
 
 ## Decisions and deviations
 

@@ -520,7 +520,7 @@ for s in "${SKILL_LABELS[@]}"; do
   fi
 done
 
-BATTERY=("executor-high" "executor-medium" "executor-low" "code-analyst" "business-analyst" "verify")
+BATTERY=("executor-high" "executor-medium" "executor-low" "code-analyst" "business-analyst" "verify" "researcher")
 declare -A BATTERY_MAP
 for b in "${BATTERY[@]}"; do BATTERY_MAP["subagent:$b"]=1; done
 
@@ -531,6 +531,7 @@ BATTERY_REQ["subagent:executor-low"]="git"
 BATTERY_REQ["subagent:code-analyst"]="rg"
 BATTERY_REQ["subagent:business-analyst"]="rg"
 BATTERY_REQ["subagent:verify"]="git"
+BATTERY_REQ["subagent:researcher"]="rg"
 
 subagent_rows=""
 subagents_detected=0
@@ -569,7 +570,7 @@ if [ "$HAS_FRAMEWORK" -eq 1 ]; then
   if [ "$subagents_definition_missing" -gt 0 ]; then
     subagent_notes="> ⚠️ $subagents_definition_missing core JAIBA battery definition(s) were not detected in scanned folders. This does not establish whether the corresponding runtime roles are registered or callable. Conduct must check its currently exposed roles/tools; if a needed role is not callable, verify its registration and installation with \`jaiba-configure\`."
   else
-    subagent_notes="> ✅ All 6 core JAIBA battery subagent definitions were detected in scanned folders. Runtime role registration and invocation are unverified; conduct must check its currently exposed roles/tools."
+    subagent_notes="> ✅ All ${#BATTERY[@]} core JAIBA battery subagent definitions were detected in scanned folders. Runtime role registration and invocation are unverified; conduct must check its currently exposed roles/tools."
   fi
 fi
 

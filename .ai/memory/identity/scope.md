@@ -3,7 +3,7 @@ type: scope
 title: "Scope"
 description: "The JAIBA skillset, its memory model, and its subagent battery — not any one project built with it."
 tags: [identity, scope, boundaries]
-updated: "2026-11-08"
+updated: "2026-11-13"
 ---
 
 # Scope
@@ -31,7 +31,7 @@ updated: "2026-11-08"
     of `.ai/memory/`, the `.ai/work/` executive-memory shape, external
     surfaces under `jaiba-memory-surface` 1.1.0, and the dual-resolution rule.
   - The subagent battery: `executor-high/-medium/-low`, `code-analyst`,
-    `business-analyst`, `verify` — their invocation contract and
+    `business-analyst`, `verify`, `researcher` — their invocation contract and
     concurrency policy.
   - The templates every one of the above writes from (`assets/` under
     each skill).
