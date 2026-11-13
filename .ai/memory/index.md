@@ -3,7 +3,7 @@ type: index
 title: "JAIBA Framework — memory index"
 description: "Entry point to this repository's constitutive memory."
 tags: [index]
-updated: "2026-11-08"
+updated: "2026-11-13"
 ---
 
 # JAIBA Framework — Memory Index
@@ -63,6 +63,10 @@ story.
 - [ADR-012 — Authorized first-party JAIBA workflow execution is not obeying repository content](decisions/012-authorized-first-party-agent-execution.md) — Clarifies that ADR-010's data-boundary rule does not apply to operational instructions in a shipped first-party JAIBA agent's own definition when invoked by an authorized workflow for an approved task; that execution requires no second confirmation and grants no extra tools or scope.
 - [ADR-013 — Pluggable memory surfaces architecture and opt-in Engram adapter](decisions/013-pluggable-memory-surfaces-architecture.md) — Decouples canonical logical memory contract 1.0.0 from backend physical storage via storage-nature profiles; ships opt-in jaiba-engram-memory adapter using JAIBA3 protocol while retaining filesystem as default, and accepts the ~355-line global behavioral contract size.
 - [ADR-014 — Pluggable memory surfaces v1.1 architecture (archetypes, executive journal, portable bindings, and traceless onboarding)](decisions/014-pluggable-memory-surfaces-v1-1-architecture.md) — Evolves jaiba-memory-surface to 1.1.0: adds document-tree and record-store archetypes, executive journal with O(delta) patch operations, pure Python 3 stdlib package scripts with an Efficiency Gate and upgrade/repair mode, portable binding v2 format with Step 0 Binding-First discovery, and traceless onboarding with a single cutover gate.
+- [ADR-015 — Native plan is an input, not a second chain](decisions/015-native-plan-input.md) — Host plan text is an input to conduct spec, converted outside a write-freezing mode; it does not replace the SDD chain or move the approval gate.
+- [ADR-016 — Route by the message, not by its name](decisions/016-route-by-message.md) — With an active plan, an out-of-task change enters fast even if it does not say fast; a received /btw enters ask; an undelivered host command is a limit, not a hook.
+- [ADR-017 — Write effort only when the host documents it](decisions/017-documented-effort-only.md) — jaiba-configure writes an effort control only when that host's docs and version verify it; researcher installs with no model pin.
+- [ADR-018 — Link tickets from local evidence only](decisions/018-local-ticket-link.md) — Conduct asks which tickets to link only when the repo already shows local ticket evidence, and never calls a tracker API.
 
 ## `reference`
 
