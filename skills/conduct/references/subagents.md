@@ -225,11 +225,14 @@ writing a PRD or design, resolves contradictions, and owns all decisions.
 
 ## Dispatch and fallback accounting
 
-For each applicable role/task, state which role was dispatched or the
-specific blocker that required inline work. Valid blockers are no spawn
-support, an inaccessible role, an explicit host/user restriction, missing
-or unverified prerequisites, or an actual dispatch error. Small tasks,
-single runnable tasks, file overlap, and convenience are not blockers.
+When a needed role is missing, not callable, or misconfigured, alert
+first naming the role and concrete blocker before sequential fallback; do
+not block the chain. For each applicable role/task, state which role was
+dispatched or the specific blocker that required inline work. Valid blockers
+are no spawn support, an inaccessible role, an explicit host/user
+restriction, missing or unverified prerequisites, or an actual dispatch
+error. Small tasks, single runnable tasks, file overlap, and convenience
+are not blockers.
 Temporary capacity exhaustion requires queuing, waiting for active work,
 or reusing an idle matching-role agent; it never justifies inline work.
 A host that cannot provide any child execution at all is a no-spawn
@@ -333,10 +336,12 @@ inside the subagent.
 Only a blocker established and reported under **Dispatch and fallback
 accounting** permits the affected work to run inline and sequentially:
 conduct surveys code, contrasts memory, implements tasks in dependency
-order, or verifies delivery targets itself. Use the same evidence standard,
-gates, and single-writer rules. A blocked role does not disable the rest
-of the battery; delegation changes throughput and context isolation,
-never the chain's correctness requirements.
+order, or verifies delivery targets itself. When a needed role is missing,
+not callable, or misconfigured, alert first naming the role and concrete
+blocker before sequential fallback; do not block the chain. Use the same
+evidence standard, gates, and single-writer rules. A blocked role does not
+disable the rest of the battery; delegation changes throughput and context
+isolation, never the chain's correctness requirements.
 
 ## Common failure modes
 

@@ -2,15 +2,20 @@
 
 When a change request arrives while an approved plan is active in the
 selected executive context and the work wasn't contemplated by the plan,
-it is **out-of-band**. For filesystem this plan is `.ai/work/plan.md`; for
+it is **out-of-band**. With an active plan, a change outside the current
+tasks enters `fast` even if the message does not say `fast`. `continue` /
+`next` / `go` do not enter `fast`; they stay on `conduct` execute.
+For filesystem this plan is `.ai/work/plan.md`; for
 an external surface, resolve standard binding `v2` (`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`, with legacy fallback to `~/.jaiba/memory/<host>/...` when present), exact context, and use the complete
 owned executive catalogue and full logical reads under `jaiba-memory-surface` contract version **1.1.0**. What
 happens next depends on the size the shared triage measured
 (`conduct/references/triage.md`, consumed with default/floor
 `inline`):
 
-- **`inline` — a contained adjustment.** `fast` executes it and, after
-  the developer confirms, records it into the work artifacts. This is
+- **`inline` — a contained adjustment.** `fast` delegates the code
+  change to a callable executor and, after the developer confirms,
+  records it into the work artifacts. `fast` remains the only writer of
+  that amendment; the executor does not write executive memory. This is
   the bulk of this reference.
 - **`design` or deeper — a big out-of-band change.** `fast` does
   **not** execute. It surfaces the size and offers exactly two exits:
@@ -30,11 +35,11 @@ plan, the tasks, and the walkthrough drift behind what the code
 actually does, and the next `conduct` `execute` or `summarize`
 phase works from a stale picture.
 
-The governing rule: **execute first, confirm, then record.** You do
-not write to the work artifacts until the developer confirms the
-change is correct. This is what keeps an *approved* plan from silently
-expanding — the human stays in the loop on every scope change
-(`AGENTS.md` §2.4, §2.8).
+The governing rule: **code change first, confirm, then record.** The
+code change is delegated to a callable executor; you do not write to
+the work artifacts until the developer confirms the change is correct.
+This is what keeps an *approved* plan from silently expanding — the
+human stays in the loop on every scope change (`AGENTS.md` §2.4, §2.8).
 
 ### Preconditions
 
@@ -65,8 +70,22 @@ report the known outcome; never claim an unverified update succeeded.
 
 ### Procedure
 
-1. **Execute the change** and bring the Quality Gate green (see
-   `SKILL.md` flow). Don't write to work artifacts yet.
+1. **Delegate the code change** to a callable executor
+   (`executor-high`, `executor-medium`, or `executor-low` — match the
+   change; if unsure, the higher tier) and bring the Quality Gate green
+   (see `SKILL.md` flow). Give it the change, the files it may touch,
+   and the gate commands, and tell it not to write executive memory.
+   `fast` remains the only writer of the amendment (plan, tasks,
+   walkthrough); the executor does not write executive memory. On an
+   external surface the existing handoff is unchanged: `fast` prepares
+   the amendment and `conduct` performs the authorized write. If no
+   executor is callable, do the code change inline and do not block. Before that inline fallback, alert
+   with the role and the concrete blocker (missing, not callable, or
+   misconfigured) — the same alert rule `conduct` already requires
+   (`conduct/references/subagents.md § Dispatch and fallback accounting`).
+   Convenience is not a blocker; do not invent a new fallback reason.
+   Review the returned report and the diff; the report is not an
+   executive write. Don't write to work artifacts yet.
 
 2. **Ask the developer to confirm.** Show what changed (a minimal
    diff or a one-line description) and ask whether it's correct before
@@ -159,7 +178,7 @@ its own phases. `fast` must not execute it, and it must not quietly
 spin up a parallel plan around it. Instead:
 
 1. **Don't touch the code.** Leave the worktree exactly as the
-   in-progress phase left it.
+   in-progress phase left it. Do not delegate it to an executor either.
 
 2. **Surface the size with evidence.** Name what triage found — file
    count, contracts hit, migration implied — and say plainly that
@@ -210,6 +229,10 @@ spin up a parallel plan around it. Instead:
 ## What not to do (both cases)
 
 - **Don't record before confirmation.** The confirmation is the gate.
+- **Don't let the executor write the amendment.** `fast` records it
+  after confirmation (external: the existing `conduct` handoff). An
+  executor report is not a write. Convenience is not a reason to skip
+  a callable executor.
 - **Don't rewrite the plan's Objective/Scope** to absorb a change.
   Amendments are append-only annotations; structural scope changes go
   through the fold-as-phase or park-and-replan fork, under the

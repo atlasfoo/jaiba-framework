@@ -349,12 +349,15 @@ the lanes have no slash commands:
 
 | The message is… | Route to |
 |---|---|
-| A **continuation cue** with active work in the resolved executive context (`.ai/work/` on filesystem; "continue", "next", "go", an answer to a pending question) | `conduct`, phase `execute`, subject to §1 capability gates |
-| A **question** — about code, the active work, or recorded decisions | `ask` (read-only) |
-| A **small contained change** to make now ("quick fix", "bump X", "rename this") | `fast` (triage floor `inline`; anything bigger routes into the chain) |
+| A **continuation cue** with active work in the resolved executive context (`.ai/work/` on filesystem; "continue", "next", "go", an answer to a pending question). These stay on `execute`. A side question is not a cue. | `conduct`, phase `execute`, subject to §1 capability gates |
+| A **question** — about code, the active work, or recorded decisions — including a side question the agent receives (`/btw`, or a documented equivalent delivered as a message). It does not mutate executive work and does not follow `execute`. | `ask` (read-only) |
+| A **small contained change** to make now ("quick fix", "bump X", "rename this"). With an active plan, a change outside the current tasks routes here even if the message does not say `fast`. | `fast` (triage floor `inline`; anything bigger routes into the chain) |
 | **New work** to shape or plan | the `conduct` chain (entry phase per triage) |
 
 `/conduct [phase]` remains available as an explicit,
 deterministic override when routing misfires or a phase must be
 forced. `jaiba-doctor`, `jaiba-configure` and `jaiba-init` are explicit
-meta-skills; they are never routed to implicitly.
+meta-skills; they are never routed to implicitly. What the host does
+not deliver to the agent is a limit, not a hook: do not claim to have
+intercepted a command the agent never received. This rule adds no
+slash command for `ask` or `fast`.

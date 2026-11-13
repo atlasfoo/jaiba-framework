@@ -137,6 +137,85 @@ Inherit means **omit `model:`**, not `model: inherit`, an empty string or
 a made-up default. Membership validates enumeration only: credentials,
 quota, entitlement, inference success and task fitness remain untested.
 
+## 5. Effort, only when this host's docs and version verify it
+
+Effort is a recommendation beside the chosen model, not a tier and not
+part of catalog membership. Do not infer a level from the tier name or
+the model name. Do not read settings, credentials, or history to
+discover it, and do not add a probe beyond the version/help check in §1.
+
+Before writing any effort control:
+
+1. Use the host and version already established above. If that version
+   was not established, stop: leave effort unset and say so.
+2. Read public docs that match **that** version. A current-page hit, a
+   catalog row, or a doc for a different version is not verification.
+3. Write only when those docs name the exact field or syntax **and**
+   list the consented value for the selected model. Use only that
+   host's syntax.
+4. If the check fails, or the developer declines, omit the control.
+   No placeholder, no empty key, no copied field from another host.
+
+`effort:` is not a universal key. Name a field only for the host whose
+docs verified it.
+
+**Claude Code** — verified on the current docs, still gated on the
+installed version. Subagent files under `~/.claude/agents/` (the path
+this skill already installs) take a frontmatter field `effort`.
+Documented values are `low`, `medium`, `high`, `xhigh`, and `max`;
+which of those the selected model accepts is model-specific, and the
+same name is not the same spend across models. `ultracode` is a session
+setting, not this field — do not write it. Write `effort` on the
+installed copy only when the detected version's docs still list that
+field and the consented value. The current pages do not state a minimum
+version for the field; if you cannot match the installed version to a
+doc that lists it, leave it unset. Do not write this field on any other
+host.
+Sources: [Create custom subagents](https://code.claude.com/docs/en/sub-agents#choose-an-effort-level),
+[Model configuration](https://code.claude.com/docs/en/model-config#effort-level-of-subagents-and-teammates).
+
+**Cursor** — a control is documented, and this skill already installs
+the generic battery at `~/.cursor/agents/` when the host is Cursor.
+There is no Cursor scaffold in this package. Do not add one, and do not
+add a separate effort key. The documented syntax is a parameter on a
+specific model ID: `model: <id>[effort=<value>]`, options depending on
+the model. Write that parameter on the consented model ID only when the
+detected version's docs still show that exact syntax and list the
+value. An omitted `model`, or `inherit`, has no verified effort syntax
+— leave those unset. If the version cannot be matched to that doc,
+leave Cursor unset and say so. A forum suffix such as `-high` is not
+this doc.
+Source: [Subagents](https://cursor.com/docs/subagents), section
+"Model parameters".
+
+**Leave unset, and say so:**
+
+- **OpenCode.** Current agent docs
+  ([Agents](https://opencode.ai/docs/agents)) put an optional `#variant`
+  on `model`. Variant names come from that model's catalog and are not
+  an effort field; v1 pages show a provider pass-through, not a
+  universal key. Those are different controls, and this check did not
+  pin a version that makes either one the effort control. Do not append
+  a variant, and do not write a pass-through key. §1 already forbids
+  manufacturing variants.
+- **GitHub Copilot.** The CLI reference documents `reasoningEffort` on
+  Copilot agent profiles loaded from `~/.copilot/agents/` and
+  `.github/agents/`, not on the generic battery this skill installs
+  under `~/.github/copilot/agents/`. Version was not pinned. Do not
+  copy that field onto the installed definitions.
+  Source checked, not written:
+  [Copilot CLI command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference).
+- **Gemini CLI, Windsurf, and an unknown host (`~/.agents/`).** No
+  agent effort control was verified. Gemini's subagent example
+  ([Subagents](https://geminicli.com/docs/core/subagents)) lists model
+  and temperature, not effort. Windsurf's docs index
+  ([llms.txt](https://docs.windsurf.com/llms.txt)) did not document one.
+  Do not invent a field.
+
+Checked 2026-11-11. Pages above are evidence of what those docs said
+then, not a substitute for the installed version's docs at configure
+time.
+
 ## Sources checked 2026-10-15
 
 - [OpenCode CLI: models](https://opencode.ai/docs/cli/#models) documents

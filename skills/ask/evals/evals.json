@@ -202,6 +202,62 @@
         "Remains strictly read-only: writes no files, makes no mutations, and does not run Quality Gate"
       ],
       "files": []
+    },
+    {
+      "id": 11,
+      "name": "researcher-dispatch-session-model",
+      "domain_under_test": "investigation-delegation",
+      "prompt": "how does the token refresh mechanism handle concurrent requests?",
+      "context": {
+        "work_state": "active",
+        "researcher_state": "callable subagent registered on host"
+      },
+      "expected_output": [
+        "Checks callability and dispatches the researcher role for investigation",
+        "Dispatch leaves model: unpinned so it inherits the session model",
+        "Researcher runs read-only and returns an investigation report",
+        "Parent agent drafts the user-facing answer from the report without repeating the delegated investigation inline",
+        "Neither ask nor researcher writes to executive memory (.ai/work/ or executive category)",
+        "Stays inside ask; does not route to execute"
+      ],
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "researcher-fallback-inline-said",
+      "domain_under_test": "investigation-fallback",
+      "prompt": "where are user sessions stored and what is their default TTL?",
+      "context": {
+        "work_state": "active",
+        "researcher_state": "scaffold file present at skills/jaiba-configure/assets/agents/researcher.md but role is not callable at runtime"
+      },
+      "expected_output": [
+        "Verifies callability via runtime check rather than treating scaffold file presence as proof of callability",
+        "Detects that researcher is missing, not callable, or misconfigured",
+        "Alerts the developer naming the researcher role and the concrete blocker before fallback",
+        "Answers inline, explicitly states that it is answering inline, and does not block the answer",
+        "Does not route the fallback to execute",
+        "Neither writes to executive memory (.ai/work/ or executive category) nor mutates state"
+      ],
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "received-btw-side-question",
+      "domain_under_test": "side-question",
+      "prompt": "/btw what hashing algorithm is used for passwords?",
+      "context": {
+        "work_state": "active plan executing",
+        "invocation": "agent actually receives /btw as a delivered message"
+      },
+      "expected_output": [
+        "Enters ask upon receiving /btw as a side-question message instead of following execute",
+        "Answers the question read-only from source code without mutating executive work",
+        "Continuation cues (continue, next, go) remain on conduct execute and are not diverted to ask",
+        "Does not claim to have intercepted any command the host did not deliver (treats undelivered commands as limits, not hooks)",
+        "Strictly read-only: no edits, no Quality Gate run, no executive memory written"
+      ],
+      "files": []
     }
   ]
 }

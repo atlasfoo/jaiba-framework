@@ -48,10 +48,13 @@ fulfills it.
 
 Host agents (Claude Code, Cursor, …) ship a native "plan mode" that
 freezes file writes while the model thinks. That is **not** this
-skill, and this skill must not run inside it: the `spec` phase writes
-full `prd` and `plan` objects to the selected executive context, which a read-only native mode
-would block. If the host is in its native plan mode, ask the developer
-to exit it before entering the chain.
+skill. Do not write executive artifacts while inside a native plan
+mode that freezes writes.
+
+After that mode returns the plan text, conduct may consume it and
+write the JAIBA draft in a session that can write. Do not replan the
+how. Do not move the approval gate: no approval, no `tasks`, no code.
+The full procedure is `references/native-plan-client.md`.
 
 ## Invocation: implicit first, explicit as override
 
@@ -67,16 +70,20 @@ to exit it before entering the chain.
 ## Routing rule (when work is active)
 
 While a fully read `plan` exists in the resolved executive context, every developer message routes down
-one of three lanes:
+one of three lanes. This table is the repeated routing rule, not a new lane.
 
 | The message is… | Lane |
 |---|---|
-| A **continuation cue** — "continue", "next", "go", "keep going", an answer to your pending question | `execute` (this skill) |
-| A **question** — asking, not asking-for-change | `ask` skill (read-only; it yields back here) |
-| A **change request** outside the plan's current tasks | `fast` skill (it runs the shared triage; a contained change is done out-of-band, a big one is surfaced to fold into the plan or re-plan) |
+| A **continuation cue** — "continue", "next", "go", "keep going", an answer to your pending question. These stay on `execute`. A side question is not a cue. | `execute` (this skill) |
+| A **question** — asking, not asking-for-change — including a side question the agent receives (`/btw`, or a documented equivalent delivered as a message). It does not mutate executive work and does not follow `execute`. | `ask` skill (read-only; it yields back here) |
+| A **change request** outside the plan's current tasks. With an active plan, it goes to `fast` even if the message does not say `fast`. | `fast` skill (it runs the shared triage; a contained change is done out-of-band, a big one is surfaced to fold into the plan or re-plan) |
 
 When no work is active, a question still goes to `ask`; a change
 request enters this chain through triage.
+
+What the host does not deliver to the agent is a limit, not a hook:
+do not claim to have intercepted a command the agent never received.
+This rule adds no slash command for `ask` or `fast`.
 
 A continuation cue never grants design approval. A draft plan stays in
 `spec`; only verified persisted approval permits `tasks`/`execute`.
@@ -314,6 +321,8 @@ ambiguous, ask the developer instead of guessing.
 | `validate` passed; developer asks to close/wrap up — or validate just passed and they confirm closing | `summarize` | `references/summarize-mode.md` |
 | Anything else — including a message unrelated to the active work | **Route or ask.** See the routing rule. | — |
 
+When `spec` creates or amends a plan, follow `references/ticket-link.md`.
+
 **Delegation.** Whenever a phase hands work to the JAIBA subagent
 battery — the code survey in `spec` (`code-analyst`), the memory
 contrast in `propose`/`spec` (`business-analyst`), task execution in
@@ -461,8 +470,10 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 
 ## Common failure modes
 
-- **Running the chain inside the host's native plan mode.** The spec
-  phase can't write; exit native plan mode first.
+- **Writing executive artifacts inside the host's native plan mode.**
+  That mode freezes writes; do not write there. After it returns the
+  plan text, consume it and write the JAIBA draft in a session that
+  can write. Do not replan the how. No approval, no `tasks`, no code.
 - **Producing a PRD for a bump.** Triage exists so depth matches blast
   radius — don't over-formalize mechanical work.
 - **Skipping the approval gate.** "Files written" is not "approved".
