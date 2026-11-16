@@ -81,13 +81,14 @@ protocol:
   roundtrip: pending            # pending | verified | failed | not-applicable
 source-authority: pending
 # binding-v2 | session-only | filesystem-unbound
-# filesystem-unbound only after a named authoritative-miss. Do not write a
-# filesystem binding to fill the v2 locator.
+# filesystem-unbound only after a named authoritative-miss whose calls
+# completed. not-enumerated is not that miss. Do not write a filesystem
+# binding to fill the v2 locator.
 filesystem-unbound:
   locator: pending              # .ai/
   layout: pending               # bundle | legacy
   path-segment: pending         # fs-<first 16 hex of sha256(canonical work root)>
-  unseen-namespace: pending     # not-enumerated | not-applicable
+  unseen-namespace: pending     # not-applicable on a true miss. not-enumerated is blocked; do not stage
 cutover-gate:
   # Single questionnaire after staging-verified. Two decisions, one turn.
   presented-at: pending
@@ -128,7 +129,7 @@ activation decision writes `jaiba-engram-storage/4`.
 
 | Role | Host/agent and exact absolute work roots | Adapter ID/version, representation/layout, wire protocol | Contract/version | Namespace/project ID and registry locator/ownership | Sanitized identity/approved aliases | Context IDs | Binding `v2` locator, session-only consent, or `filesystem-unbound` |
 |---|---|---|---|---|---|---|---|
-| Source | | | `jaiba-memory-surface` `1.1.0` | | | | `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` |
+| Source | | | `jaiba-memory-surface` `1.1.0` | | | | `filesystem-unbound` locator `.ai/`, or the v2 path when a binding exists |
 | Staging | | | `jaiba-memory-surface` `1.1.0` | | | | not active |
 | Proposed active target | | | `jaiba-memory-surface` `1.1.0` | | | | same v2 locator, written only if activation is authorized |
 

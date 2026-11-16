@@ -105,20 +105,25 @@ each call. The only results are `hit`, `authoritative-miss`, and
    match is `hit`: report that binding's `project-id` and locator. Do not
    stage a second project.
 2. Call `mem_list_projects` and `mem_current_project` with the work root.
-   An error, a partial page, or a tool that is down on `mem_list_projects`
-   is `blocked`. A successful empty list is not a brain. A non-empty list
+   An error, a partial page, or a tool that is down on either call is
+   `blocked`. A successful empty list is not a brain. A non-empty list
    of ordinary Engram projects is not a brain and is not `hit`.
 3. Probe an exact `topic_key`, or an exact catalogue-alias match, only
    where a locator is already known (a sibling binding or a known
    catalogue). An exact sanitized `git-remote` match is `hit`: report
-   that `project-id` and locator. Zero matches in a complete response is
-   a miss of that key or catalogue only. Do not call `mem_search`. Its
-   empty result is not a miss.
-4. Those calls completed, with no exact identity match, are
-   `authoritative-miss` of the registries this host can read. Record
-   `unseen-namespace: not-enumerated`. That note does not block an
-   explicit migrate-surface. If the destination namespace later already
-   holds the object, staging collision still blocks.
+   that `project-id` and locator. Do not stage a second project. Zero
+   matches in a complete response is a miss of that key or catalogue
+   only. Do not call `mem_search`. Its empty result is not a miss. A
+   returned project with no known locator is not probed. Do not invent
+   a probe, a `reg/` key, or a search.
+4. `authoritative-miss` only when both calls completed and either the
+   project list was empty or every returned project was probed, and
+   there was no exact identity match. Do not record
+   `unseen-namespace: not-enumerated` on that miss. This is the only
+   absence claim this lookup makes. A non-empty list with any unprobed
+   project, or either call not completed, is `blocked`, not
+   `authoritative-miss`. `blocked` does not start migrate-surface and
+   does not report an external brain as existing.
 
 "No locator means unresolved bootstrap" applies only when a binding or a
 `hit` already named a locator and that locator cannot be read. It does

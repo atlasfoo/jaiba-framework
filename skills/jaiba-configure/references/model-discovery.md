@@ -143,11 +143,7 @@ Inherit means **omit `model:`**, not `model: inherit`, an empty string or
 a made-up default. Membership validates enumeration only: credentials,
 quota, entitlement, inference success and task fitness remain untested.
 
-**Antigravity exception:** Antigravity (`~/.gemini/config/agents/`) is
-exempt from querying a `models` CLI subcommand or ACP catalog because its
-subagent definitions only accept `flash`, `pro`, and `inherit` (or omitting
-`model:` to inherit). On Antigravity, skip CLI/ACP catalog probing and only
-present/accept those three options (`flash`, `pro`, `inherit`).
+**Antigravity:** apply the exception in §1. Those three values are the catalog for this write gate.
 
 ## 5. Effort, only when this host's docs and version verify it
 

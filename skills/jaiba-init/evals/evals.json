@@ -638,7 +638,7 @@
       "context": {
         "request": "explicit migrate-surface",
         "binding": "no v2 file and no agreeing legacy binding",
-        "lookup": "authoritative-miss, calls named, unseen-namespace not-enumerated",
+        "lookup": "authoritative-miss, both calls completed, empty project list, unseen-namespace not-applicable",
         "source": ".ai/memory bundle, index.md only, real content, not a bracket template"
       },
       "expected_output": [
@@ -646,7 +646,8 @@
         "Continues to snapshot without writing a filesystem binding and without a new question",
         "Uses path segment fs- plus the first 16 hex of sha256(canonical work root), marked source-local, and does not invent a registry project-id or rename the directory when staging later records the real project-id",
         "Exports the bundle as-is, without converting it",
-        "Leaves MSV-011 as the only question, after staging-verified; declining activation leaves the source without a binding"
+        "Leaves MSV-011 as the only question, after staging-verified; declining activation leaves the source without a binding",
+        "Does not record unseen-namespace not-enumerated on this miss, and does not fill the source binding cell with a v2 path"
       ],
       "files": []
     },
@@ -654,14 +655,14 @@
       "id": 33,
       "name": "migrate-unbound-filesystem-blocked",
       "mode_under_test": "migrate-surface:filesystem-unbound",
-      "prompt": "Migrate this repository. Either the identity lookup was not called, or .ai/memory has both index.md and constitution.md. A third case is an intact bracket template, or no entry file.",
+      "prompt": "Migrate this repository. Either the identity lookup was not called, or it recorded unseen-namespace not-enumerated, or mem_list_projects returned projects that were not probed. Other cases: .ai/memory has both index.md and constitution.md, an intact bracket template, or no entry file.",
       "context": {
         "request": "explicit migrate-surface",
         "binding": "no v2 file",
         "note": "Does not change Binding-First for a conduct, ask, or doctor session that did not request migrate"
       },
       "expected_output": [
-        "Does not treat .ai/ as a migrate source when the lookup was not called, and does not report an external brain as existing",
+        "Does not treat .ai/ as a migrate source when the lookup was not called, when it recorded unseen-namespace not-enumerated, or when a returned project was not probed, and does not report an external brain as existing",
         "Blocks when both entry files are present, when neither entry file exists, or when the files are an intact bracket template: no snapshot and no new binding",
         "Does not write a filesystem binding and does not add a question before MSV-011",
         "Does not change Binding-First order for a conduct, ask, or doctor session that did not request migrate"
