@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v3.5.0 (2026-11-16)
+
+### Feat
+
+- **memory**: allow unbound filesystem source in migrate-surface after closed lookup
+
+### Fix
+
+- **memory**: block unbound migrate when the registry was not read
+- **configure**: use ~/.gemini/config/agents and restrict model options on Antigravity
+
 ## v3.4.0 (2026-11-13)
 
 ### Feat
