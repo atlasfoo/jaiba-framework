@@ -38,10 +38,12 @@ automatic. Never prompt the operator to invent or choose a directory:
 
 `~/.jaiba/migrations/<project-id>/<tx-id>/`
 
-`<project-id>` is the stable registry project ID. `<tx-id>` is the assigned
-transaction ID, reused on every retry of this transfer. Both must be a single
-path segment. If either is empty or not a single segment, stop. Do not hash or
-encode a substitute path, and do not ask for another location. Standard files,
+`<project-id>` is the stable registry project ID when one exists. `<tx-id>`
+is the assigned transaction ID, reused on every retry of this transfer. Both
+must be a single path segment. If `<tx-id>` is empty or not a single segment,
+stop. If `<project-id>` is empty and the source is not `filesystem-unbound`,
+stop. Do not hash or encode a substitute path except the source-local segment
+under Unbound filesystem source, and do not ask for another location. Standard files,
 all inside that directory:
 
 - `journal.yaml` — state, binding `v2` locators, cutover decisions, attempt history
@@ -144,6 +146,45 @@ Preflight is the start of the continuous sequence, not a questionnaire.
    establish actual serialized access or block. A requested pause without
    established compliance is not serialization. This pause is operational. It
    is not an approval question. Then continue immediately to §2.
+
+### Unbound filesystem source
+
+This clause applies only to an explicit migrate-surface request, after the
+closed lookup in `resolution.md`. It does not reorder Step 0. A pin or a
+valid binding still wins. Conduct, ask, and doctor do not open `.ai/`
+because of this clause.
+
+Name the lookup call. Results are only `hit`, `authoritative-miss`, and
+`blocked`.
+
+- `hit`: do not stage a second project. Report the existing `project-id`
+  and locator. Stop this transfer as a new project.
+- `blocked`, or the call was not made: do not treat `.ai/` as a source and
+  do not report an external brain as existing. No snapshot. No new binding.
+- `authoritative-miss`: a coherent `.ai/` may be the source. Classify it
+  with the layout table in `filesystem-surface.md`. Real prose is not an
+  intact `[bracket]` template, the same rule `migrate-mode.md` uses.
+  `index.md` without `constitution.md`, or `constitution.md` without
+  `index.md`, with real prose: export that layout as-is. Do not convert.
+  Both entry files, neither, no real prose, or an intact bracket template:
+  `blocked`. No snapshot. No new binding.
+
+Do not write a filesystem binding. Record source authority
+`filesystem-unbound` in the journal, with locator `.ai/` and layout
+`bundle` or `legacy`, beside binding `v2` and the session-only consent
+the journal already accepts. Record `unseen-namespace: not-enumerated`.
+That note does not block this explicit migrate. A later collision in the
+destination namespace still blocks staging.
+
+When no registry `project-id` exists, the `<project-id>` path segment is
+`fs-` plus the first 16 hexadecimal characters of the SHA-256 of the
+UTF-8 canonical work root (the `resolution.md` formula). One segment,
+stable on every retry, marked source-local. When staging creates the
+real `project-id`, record it in the journal. Do not rename the directory.
+
+No new question. The only approval gate remains `MSV-011` after
+`staging-verified`. Declining activation leaves the source as it was:
+no binding.
 
 ## 2. Complete source inventory and snapshot
 

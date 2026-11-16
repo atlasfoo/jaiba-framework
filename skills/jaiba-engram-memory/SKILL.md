@@ -101,8 +101,11 @@ holds routing fields only; copying it activates nothing.
    authorized Engram project separately from the stable JAIBA `project-id`.
    `git` is for origin identity, not a storage client.
 3. Read the bound catalogue locator and verify it (`Project:`/`Scope:`, digest,
-   project id). No locator means unresolved bootstrap, not absence; search never
-   proves absence.
+   project id). No locator already named by a binding, or by a hit, means
+   that named locator is unresolved bootstrap, not absence; search never
+   proves absence. A checkout with no binding has not named a locator:
+   run the identity lookup in `references/engram-mapping.md`. Do not treat
+   "no locator" as a brain or as a miss.
 4. Resolve origin/root identity through the catalogue and verify the explicit
    context binding. A new work root defaults to an independent confirmed context.
 5. Establish serialized access and permissions. No native CAS is claimed.
