@@ -458,11 +458,7 @@ selection isn't meaningful. Offer to pin one instead:
 1. **Discover and validate** using **Shared model discovery and
    validation** below. No configuration-file scan or remembered roster
    substitutes for a verifiable catalog of this host's available IDs.
-   **Antigravity exception:** for Antigravity, do not run the `models`
-   CLI subcommand (or ACP discovery) for subagents; Antigravity subagents
-   only permit `flash`, `pro`, and `inherit` (or leaving `model:` blank to
-   inherit), so skip the `models` subcommand and present only those three
-   options (`flash`, `pro`, `inherit`).
+   **Antigravity:** follow the exception in [Model discovery](references/model-discovery.md) §1. Do not probe. Present only `flash`, `pro`, and `inherit`.
 2. **Ask once, per tier, not per agent.** Three tiers group the battery:
    **high** (`executor-high` alone — top reasoning), **medium**
    (`executor-medium`, `code-analyst`, `business-analyst`, `verify` —
@@ -574,11 +570,7 @@ schema fields, safety constraints and current source citations.
    examples, not a universal command list. Never run a guessed command
    or flag. A provider-wide roster alone does not prove availability in
    this host.
-   - **Antigravity exception:** for Antigravity, do not run the `models`
-     CLI subcommand (or ACP discovery) for subagents; Antigravity
-     subagents only permit `flash`, `pro`, and `inherit` (or leaving
-     `model:` blank to inherit), so skip the `models` subcommand and
-     present only those three options (`flash`, `pro`, `inherit`).
+   - **Antigravity:** follow the exception in [Model discovery](references/model-discovery.md) §1. Do not probe. Present only `flash`, `pro`, and `inherit`.
 2. **ACP only as fallback.** Use an already-available, documented host
    transport only if CLI is unavailable, unsupported, failed/timed out,
    empty, uninterpretable, or cannot establish host availability. Parse
