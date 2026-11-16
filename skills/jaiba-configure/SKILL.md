@@ -184,10 +184,15 @@ determine the vendor by **introspecting yourself**, not by scanning any
 directory:
 
 - You know your own identity (e.g. Claude Code → `.claude`, Cursor →
-  `.cursor`, Gemini CLI → `.gemini`, Windsurf → `.windsurf`, opencode →
-  `.opencode`, GitHub Copilot → `.github/copilot`). Use it.
+  `.cursor`, Gemini CLI → `.gemini`, Antigravity → `.gemini/config`,
+  Windsurf → `.windsurf`, opencode → `.opencode`, GitHub Copilot →
+  `.github/copilot`). Use it.
 - Corroborate — don't replace — that identity with the config folder you
-  actually read from at the user level (e.g. an existing `~/.claude/`).
+  actually read from at the user level (e.g. an existing `~/.claude/`,
+  `~/.gemini/config/`).
+- For Antigravity, the global config root is `~/.gemini/config/` (distinct
+  from plain Gemini CLI `~/.gemini/`), and the subagent battery therefore
+  installs into `~/.gemini/config/agents/`.
 - For OpenCode, use its global config root (normally
   `~/.config/opencode/`) and select the OpenCode-native agent definitions
   from `assets/agents/opencode/`.
@@ -429,7 +434,7 @@ executors `executor-high/medium/low` plus the specialists `code-analyst`,
 `business-analyst`, and `verify` — the battery
 `conduct/references/subagents.md` invokes — and `researcher`) into the `agents/`
 subdirectory of the **global** config root from step 1 (e.g.
-`~/.claude/agents/`), creating it if absent. They install globally for
+`~/.claude/agents/`, `~/.gemini/config/agents/`), creating it if absent. They install globally for
 the same reason the contract does: one battery serves every repo, and
 `execute`'s fan-out expects to find them at the agent level, not
 per-project.
@@ -453,13 +458,19 @@ selection isn't meaningful. Offer to pin one instead:
 1. **Discover and validate** using **Shared model discovery and
    validation** below. No configuration-file scan or remembered roster
    substitutes for a verifiable catalog of this host's available IDs.
+   **Antigravity exception:** for Antigravity, do not run the `models`
+   CLI subcommand (or ACP discovery) for subagents; Antigravity subagents
+   only permit `flash`, `pro`, and `inherit` (or leaving `model:` blank to
+   inherit), so skip the `models` subcommand and present only those three
+   options (`flash`, `pro`, `inherit`).
 2. **Ask once, per tier, not per agent.** Three tiers group the battery:
    **high** (`executor-high` alone — top reasoning), **medium**
    (`executor-medium`, `code-analyst`, `business-analyst`, `verify` —
    balanced), **low** (`executor-low` alone — fast/cheap). Do not add
    `researcher` to a model-pin tier: `researcher` ships with no `model:`
    field and install must not add one. A single
-   structured question per tier, options built from step 1's discovery,
+   structured question per tier, options built from step 1's discovery
+   (or for Antigravity, `flash`, `pro`, and `inherit`),
    plus **"leave blank — inherit the orchestrator's model"** always
    offered as a choice, never just an implied default. If no catalog is
    verifiable, offer inheritance or cancel pinning, not guessed IDs.
@@ -559,10 +570,15 @@ schema fields, safety constraints and current source citations.
 
 1. **CLI first.** Identify this host/version, confirm the executable and
    documented catalog subcommand via current docs/help, then query with
-   a timeout. `opencode models`, `agy models`, and `agent models` are
-   conditional examples, not a universal command list. Never run a
-   guessed command or flag. A provider-wide roster alone does not prove
-   availability in this host.
+   a timeout. `opencode models` and `agent models` are conditional
+   examples, not a universal command list. Never run a guessed command
+   or flag. A provider-wide roster alone does not prove availability in
+   this host.
+   - **Antigravity exception:** for Antigravity, do not run the `models`
+     CLI subcommand (or ACP discovery) for subagents; Antigravity
+     subagents only permit `flash`, `pro`, and `inherit` (or leaving
+     `model:` blank to inherit), so skip the `models` subcommand and
+     present only those three options (`flash`, `pro`, `inherit`).
 2. **ACP only as fallback.** Use an already-available, documented host
    transport only if CLI is unavailable, unsupported, failed/timed out,
    empty, uninterpretable, or cannot establish host availability. Parse

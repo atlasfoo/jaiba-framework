@@ -39,6 +39,12 @@ Do not invoke ACP to find a more permissive answer. The same rule applies
 to a valid fallback ACP catalog. An error message or a partial/truncated
 catalog is not a valid catalog.
 
+**Antigravity exception:** Antigravity (`~/.gemini/config/agents/`) is
+exempt from querying a `models` CLI subcommand or ACP catalog because its
+subagent definitions only accept `flash`, `pro`, and `inherit` (or omitting
+`model:` to inherit). On Antigravity, skip CLI/ACP catalog probing and only
+present/accept those three options (`flash`, `pro`, `inherit`).
+
 ## 2. Eligible ACP fallback, without a universal discovery method
 
 ACP is eligible only for CLI unavailable / unsupported / failed (including
@@ -136,6 +142,12 @@ offers explicit, backed-up pin removal. Preserve existing pins on decline.
 Inherit means **omit `model:`**, not `model: inherit`, an empty string or
 a made-up default. Membership validates enumeration only: credentials,
 quota, entitlement, inference success and task fitness remain untested.
+
+**Antigravity exception:** Antigravity (`~/.gemini/config/agents/`) is
+exempt from querying a `models` CLI subcommand or ACP catalog because its
+subagent definitions only accept `flash`, `pro`, and `inherit` (or omitting
+`model:` to inherit). On Antigravity, skip CLI/ACP catalog probing and only
+present/accept those three options (`flash`, `pro`, `inherit`).
 
 ## 5. Effort, only when this host's docs and version verify it
 
