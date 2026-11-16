@@ -94,13 +94,45 @@ titles, search hits, or a numeric id alone prove nothing. Mismatch means
 stop, never adopt. A `JAIBA3.` prefix does not satisfy a JAIBA4 owned-write
 predicate.
 
+**Identity lookup when this checkout has no binding.** Realizes the closed
+result in `resolution.md`. No new `reg/` key. When this work root has no
+binding `v2` and Engram can be queried, this lookup is mandatory. Name
+each call. The only results are `hit`, `authoritative-miss`, and
+`blocked`. Not calling is not a result and is not "a brain exists".
+
+1. Scan `~/.jaiba/memory/bindings/*.yaml` for the sanitized `git-remote`.
+   Routing fields only, the same C4 sweep, not FTS. An exact identity
+   match is `hit`: report that binding's `project-id` and locator. Do not
+   stage a second project.
+2. Call `mem_list_projects` and `mem_current_project` with the work root.
+   An error, a partial page, or a tool that is down on `mem_list_projects`
+   is `blocked`. A successful empty list is not a brain. A non-empty list
+   of ordinary Engram projects is not a brain and is not `hit`.
+3. Probe an exact `topic_key`, or an exact catalogue-alias match, only
+   where a locator is already known (a sibling binding or a known
+   catalogue). An exact sanitized `git-remote` match is `hit`: report
+   that `project-id` and locator. Zero matches in a complete response is
+   a miss of that key or catalogue only. Do not call `mem_search`. Its
+   empty result is not a miss.
+4. Those calls completed, with no exact identity match, are
+   `authoritative-miss` of the registries this host can read. Record
+   `unseen-namespace: not-enumerated`. That note does not block an
+   explicit migrate-surface. If the destination namespace later already
+   holds the object, staging collision still blocks.
+
+"No locator means unresolved bootstrap" applies only when a binding or a
+`hit` already named a locator and that locator cannot be read. It does
+not apply to a checkout with no binding.
+
 **Catalogue acquisition (no search-based absence):**
 
 1. Read the bound catalogue locator, verify per storage §4, check the
    declared project id. Changed, missing, or inaccessible blocks reuse; no
    title lookup.
-2. No locator: unresolved bootstrap, not `not-found`. Search may propose
-   candidates for human confirmation only.
+2. No locator already named by a binding or a hit: that locator is
+   unresolved bootstrap, not `not-found`. Search may propose candidates
+   for human confirmation only. Do not apply this step to a checkout
+   that has no binding.
 3. Only explicit authorization to provision a new exclusive namespace lets
    `jaiba-init` save the empty catalogue (key
    `jaiba/v4/<ns16>/cat/<sha24>`), read it back, then persist its locator

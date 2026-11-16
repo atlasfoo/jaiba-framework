@@ -104,6 +104,18 @@ unbound).
    `jaiba-init`. It does not run because a binding file was absent on a
    machine that can still match `origin`.
 
+The lookup in step 2 is a call with a closed result, not a narration.
+When no binding exists and an external surface can be queried, that call
+is mandatory before any fallback, link, or new-project path. The only
+results are `hit`, `authoritative-miss`, and `blocked`. Not calling is
+not a result: do not report an existing brain, a miss, or an empty
+project from a lookup that did not run. Fuzzy search, a title match, and
+basename ranking are not the lookup; an empty fuzzy result is not
+`authoritative-miss`. A permission error, a partial page, or a tool that
+is down is `blocked`, not `authoritative-miss` and not absence. Name the
+call in the result. This paragraph does not move Step 0 and does not add
+a question.
+
 The installed-skill list is not Step 0. It chooses which external surface
 to query when no binding and no pin exist, and it is the selection order
 only on the authoritative-miss path with no pin. It never outranks a valid

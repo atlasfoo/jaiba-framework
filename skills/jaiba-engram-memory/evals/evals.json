@@ -155,6 +155,18 @@
         "Migration converts legacy objects to exec-base at seq: 0, preserving all address fields, content, custom metadata, and relations losslessly.",
         "Canonical binding path resolves strictly to ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml."
       ]
+    },
+    {
+      "id": 13,
+      "prompt": "This checkout has no binding v2 and Engram can be queried. Classify the identity lookup for three outcomes: mem_list_projects returns ordinary Engram projects; a successful empty list plus zero exact topic_key or catalogue-alias matches on known locators; mem_list_projects errors or returns a partial page. Do not use mem_search. An exact git-remote match in a sibling binding is a separate case.",
+      "expected_output": "Ordinary projects are not a hit and not a JAIBA brain. Completed calls with an empty success and zero exact matches are authoritative-miss of registries this host can read. An error, a partial page, or a tool that is down is blocked. Not calling is not a result. An exact sibling-binding or known-catalogue alias match is hit and does not stage a second project.",
+      "files": [],
+      "assertions": [
+        "A non-empty mem_list_projects of ordinary Engram projects is not hit and not proof of a JAIBA brain.",
+        "A successful empty list plus zero exact matches on known locators, with the required calls completed, is authoritative-miss and records unseen-namespace not-enumerated; mem_search fuzzy empty is not that miss.",
+        "An error from mem_list_projects, a partial page, or a tool that is down is blocked, not authoritative-miss and not an existing brain. Not calling is not a result.",
+        "Does not invent a reg/ key. An exact sanitized git-remote match in a sibling binding or a known catalogue alias is hit, reports that project-id, and does not stage a second project."
+      ]
     }
   ]
 }

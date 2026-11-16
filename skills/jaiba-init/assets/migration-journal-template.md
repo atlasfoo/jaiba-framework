@@ -13,16 +13,20 @@ Create this directory before the first mutation. The only path is:
 
 `~/.jaiba/migrations/<project-id>/<tx-id>/`
 
-`<project-id>` is the stable registry project ID. `<tx-id>` is the transaction
-ID assigned for this transfer and reused on every retry. Each must be one path
-segment. If either is empty, ambiguous, or not a single segment (separator,
-`..`, or empty), stop. Do not encode a substitute path, and do not ask for
-another location. This directory is outside source and target catalogues,
+`<project-id>` is the stable registry project ID when one exists, or the
+source-local `fs-` segment when source authority is `filesystem-unbound` and
+no registry project ID exists yet. `<tx-id>` is the transaction ID assigned
+for this transfer and reused on every retry. Each must be one path segment.
+If `<tx-id>` is empty, ambiguous, or not a single segment (separator, `..`,
+or empty), stop. If `<project-id>` is empty and the source is not
+`filesystem-unbound`, stop. Do not encode any other substitute path, and do
+not ask for another location. Do not rename the directory when staging later
+records the real `project-id`. This directory is outside source and target catalogues,
 `.ai/`, `.atl/` and `~/.jaiba/memory/`.
 
 | File | Required | Holds |
 |---|---|---|
-| `journal.yaml` | yes | This journal: state, binding `v2` locators, cutover decisions, attempt history. No payloads. |
+| `journal.yaml` | yes | This journal: state, binding `v2` locators, `filesystem-unbound` source authority, cutover decisions, attempt history. No payloads. |
 | `snapshot.json` | yes | Complete source snapshot for the approved scope. Full bodies, not summaries. |
 | `staging-manifest.json` | yes | Staged target inventory, protocol-conversion rows, receipts and verification evidence. |
 
@@ -75,6 +79,15 @@ protocol:
   target-namespace: pending     # jaiba/v4/<ns16> when JAIBA4
   context-heads: pending        # locators created at seq 0; none if conversion is none
   roundtrip: pending            # pending | verified | failed | not-applicable
+source-authority: pending
+# binding-v2 | session-only | filesystem-unbound
+# filesystem-unbound only after a named authoritative-miss. Do not write a
+# filesystem binding to fill the v2 locator.
+filesystem-unbound:
+  locator: pending              # .ai/
+  layout: pending               # bundle | legacy
+  path-segment: pending         # fs-<first 16 hex of sha256(canonical work root)>
+  unseen-namespace: pending     # not-enumerated | not-applicable
 cutover-gate:
   # Single questionnaire after staging-verified. Two decisions, one turn.
   presented-at: pending
@@ -105,12 +118,15 @@ cutover-gate:
 
 Repeat for source, staging and proposed active target. Distinguish routing
 configuration from actual authority and from source provenance revisions.
-Binding locator is the binding `v2` path above, or an explicit session-only
-consent that is not that file. For a `JAIBA3` → `JAIBA4` transfer, staging
+Binding locator is the binding `v2` path above, an explicit session-only
+consent that is not that file, or `filesystem-unbound` with locator `.ai/`
+and layout `bundle` or `legacy`. Do not write a filesystem binding to fill
+this cell. The `fs-` plus 16-hex segment is source-local and is not a
+registry `project-id`. For a `JAIBA3` → `JAIBA4` transfer, staging
 keeps `storage-profile` unset or still `jaiba-engram-storage/3` until the
 activation decision writes `jaiba-engram-storage/4`.
 
-| Role | Host/agent and exact absolute work roots | Adapter ID/version, representation/layout, wire protocol | Contract/version | Namespace/project ID and registry locator/ownership | Sanitized identity/approved aliases | Context IDs | Binding `v2` locator/revision or session-only consent |
+| Role | Host/agent and exact absolute work roots | Adapter ID/version, representation/layout, wire protocol | Contract/version | Namespace/project ID and registry locator/ownership | Sanitized identity/approved aliases | Context IDs | Binding `v2` locator, session-only consent, or `filesystem-unbound` |
 |---|---|---|---|---|---|---|---|
 | Source | | | `jaiba-memory-surface` `1.1.0` | | | | `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` |
 | Staging | | | `jaiba-memory-surface` `1.1.0` | | | | not active |
