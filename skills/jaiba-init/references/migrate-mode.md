@@ -14,12 +14,11 @@ transfer: a legacy source can migrate losslessly as legacy without conversion.
 
 For a selected filesystem brain the procedure below remains supported,
 including backup, literal gap carry-over, log-frontmatter backfill and the
-temporary dual-layout ambiguity until separately confirmed removal. Do not
-offer this conversion unprompted or warn merely because historical legacy
-entries lack modern frontmatter. Apply full-source revision comparisons,
-serialized writes and verified full readback/receipts after each write;
-changed/unknown outcomes stop dependent work, never claim atomic CAS.
-Keep original/unknown source material and approved identity mappings intact.
+temporary dual-layout ambiguity until separately confirmed removal. Apply
+full-source revision comparisons, serialized writes and verified full
+readback/receipts after each write; changed/unknown outcomes stop
+dependent work, never claim atomic CAS. Keep original/unknown source
+material and approved identity mappings intact.
 
 Convert a populated **flat** brain into the **concept bundle**. End
 state: `.ai/memory/` holds `index.md` plus one file per concept, every
@@ -28,10 +27,12 @@ fact carried over from `constitution.md`, `adr-log.md` and
 originals are backed up and still in place; a `brain-change` entry
 records the conversion.
 
-This mode is **optional and human-triggered**. The flat layout is a
-supported layout (`jaiba-contract.md` §1) — a project may stay on it
-forever. Never offer migration to a working flat brain that nobody asked
-about; run this only when the developer explicitly asks for it.
+This mode is **human-confirmed**: Level 1 (flat) brains emit Notice 1 (very
+high urgency) on every response per `jaiba-contract.md` §1 to guide the
+developer here, and `migrate` executes once the developer confirms. After
+converting flat v1 → OKF v2 and confirming cleanup of the flat trio, this
+mode chains into **Step 9 (Level v3 setup)**. Projects already on OKF v2
+arriving from Notice 2 enter Step 9 directly.
 
 Migration is a **translation, not a re-survey.** The evidence sweep
 belongs to `initialize`; drift correction belongs to `update`. Here the
@@ -391,6 +392,30 @@ End every `migrate` run with a report:
    possibly-never run where every skill keeps stopping on the ambiguous
    layout in the meantime.
 
+## Step 9 — Guided Level v3 transition (Surface choice or `filesystem` v3)
+
+Once the flat trio is deleted (or immediately when a project already on OKF
+v2 arrives from **Notice 2**), offer in the same conversation to complete
+**Level 3 (v3)**:
+
+1. **Migrate to a conforming installed memory surface (traceless mode):**
+   only if at least one conforming `category: memory-surface` adapter is
+   visible to this host (never offer `memory-surface-draft` adapters).
+   Always display the **traceless shareability warning** first: moving to a
+   surface with traceless mode enabled (omitting `.ai/` and `AGENTS.md`
+   from the repository) means JAIBA cannot guarantee the brain is shareable
+   across developers, machines, or clones, as that depends exclusively on
+   the surface backend itself. If chosen, chain into
+   `jaiba-init:migrate-surface`. **Ambiguity guard:** if the developer
+   deferred deleting `constitution.md`, `adr-log.md`, and
+   `reference-index.md` above, **block** `migrate-surface` until the flat
+   trio is deleted and the ambiguous dual-layout state is gone.
+2. **Stay on `filesystem` (Level v3):** add `jaiba-memory-surface:
+   filesystem` to `AGENTS.md` frontmatter and persist + readback-verify
+   the `filesystem` `v2` binding at
+   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` per
+   `create-memory/references/resolution.md`.
+
 ## Common failure modes
 
 - **Migrating a bare or template flat brain.** There is nothing to
@@ -423,6 +448,5 @@ End every `migrate` run with a report:
   frontmatter.
 - **Fattening `index.md`** with the Decision Index table or the flat
   index's section prose.
-- **Offering migration unprompted** to a healthy flat brain. Both
-  layouts are supported.
+- **Starting `migrate-surface` while the flat trio still exists** (ambiguous `index.md` + `constitution.md` state).
 - **Finishing without the backup path and the gap list.**

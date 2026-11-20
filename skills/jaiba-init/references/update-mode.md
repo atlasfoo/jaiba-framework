@@ -109,7 +109,7 @@ which half to follow.
 | `.ai/memory/` holds | Layout | Follow |
 |---|---|---|
 | `index.md` | concept bundle | the **bundle** half of each rule below |
-| `constitution.md`, no `index.md` | legacy flat | the **legacy flat** half. This is a supported layout — maintain it in place, and never offer migration unless the developer asks (`references/migrate-mode.md`) |
+| `constitution.md`, no `index.md` | legacy flat | the **legacy flat** half. Maintain it losslessly in place while emitting **Notice 1 (very high urgency)** per `jaiba-contract.md` §1 routing to `references/migrate-mode.md` when the developer confirms migration. |
 | both | ambiguous | **Stop and surface it** (contract §1). Never silently pick a half. |
 | neither | no brain | Wrong mode — route to `initialize`. |
 

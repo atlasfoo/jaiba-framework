@@ -320,6 +320,21 @@
         "Host locks (active-procedure-reference, absolute paths) are dropped, keeping procedure-provenance as history.",
         "Incremental conformance validates patch semantics, determinism, and the Efficiency Gate before multi-host reinstall."
       ]
+    },
+    {
+      "id": 24,
+      "prompt": "Verify the built-in filesystem v2 binding schema, Step 0 silent auto-generation over OKF + AGENTS.md pin, malformed binding guard, and traceless shareability warning.",
+      "expected_output": "Built-in filesystem v2 bindings use adapter-id 'filesystem', adapter-version 'built-in', namespace 'filesystem', registry-locator '.ai/memory/index.md', deterministic project-id and context-id, and context-locator '.ai/work'. When .ai/memory/index.md exists and AGENTS.md already declares jaiba-memory-surface: filesystem, Step 0 silently auto-generates the missing v2 binding with readback without firing Notice 2 (though an AGENTS.md pin never suppresses Notice 1 on flat constitution.md). A malformed or mismatched pre-existing v2 binding stops without silent overwrite. Cancelled migrate-surface on filesystem-unbound still writes no filesystem binding. Traceless external options always include the shareability warning.",
+      "files": [
+        "evals/fixtures/layout-legacy.json",
+        "evals/fixtures/binding-v2-cases.json"
+      ],
+      "assertions": [
+        "Filesystem v2 binding uses deterministic namespace 'filesystem', registry-locator '.ai/memory/index.md', and context-locator '.ai/work'.",
+        "Step 0 silently auto-generates missing v2 binding with readback when OKF + AGENTS.md filesystem pin are present, without suppressing Notice 1 on flat layout.",
+        "Malformed or mismatched pre-existing v2 binding stops and reports without overwriting.",
+        "Cancelled migrate-surface on filesystem-unbound writes no filesystem binding, and traceless explanations include the shareability warning."
+      ]
     }
   ]
 }

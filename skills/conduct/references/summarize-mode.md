@@ -27,6 +27,8 @@ shortcut. Amendments require re-presentation and renewed confirmation.
 
 Filesystem keeps both supported layouts: resolve the concept bundle
 through `index.md`, or the legacy flat brain when only `constitution.md`
+is present (emitting Level 1 Notice 1 or Level 2 Notice 2 per
+`jaiba-contract.md` §1 without blocking closure).
 exists. Both markers or neither block mutation. Do not migrate to close.
 Filesystem locators below are examples, not logical addresses for external
 surfaces. No constitutive editing is authorized beyond append-log.

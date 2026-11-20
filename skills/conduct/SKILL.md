@@ -54,6 +54,10 @@ mode that freezes writes.
 After that mode returns the plan text, conduct may consume it and
 write the JAIBA draft in a session that can write. Do not replan the
 how. Do not move the approval gate: no approval, no `tasks`, no code.
+**Before planning in an uninstrumented project:** check Step 0 first; if
+the repo is authoritatively uninstrumented, pause before planning and
+suggest running `jaiba-init` first (or continuing explicitly with native
+planning alone while keeping JAIBA dormant).
 The full procedure is `references/native-plan-client.md`.
 
 ## Invocation: implicit first, explicit as override
@@ -245,8 +249,16 @@ concepts above through that index; with `constitution.md` only, retain the
 supported legacy `constitution.md`, `adr-log.md`, `reference-index.md` and
 `log/` sources without migration. Both entry files block access pending
 human resolution. Neither entry file or a missing marker routes to
-`jaiba-init`; bare templates route to initialize. Neither supported layout
-is a warning. `.ai/work/` remains per checkout, without new context folders.
+`jaiba-init`; bare templates route to initialize. Both layouts remain
+readable losslessly, but **apply the 3-level memory notices (`jaiba-contract.md` §1)**
+at Step 0: Level 1 (`constitution.md` without `index.md`) emits **Notice 1
+(very high urgency)** on every response; Level 2 (`index.md` without
+`jaiba-memory-surface: filesystem` in `AGENTS.md`) emits **Notice 2
+(medium urgency)** on every response; when `AGENTS.md` already declares
+`jaiba-memory-surface: filesystem` over OKF (`index.md`), silently
+auto-generate the missing `v2` binding with readback and emit no notice.
+Always include the **traceless shareability warning** when offering
+external surface migration. `.ai/work/` remains per checkout, without new context folders.
 
 For either surface, permission errors, partial catalogues, unavailable
 tools, unsupported versions and truncated reads are failures, not absence.

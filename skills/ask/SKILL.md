@@ -97,7 +97,16 @@ absent, not a reason to skip Step 0.
 
 Orienting cold (see `references/orientation.md`) includes Step 0 above.
 On filesystem — only after Step 0 selects it — resolve its supported
-concept-bundle or legacy layout. On an external surface, require a valid
+concept-bundle or legacy layout and run the lightweight 3-level memory
+check (`jaiba-contract.md` §1) on **every turn (including pure code
+questions)**: Level 1 (`constitution.md` without `index.md`) emits
+**Notice 1 (very high urgency)** non-blockingly; Level 2 (`index.md`
+without `jaiba-memory-surface: filesystem` in `AGENTS.md`) emits
+**Notice 2 (medium urgency)** non-blockingly, including the **traceless
+shareability warning** and routing to `jaiba-init`. If `AGENTS.md`
+already declares `jaiba-memory-surface: filesystem` over OKF (`index.md`),
+silently auto-generate the missing `v2` binding with readback (never
+overwriting a malformed binding) and emit no notice. On an external surface, require a valid
 binding (`v2` locator), readable owned catalogue, exact project/context
 scope and required full reads; a marker, probe, search result or empty
 catalogue alone is not authoritative. Do not open `.ai/` to orient when

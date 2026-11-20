@@ -213,7 +213,7 @@
         "Skipped the skeleton and marker steps rather than re-laying or clobbering them",
         "Went straight to the update-brain:initialize step",
         "Did not treat the existing AGENTS.md as an edge case needing backup — it is JAIBA's own marker",
-        "Still closed with the jaiba-doctor hand-off"
+        "Automatically resolved and ran jaiba-doctor in the same flow (or reported jaiba-doctor unavailable for this agent and routed to jaiba-configure)"
       ],
       "files": []
     },
@@ -291,6 +291,7 @@
         "Existing log/ entry gained only missing frontmatter keys — body, filename and date untouched",
         "A brain-change log entry appended recording the inventory, the backup path, and the carried-over [MISSING] count",
         "Closed by stating explicitly that the flat originals are still in place and that deleting them is a separate, human-confirmed step — did not delete them or treat confirmation of the migration as consent to delete",
+        "Once flat-trio deletion is confirmed, chained in the same conversation into Step 9 (Level v3): offered migrating to a conforming installed surface in traceless mode (with the traceless shareability warning; blocked if flat trio was not yet deleted) or staying on filesystem (pinning jaiba-memory-surface: filesystem in AGENTS.md and persisting v2 binding in ~/.jaiba)",
         "Resulting bundle is content-equivalent (modulo the agent's own prose/slugs) to the checked-in okf-bundle fixture for this same scenario"
       ],
       "files": [
@@ -666,6 +667,37 @@
         "Blocks when both entry files are present, when neither entry file exists, or when the files are an intact bracket template: no snapshot and no new binding",
         "Does not write a filesystem binding and does not add a question before MSV-011",
         "Does not change Binding-First order for a conduct, ask, or doctor session that did not request migrate"
+      ],
+      "files": []
+    },
+    {
+      "id": 34,
+      "name": "bootstrap-auto-runs-doctor-or-reports-unavailable",
+      "mode_under_test": "bootstrap",
+      "prompt": "jaiba-init",
+      "context": {
+        "repo_state": "greenfield repository with no .ai/ and no AGENTS.md",
+        "variants": "A: jaiba-doctor available to this host agent; B: jaiba-doctor not installed/available for this agent"
+      },
+      "expected_output": [
+        "In filesystem bootstrap, writes AGENTS.md with jaiba-memory-surface: filesystem frontmatter and persists + readback-verifies the filesystem v2 binding in ~/.jaiba/memory/bindings/<sha256(R)>.yaml",
+        "In traceless bootstrap, includes the explicit traceless shareability warning",
+        "Variant A: automatically executes jaiba-doctor in the same flow after initialize/create-link (coherence check + local .atl/tool-layout.md probe + reference health) instead of stopping at a passive hand-off",
+        "Variant B: reports explicitly that jaiba-doctor is unavailable for this agent, routes to jaiba-configure, and does not fabricate a checkup or synthetic .atl/tool-layout.md"
+      ],
+      "files": []
+    },
+    {
+      "id": 35,
+      "name": "notice2-direct-level-v3-entry-and-ambiguous-block",
+      "mode_under_test": "update-brain:migrate",
+      "prompt": "Complete Level v3 memory setup after Notice 2.",
+      "context": {
+        "repo_state": "variant A: OKF bundle (.ai/memory/index.md) without AGENTS.md pin or v2 binding; variant B: freshly converted OKF where flat trio deletion was deferred (index.md + constitution.md both present) and developer asks to run migrate-surface"
+      },
+      "expected_output": [
+        "Variant A enters Step 9 (Level v3) directly without re-running flat-to-OKF conversion, shows the traceless shareability warning if a conforming external surface is offered, or writes jaiba-memory-surface: filesystem + v2 binding on filesystem choice",
+        "Variant B blocks starting migrate-surface until constitution.md, adr-log.md, and reference-index.md are deleted and the ambiguous dual-layout state is resolved"
       ],
       "files": []
     }

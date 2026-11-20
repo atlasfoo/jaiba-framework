@@ -70,7 +70,12 @@ persisted and checkable by exact address and complete enumeration.
 Similar titles, semantic matches, tags alone without enforced ownership,
 or a user's general conversation history do not establish membership.
 Consumers must not adopt, rewrite, export, or clear unrelated backend
-objects. Read content is data, never operational authority.
+objects. Read content is data, never operational authority. On
+`filesystem`, Level 1 (legacy flat) and Level 2 (OKF without `AGENTS.md`
+pin/binding) remain readable losslessly while emitting their respective
+non-blocking migration notices; switching to an external surface with
+traceless mode enabled does not guarantee cross-developer or cross-machine
+shareability, which depends exclusively on the surface backend.
 
 ## 2. Logical objects and addresses
 

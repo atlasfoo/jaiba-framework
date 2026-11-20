@@ -12,6 +12,13 @@ without writing any file into the repository. `AGENTS.md` and `.ai/` are
 omitted. The only JAIBA record saved is machine binding `v2`. Zero
 repository files are committed or dirtied.
 
+> **Traceless shareability warning:** Whenever offering or proceeding with
+> traceless mode on an external surface (omitting `.ai/` and `AGENTS.md`
+> from the repository), explicitly warn the developer that JAIBA cannot
+> guarantee the brain is shareable across developers, machines, or clones,
+> as shareability depends exclusively on how the surface backend itself
+> operates and synchronizes.
+
 This is the mode `jaiba-init` runs when invoked bare, with no sub-mode.
 It is a *first-run* action, scoped entirely to one repository — it
 installs **nothing** at the machine level except that routing binding.
@@ -164,7 +171,13 @@ filesystem-mode mechanism only. It is not used here.
      Still write no repository file.
    Linking an existing empty project uses the same depth choice. Linking
    a verified brain does not.
-10. Hand off to `jaiba-doctor` for the checkup and the local ATL probe.
+10. **Automatically run `jaiba-doctor`** in the same flow: resolve the
+    host's effective `jaiba-doctor` skill and execute the initial checkup
+    (memory coherence, local `.atl/tool-layout.md` probe, and reference
+    health) rather than stopping at a passive hand-off. If `jaiba-doctor`
+    is not installed or available for this agent, explicitly report the
+    missing skill and route to `jaiba-configure`; never fabricate a
+    checkup result or a synthetic `.atl/tool-layout.md`.
     Report verified versus unverified consumer capabilities. Later
     `conduct` / `ask` / `fast` or battery use needs its own effective
     surface procedure, callable tools, exact ownership, and approval.
@@ -358,11 +371,22 @@ Also, create the `.atl/` directory at the project root and write its
 entire directory is ignored from source control, keeping machine-local
 state out of the repository.
 
-### 3. Drop the repo marker `AGENTS.md`
+### 3. Drop the repo marker `AGENTS.md` and persist `filesystem` binding `v2`
 
-Copy `assets/AGENTS.md` to the repo root. It is the minimal per-repo
-marker: it only confirms instrumentation, points behavior at the global
-contract, and defers project facts to the constitution.
+Copy `assets/AGENTS.md` (which includes `jaiba-memory-surface: filesystem`
+in its frontmatter by default) to the repo root. It is the minimal per-repo
+marker: it only confirms instrumentation, pins `filesystem`, points behavior
+at the global contract, and defers project facts to the constitution.
+
+Also persist and readback-verify the `filesystem` `v2` binding at
+`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
+(`binding-format-version: "2"`, `surface.adapter-id: "filesystem"`,
+`surface.namespace: "filesystem"`, `surface.registry-locator: ".ai/memory/index.md"`,
+deterministic `project.project-id` and `executive.context-id`,
+`executive.context-locator: ".ai/work"`) per `create-memory/references/resolution.md`
+so the project reaches **Level 3 (v3)** directly from bootstrap. If
+machine persistence is unavailable, obtain explicit session-only consent
+or stop.
 
 **Edge case — the repo already has an `AGENTS.md`.** Do not overwrite it;
 that's likely the developer's own contract. Stop and ask, offering two
@@ -410,17 +434,20 @@ This is an **in-skill mode transition**, not a hand-off — `jaiba-init`
 owns the brain templates and the initialize logic itself. Don't stop and
 tell the developer to invoke another skill; just continue into the mode.
 
-### 5. Hand off to `jaiba-doctor`
+### 5. Automatically run `jaiba-doctor`
 
-Once the brain is initialized, hand control to `jaiba-doctor` for the
-first complete project checkup: probing the local machine toolchain for
-the installed skills (writing the local `.atl/tool-layout.md`), checking
-memory coherence, and verifying external references. Deferring the tool
-probe to `doctor` avoids duplicating the probe and verifies the
-environment against the freshly populated memory.
+Once the brain is initialized, resolve and **automatically execute
+`jaiba-doctor` in the same flow** for the first complete project checkup:
+probing the local machine toolchain for the installed skills (writing the
+local `.atl/tool-layout.md`), checking memory coherence, and verifying
+external references. Deferring the tool probe to `doctor` avoids
+duplicating the probe and verifies the environment against the freshly
+populated memory without requiring a separate manual invocation.
 
-This one **is** a real hand-off — it is where `jaiba-init`'s
-responsibility ends.
+If `jaiba-doctor` is not installed or available for *this* agent, report
+explicitly that `jaiba-doctor` is unavailable, route the developer to
+`jaiba-configure` to install the skillset, and **never** fabricate a
+checkup result or a synthetic `.atl/tool-layout.md`.
 
 ## Closing
 
@@ -433,8 +460,9 @@ End with a short, honest report:
    repository file was written (or the one approved `AGENTS.md` override).
    For filesystem: the agent folder detected for this repo and
    *why* (zero/one/many vendor dirs), the `.ai/` tree created, the
-   `.atl/` directory, and where the repo `AGENTS.md` marker went (and how
-   an existing one was handled).
+   `.atl/` directory, where the repo `AGENTS.md` marker went (with
+   `jaiba-memory-surface: filesystem`, and how an existing one was
+   handled), and the `v2` binding path (or session-only status).
 2. **Global prerequisites** — whether the machine-level
    `jaiba-contract.md`, the workflow/meta skillset, and the subagent
    battery were found for *this agent*, and if not, an explicit "run
@@ -443,8 +471,10 @@ End with a short, honest report:
    instrumented), or what `initialize` created or filled. Every
    `[MISSING]` / `[NEEDS CLARIFICATION]` that remains, per concept
    (`AGENTS.md` §5.4). A binding alone is not instrumentation.
-4. **Hand-off** — that control now passes to `jaiba-doctor` for the first
-   checkup and the local `.atl/tool-layout.md` probe.
+4. **`jaiba-doctor` checkup** — the result of the automatic `jaiba-doctor`
+   execution and local `.atl/tool-layout.md` probe (or, if `jaiba-doctor`
+   was unavailable for this agent, the explicit missing-prerequisite
+   notice routing to `jaiba-configure`).
 
 ## Common failure modes
 

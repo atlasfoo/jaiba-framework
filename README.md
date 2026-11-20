@@ -366,10 +366,40 @@ Behavior does not live per-repo anymore. `jaiba-configure` installs the **JAIBA 
 `.ai/memory/` comes in **two supported layouts** — a repo holds one or
 the other, resolved by whether `index.md` exists (both existing at once
 is treated as ambiguous and surfaced to the human, never silently
-picked). Neither is a fallback: the flat layout is a fully supported,
-warning-free state, not drift toward the bundle. Converting one to the
-other is optional and human-triggered (`jaiba-init:update-brain:migrate`)
-— it is never offered unprompted.
+picked). Both remain readable losslessly, and JAIBA classifies every
+instrumented project into **3 memory levels** (`jaiba-contract.md` §1):
+
+- **Level 1 (v1 — Legacy flat):** `.ai/memory/constitution.md` without
+  `index.md`. Emits a non-blocking **Notice 1 (very high urgency)** on
+  every response routing to `jaiba-init` (`update-brain:migrate` → Level
+  v3).
+- **Level 2 (v2 — OKF without v3):** `.ai/memory/index.md` without the
+  `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (and without an
+  active external binding). Emits a non-blocking **Notice 2 (medium
+  urgency)** on every response routing to `jaiba-init` to migrate to a
+  conforming installed surface (traceless mode) or stay on `filesystem`
+  (pin + `v2` binding).
+- **Level 3 (v3 — Bound surface or `filesystem` with pin + `v2` binding):**
+  `index.md` + `jaiba-memory-surface: filesystem` in `AGENTS.md` + `v2`
+  binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` (auto-generated
+  silently on Step 0 if `AGENTS.md` already has the `filesystem` pin over
+  OKF), or a valid external surface `v2` binding.
+
+> **Unorchestrated projects:** On the **first message of a session** in an
+> authoritatively unorchestrated repository (no `.ai/memory/`, no
+> `AGENTS.md`, no `v2` binding, and no external registry match), the agent
+> responds non-blockingly with a brief **one-time-per-session** suggestion
+> to run `jaiba-init` (without repeating it on ordinary follow-up turns or
+> fabricating memory). Before starting **native plan mode** on an
+> unorchestrated repository, the agent pauses and suggests running
+> `jaiba-init` first (or letting the developer explicitly continue with
+> native planning alone while JAIBA stays dormant).
+
+> **Traceless shareability warning:** When moving to an external surface
+> with traceless mode enabled (omitting `.ai/` and `AGENTS.md` from the
+> repository), JAIBA cannot guarantee the brain is shareable across
+> developers, machines, or clones — shareability depends exclusively on
+> how the surface backend itself operates and synchronizes.
 
 #### Concept bundle (current default)
 
@@ -489,7 +519,7 @@ The framework health check — a pre-flight before entering the conduct chain. *
 | Diagnostic | What it checks | Where the fix routes |
 |---|---|---|
 | **Memory coherence** | Behavioral contract present and drift-free (repo marker + global copy vs packaged version); resolves the `.ai/memory/` layout first (concept bundle vs legacy flat, per the dual-resolution rule) and checks it — bundle graph integrity (no broken links, every concept carries `type:`) or the three flat files — complete, mutually consistent, and not drifting from the repo; curated-vs-chronological separation intact. | `jaiba-init` (brain, repo marker) / `jaiba-configure` (global contract) |
-| **Tool state** | Are the CLI tools that installed skills, **subagents**, and hooks declare (`requires:`) actually present? Refreshes `.atl/tool-layout.md` with provenance. | install the tool |
+| **Tool state** | Are the CLI tools that installed skills, **subagents**, and hooks declare (`requires:`) actually present? Refreshes `.atl/tool-layout.md` with provenance, and tracks the once-per-24h per-project framework version freshness check in gitignored `.atl/framework-version.json` (fail-soft offline/sandbox, strict semver token validation under §4.5, non-blocking `jaiba-configure` upgrade notice). | install the tool / run `jaiba-configure` |
 | **External-reference health** | Every `reference` concept (or `reference-index.md` entry, legacy flat) reachable: MCP/CLI installed, remote spec live, vendored copy present and fresh. | install · fix endpoint · re-vendor via `jaiba-init:update-brain` |
 
 ### 🧩 `jaiba-engram-memory` — optional Engram adapter
@@ -665,7 +695,7 @@ Projects instrumented before the conduct unification use `planning`/`specificati
 | **Brain** | The set of files in `.ai/` that make up the agent's persistent context |
 | **Constitutive memory** | `.ai/memory/`: identity, decision and reference concepts reachable from `index.md` (or constitution / curated ADR log / reference index, legacy flat) plus the chronological log — who the project is |
 | **Concept bundle** | The current-default `.ai/memory/` layout: one file per constitutive concept, closed `type:` vocabulary, all reachable from `index.md` |
-| **Legacy flat layout** | The pre-bundle `.ai/memory/` layout — three files (`constitution.md`, `adr-log.md`, `reference-index.md`) plus `log/`. Still fully supported; converting to the bundle is optional and human-triggered |
+| **Legacy flat layout** | The pre-bundle `.ai/memory/` layout — three files (`constitution.md`, `adr-log.md`, `reference-index.md`) plus `log/` (Level 1). Readable losslessly; emits Notice 1 routing to `jaiba-init:update-brain:migrate` → Level v3 |
 | **Executive memory** | `.ai/work/`: PRD (if any), plan, tasks, walkthrough — what is being done right now (gitignored) |
 | **Behavioral contract** | `jaiba-contract.md`, installed once per machine in the agent's global config; each repo keeps a minimal `AGENTS.md` marker pointing at it |
 | **Triage** | The shared blast-radius → depth mapping (`inline → design → spec`) that decides how deep a change enters the chain |

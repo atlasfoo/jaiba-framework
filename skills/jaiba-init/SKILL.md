@@ -23,8 +23,9 @@ memory owner. `jaiba-init` provides three entry points:
   **traceless** external association. Traceless instruments a verified
   or newly authorized external brain without writing any repository
   file: `AGENTS.md` and `.ai/` are omitted; the only machine write is
-  binding `v2`. Then the first `jaiba-doctor` checkup. ATL always stays
-  local.
+  binding `v2`. Then automatically run the first `jaiba-doctor` checkup
+  in the same flow (or report it missing and route to `jaiba-configure`).
+  ATL always stays local.
 - **Maintain** (`jaiba-init:update-brain`) — keep the brain true to the
   repository for the rest of the project's life.
 - **Surface migration** (`jaiba-init:migrate-surface`) — explicitly transfer
@@ -69,7 +70,7 @@ Absence of local files is never evidence of an absent external brain.
 | The repo is not instrumented at all — no `.ai/` whatsoever — and the developer wants JAIBA adopted here: "set up jaiba in this repo", "onboard this project", "jaiba-init", or the skill invoked bare with no sub-mode. | **bootstrap** (the default) | `references/bootstrap-mode.md` |
 | The `.ai/` skeleton exists but the brain does not (no `.ai/memory/index.md`, or the concept files it links to are bare templates) and the developer wants it built — "build the brain", "initialize the memory". Also: reached from bootstrap mode's step 4, and from a half-bootstrapped repo (see the resume table in `references/bootstrap-mode.md`). | `update-brain:initialize` | `references/initialize-mode.md` |
 | The brain already exists and must be reconciled with reality — either **apply proposals** ("apply the proposed ADR", "record this decision", "add this integration") handed over by `conduct:summarize`, or **fix drift** ("the identity concepts are stale", "reconcile memory with the code") after the project evolved. | `update-brain:update` | `references/update-mode.md` |
-| The brain exists in populated flat layout (`constitution.md`, `adr-log.md`, `reference-index.md` with real content, no `index.md`) and the developer explicitly wants to convert it to the OKF concept bundle — "convert the brain to OKF", "migrate to the new format", "I want the concept bundle". Also: optional and human-triggered, never offered unprompted. | `update-brain:migrate` | `references/migrate-mode.md` |
+| The brain exists in populated flat layout (`constitution.md`, `adr-log.md`, `reference-index.md` with real content, no `index.md`) and the developer wants to convert it to the OKF concept bundle (explicitly or routed from Notice 1) — "convert the brain to OKF", "migrate to the new format", "I want the concept bundle". Chains into Level v3 setup (conforming external surface in traceless mode with shareability warning, or `filesystem` pin + `v2` binding). Projects already on OKF v2 arriving from Notice 2 enter that Level v3 step directly. | `update-brain:migrate` | `references/migrate-mode.md` |
 | The developer explicitly requests a transfer between filesystem/external surfaces, between external bindings, or a return to filesystem. Layout conversion is not implied. | `migrate-surface` | `references/surface-migration.md` and `assets/migration-journal-template.md` |
 | Anything else — a pure question about the brain (that's `ask`), *implementing* code (that's `conduct`/`fast`), or **machine-level** setup (that's `jaiba-configure`) | **Route, don't guess.** See "Hand-off" below. | — |
 
@@ -246,8 +247,15 @@ developer means rather than guessing.
    block. For external instrumentation verify the binding **and** real index
    and required entry concepts by full reads, not just a successful probe or
    empty catalogue. For filesystem apply dual resolution before reading:
-   bundle or historical flat supported without warnings/conversion; both
-   entry layouts → ambiguous, stop. Neither after successful access → no brain.
+   bundle or historical flat readable losslessly, with Level 1 (flat)
+   emitting Notice 1 and Level 2 (unbound OKF) emitting Notice 2 per
+   `jaiba-contract.md` §1; both entry layouts → ambiguous, stop. Neither
+   after successful access → no brain.
+   Whenever offering or explaining traceless mode on an external surface
+   (omitting `.ai/` and `AGENTS.md`), explicitly include the **traceless
+   shareability warning**: JAIBA cannot guarantee the brain is shareable
+   across developers, machines, or clones, as that depends exclusively on
+   the surface backend itself.
 
 ### Mutation discipline — all modes
 
@@ -585,10 +593,14 @@ Per `AGENTS.md` §3.5:
   depth and a verified existing brain do not. The artifact templates have
   always belonged here. On an external surface they are logical content,
   not a requirement to create local files.
-- **`jaiba-init` → `jaiba-doctor`.** Bootstrap's closing hand-off: the
-  first checkup and the local toolchain probe (`.atl/tool-layout.md`).
-  A real cross-skill boundary, never a cross-skill file path (skills
-  package independently; see `state.md`).
+- **`jaiba-init` → `jaiba-doctor`.** On a new bootstrap (filesystem after
+  `initialize`, or traceless after create/link), `jaiba-init` automatically
+  resolves and runs the host's effective `jaiba-doctor` skill in the same
+  flow for the first checkup and local `.atl/tool-layout.md` probe (still
+  a cross-skill boundary with no cross-skill file path). If `jaiba-doctor`
+  is not installed/available for this agent, report the missing prerequisite
+  and route to `jaiba-configure` without fabricating a checkup or
+  `.atl/tool-layout.md`.
 - **`conduct:summarize` → `update`.** It
   *propose* `decision` concepts / `reference` entries / identity
   changes and point the developer here. `update` is where those

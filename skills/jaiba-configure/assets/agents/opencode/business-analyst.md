@@ -49,7 +49,9 @@ backend data or create probe records. Host bookkeeping is not adapter evidence.
 **Filesystem only:** resolve the layout first (`index.md` present →
 concept bundle; `constitution.md` with no `index.md` → legacy flat —
 see `jaiba-contract.md` §1). Both present means ambiguous; neither
-present means uninstrumented. External mode needs no `.ai/` and is
+present means uninstrumented. Report detected Level 1 (flat) or Level 2
+(unbound OKF) state in findings without suppressing parent migration
+notices. External mode needs no `.ai/` and is
 not read through these paths. Then read the resolved constitutive
 sources, in order, and check the requirement against each:
 

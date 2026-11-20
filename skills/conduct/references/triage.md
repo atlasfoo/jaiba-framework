@@ -57,6 +57,10 @@ is selected; external triage creates no local cache or mirror.
    `kind: internal-contract`, resolved by exact constitutive address:
    a change crossing a declared `sub-unit` boundary ripples by definition.
    Only filesystem resolves these through bundle paths or legacy flat
+   paths; apply Step 0's 3-level memory check (`jaiba-contract.md` §1) so
+   Level 1 (flat) emits Notice 1, Level 2 (unbound OKF) emits Notice 2,
+   and OKF + `AGENTS.md` `filesystem` pin silently auto-generates the
+   missing `v2` binding.
    document/entry mappings; preserve both layouts without migration.
 4. **Check migration / breaking-change ripple.** For dependency
    upgrades, skim the changelog for the target version.

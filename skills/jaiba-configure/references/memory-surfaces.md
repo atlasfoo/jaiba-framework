@@ -76,7 +76,11 @@ With existing `.ai/` memory/work, require a separately confirmed filesystem
 exception (normally the explicit `filesystem` override, written only through
 an authorized project workflow), or hand off an explicit migration request to
 the independently resolved effective `jaiba-init:migrate-surface` operation
-(`references/surface-migration.md`). Configure performs neither operation.
+(`references/surface-migration.md`). Configure performs neither operation. Always include the **traceless
+shareability warning**: switching to a memory surface with traceless mode
+enabled (omitting `.ai/` and `AGENTS.md` from the repository) means JAIBA
+cannot guarantee the brain is shareable across developers, machines, or
+clones, as shareability depends exclusively on the surface backend itself.
 If local and external stores are both populated, stop for an explicit
 authority/collision decision; never prefer timestamps, merge, ignore, retire
 or dual-write stores. An unreadable store is not empty. Configure reports

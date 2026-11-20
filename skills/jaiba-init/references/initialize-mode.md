@@ -99,8 +99,11 @@ creation below:
    `conduct` owns executive contents. README role guidance below still applies
    locally, but its context pointer must describe the actual surface.
 8. Close with types/counts, full-read/receipt evidence, every unresolved gap
-   by logical address and persistence status; hand off to effective doctor for
-   local ATL/checkup when onboarding. Subsequent consumers must independently
+   by logical address and persistence status; when entered from a new
+   `bootstrap`, automatically run the host's effective `jaiba-doctor` for
+   the first checkup and local `.atl/tool-layout.md` probe (or report it
+   missing and route to `jaiba-configure`, never fabricating a checkup).
+   Subsequent consumers must independently
    resolve their effective surface procedures and verify actual callable tools,
    ownership, required capabilities and operation-specific human approval.
    A clean external brain alone grants no consumer mutation authority.
@@ -377,10 +380,14 @@ End every `initialize` run with a short report:
    Here the file is named explicitly: this is the list the developer acts
    on. This is mandatory (`AGENTS.md` §5.4); the developer must never find
    an incomplete brain by surprise.
-3. **Next step** — if gaps remain, the developer resolves them (re-run
-   the relevant questions or fill by hand). If the brain is clean, the
-   project can proceed to the `conduct` chain only through its effective
-   selected-surface procedure, verified capabilities and required approvals.
+3. **Next step** — when entered from a new `bootstrap`, automatically
+   execute the host's effective `jaiba-doctor` in the same flow (or report
+   `jaiba-doctor` unavailable for this agent and route to `jaiba-configure`
+   without fabricating a checkup). Otherwise, if gaps remain, the developer
+   resolves them (re-run the relevant questions or fill by hand). If the
+   brain is clean, the project can proceed to the `conduct` chain only
+   through its effective selected-surface procedure, verified capabilities
+   and required approvals.
    Report any unverified requirement and block the dependent operation; never
    substitute filesystem consumers for an external binding.
 

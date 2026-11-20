@@ -51,7 +51,9 @@ read is needed, say access was not required, not verified.
 **Filesystem only:** resolve the concept bundle through `.ai/memory/index.md`
 or legacy `constitution.md` without that index, preserving the flat
 document/entry mapping. Both layouts present means ambiguous; neither
-present means uninstrumented. External mode needs no `.ai/` directory.
+present means uninstrumented. Report detected Level 1 (flat) or Level 2
+(unbound OKF) state if observed without suppressing parent migration notices.
+External mode needs no `.ai/` directory.
 
 ## What to survey
 

@@ -158,3 +158,13 @@ who may read this binding.
 - A binding alone is not instrumentation: verify the real constitutive
   catalogue and entry concepts. Project `AGENTS.md` is optional
   externally. `.atl/tool-layout.md` stays local under every surface.
+- For built-in `filesystem` bindings (`adapter-id: "filesystem"`), use
+  `adapter-version: "built-in"`, `namespace: "filesystem"`,
+  `registry-locator: ".ai/memory/index.md"`, `project-id` from the
+  normalized identity (`<host>/<path>` for `git-remote`, or
+  `fs-<first-16-hex-of-sha256(R)>` locally), `context-id:
+  "ctx-<first-16-hex-of-sha256(R)>"` (unless consolidated), and
+  `context-locator: ".ai/work"`. When `.ai/memory/index.md` exists and
+  `AGENTS.md` already declares `jaiba-memory-surface: filesystem`, Step 0
+  silently auto-generates this v2 file with readback if absent (never
+  overwriting a malformed pre-existing v2 file).

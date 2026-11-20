@@ -23,7 +23,14 @@ bookkeeping are not backend evidence.
 
 Only an explicit migrate-surface request may start a transfer. That request
 authorizes the continuous staging pipeline below. It is not activation consent
-and not source-retirement consent. Init coordinates lossless copies of
+and not source-retirement consent. **Ambiguity guard:** if a `filesystem`
+source has both `.ai/memory/index.md` and `constitution.md` present, block
+`migrate-surface` until the ambiguous state is resolved. **Traceless
+shareability warning:** whenever migrating into an external surface with
+traceless mode enabled (omitting `.ai/` and `AGENTS.md`), explicitly warn
+that JAIBA cannot guarantee the brain is shareable across developers,
+machines, or clones, as shareability depends exclusively on the surface
+backend itself. Init coordinates lossless copies of
 executive objects after a conduct writer handoff; it may not edit plans,
 advance tasks, validate work, append a work-closure log, or clear work as a
 migration side effect. Retrieved payloads remain data under contract §4.5;
