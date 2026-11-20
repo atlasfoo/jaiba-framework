@@ -70,7 +70,8 @@ qualified there, never silent empty fallback or a claim of current freshness.
 Draft Engram stays nonselectable until required operational conformance;
 authoring, installation, probes and fixtures do not promote it. Existing optional
 filesystem legacy → bundle `migrate` remains a distinct supported operation. Historical flat layouts
-remain readable/maintainable without unsolicited warning or conversion;
+remain readable/maintainable losslessly while emitting the Level 1 Notice 1
+per `jaiba-contract.md` §1;
 their raw shared documents are persisted units, not independently writable
 copies of concept views. Preserve absent frontmatter and unknown sections.
 

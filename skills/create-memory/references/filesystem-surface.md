@@ -14,12 +14,25 @@ co-installed.
 The project root is the checkout currently selected by the host. Resolve
 `.ai/memory/` before any operation:
 
-| Evidence | Layout and action |
+| Evidence | Layout / Level and action |
 |---|---|
-| `.ai/memory/index.md` and no `constitution.md` | Concept bundle; resolve concepts through the index and its declared paths. |
-| `constitution.md` and no `index.md` | Supported legacy flat layout; retain the source documents and map their logical contents losslessly. |
+| `.ai/memory/index.md` and no `constitution.md` | **Level 2 (v2 OKF)** or **Level 3 (v3 bound `filesystem`)**. Resolve concepts through the index and its declared paths. If `AGENTS.md` declares `jaiba-memory-surface: filesystem` and `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is missing (and no malformed v2 record exists), silently auto-generate the `v2` binding with readback (Level 3, no notice). If the `AGENTS.md` pin is absent, emit **Notice 2 (medium urgency)** on every response. |
+| `constitution.md` and no `index.md` | **Level 1 (v1 legacy flat)**. Retain and map source documents losslessly so active work is not broken, and emit **Notice 1 (very high urgency)** on every response (even if `AGENTS.md` pins `filesystem`). |
 | Both entry files | Ambiguous; block access, export, and mutation pending human resolution. |
 | Neither entry file | No resolved brain; do not manufacture one or claim an empty brain. |
+
+### Filesystem binding v2 schema
+
+When `surface.adapter-id: "filesystem"` is persisted at
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (by `jaiba-init` or silent
+auto-generation over OKF + `AGENTS.md` pin), use the deterministic fields
+from `resolution.md` and `assets/binding-template.md`: `adapter-id:
+"filesystem"`, `adapter-version: "built-in"`, `category: memory-surface`,
+`namespace: "filesystem"`, `registry-locator: ".ai/memory/index.md"`,
+`project.project-id` (`<host>/<path>` for `git-remote`, or
+`fs-<first-16-hex-of-sha256(R)>` on local fallback),
+`executive.context-id` (`ctx-<first-16-hex-of-sha256(R)>` unless
+consolidated from legacy), and `executive.context-locator: ".ai/work"`.
 
 The filesystem binding owns only the selected project's `.ai/memory/` and,
 for a specifically selected executive context, its `.ai/work/`. It does not

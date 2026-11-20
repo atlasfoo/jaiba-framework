@@ -229,6 +229,20 @@
         "Conduct continues execution of the active plan without entering fast"
       ],
       "files": []
+    },
+    {
+      "id": 12,
+      "name": "fast-inline-change-step0-notice1-and-v2-autogen",
+      "context_under_test": "step0-memory-level-check",
+      "prompt": "quick fix: rename retryCount to maxRetries in src/client.ts",
+      "context": {
+        "variants": "A: filesystem v1 flat (constitution.md without index.md, even if AGENTS.md pins filesystem); B: filesystem v2 OKF + AGENTS.md jaiba-memory-surface: filesystem with missing ~/.jaiba v2 binding"
+      },
+      "expected_output": [
+        "Variant A executes the inline fix and emits Notice 1 (very high urgency) non-blockingly — the AGENTS.md pin does not suppress Notice 1 while .ai/memory/ is still flat",
+        "Variant B silently auto-generates the filesystem v2 binding with readback, executes the inline fix, and emits no Notice 2"
+      ],
+      "files": []
     }
   ]
 }

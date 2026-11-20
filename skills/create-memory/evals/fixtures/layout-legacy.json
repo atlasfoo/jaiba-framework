@@ -1,5 +1,7 @@
 {
   "layout": "legacy-flat",
+  "expected_memory_level": "level-1-v1-flat",
+  "expected_notice": "Notice 1 (very high urgency)",
   "markers": [".ai/memory/constitution.md"],
   "documents": [
     {"path": ".ai/memory/constitution.md", "logical_id": "legacy-constitution-document", "full_content": "# Constitution\nPurpose and identity.\n\n## Unknown section\nKeep this full section.\n", "frontmatter": null, "unknown_sections": ["Unknown section"], "relations": [{"source": "legacy-constitution-document", "target": "legacy-adr-document", "representation": "adr-log.md", "unknown_relation_metadata": "preserve"}]},

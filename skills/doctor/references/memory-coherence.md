@@ -301,15 +301,26 @@ found **both**, and these apply:
   *optional* keys (`title`, `description`, `tags`, `updated`) are at most
   a quality note, never a finding on their own.
 
-> **The flat layout is not a finding.** A repository holding
-> `constitution.md` / `adr-log.md` / `reference-index.md` and no
-> `index.md` is **✅ Healthy** — the dual read is first-class support, not
-> a fallback, and this layout is a deliberately supported state rather
-> than drift toward broken. Report it, at most, as a one-line
-> *informative* note saying which layout was diagnosed; never as
-> ⚠️ Degraded, and never with a migration offer attached. The bundle is
-> opt-in and human-triggered (`jaiba-init:update-brain:migrate`) —
-> doctor diagnoses it, doctor does not nudge toward it.
+> **3-level memory state findings (v1 flat and v2 unbound OKF are `⚠️ Degraded`).**
+> - **Level 1 (v1 legacy flat — `constitution.md` without `index.md`):**
+>   report as **⚠️ Degraded (very high urgency)** and emit **Notice 1**.
+>   The flat files remain readable losslessly so work is not broken,
+>   but route to `jaiba-init` (`jaiba-init:update-brain:migrate` → Level v3)
+>   to upgrade to OKF and either migrate to a conforming installed surface
+>   (`category: memory-surface`, traceless mode — include the **traceless
+>   shareability warning**: JAIBA cannot guarantee cross-developer/machine
+>   shareability, which depends exclusively on the surface backend) or
+>   stay on `filesystem` (`jaiba-memory-surface: filesystem` pin in
+>   `AGENTS.md` + `v2` binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml`).
+> - **Level 2 (v2 OKF without v3 — `index.md` without `constitution.md` and
+>   without `jaiba-memory-surface: filesystem` in `AGENTS.md`):** report as
+>   **⚠️ Degraded (medium urgency)** and emit **Notice 2**, routing to
+>   `jaiba-init` to migrate to a conforming installed surface in traceless
+>   mode (with the **traceless shareability warning**; never offer
+>   `memory-surface-draft` adapters) or stay on `filesystem` (pin + `v2`
+>   binding). If `AGENTS.md` already declares `jaiba-memory-surface:
+>   filesystem` over OKF and the `v2` binding is missing, Step 0 silently
+>   auto-generates it with readback (Level 3, healthy).
 
 External surfaces use the preflight's logical catalogue/relation checks,
 not filesystem marker/path requirements. Preserve supported legacy raw
@@ -417,10 +428,9 @@ useful than an exhaustive audit.
 ## Reporting
 
 - **Say which surface/scope and layout you diagnosed.** One informative line, before the
-  findings — "concept bundle, 14 concepts indexed" or "legacy flat
-  layout" — so the developer reads the rest in the right frame. It is
-  context, not a finding: it carries no severity of its own, and the flat
-  case in particular is neither a warning nor a migration prompt.
+  findings — "concept bundle (Level 3)", "concept bundle (Level 2 — missing v3 pin/binding)",
+  or "legacy flat layout (Level 1)" — so the developer reads the rest in the right frame.
+  Level 1 (flat) and Level 2 (unbound OKF) carry their `⚠️ Degraded` findings above.
 - **Make every finding evidenced and routed.** Not "brain is stale" but
   "`constitution.md` claims a Python stack; `pyproject.toml` is gone and
   `go.mod` is present — run `jaiba-init:update-brain` (update mode)."

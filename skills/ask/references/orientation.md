@@ -7,7 +7,11 @@ whether the work carries a PRD. Orientation is how you find out,
 cheaply, before you answer.
 
 The guiding rule: **orient only as far as the question requires.** A
-pure code question needs almost no orientation. A plan or PRD question
+pure code question needs almost no orientation — still run Step 0's
+lightweight memory-level check (`jaiba-contract.md` §1) so Level 1 (flat)
+and Level 2 (unbound OKF) emit their non-blocking notices (and OKF +
+`AGENTS.md` `filesystem` pin silently auto-generates a missing `v2`
+binding) without reading deep concepts. A plan or PRD question
 needs you to locate the active artifact first. Don't read the whole
 brain reflexively (`AGENTS.md` §3.2).
 

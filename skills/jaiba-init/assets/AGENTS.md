@@ -1,3 +1,7 @@
+---
+jaiba-memory-surface: filesystem
+---
+
 # AGENTS.md — JAIBA project marker
 
 This repository is **JAIBA-instrumented** (Joint-operations Artificial

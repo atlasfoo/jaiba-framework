@@ -68,8 +68,9 @@ Return a compact, factual report for `ask`:
    artifact excerpts examined (no full-file dumps).
 3. **Context & constraints** — relevant ADRs, active plan status, or design
    constraints that apply.
-4. **Limits & gaps** — unverified assumptions, unreadable memory, or missing
-   files that bounded the investigation.
+4. **Limits & gaps** — unverified assumptions, unreadable memory, missing
+   files that bounded the investigation, or detected Level 1 (flat) /
+   Level 2 (unbound OKF) state (without suppressing parent migration notices).
 
 Facts only, with evidence. Do not draft the user-facing response; report the
 findings back to the parent agent.
