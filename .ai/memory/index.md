@@ -3,7 +3,7 @@ type: index
 title: "JAIBA Framework — memory index"
 description: "Entry point to this repository's constitutive memory."
 tags: [index]
-updated: "2026-11-13"
+updated: "2026-11-19"
 ---
 
 # JAIBA Framework — Memory Index
@@ -67,6 +67,7 @@ story.
 - [ADR-016 — Route by the message, not by its name](decisions/016-route-by-message.md) — With an active plan, an out-of-task change enters fast even if it does not say fast; a received /btw enters ask; an undelivered host command is a limit, not a hook.
 - [ADR-017 — Write effort only when the host documents it](decisions/017-documented-effort-only.md) — jaiba-configure writes an effort control only when that host's docs and version verify it; researcher installs with no model pin.
 - [ADR-018 — Link tickets from local evidence only](decisions/018-local-ticket-link.md) — Conduct asks which tickets to link only when the repo already shows local ticket evidence, and never calls a tracker API.
+- [ADR-019 — Proactive 3-level memory migration, onboarding guards, and daily version check](decisions/019-proactive-memory-migration.md) — Enforces non-blocking v1/v2 migration notices, silent filesystem v2 binding auto-generation, chained v1->v2->v3 jaiba-init flow with automatic jaiba-doctor, traceless shareability warnings, unorchestrated session/native-plan guards, and a daily .atl/framework-version.json check.
 
 ## `reference`
 
