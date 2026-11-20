@@ -89,7 +89,10 @@ base with zero deltas (`seq: 0`). When imported into a target of archetype
 with `seq: 0`; when imported into `document-tree`, it materializes directly
 as the destination document. Declare namespace and list all contexts in the
 selected scope, including contexts with no objects; each object records its
-own category and context. Preserve stable logical IDs and original source
+own category and context. When transferring into an external surface with
+traceless mode enabled (omitting `.ai/` and `AGENTS.md`), note that JAIBA
+cannot guarantee brain shareability across developers, machines, or clones,
+as shareability depends exclusively on the target surface backend. Preserve stable logical IDs and original source
 revision evidence. Recheck source inventory and revisions after export;
 changes during capture require reconciliation and a fresh verified export.
 

@@ -4,9 +4,15 @@
 hooks declare actually present on *this* machine?
 
 This is the one diagnostic that **writes**: it refreshes
-`.atl/tool-layout.md`. That file is machine state (gitignored, `AGENTS.md`
-§6), not project memory, so rewriting it is squarely doctor's job — it
-does not violate the "propose, don't patch" rule that governs the brain.
+`.atl/tool-layout.md` (and, when due under `jaiba-contract.md` §6.5,
+`.atl/framework-version.json`). Both files are machine state (gitignored,
+`jaiba-contract.md` §6 — never in `.ai/memory/` or
+`~/.jaiba/memory/bindings/`), not project memory, so updating them is
+squarely doctor's job. For `.atl/framework-version.json`, enforce a 24h
+per-project throttle, validate only a strict `^v[0-9]+\.[0-9]+\.[0-9]+$`
+semver token (§4.5 / ADR-010), fail-soft silently when offline or in a
+network-blocked sandbox, and emit a non-blocking notice routing to
+`jaiba-configure` if a newer version is available (never auto-install).
 doctor owns this probe outright: `jaiba-init` defers the first run here
 (bootstrap step 5) rather than probing itself, and every later checkup
 re-runs it, widened to cover subagents and hooks.

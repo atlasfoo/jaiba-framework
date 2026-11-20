@@ -97,12 +97,38 @@ unbound).
    page, or a search miss — permits the rest of this branch. Multiple
    matches block. Do not create a second brain.
 5. After that miss, a local `.ai/` directory is an unbound filesystem
-   bootstrap or legacy repository. Check it only then. If there is also no
-   `AGENTS.md` pin and no `.ai/` directory, the checkout is authoritatively
-   uninstrumented. Do not manufacture memory. The ≤4-question questionnaire
-   (`jaiba-init`, Issue #17 C3) runs only for that miss, and only in
-   `jaiba-init`. It does not run because a binding file was absent on a
-   machine that can still match `origin`.
+   bootstrap or legacy repository. Check it only then:
+   - **Level 1 (v1 legacy flat — `.ai/memory/constitution.md` without `index.md`):**
+     readable losslessly, but **not** warning-free. Emit **Notice 1 (very
+     high urgency)** on every response routing to `jaiba-init`
+     (`update-brain:migrate` → Level v3). An `AGENTS.md` pin
+     `jaiba-memory-surface: filesystem` does not suppress Notice 1 while
+     `.ai/memory/` remains flat.
+   - **Level 2 (v2 OKF without v3 — `.ai/memory/index.md` without `constitution.md`
+     and without `jaiba-memory-surface: filesystem` in `AGENTS.md`):**
+     emit **Notice 2 (medium urgency)** on every response routing to
+     `jaiba-init` to migrate to a conforming installed surface (traceless
+     mode, with the **traceless shareability warning**; never offer
+     `memory-surface-draft` adapters) or stay on `filesystem` (creating the
+     `v2` binding and `AGENTS.md` pin).
+   - **Silent `v2` binding auto-generation (Level 3 transition):** if
+     `.ai/memory/index.md` exists (no `constitution.md`), `AGENTS.md`
+     already declares `jaiba-memory-surface: filesystem`, and
+     `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent (with no
+     malformed v2 file or disagreeing legacy record), silently
+     auto-generate that `filesystem` `v2` binding (verified by readback)
+     and do **not** emit Notice 2.
+   - **Boundary on cancelled `migrate-surface`:** when a
+     `filesystem-unbound` project (no pin, no binding) invokes
+     `jaiba-init:migrate-surface` toward an external surface and declines
+     activation at the cut gate, do **not** write a `filesystem` `v2`
+     binding as a side effect of the cancelled external migration.
+   - If there is also no `AGENTS.md` pin and no `.ai/` directory, the
+     checkout is authoritatively uninstrumented. Do not manufacture
+     memory. The ≤4-question questionnaire (`jaiba-init`, Issue #17 C3)
+     runs only for that miss, and only in `jaiba-init`. It does not run
+     because a binding file was absent on a machine that can still match
+     `origin`.
 
 The lookup in step 2 is a call with a closed result, not a narration.
 When no binding exists and an external surface can be queried, that call
@@ -566,6 +592,20 @@ or synchronization layer.
 (`memory-surface`), not the logical memory category. Constitutive versus
 executive remains the address category, not a second binding file.
 
+**Deterministic `filesystem` `v2` binding fields.** When
+`surface.adapter-id` is `"filesystem"`, populate the routing record
+deterministically as:
+
+- `surface.adapter-id: "filesystem"`, `surface.adapter-version: "built-in"`,
+  `surface.category: memory-surface`, `surface.namespace: "filesystem"`,
+  `surface.registry-locator: ".ai/memory/index.md"`.
+- `project.project-id`: `<host>/<path>` when `project.identity.kind` is
+  `git-remote` (from §2 normalization), or
+  `fs-<first-16-hex-of-sha256(R)>` on local-only fallback.
+- `executive.context-id`: `ctx-<first-16-hex-of-sha256(R)>` (unless an
+  agreed legacy record already supplies one) with
+  `executive.context-locator: ".ai/work"`.
+
 ### Read and reuse
 
 On each resolution, after the canonical work root is known:
@@ -814,6 +854,14 @@ to authorized `jaiba-init`, whereas access failure blocks work. External
 mode may omit project `AGENTS.md` and `.ai/` entirely. Do not create a local
 `.ai/` cache or marker as proof of external instrumentation. Do not treat
 a passed cross-agent preflight as instrumentation by itself.
+
+**Traceless shareability warning.** Whenever traceless mode or migrating
+to an external surface is offered or explained, explicitly warn that if a
+project switches to a memory surface with traceless mode enabled
+(omitting `.ai/` and `AGENTS.md` from the repository), JAIBA cannot
+guarantee the brain is shareable across developers, machines, or clones,
+as shareability depends exclusively on how the surface backend itself
+operates and synchronizes.
 
 `.atl/tool-layout.md` always remains local at the work root, regardless of
 surface or context. It is machine/toolchain evidence, never constitutive

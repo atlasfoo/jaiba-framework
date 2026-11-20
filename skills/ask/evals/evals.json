@@ -258,6 +258,39 @@
         "Strictly read-only: no edits, no Quality Gate run, no executive memory written"
       ],
       "files": []
+    },
+    {
+      "id": 14,
+      "name": "pure-code-question-emits-level1-or-level2-notice",
+      "domain_under_test": "code-with-step0-notice",
+      "prompt": "What does parseToken() in src/auth.ts return on expired JWTs?",
+      "context": {
+        "variants": "A: filesystem v1 flat (.ai/memory/constitution.md without index.md); B: filesystem v2 OKF (.ai/memory/index.md without AGENTS.md pin)"
+      },
+      "expected_output": [
+        "Answers the pure code question from source without reading deep brain concepts",
+        "Still runs Step 0's lightweight memory-level check",
+        "Variant A emits Notice 1 (very high urgency) non-blockingly with traceless shareability warning and jaiba-init routing",
+        "Variant B emits Notice 2 (medium urgency) non-blockingly with traceless shareability warning and jaiba-init routing"
+      ],
+      "files": []
+    },
+    {
+      "id": 15,
+      "name": "first-turn-unorchestrated-session-one-time-init-suggestion",
+      "domain_under_test": "unorchestrated-first-turn",
+      "prompt": "Explain how the payment webhook handler works.",
+      "context": {
+        "repo_state": "authoritatively unorchestrated via Step 0 (no .ai/memory/, no AGENTS.md, no ~/.jaiba v2 binding, no external registry match)",
+        "session_turns": "first message of session, followed by an ordinary second code question without invoking jaiba-init; also error variant where Step 0 has an access/resolution failure"
+      },
+      "expected_output": [
+        "On the first turn in an authoritatively unorchestrated repo, answers non-blockingly and includes a brief one-time-per-session suggestion to orchestrate the project with jaiba-init",
+        "Keeps JAIBA dormant without creating .ai/, AGENTS.md, or bindings",
+        "Does not repeat the jaiba-init suggestion on subsequent ordinary turns in the same session",
+        "If Step 0 encounters an access or resolution failure, reports the error instead of classifying the repo as unorchestrated"
+      ],
+      "files": []
     }
   ]
 }

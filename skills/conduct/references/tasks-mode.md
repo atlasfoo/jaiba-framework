@@ -22,6 +22,7 @@ are shorthand for those logical objects; only filesystem maps them into
   catalogue and `render` the concepts. Do not search for them.
   **Filesystem only:** use the bundle index or supported legacy flat
   mapping per the effective `create-memory` filesystem reference,
+  preserving Level 1 / Level 2 migration notices (`jaiba-contract.md` §1).
   without migration.
 - If either concept is authoritatively absent or empty in the selected
   scope, **stop and surface it** — name the concept and surface

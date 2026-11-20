@@ -16,6 +16,16 @@ or a plan subagent. If the host exposes neither, or the setting is
 
 ## When the client runs
 
+**Before planning — uninstrumented check.** Run Step 0 first. If the
+repository is authoritatively uninstrumented (no `v2` binding, no
+`AGENTS.md` pin, no `.ai/memory/`, and no external registry match), **stop
+before starting native planning and suggest orchestrating the project
+first with `jaiba-init`**. Offer the developer two choices:
+1. Run `jaiba-init` now to orchestrate the project before planning.
+2. Continue explicitly with native planning alone without JAIBA — in which
+   case JAIBA stays dormant, writes no memory or executive artifacts
+   (`.ai/work/`), and does not re-block the session.
+
 Ask the native plan mode or plan subagent for the plan text and wait.
 Do not write executive artifacts inside a mode that freezes writes.
 Convert after the text returns, in a session that can write.

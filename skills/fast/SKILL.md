@@ -100,7 +100,14 @@ ask the developer; don't silently over- or under-scope
 > active artifact. If the surface is authoritatively absent, apply the
 > free-standing policy and use the repository's applicable Quality Gate
 > (quality-gate concept for a bundle; `constitution.md §6` for legacy; see
-> `jaiba-contract.md` §1) or documented repository fallback.
+> `jaiba-contract.md` §1) or documented repository fallback. On
+> `filesystem`, always run Step 0's lightweight 3-level memory check
+> (`jaiba-contract.md` §1): emit Notice 1 (very high urgency) for Level 1
+> flat or Notice 2 (medium urgency) for Level 2 unbound OKF (with the
+> traceless shareability warning and `jaiba-init` routing) non-blockingly
+> in every response, and silently auto-generate a missing `v2` binding
+> when `AGENTS.md` already declares `jaiba-memory-surface: filesystem`
+> over OKF.
 
 Context loaded depends on execution context — detect which applies (see
 "Two contexts" below) before reading.

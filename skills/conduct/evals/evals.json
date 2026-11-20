@@ -794,6 +794,38 @@
         "Leaves fetching the ticket body to input knowledge plugins (source: ticket on the PRD)"
       ],
       "files": []
+    },
+    {
+      "id": 40,
+      "name": "native-plan-unorchestrated-suggests-jaiba-init-first",
+      "phase_under_test": "spec (native-plan-client uninstrumented guard)",
+      "prompt": "Plan the billing refactor in native plan mode.",
+      "context": {
+        "repo_state": "authoritatively uninstrumented via Step 0 (no v2 binding, no AGENTS.md, no .ai/memory/, no external registry match)",
+        "host_capabilities": "host exposes native plan mode"
+      },
+      "expected_output": [
+        "Runs Step 0 before starting native planning and detects the repository is authoritatively uninstrumented",
+        "Pauses before planning and suggests orchestrating the project first with jaiba-init",
+        "Offers the developer to choose between running jaiba-init first or continuing explicitly with native planning alone",
+        "If the developer declines jaiba-init and continues native-only, keeps JAIBA dormant without writing .ai/work/ or fabricating memory and does not re-block the session"
+      ],
+      "files": []
+    },
+    {
+      "id": 41,
+      "name": "conduct-3-level-memory-notices-and-v2-binding-autogen",
+      "phase_under_test": "spec / execute (Step 0 memory-level notices)",
+      "prompt": "continue",
+      "context": {
+        "variants": "A: v1 flat (.ai/memory/constitution.md without index.md); B: v2 OKF without AGENTS.md pin; C: OKF + AGENTS.md jaiba-memory-surface: filesystem without ~/.jaiba v2 binding"
+      },
+      "expected_output": [
+        "Variant A processes the prompt non-blockingly and emits Notice 1 (very high urgency) with traceless shareability warning and jaiba-init routing",
+        "Variant B processes the prompt non-blockingly and emits Notice 2 (medium urgency) with traceless shareability warning and jaiba-init routing",
+        "Variant C silently auto-generates the filesystem v2 binding with readback and emits no Notice 2"
+      ],
+      "files": []
     }
   ]
 }

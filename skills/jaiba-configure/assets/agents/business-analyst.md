@@ -53,7 +53,9 @@ resolve `index.md` → concept bundle; `constitution.md` without `index.md`
 → supported legacy flat mapping. Both present means ambiguous; neither
 present means an uninstrumented filesystem brain. External mode needs no `.ai/`.
 Report absent/empty concepts and bare `[bracket]` templates rather than
-inventing facts; access failure never establishes absence.
+inventing facts; access failure never establishes absence. Report detected
+Level 1 (flat) or Level 2 (unbound OKF) state in findings without
+suppressing parent migration notices.
 
 - **Identity concepts** (`project`, `architecture`, `purpose`,
   `scope`, `sub-unit`, `quality-gate` — or `constitution.md` in the
