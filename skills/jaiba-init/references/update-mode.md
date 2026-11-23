@@ -406,5 +406,3 @@ End every `update` run with a short report:
 - **Touching an identity concept — or `constitution.md` — for a
   non-identity change.**
 - **Finishing without surfacing remaining gaps.**
-</content>
-</invoke>

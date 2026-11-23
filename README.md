@@ -111,7 +111,7 @@ Navigate to the root of the project you want to adopt and run:
 - Drops the minimal `AGENTS.md` marker at the repo root (offering replace / coexist if you already have one)
 - **Checks** that the global contract and subagent battery exist — and only checks: if they're missing it names `jaiba-configure`, it never installs them itself
 - Continues into its own `update-brain` initialize mode to populate the long-term memory — an internal mode switch, not a hand-off to another skill
-- Hands off to `jaiba-doctor` for the first health check and toolchain probe (`.atl/tool-layout.md`)
+- Automatically runs `jaiba-doctor` in the same flow for the first health check and toolchain probe (`.atl/tool-layout.md`); if it isn't available for this agent, reports that and routes to `jaiba-configure`
 
 Run it once per repository. On an already-instrumented repo it resumes or routes instead of bootstrapping.
 
@@ -674,7 +674,8 @@ New work, but the triage scores it **design depth** — bounded blast radius, no
 
 > Not to be confused with converting `.ai/memory/` from the legacy flat
 > layout to the concept bundle — that's `jaiba-init:update-brain:migrate`,
-> optional and human-triggered. This section covers an older, unrelated
+> human-confirmed (proactively prompted by Level 1 Notice 1 to upgrade
+> v1 → OKF v2 → Level v3). This section covers an older, unrelated
 > migration: off the pre-`conduct` skillset entirely.
 
 Projects instrumented before the conduct unification use `planning`/`specification` skills and an older brain layout. There is no automatic migration; the manual route:

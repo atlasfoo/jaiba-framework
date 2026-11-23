@@ -86,8 +86,9 @@ check_tasks() {
     [[ $status == 1 ]] || fail 'unchecked tasks or failed task read'
   fi
 }
+RECEIPT_CONTRACT='contract jaiba-memory-surface 1.1.0'
 emit_receipt() {
-  printf '<!-- jaiba-close-v1\ncontract jaiba-memory-surface 1.0.0\nbinding filesystem\nproject %s\ncontext %s\nscope %s\nclose %s\nbody %s\n' "$PROJECT" "$CONTEXT" "$SCOPE" "$CLOSE" "$BODY"
+  printf '<!-- jaiba-close-v1\n%s\nbinding filesystem\nproject %s\ncontext %s\nscope %s\nclose %s\nbody %s\n' "$RECEIPT_CONTRACT" "$PROJECT" "$CONTEXT" "$SCOPE" "$CLOSE" "$BODY"
   local i
   for i in "${!FILES[@]}"; do printf '%s %s\n' "${FILES[i]}" "${REVISIONS[i]}"; done
   printf '%s\n' '-->'
@@ -126,7 +127,8 @@ fi
 RECEIPT_TEXT=$(tail -n 14 "$SOURCE")
 mapfile -t RECEIPT <<< "$RECEIPT_TEXT"
 (( ${#RECEIPT[@]} == 14 )) || fail 'incomplete closure receipt'
-[[ ${RECEIPT[0]} == '<!-- jaiba-close-v1' && ${RECEIPT[1]} == 'contract jaiba-memory-surface 1.0.0' && ${RECEIPT[2]} == 'binding filesystem' && ${RECEIPT[13]} == '-->' ]] || fail 'invalid receipt contract/binding'
+[[ ${RECEIPT[0]} == '<!-- jaiba-close-v1' && ( ${RECEIPT[1]} == 'contract jaiba-memory-surface 1.0.0' || ${RECEIPT[1]} == 'contract jaiba-memory-surface 1.1.0' ) && ${RECEIPT[2]} == 'binding filesystem' && ${RECEIPT[13]} == '-->' ]] || fail 'invalid receipt contract/binding'
+RECEIPT_CONTRACT=${RECEIPT[1]}
 [[ ${RECEIPT[3]} == "project $PROJECT" && ${RECEIPT[4]} == "context $CONTEXT" && ${RECEIPT[5]} == "scope $SCOPE" ]] || fail 'different filesystem/project/context'
 CLOSE=${RECEIPT[6]#close }
 [[ ${RECEIPT[6]} == "close $CLOSE" && $CLOSE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}- && ${CLOSE:11} == "$SLUG" ]] || fail 'invalid close ID'

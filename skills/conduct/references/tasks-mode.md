@@ -21,9 +21,8 @@ are shorthand for those logical objects; only filesystem maps them into
   them again. Resolve exact addresses from the selected constitutive
   catalogue and `render` the concepts. Do not search for them.
   **Filesystem only:** use the bundle index or supported legacy flat
-  mapping per the effective `create-memory` filesystem reference,
-  preserving Level 1 / Level 2 migration notices (`jaiba-contract.md` §1).
-  without migration.
+  mapping without migration, per the effective `create-memory` filesystem
+  reference, preserving Level 1 / Level 2 migration notices (`jaiba-contract.md` §1).
 - If either concept is authoritatively absent or empty in the selected
   scope, **stop and surface it** — name the concept and surface
   — before writing `tasks.md`. Access/availability/truncation failures

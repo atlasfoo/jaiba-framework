@@ -24,7 +24,7 @@ conventions, **not** adapter selection or backend APIs. Resolve the
 host-effective `create-memory` installation independently (never assume
 co-installed siblings), then its canonical `memory-surface-contract.md`,
 `resolution.md` and `filesystem-surface.md` for `jaiba-memory-surface`
-**1.0.0**. These are declarative instructions, not an OKF runtime.
+**1.1.0**. These are declarative instructions, not an OKF runtime.
 
 All `.ai/` paths, directories, filenames and file-relative links below
 describe the **filesystem binding**. External surfaces use the same full
@@ -67,8 +67,8 @@ actual writer pause, no-merge collision decisions, full staged verification and
 separate human activation; preserve source and recover unknown outcomes under
 the same durable journal/transaction. Source-outage recovery is separately
 qualified there, never silent empty fallback or a claim of current freshness.
-Draft Engram stays nonselectable until required operational conformance;
-authoring, installation, probes and fixtures do not promote it. Existing optional
+Draft or unverified adapters stay nonselectable until required operational conformance;
+authoring, installation, probes and fixtures do not promote them. Existing optional
 filesystem legacy → bundle `migrate` remains a distinct supported operation. Historical flat layouts
 remain readable/maintainable losslessly while emitting the Level 1 Notice 1
 per `jaiba-contract.md` §1;

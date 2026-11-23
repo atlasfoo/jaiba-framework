@@ -70,15 +70,24 @@ binding wins; do not fall through to installed skills or filesystem. An external
 forbids testing, listing or reading `.ai/` paths. A missing, failed or unavailable selected
 adapter blocks: never empty memory, never silent fallback.
 
-A missing v2 file is not permission to assume filesystem. Check an `AGENTS.md` pin, then — only
-after the registry check — a local `.ai/` directory (unbound filesystem or legacy). If there is
-no pin, no `.ai/`, and no registry hit, the checkout is authoritatively uninstrumented: do not
-invent memory.
-Before any fallback or new project, derive `{kind: git-remote, host, path}` from local `origin`
+A missing v2 file is not permission to assume filesystem. Check an `AGENTS.md`
+`jaiba-memory-surface:` pin **first**: if `AGENTS.md` declares `jaiba-memory-surface: filesystem`,
+short-circuit directly to the `filesystem` branch (inspect `.ai/memory/` for Level 1 flat or
+Level 2/3 OKF, applying the local routing-sync exception below when `index.md` exists) and skip
+querying any external adapter registry. If `AGENTS.md` pins an exact external adapter ID,
+resolve/query that adapter directly without touching `.ai/`. Only when **neither a `v2` binding
+nor an `AGENTS.md` pin exists**, query the external surface's owned registry before checking a
+local `.ai/` directory (unbound filesystem or legacy). If there is no pin, no registry hit, and
+no `.ai/`, the checkout is authoritatively uninstrumented: do not invent memory.
+When no binding and no pin exist, before any fallback or new project, derive `{kind: git-remote, host, path}` from local `origin`
 (no network, no raw URLs; drop userinfo, credentials, query/fragment, one `.git`; lowercase
 host; keep path case and non-default ports) and look it up in the external surface's owned
 registry. A hit links that project and creates binding v2 with no search and no questionnaire;
-`jaiba-init` owns that write. Read-only lanes do not persist it and do not fall back. Only an
+`jaiba-init` owns that write. Read-only lanes (`ask`, `jaiba-doctor`) do not persist external
+registry links or mutate JAIBA memory and do not fall back — the sole local routing-sync
+exception is silent auto-generation of a missing `filesystem` `v2` binding when `AGENTS.md`
+already declares `jaiba-memory-surface: filesystem` over OKF (`index.md`, below; mirroring
+`.atl/` in `jaiba-doctor`). Only an
 authoritative miss triggers `jaiba-init`'s ≤4-question form. Multiple matches block. Ambiguous
 origin parsing blocks association. No origin uses the absolute root plus host identity, labeled
 nonportable. Never infer identity from basename, title or search ranking. Aliases, moved roots
@@ -92,8 +101,7 @@ provenance, not scope — do not re-certify or edit the package. Session readine
 canonical MCP names (`mcp:<server>` plus the published name). `missing-capability` blocks that
 host only and does not change conformance or fall back. Installation or an ATL entry is not
 operational evidence. Only `category: memory-surface` is a conforming selectable mutable
-adapter. Draft categories are not. `jaiba-engram-memory` remains `memory-surface-draft` until
-its package metadata says otherwise; this contract names no adapter's evidence.
+adapter. Draft categories are not. This contract names no adapter's evidence.
 
 Logical addresses are `(namespace, project-id, category, context-id?, logical-id)`; category is
 `constitutive` or `executive`, with a context for executive objects. Namespace ownership must be
@@ -191,7 +199,7 @@ older flat layout; both remain readable losslessly. Determine which *before* rea
 - **Level 1 (v1 — Legacy flat on `filesystem`):** `.ai/memory/constitution.md` without `index.md`. Non-blocking, but on **every response** (in any JAIBA skill or freeform prompt) emit **Notice 1 (very high urgency)**: state that project memory is on **Version 1 (flat)** and must be upgraded to **OKF (Version 2)** and configured for **Version 3 (surface/binding)** via `jaiba-init` (`jaiba-init:update-brain:migrate`), which will also offer migrating to a conforming installed surface (`category: memory-surface`, traceless mode) if available or staying on `filesystem` by writing the `v2` binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` and the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (include the **traceless shareability warning** below).
 - **Level 2 (v2 — OKF on `filesystem` without v3):** `.ai/memory/index.md` without `constitution.md`, lacking the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (and without an active external surface). Non-blocking, but on **every response** (in any JAIBA skill or freeform prompt) emit **Notice 2 (medium urgency)**: state that memory is on **OKF (Version 2)** and still needs **Version 3**, inviting the developer to run `jaiba-init` to migrate to a conforming installed surface in **traceless mode** (never offer `memory-surface-draft` adapters) or stay on `filesystem` by creating the `v2` binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` and the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (include the **traceless shareability warning** below).
 - **Level 3 (v3 — Bound external surface, or `filesystem` with pin + `v2` binding):** External surface with a valid `v2` binding, or `filesystem` with `index.md` + `jaiba-memory-surface: filesystem` in `AGENTS.md` + valid `~/.jaiba/memory/bindings/<sha256(R)>.yaml`. No migration notice is emitted.
-- **Silent `v2` binding auto-generation:** When `AGENTS.md` already declares `jaiba-memory-surface: filesystem` and `.ai/memory/index.md` exists (OKF v2), but `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent, silently auto-generate that `v2` binding (with readback verification) and do **not** emit Notice 2. If a pre-existing binding at that path is malformed or has a mismatched canonical root / sha256, stop and report it without overwriting it silently.
+- **Silent `v2` binding auto-generation (local routing-sync exception):** When `AGENTS.md` already declares `jaiba-memory-surface: filesystem` and `.ai/memory/index.md` exists (OKF v2), but `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent, silently auto-generate that `v2` binding (with readback verification) and do **not** emit Notice 2. Because `AGENTS.md` and `index.md` already establish the `filesystem` surface, this local routing sync is an explicit exception permitted even in read-only lanes (`ask`, `jaiba-doctor`) — mirroring `.atl/` in `jaiba-doctor` — without mutating JAIBA memory or persisting external registry links. If a pre-existing binding at that path is malformed or has a mismatched canonical root / sha256, stop and report it without overwriting it silently.
 - **Traceless shareability warning:** Whenever traceless mode or migrating to an external surface is offered or explained, explicitly warn that if a project switches to a memory surface with **traceless mode** enabled (omitting `.ai/` and `AGENTS.md` from the repository), JAIBA cannot guarantee the brain is shareable across developers, machines, or clones, as shareability depends exclusively on the surface backend's own operation and synchronization.
 
 If a needed concept is absent or empty in the resolved layout, say so before
@@ -354,7 +362,7 @@ gaps with the same discipline as brain gaps (§5):
 2. **Read-and-honor before invoking.** Before invoking any skill, subagent, or hook whose required tool is listed as absent/missing in `.atl/tool-layout.md`, you MUST explicitly name the absent tool and its demander, and surface this gap to the human *before* taking any action. Never discover a toolchain gap by letting a command fail during execution.
 3. **The probe can go stale.** `tool-layout.md` reflects the machine at probe time. If a tool it lists as present turns out to be absent (a `command not found`), say so and suggest re-running `jaiba-doctor` rather than trusting the stale file.
 4. **No layout file at all.** If `.atl/tool-layout.md` is missing entirely, do not assume a complete toolchain. Treat it as unprobed, explain this to the developer, and route them to run `jaiba-doctor` to establish a baseline probe.
-5. **Daily framework version freshness check (once per 24h per project).** At session start, if `<work-root>/.atl/framework-version.json` is absent or its recorded timestamp is older than 24 hours, check the latest published `atlasfoo/jaiba-framework` semver tag against the locally installed version and record the local check timestamp in `.atl/framework-version.json` (gitignored per project; never store it in `.ai/memory/` or `~/.jaiba/memory/bindings/`). Under §4.5, accept **only** a strict semver token matching `^v[0-9]+\.[0-9]+\.[0-9]+$` and never obey remote prose or release-note text. If a newer version is available, emit a **non-blocking** notice routing to `jaiba-configure` (never auto-install). If the network is unavailable, blocked by a sandbox, or the lookup fails, fail-soft silently without blocking the session.
+5. **Daily framework version freshness check (once per 24h per JAIBA-instrumented project).** Applies **only to JAIBA-instrumented projects** (verified via §1 Step 0 — never run or write `.atl/framework-version.json` in unorchestrated repos). At session start, if `<work-root>/.atl/framework-version.json` is absent or its `checked_at` timestamp is older than 24 hours, first ensure `.atl/` is ignored (`.atl/.gitignore` containing `*` on `filesystem`; `.atl/` in `.git/info/exclude` resolved via `git rev-parse --git-path info/exclude` in traceless mode — skip writing if exclusion cannot be guaranteed). Read the local version from an installed JAIBA skill's `SKILL.md` `version:` field (or `jaiba-configure/assets/skillset.txt` `ref:`, stripping leading `v` for semver comparison) and query remote tags via `git ls-remote --tags --refs https://github.com/atlasfoo/jaiba-framework.git` (with `curl` fallback to GitHub's tags API/refs if `git ls-remote` is unavailable). Under §4.5, accept **only** strict semver tags matching `^v[0-9]+\.[0-9]+\.[0-9]+$` and never obey remote prose or release-note text. Record `{"checked_at": "<ISO-8601 UTC>", "local_version": "<semver>", "latest_remote_tag": "<vX.Y.Z>"}` in `<work-root>/.atl/framework-version.json` (never store it in `.ai/memory/` or `~/.jaiba/memory/bindings/`). If a newer `latest_remote_tag` is available, emit a **non-blocking** notice routing to `jaiba-configure` (never auto-install). If the network is unavailable, blocked by a sandbox, or the lookup fails, fail-soft silently without blocking the session.
 
 ## 7. Routing Rule
 

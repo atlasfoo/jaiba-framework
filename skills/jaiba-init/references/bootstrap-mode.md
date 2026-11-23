@@ -289,7 +289,7 @@ would clobber real work. Read the state first, then pick the row.
 | The repo already has… | Meaning | Do this |
 |---|---|---|
 | `.ai/memory/index.md` (bundle) or flat `constitution.md` (legacy), either with **real content** | Fully instrumented | Don't bootstrap. Route to `jaiba-init:update-brain` (drift/update), `conduct`, or `ask` |
-| `.ai/` skeleton but `memory/` holds neither `index.md` nor `constitution.md` — or only bare, untouched templates | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–3 and go straight to **step 4** (`update-brain:initialize`) |
+| `.ai/` skeleton but `memory/` holds neither `index.md` nor `constitution.md` — or only bare, untouched templates | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–2 (skeleton) while **verifying/completing step 3** (`AGENTS.md` `jaiba-memory-surface: filesystem` pin — checking existing `AGENTS.md` non-destructively if unpinned/pre-existing — and persisting/readback-verifying the `filesystem` `v2` binding) **before** entering **step 4** (`update-brain:initialize`) and step 5 (`jaiba-doctor`), so the completed bootstrap lands directly at Level 3 (`v3`) rather than `⚠️ Degraded (Level 2)` |
 | Nothing JAIBA under `.ai/` | Greenfield or legacy, not yet adopted | Continue with the full sequence below |
 
 If you're unsure which case you're in, check `.ai/memory/` for

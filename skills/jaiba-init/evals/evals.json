@@ -193,10 +193,10 @@
         "Detected exactly one vendor dir (.claude/) and used it — did NOT fall back to .agents/",
         "Created .ai/memory/identity/, decisions/, references/, log/, .ai/work/, .ai/vendored/, .ai/.gitignore from assets/ai.gitignore, .gitkeep in identity/, decisions/, references/, log/ and vendored/",
         "Created .atl/ with its .gitignore from assets/atl.gitignore",
-        "Dropped the repo marker AGENTS.md from assets/AGENTS.md at the root",
+        "Step 3 dropped the repo marker AGENTS.md from assets/AGENTS.md at the root (with jaiba-memory-surface: filesystem frontmatter) and persisted + readback-verified the filesystem v2 binding in ~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml",
         "Did NOT install any global skills, contract, or subagent battery — those are jaiba-configure's",
         "Continued into update-brain:initialize itself as an internal mode transition, not a hand-off to another skill",
-        "Closed by handing off to jaiba-doctor for the first checkup and the .atl/tool-layout.md probe"
+        "Automatically resolved and ran jaiba-doctor in the same flow for the first checkup and local .atl/tool-layout.md probe (or reported jaiba-doctor unavailable for this agent and routed to jaiba-configure)"
       ],
       "files": []
     },
@@ -307,12 +307,12 @@
       "mode_under_test": "update-brain:migrate",
       "prompt": "Migrate the brain to the concept-bundle format.",
       "context": {
-        "memory_state": "already a populated concept bundle: index.md present alongside identity/, decisions/, references/"
+        "memory_state": "already a populated Level 3 OKF bundle: index.md present alongside identity/, decisions/, references/, jaiba-memory-surface: filesystem pin in AGENTS.md, and v2 binding present (or developer requests to re-run flat→OKF conversion; distinguished from Eval 35's Notice 2 direct Step 9 Level v3 completion for Level 2 OKF)"
       },
       "expected_output": [
-        "Checked for index.md FIRST, before reading constitution.md or anything else",
-        "Recognized the brain is already a bundle and stopped without writing a single byte",
-        "Did NOT merge into, top up, or overwrite the existing bundle",
+        "Checked for index.md FIRST, before reading constitution.md or anything else (Precondition 1)",
+        "Recognized the brain is already an OKF bundle at Level 3 and rejected re-running flat→OKF translation without writing a single byte (distinguished from Eval 35 where Level 2 OKF enters Step 9 directly)",
+        "Did NOT merge into, top up, or overwrite the existing bundle, and did not enter Step 9",
         "Said so plainly and routed the developer to update-brain:update for maintenance instead",
         "Did not create a backup, since no write was attempted"
       ],
@@ -379,7 +379,7 @@
         "Creates only the authorized routing binding and fresh context identity, reads back routing fields; creates no executive context contents or constitutive objects",
         "Does not seed or overwrite the existing brain and does not invoke unselected jaiba-engram-memory",
         "Creates no .ai/ mirror/cache; ATL remains local",
-        "Hands off to doctor; for later transfer, requires the effective init migrate-surface workflow, complete inventory, staged full readback and separate activation approval; does not claim live adapter conformance"
+        "Automatically resolves and runs jaiba-doctor in the same flow (or reports jaiba-doctor unavailable and routes to jaiba-configure); for later transfer, requires the effective init migrate-surface workflow, complete inventory, staged full readback and separate activation approval; does not claim live adapter conformance"
       ],
       "files": ["fixtures/external-link-existing/catalogue.json"]
     },

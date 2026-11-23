@@ -1,7 +1,7 @@
 {
   "cases": [
     {"id": "override-filesystem", "override": "filesystem", "local": ["team"], "global": ["global"], "expected": "filesystem"},
-    {"id": "no-candidates-default-filesystem", "override": null, "local": [], "global": [], "expected": "filesystem"},
+    {"id": "no-candidates-default-filesystem", "override": null, "local": [], "global": [], "expected": "uninstrumented"},
     {"id": "global-only-adapter", "override": null, "local": [], "global": ["global-team"], "expected": "global:global-team:validate-tools-before-use"},
     {"id": "local-global-same-id", "override": null, "local": [{"id": "team", "version": 1}], "global": [{"id": "team", "version": 9}], "expected": "local:team@1"},
     {"id": "local-level-different-ids", "override": null, "local": ["alpha", "beta"], "global": ["gamma"], "expected": "human-choice:alpha|beta"},

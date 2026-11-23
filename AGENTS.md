@@ -8,11 +8,13 @@ This repository is **JAIBA-instrumented** (Joint-operations Artificial
 Intelligence Behavioral Architecture). This file is deliberately
 minimal: behavior does not live per-repo.
 
-**Surface pin.** The frontmatter field above is selection data for this
-repository only. It pins the built-in filesystem surface so showcase and
-dogfooding sessions resolve `.ai/` even when a host-visible adapter is
-installed. It is not a behavioral rule, and the marker template does not
-copy it into other projects.
+**Surface pin.** The frontmatter field above is selection data, not a
+behavioral rule. This repository uses it to pin the built-in filesystem
+surface so showcase and dogfooding sessions resolve `.ai/` even when a
+host-visible adapter is installed. It is also the standard Level 3 (`v3`)
+filesystem pin: `jaiba-init`'s marker template
+(`skills/jaiba-init/assets/AGENTS.md`) includes it by default, so Level 3
+filesystem projects copy it along with the rest of the marker.
 
 1. **Behavior** — follow the **JAIBA Behavioral Contract** installed
    globally in your agent configuration (file `jaiba-contract.md` in

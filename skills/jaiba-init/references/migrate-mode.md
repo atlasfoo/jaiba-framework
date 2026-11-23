@@ -48,14 +48,21 @@ must never be resolved along the way.
 
 ## Preconditions
 
-1. **`.ai/memory/index.md` must not exist.** Check this **first**,
+1. **`.ai/memory/index.md` must not exist (for flat→OKF conversion).** Check this **first**,
    before reading anything else and before writing anything at all. If
    it exists, the brain is already a bundle (or a prior migration ran):
-   **stop without writing a single byte**, say so plainly, and route the
-   developer to `update` for maintenance. Never merge into an existing
-   bundle, never overwrite it, never "top it up" — a second migration
-   pass over a migrated brain duplicates concepts and destroys the
+   never re-run flat→OKF conversion (Steps 0–8), never merge into an existing
+   bundle, never overwrite it, and never "top it up" — a second conversion
+   pass over an existing bundle duplicates concepts and destroys the
    provenance of the first.
+   **Notice 2 carve-out:** when `.ai/memory/index.md` exists *without*
+   `constitution.md` and lacks Level 3 (`jaiba-memory-surface: filesystem`
+   pin + `v2` binding, i.e. Level 2 arriving from Notice 2), enter **Step 9**
+   directly (skipping Steps 0–8 without modifying `.ai/memory/` bundle files)
+   to complete Level 3 (`v3`). If `.ai/memory/index.md` exists and the developer
+   asks to re-run flat→OKF conversion (or `constitution.md` is absent and the
+   project is already Level 3), **stop without writing a single byte**, say so
+   plainly, and route the developer to `update` for maintenance.
 2. **The flat brain exists and carries real content.** `constitution.md`
    present with real prose. If the flat files are absent, or are
    untouched templates full of `[brackets]`, there is nothing to
@@ -420,9 +427,12 @@ v2 arrives from **Notice 2**), offer in the same conversation to complete
 
 - **Migrating a bare or template flat brain.** There is nothing to
   translate; that is `initialize`. Check for real prose first.
-- **Running when `index.md` already exists.** Stop, write nothing.
+- **Running flat→OKF conversion when `index.md` already exists** (or
+  re-running migration when already Level 3). Stop without writing.
   Merging into or overwriting an existing bundle is the one outcome this
-  mode must never produce.
+  mode must never produce. When `.ai/memory/index.md` exists without
+  `constitution.md` and lacks Level 3 (Notice 2), enter Step 9 directly
+  to complete Level 3 instead of running Steps 0–8.
 - **Writing before backing up.** The backup is a precondition of the
   write phase, not a courtesy.
 - **Resolving a `[MISSING]`** instead of carrying it over — the single

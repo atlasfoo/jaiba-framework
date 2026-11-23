@@ -649,8 +649,9 @@ End with a short, honest report:
    *specific project*, tell them to run **`jaiba-init`** from inside that
    repo: it resolves the selected surface, owns authorized registration and
    constitutive instrumentation (the `.ai/` skeleton and `AGENTS.md` marker
-   in filesystem mode), and hands off to `jaiba-doctor` for
-   the first checkup. Mention it; **do not invoke it** — this machine is
+   in filesystem mode), and automatically runs `jaiba-doctor` in the same
+   flow for the first checkup (or reports it unavailable for this agent).
+   Mention it; **do not invoke it** — this machine is
    now configured, and that is where `jaiba-configure` ends.
 
 ## Boundaries
