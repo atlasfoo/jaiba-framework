@@ -6,7 +6,10 @@ behavioral contract verified under `jaiba-memory-surface` 1.1.0, and is the
 selected constitutive brain (including append-only logs) complete, and consistent
 both with **each other** and with the **repository**?
 
-This diagnostic is **read-only**. doctor never edits selected memory or bindings.
+This diagnostic is **read-only**. doctor never edits selected memory or external/malformed
+bindings (the single carve-out is the Step 0 local `filesystem` `v2` routing-sync exception:
+silently auto-generating `~/.jaiba/memory/bindings/<sha256(R)>.yaml` with readback verification
+when `AGENTS.md` already declares `jaiba-memory-surface: filesystem` over OKF).
 Constitutive reconciliation belongs to `jaiba-init:update-brain` (`AGENTS.md` §2.9). Every brain
 finding here resolves to the same prescription: *run
 `jaiba-init:update-brain`* (update mode to reconcile drift, or initialize
@@ -112,8 +115,14 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
    that fails canonical path/digest checks) is surfaced as a diagnostic finding;
    it is not empty memory and legacy files are not a silent fallback for a
    corrupt v2 record. Doctor reports binding defects without saving or
-   replacing them. Session-only operation requires explicit consent through
-   the owning setup workflow, not a claim of durable persistence.
+   replacing them, and never mutates external or malformed bindings. Under the
+   Step 0 local `filesystem` `v2` routing-sync exception (`jaiba-contract.md`
+   §1), when `AGENTS.md` already declares `jaiba-memory-surface: filesystem`
+   over OKF (`index.md`) and the local `v2` binding is absent (with no malformed
+   file or disagreeing legacy record), doctor silently auto-generates that
+   `filesystem` `v2` record with readback verification. Session-only operation
+   requires explicit consent through the owning setup workflow, not a claim of
+   durable persistence.
    Clones/worktrees default to independent executive contexts per root.
    Unknown context or collision stops executive checks; never select latest
    work or another root's context.
@@ -187,9 +196,11 @@ same durable journal/transaction; source-outage stale-snapshot recovery requires
 its explicit qualified decision, never a fabricated current-source check or
 empty fallback. Offer an explicit filesystem exception for existing local memory,
 not an automatic transfer, activation, binding edit, merge, dual-write or retirement.
-A successful diagnostic is not activation or adapter conformance; draft Engram
-remains nonselectable until required operational conformance, not installation,
-probe, authoring or fixture success.
+A successful diagnostic is not activation or adapter conformance; adapters
+remain nonselectable unless they declare `category: memory-surface` and pass
+required operational conformance, not merely installation, probe, authoring,
+or fixture success (`memory-surface-draft` adapters are never selectable for
+mutable use).
 Route machine dependency, host toolchain exposure and configuration defects to
 `jaiba-configure`; repo identity, unassociated roots, legacy binding conflicts,
 and constitutive defects to `jaiba-init` with human approval. Backend permissions
@@ -318,7 +329,8 @@ found **both**, and these apply:
 >   `jaiba-init` to migrate to a conforming installed surface in traceless
 >   mode (with the **traceless shareability warning**; never offer
 >   `memory-surface-draft` adapters) or stay on `filesystem` (pin + `v2`
->   binding). If `AGENTS.md` already declares `jaiba-memory-surface:
+>   binding). Under the Step 0 local `filesystem` `v2` routing-sync
+>   exception, if `AGENTS.md` already declares `jaiba-memory-surface:
 >   filesystem` over OKF and the `v2` binding is missing, Step 0 silently
 >   auto-generates it with readback (Level 3, healthy).
 
@@ -390,11 +402,10 @@ as:
   or `.ai/session/` directory still present means the project predates
   the `work/` + `memory/log/` layout — **Degraded**; route to
   `jaiba-init:update-brain` (update mode) and the framework README's manual
-  migration notes. Note this is *not* the flat-vs-bundle question, which
-  Layer 1 settles and which is never a Degraded finding: these
-  directories are superseded in **both** supported layouts, and the dual
-  read does nothing for them. Executive memory lives in `.ai/work/` and is
-  gitignored; a tracked `work/` (or a tracked plan/tasks/walkthrough
+  migration notes. Layer 1 handles the flat-vs-bundle 3-level memory state;
+  these obsolete directories are superseded in **both** supported layouts,
+  and the dual read does nothing for them. Executive memory lives in `.ai/work/`
+  and is gitignored; a tracked `work/` (or a tracked plan/tasks/walkthrough
   anywhere under `.ai/`) is a finding too.
 
 ### Layer 4 — Coherence with the repository (drift)

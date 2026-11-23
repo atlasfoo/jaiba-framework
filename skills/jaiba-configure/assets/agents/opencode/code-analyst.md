@@ -46,7 +46,7 @@ or legacy `constitution.md` without that index, preserving the flat
 document/entry mapping. Both layouts present means ambiguous; neither
 present means uninstrumented. Report detected Level 1 (flat) or Level 2
 (unbound OKF) state if observed without suppressing parent migration notices.
-present means uninstrumented. External mode needs no `.ai/` directory.
+External mode needs no `.ai/` directory.
 
 ## What to survey
 

@@ -11,7 +11,8 @@ pure code question needs almost no orientation — still run Step 0's
 lightweight memory-level check (`jaiba-contract.md` §1) so Level 1 (flat)
 and Level 2 (unbound OKF) emit their non-blocking notices (and OKF +
 `AGENTS.md` `filesystem` pin silently auto-generates a missing `v2`
-binding) without reading deep concepts. A plan or PRD question
+binding under the local routing-sync exception, without mutating JAIBA memory
+or persisting external bindings) without reading deep concepts. A plan or PRD question
 needs you to locate the active artifact first. Don't read the whole
 brain reflexively (`AGENTS.md` §3.2).
 
@@ -57,10 +58,12 @@ help discover candidates but cannot prove completeness or absence and must never
 binding, catalogue, page, exact read, or required relation is unavailable,
 ambiguous, partial, truncated, or permission-denied, report the failure and
 stop; none is evidence that the context or artifact is empty. `ask` must
-not persist JAIBA bindings, alter JAIBA namespace/ownership, or perform
-JAIBA adapter/memory operations that mutate JAIBA-owned data. Ordinary
-host-required memory/session bookkeeping remains independent and is not
-JAIBA evidence or a source for JAIBA reads.
+not persist external bindings, alter JAIBA namespace/ownership, or perform
+JAIBA adapter/memory operations that mutate JAIBA-owned data (permitting
+only Step 0's local `filesystem` `v2` routing-sync record when `AGENTS.md`
+already pins `filesystem` over `index.md`). Ordinary host-required
+memory/session bookkeeping remains independent and is not JAIBA evidence
+or a source for JAIBA reads.
 
 ### Active plan
 

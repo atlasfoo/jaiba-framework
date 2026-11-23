@@ -1,7 +1,7 @@
 ---
 name: ask
 description: >-
-  Implicit read-only Q&A lane for questions about code, active work, or decisions; not user-invocable. Triggers on interrogative/exploratory requests ("why…?", "what's left?", "explain…", "is this covered?"). Never mutates JAIBA-owned data or persists JAIBA bindings; independent host-required bookkeeping is not JAIBA evidence. Continuations route to conduct:execute, new work to conduct, small changes to fast. Never executes changes or runs the Quality Gate.
+  Implicit read-only Q&A lane for questions about code, active work, or decisions; not user-invocable. Triggers on interrogative/exploratory requests ("why…?", "what's left?", "explain…", "is this covered?"). Never mutates JAIBA-owned data or persists external bindings (permitting only Step 0's local filesystem v2 routing sync); independent host-required bookkeeping is not JAIBA evidence. Continuations route to conduct:execute, new work to conduct, small changes to fast. Never executes changes or runs the Quality Gate.
 version: 3.5.0
 author: atlasfoo<iscomejia15@outlook.com>
 user-invocable: false
@@ -84,15 +84,19 @@ field, or no `AGENTS.md` (traceless), and the binding wins. When the
 active surface is external, do not test, list, or read `.ai/` paths.
 External surfaces need not have local `.ai/` files or an `AGENTS.md`
 marker. A missing v2 file is not a filesystem default: check an
-`AGENTS.md` pin, then the sanitized `{kind: git-remote, host, path}`
-lookup of `origin` against the external registry, before any fallback.
-A hit is a registered project. `ask` does not persist the binding and
-does not run the ≤4-question questionnaire; route that link to
-`jaiba-init` and do not answer as if the brain were absent or filesystem.
-Only an authoritative miss continues to a local `.ai/` check (unbound
-filesystem or legacy). If there is no pin, no `.ai/`, and no registry
-hit, the checkout is authoritatively uninstrumented. Legacy
-`~/.jaiba/memory/<host>/...` is a compatibility input only when v2 is
+`AGENTS.md` `jaiba-memory-surface:` pin first — if `AGENTS.md` declares
+`jaiba-memory-surface: filesystem`, short-circuit directly to the `filesystem`
+branch (inspecting `.ai/memory/` and applying the local routing-sync exception
+below when `index.md` exists) and skip querying any external adapter registry.
+Only when neither a `v2` binding nor an `AGENTS.md` pin exists, derive the
+sanitized `{kind: git-remote, host, path}` lookup of `origin` against the
+external registry before checking a local `.ai/` directory. A hit is a registered
+project; `ask` does not persist external registry link bindings and does not run
+the ≤4-question questionnaire; route that link to `jaiba-init` and do not answer
+as if the brain were absent or filesystem. Only an authoritative miss continues
+to a local `.ai/` check (unbound filesystem or legacy). If there is no pin, no
+`.ai/`, and no registry hit, the checkout is authoritatively uninstrumented.
+Legacy `~/.jaiba/memory/<host>/...` is a compatibility input only when v2 is
 absent, not a reason to skip Step 0.
 
 Orienting cold (see `references/orientation.md`) includes Step 0 above.
@@ -106,7 +110,12 @@ without `jaiba-memory-surface: filesystem` in `AGENTS.md`) emits
 shareability warning** and routing to `jaiba-init`. If `AGENTS.md`
 already declares `jaiba-memory-surface: filesystem` over OKF (`index.md`),
 silently auto-generate the missing `v2` binding with readback (never
-overwriting a malformed binding) and emit no notice. On an external surface, require a valid
+overwriting a malformed binding) and emit no notice. Because `AGENTS.md`
+and `index.md` already establish the `filesystem` surface, this local
+routing-sync exception is permitted even in read-only lanes like `ask`
+(mirroring `.atl/` in `jaiba-doctor`), writing only the local machine
+routing record without mutating JAIBA memory or persisting external registry
+links. On an external surface, require a valid
 binding (`v2` locator), readable owned catalogue, exact project/context
 scope and required full reads; a marker, probe, search result or empty
 catalogue alone is not authoritative. Do not open `.ai/` to orient when
@@ -117,8 +126,10 @@ Follow the deterministic rendering path (`MSV-008`):
 Strictly prohibit using full-text `search` (`mem_search`) to locate or display project artifacts or decisions; full-text search is only for exploratory discovery when the concept address is completely unknown.
 
 `ask` is read-only for JAIBA-owned data: it must not
-persist a JAIBA binding/namespace change or perform JAIBA adapter or memory
-operations that mutate owned data. Ordinary host-required memory/session
+persist external bindings, alter JAIBA namespace/ownership, or perform JAIBA
+adapter or memory operations that mutate owned data (with the sole exception
+of Step 0's local `filesystem` `v2` routing-sync record when `AGENTS.md` already
+pins `filesystem` over `index.md`). Ordinary host-required memory/session
 bookkeeping remains independent, is not JAIBA evidence, and is not used as
 a JAIBA read source.
 

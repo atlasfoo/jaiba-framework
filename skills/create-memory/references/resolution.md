@@ -74,30 +74,41 @@ unbound).
 1. Read `AGENTS.md`, if it exists, only as selection data. An explicit
    `jaiba-memory-surface:` field is a pin. No field is not a pin. A missing
    file is not a pin. Duplicate or conflicting declarations are ambiguous;
-   do not choose by line order.
-2. Before any fallback surface or new-project creation, resolve identity
-   by the sanitized `git-remote` candidate from `origin` (§2). Look that
-   candidate up by exact identity in the external surface's owned JAIBA
-   project registry. The surface queried is the pin when the pin names an
-   external adapter; otherwise the winning host-visible external adapter
-   from the installed-skill list below. Ambiguous IDs at that level still
-   need a human choice before the lookup. Filesystem has no external
-   registry; do not invent one, and do not use filesystem to skip the
-   lookup when an external surface can be queried.
+   do not choose by line order. If `AGENTS.md` declares
+   `jaiba-memory-surface: filesystem`, short-circuit directly to **step 5**
+   (the `filesystem` branch: Level 1 / Level 2 / silent `v2` binding
+   auto-generation) and **skip** step 2's external registry lookup (and
+   steps 3–4).
+2. Run this step only when there is **no pin** or when the pin names an
+   **external adapter** (never when step 1 found
+   `jaiba-memory-surface: filesystem`). Before any fallback surface or
+   new-project creation, resolve identity by the sanitized `git-remote`
+   candidate from `origin` (§2). Look that candidate up by exact identity
+   in the external surface's owned JAIBA project registry. The surface
+   queried is the pin when the pin names an external adapter; otherwise
+   the winning host-visible external adapter from the installed-skill list
+   below. Ambiguous IDs at that level still need a human choice before
+   the lookup. Filesystem has no external registry; do not invent one,
+   and do not treat unpinned filesystem as a fallback to skip the lookup
+   when no `filesystem` pin exists and an external surface can be queried.
 3. An exact hit links that registered project. `jaiba-init` creates
    binding `v2` for this canonical root with the registry's stable
    `project-id` and a fresh per-root `executive.context-id` (the §3
    default), without search and without the ≤4-question questionnaire.
    Do not prompt. Do not pick another checkout's context. Search, titles,
-   and basename ranking are not the lookup. A read-only consumer must not
-   persist the binding, must not invent a filesystem brain, and must not
-   declare the project absent because the local file is missing. It routes
-   the link to `jaiba-init` and does not run the questionnaire.
+   and basename ranking are not the lookup. A read-only consumer (`ask`,
+   `jaiba-doctor`) must not persist the external registry link's binding
+   here, must not invent a filesystem brain, and must not declare the
+   project absent because the local file is missing. It routes the link
+   to `jaiba-init` and does not run the questionnaire. (Contrast with
+   step 5's local routing-sync exception below.)
 4. Only an authoritative registry miss — not a permission error, a partial
    page, or a search miss — permits the rest of this branch. Multiple
    matches block. Do not create a second brain.
-5. After that miss, a local `.ai/` directory is an unbound filesystem
-   bootstrap or legacy repository. Check it only then:
+5. **Filesystem / local `.ai/` branch** (reached directly when step 1
+   finds `jaiba-memory-surface: filesystem`, or after an authoritative
+   miss in step 4 / when no external surface is visible to query): check
+   a local `.ai/` directory only here:
    - **Level 1 (v1 legacy flat — `.ai/memory/constitution.md` without `index.md`):**
      readable losslessly, but **not** warning-free. Emit **Notice 1 (very
      high urgency)** on every response routing to `jaiba-init`
@@ -117,7 +128,12 @@ unbound).
      `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent (with no
      malformed v2 file or disagreeing legacy record), silently
      auto-generate that `filesystem` `v2` binding (verified by readback)
-     and do **not** emit Notice 2.
+     and do **not** emit Notice 2. This is an explicit **local
+     routing-sync exception** permitted for **all lanes**, including
+     read-only consumers (`ask`, `jaiba-doctor`): it writes only the
+     machine-local `filesystem` routing record (unlike external registry
+     links in step 3, and without mutating JAIBA constitutive or
+     executive memory).
    - **Boundary on cancelled `migrate-surface`:** when a
      `filesystem-unbound` project (no pin, no binding) invokes
      `jaiba-init:migrate-surface` toward an external surface and declines
@@ -131,8 +147,10 @@ unbound).
      `origin`.
 
 The lookup in step 2 is a call with a closed result, not a narration.
-When no binding exists and an external surface can be queried, that call
-is mandatory before any fallback, link, or new-project path. The only
+When no binding exists, `AGENTS.md` does **not** declare
+`jaiba-memory-surface: filesystem`, and an external surface can be
+queried, that call is mandatory before any fallback, link, or
+new-project path. The only
 results are `hit`, `authoritative-miss`, and `blocked`. Not calling is
 not a result: do not report an existing brain, a miss, or an empty
 project from a lookup that did not run. Fuzzy search, a title match, and
@@ -321,14 +339,14 @@ pending journal or unknown mutation blocks writes (§4).
 | Valid v2 binding; no `jaiba-memory-surface:` field, or no `AGENTS.md` | Binding governs. O(1) `project-id` and `context-id`. Do not read `.ai/`. Do not fall through to filesystem. |
 | Valid v2 external binding; explicit override `filesystem` | Override selects filesystem. Not migration approval. Do not treat the override as a silent switch of populated stores. |
 | Valid v2 binding for `alpha`; local skill `beta` newly visible | `alpha` still governs. A new local skill does not displace Step 0. |
-| Override `filesystem`; local adapter `team-store`; no binding | Filesystem selected; no automatic export/import. |
+| Override `filesystem`; local adapter `team-store`; no binding | Short-circuit directly to step 5 (`filesystem` branch); skip step 2's external registry lookup. No automatic export/import. If OKF `index.md` exists, silently auto-generate the local `filesystem` `v2` binding (local routing-sync exception permitted in all lanes including `ask` and `jaiba-doctor`). |
 | Override `team-store`; only its global skill visible | Global `team-store`, after real tool validation. |
 | Override `team-store`; skill or required tool missing | Stop with selected-adapter failure; no fallback. |
 | No binding; local `team-store` v1; global same ID v2 | Local v1 is the surface to query. Incompatible contract blocks use, not fallback to v2. |
 | No binding; local `team-store`; global `personal-store` | Query local `team-store`. Existing data still needs authority checks. |
 | No binding, no pin; local `alpha` and `beta` | Ask which ID before the registry lookup; do not pick by discovery order. |
-| No binding; `origin` matches one registry project | Link and write v2. No search. No ≤4 questionnaire. Fresh per-root context. |
-| No binding; `origin` not in the registry (authoritative miss) | Then pin / `.ai/` / uninstrumented. Questionnaire only in `jaiba-init`. |
+| No binding, no `filesystem` pin; `origin` matches one registry project | Link and write v2 (read-only consumers route the link to `jaiba-init`). No search. No ≤4 questionnaire. Fresh per-root context. |
+| No binding, no `filesystem` pin; `origin` not in the registry (authoritative miss) | Then check `.ai/` (or uninstrumented if absent). Questionnaire only in `jaiba-init`. |
 | No binding, no pin, no `.ai/`, registry miss or no external surface to query | Authoritatively uninstrumented. Do not assume filesystem. |
 | No adapters, no pin, no binding, no `.ai/` | Uninstrumented. Built-in filesystem is not a silent default. |
 | Saved `alpha`; new override `beta` | Select `beta`, then resolve data authority before activation. |
@@ -450,22 +468,24 @@ re-query the registry to confirm who the checkout is. Still run readiness.
 An explicit `AGENTS.md` override may select a different surface; it does
 not replace those IDs and does not approve a store switch.
 
-When no local binding exists — a new machine, or a fresh clone — derive
-the sanitized `git-remote` candidate from `origin`
-(`{kind: git-remote, host, path}`, §2). Look that candidate up by exact
-identity in the external surface's owned JAIBA project registry before
-any fallback surface or new-project creation. Fuzzy search cannot
+When no local binding exists — a new machine, or a fresh clone — unless
+`AGENTS.md` pins `jaiba-memory-surface: filesystem` (which short-circuits
+to step 5 per §1), derive the sanitized `git-remote` candidate from
+`origin` (`{kind: git-remote, host, path}`, §2). Look that candidate up
+by exact identity in the external surface's owned JAIBA project registry
+before any fallback surface or new-project creation. Fuzzy search cannot
 establish the hit. An exact hit links that project: `jaiba-init` writes
 binding `v2` with the registry `project-id` and a fresh per-root
 `context-id`, without search and without prompting. The ≤4-question
-questionnaire does not run. A read-only consumer does not write the file
-and does not fall back while that link is outstanding. Only an
-authoritative miss — not a permission error, a partial page, or a search
-miss — requires explicit association or authorization for `jaiba-init`
-to create a project, and only then does the ≤4-question questionnaire
-(C3) trigger. Multiple matches are an identity conflict. Do not create a
-second brain to bypass it. The binding retains the stable resolved
-`project-id` and sanitized candidate, not a display-name guess.
+questionnaire does not run. A read-only consumer does not write the
+external link binding and does not fall back while that link is
+outstanding. Only an authoritative miss — not a permission error, a
+partial page, or a search miss — requires explicit association or
+authorization for `jaiba-init` to create a project, and only then does
+the ≤4-question questionnaire (C3) trigger. Multiple matches are an
+identity conflict. Do not create a second brain to bypass it. The
+binding retains the stable resolved `project-id` and sanitized
+candidate, not a display-name guess.
 
 ### Aliases, renames and identity examples
 
@@ -632,11 +652,13 @@ On each resolution, after the canonical work root is known:
 4. If the file does not exist, read legacy locations for compatibility
    as specified under legacy read and consolidation. Do not treat
    absence of v2 as absence of a project. If no legacy record matches,
-   this is not yet "uninstrumented": apply Step 0's no-binding branch.
-   Derive the sanitized `git-remote` candidate and look it up before any
-   filesystem fallback or new-project creation. An exact hit is a link,
-   not a questionnaire. Only an authoritative miss, with no pin and no
-   `.ai/` directory, is an authoritatively uninstrumented checkout.
+   this is not yet "uninstrumented": apply Step 0's no-binding branch
+   (short-circuiting to step 5 when `AGENTS.md` pins `filesystem`;
+   otherwise derive the sanitized `git-remote` candidate and look it up
+   before any unpinned fallback or new-project creation). An exact hit
+   is a link, not a questionnaire. Only an authoritative miss, with no
+   pin and no `.ai/` directory, is an authoritatively uninstrumented
+   checkout.
 
 Validate a reusable binding against the explicit `AGENTS.md` override,
 root, origin, adapter identity, and exact registry ownership before
@@ -679,12 +701,12 @@ it.
 
 If no legacy record matches, this root has no machine registration yet.
 That is not permission to assume filesystem or to open the questionnaire.
-Apply Step 0's no-binding branch: pin, then the sanitized `git-remote`
-lookup, then `.ai/` only after an authoritative miss. An exact registry
-hit writes v2 as that link, with a fresh per-root context and no
-questionnaire. An authoritative miss follows the identity and context
-rules, and only then may `jaiba-init` run C3. Do not also write a
-host-keyed legacy file.
+Apply Step 0's no-binding branch: pin (`filesystem` short-circuits to
+step 5), then the sanitized `git-remote` lookup, then `.ai/` only after
+an authoritative miss. An exact registry hit writes v2 as that link,
+with a fresh per-root context and no questionnaire. An authoritative
+miss follows the identity and context rules, and only then may
+`jaiba-init` run C3. Do not also write a host-keyed legacy file.
 
 If one or more legacy records match and they agree on every blocking
 field below, consolidate once:

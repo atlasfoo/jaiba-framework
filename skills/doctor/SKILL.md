@@ -29,9 +29,14 @@ Its governing principle is the framework's own: **propose, don't
 patch** (`AGENTS.md` §2.9, §5). doctor reads widely and writes almost
 nothing. It surfaces problems and names the skill that fixes each one —
 it does not rebuild the brain, re-vendor a spec, or install a tool
-itself. The **single exception** is `.atl/tool-layout.md`: that file is
-*machine state, not project memory* (gitignored — `AGENTS.md` §6), so
-refreshing it is doctor's job, not a memory mutation.
+itself. The only writes doctor performs are machine state, not project
+memory: refreshing `.atl/tool-layout.md` and (when due per `jaiba-contract.md`
+§6.5) `.atl/framework-version.json` (both gitignored machine state, never in
+`.ai/memory/` or `~/.jaiba/memory/bindings/`), plus the Step 0 local
+`filesystem` `v2` routing-sync exception (silently auto-generating missing
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` when `AGENTS.md` already declares
+`jaiba-memory-surface: filesystem` over OKF). It never mutates selected project
+memory, external surfaces, or external/malformed bindings.
 
 Think of it as a pre-flight check. The natural time to run it is **right
 before entering the `conduct` chain**, so that a stale
@@ -62,8 +67,13 @@ the binding wins. When that surface is external, do not test, list, or
 read `.ai/` paths — missing `.ai/` is expected, not absence. A missing v2
 file is not a filesystem default: an `AGENTS.md` pin, then the sanitized
 `git-remote` lookup of `origin`, before any fallback. A registry hit is a
-link for `jaiba-init`; doctor does not write the binding and does not
-treat the checkout as uninstrumented or as filesystem. Only an
+link for `jaiba-init`; doctor does not write external bindings and does not
+treat the checkout as uninstrumented or as filesystem. Under the Step 0 local
+`filesystem` `v2` routing-sync exception (`jaiba-contract.md` §1), when `AGENTS.md`
+already declares `jaiba-memory-surface: filesystem` over OKF (`index.md`), doctor
+silently auto-generates the missing local `filesystem` `v2` binding with
+readback verification (never overwriting a malformed binding or disagreeing legacy
+record) and emits no Notice 2. Only an
 authoritative miss, with no pin and no `.ai/`, is authoritatively
 uninstrumented. External mode needs neither `AGENTS.md` nor `.ai/`; a
 binding, ordinary backend note, search hit, probe success or empty
@@ -91,7 +101,10 @@ reflect the repository, not the prompt's assumptions.
    installation requirement, and not the default when Step 0 has no binding, no
    pin and no `.ai/`. Verify standard machine binding v2 persistence at
    `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
-   (`binding-format-version: "2"`) before any `.ai/` probe. When that binding
+   (`binding-format-version: "2"`) before any `.ai/` probe (under the Step 0 local
+   `filesystem` `v2` routing-sync exception, if `AGENTS.md` already declares
+   `jaiba-memory-surface: filesystem` over OKF and this binding is absent, doctor
+   silently auto-generates it with readback verification). When that binding
    declares an external surface and `AGENTS.md` does not override it, do not
    test `.ai/` paths. Inspect legacy binding resolution
    (`~/.jaiba/memory/<host>/...`) only when v2 is absent, and perform the
@@ -244,15 +257,19 @@ reference-health findings.
 The interview offers options (leave the marker, untrusted candidates from
 already-read text or C4 siblings, or freeform) and emits a confirmed brief
 in the chat report. It names `jaiba-init:update-brain` as the writer.
-Doctor does not call the write and does not edit selected memory, bindings,
-or vendored files. The only write remains `.atl/tool-layout.md`. A confirmed
+Doctor does not call the write and does not edit selected memory, external
+bindings, or vendored files. The only machine-state writes remain
+`.atl/tool-layout.md` and `.atl/framework-version.json` (plus the Step 0 local
+`filesystem` `v2` routing-sync exception). A confirmed
 value in the brief is not a memory write.
 
 ## Boundaries
 
 - **Diagnose and route — don't fix.** doctor proposes; the owning skill
-  enacts. The one thing it writes is `.atl/tool-layout.md` (machine
-  state, §6), never selected memory, routing bindings or vendored files.
+  enacts. The only writes it performs are machine state (`.atl/tool-layout.md`
+  and, when due per §6.5, `.atl/framework-version.json`) and the Step 0 local
+  `filesystem` `v2` routing-sync exception, never selected memory, external
+  routing bindings, or vendored files.
   A confirmed value in the gap-interview brief is not a memory write
   (it is an evidence harvest routed to `jaiba-init:update-brain`).
   Constitutive changes belong to `jaiba-init`; executive writes belong to
