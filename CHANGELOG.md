@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v3.6.0 (2026-11-23)
+
+### Feat
+
+- **memory**: enforce 3-level migration notices, onboarding guards, and daily version check
+
+### Fix
+
+- **memory**: resolve PR #22 adversarial review findings
+
 ## v3.5.0 (2026-11-16)
 
 ### Feat

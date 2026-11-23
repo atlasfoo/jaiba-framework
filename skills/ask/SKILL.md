@@ -2,7 +2,7 @@
 name: ask
 description: >-
   Implicit read-only Q&A lane for questions about code, active work, or decisions; not user-invocable. Triggers on interrogative/exploratory requests ("why…?", "what's left?", "explain…", "is this covered?"). Never mutates JAIBA-owned data or persists external bindings (permitting only Step 0's local filesystem v2 routing sync); independent host-required bookkeeping is not JAIBA evidence. Continuations route to conduct:execute, new work to conduct, small changes to fast. Never executes changes or runs the Quality Gate.
-version: 3.5.0
+version: 3.6.0
 author: atlasfoo<iscomejia15@outlook.com>
 user-invocable: false
 requires:
