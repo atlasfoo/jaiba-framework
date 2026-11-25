@@ -700,6 +700,24 @@
         "Variant B blocks starting migrate-surface until constitution.md, adr-log.md, and reference-index.md are deleted and the ambiguous dual-layout state is resolved"
       ],
       "files": []
+    },
+    {
+      "id": 36,
+      "name": "v2-binding-atomic-persistence-and-failure-cleanup",
+      "mode_under_test": "bootstrap / binding-persistence",
+      "prompt": "Persist the v2 binding for this project and handle any write or readback errors.",
+      "context": {
+        "canonical_work_root": "/work/payments",
+        "binding_target": "~/.jaiba/memory/bindings/<sha256(/work/payments)>.yaml",
+        "variants": "A: normal write/replace/readback; B: rename or readback fails leaving a temp file; C: pre-existing binding at target path is malformed or has a mismatched canonical work root / sha256"
+      },
+      "expected_output": [
+        "Variant A writes the full YAML payload to a same-directory temp file (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>`), atomically replaces `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`, and verifies exact readback of routing fields (`binding-format-version: \"2\"`, `surface`, `project.project-id`, `executive.context-id`) before claiming persistence",
+        "Variant B removes any leftover `.tmp.<pid>` file on write, rename, or readback failure and obtains explicit session-only consent or stops rather than claiming the binding saved",
+        "Variant C stops and reports the pre-existing malformed or mismatched binding without silently overwriting it",
+        "Never writes under `~/.jaiba/memory/<host-agent-id>/`; records `host-agent-id` only as `last-verified-by` provenance"
+      ],
+      "files": []
     }
   ]
 }

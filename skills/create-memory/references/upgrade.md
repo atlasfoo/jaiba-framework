@@ -390,6 +390,9 @@ install authorization.
 1. **Discover destinations.** Do not scan the whole home directory.
    Do not invent an installer. Global candidates are:
 
+   - `~/.jaiba` (SSOT root — when `~/.jaiba/config.yaml` or
+     `~/.jaiba/contract/jaiba-contract.md` exists, plus any `enabled: true`
+     host `config-root` entries declared in `~/.jaiba/config.yaml`)
    - `~/.agents`
    - `~/.claude`
    - `~/.codex`
@@ -397,10 +400,11 @@ install authorization.
 
    Also include a root the user names, and this project's documented
    project-local skill location when a project-local install was
-   requested. A root counts as JAIBA-configured only when it contains
-   `jaiba-contract.md`, or a `skills/` directory that already holds a
-   JAIBA skill (for example `create-memory` or `conduct`). A vendor
-   directory with neither marker is not a destination. Do not create a
+   requested. A root counts as JAIBA-configured only when it is `~/.jaiba`
+   with `config.yaml` or `contract/jaiba-contract.md`, or a host root that
+   contains `jaiba-contract.md` (file or symlink) or a `skills/` directory that
+   already holds a JAIBA skill (for example `create-memory` or `conduct`). A
+   vendor directory with neither marker is not a destination. Do not create a
    root in order to have somewhere to install. Skill packages land in
    `<root>/skills/<adapter-name>/`.
 

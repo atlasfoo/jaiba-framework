@@ -1,7 +1,19 @@
 {
   "fixture_kind": "multihost_installation_cases",
-  "purpose": "Test discovery of JAIBA hosts, multi-selection, collision backups (.bak-<timestamp>), and destination readback (MSV-003).",
+  "purpose": "Test discovery of ~/.jaiba SSOT and JAIBA-configured hosts (excluding enabled: false hosts), multi-selection, collision backups (.bak-<timestamp>), and destination readback (MSV-003, ADE-001, ADE-004).",
+  "ssot_config": {
+    "path": "~/.jaiba/config.yaml",
+    "present": true,
+    "enabled_hosts": ["claude-code", "opencode"],
+    "disabled_hosts": ["cursor"]
+  },
   "candidate_roots": [
+    {
+      "path": "~/.jaiba",
+      "markers": {"config_yaml": true, "contract_jaiba_contract_md": true, "jaiba_skills": ["conduct", "create-memory"]},
+      "is_ssot_root": true,
+      "is_jaiba_configured": true
+    },
     {
       "path": "~/.agents",
       "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct", "create-memory"]},
@@ -10,6 +22,7 @@
     {
       "path": "~/.claude",
       "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct"]},
+      "ssot_enabled": true,
       "is_jaiba_configured": true
     },
     {
@@ -20,7 +33,15 @@
     {
       "path": "~/.config/opencode",
       "markers": {"jaiba_contract": true, "jaiba_skills": ["conduct", "fast", "jaiba-doctor"]},
+      "ssot_enabled": true,
       "is_jaiba_configured": true
+    },
+    {
+      "path": "~/.cursor",
+      "markers": {"jaiba_contract": false, "jaiba_skills": []},
+      "ssot_enabled": false,
+      "is_jaiba_configured": false,
+      "reason": "Host disabled (enabled: false) in ~/.jaiba/config.yaml and unconfigured; skipped and untouched"
     },
     {
       "path": "~/.other_agent",
@@ -31,8 +52,21 @@
   ],
   "selection_scenarios": [
     {
+      "id": "ssot-plus-enabled-hosts",
+      "discovered_roots": ["~/.jaiba", "~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
+      "excluded_disabled_roots": ["~/.cursor"],
+      "user_selection": ["~/.jaiba", "~/.claude"],
+      "expected_targets": [
+        "~/.jaiba/skills/mock-memory-surface",
+        "~/.claude/skills/mock-memory-surface"
+      ],
+      "disabled_hosts_untouched": ["~/.cursor"],
+      "bindings_untouched": "~/.jaiba/memory/bindings/",
+      "install_to_all_by_default": false
+    },
+    {
       "id": "multi-host-select-two",
-      "discovered_roots": ["~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
+      "discovered_roots": ["~/.jaiba", "~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
       "user_selection": ["~/.claude", "~/.config/opencode"],
       "expected_targets": [
         "~/.claude/skills/mock-memory-surface",
@@ -42,7 +76,7 @@
     },
     {
       "id": "draft-only-selection",
-      "discovered_roots": ["~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
+      "discovered_roots": ["~/.jaiba", "~/.agents", "~/.claude", "~/.codex", "~/.config/opencode"],
       "user_selection": [],
       "expected_targets": [],
       "expected_action": "draft-only:no-installation"

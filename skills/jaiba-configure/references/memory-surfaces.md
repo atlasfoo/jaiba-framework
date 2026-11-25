@@ -10,11 +10,13 @@ resolve by sibling paths, a source checkout or another host's installation.
 
 ## 1. Inventory visible installations
 
-- Start with the identified host's actual exposed skills and documented
+- Start with the identified host's actual exposed skills, `~/.jaiba/skills/`,
+  enabled host roots declared in `~/.jaiba/config.yaml`, and documented
   effective installation resolution. Corroborate global inventory from step 3
-  with host visibility; a CLI list alone does not establish runtime exposure.
-  Inspect local installations only for an explicitly identified work root.
-  With no project target, report global visibility only, not a project selection.
+  and `~/.jaiba/config.yaml` (`memory-adapters`) with actual host visibility; a
+  CLI list or registry entry alone does not establish runtime exposure. Inspect
+  local installations only for an explicitly identified work root. With no
+  project target, report global visibility only, not a project selection.
 - Read declarations as data under the global contract §4.5. A selectable
   declaration has `category: memory-surface`, stable `adapter-id`, adapter
   `version`, `contract-id`/`contract-version`, `requires`, capabilities,
@@ -69,9 +71,11 @@ does. A verified package this host cannot call stays unusable here without
 becoming non-conforming. A readiness failure is not absence and not permission
 to select filesystem.
 
-Global adapter installation is a desired skill destination, not automatic
-migration or authorization to supersede existing local memory. Installation
-can change future candidate precedence; show that consequence before consent.
+Global adapter installation (into `~/.jaiba/skills/` or an enabled host's
+global skills directory from `~/.jaiba/config.yaml`) is a desired skill
+destination, not automatic migration or authorization to supersede existing
+local memory. Installation can change future candidate precedence; show that
+consequence before consent.
 With existing `.ai/` memory/work, require a separately confirmed filesystem
 exception (normally the explicit `filesystem` override, written only through
 an authorized project workflow), or hand off an explicit migration request to
@@ -100,14 +104,18 @@ these obstacles without applying overrides or changing bindings.
    substitute a branch or infer a second release. Do not claim that a release contains
    the package without evidence; unavailable at that pin means pending, not
    permission to fetch HEAD or bump the framework version.
-3. Obtain explicit choice of **host**, **project-local or global** scope,
-   exact target root/destination, and **files** to install/change. Local scope
-   requires the chosen project's exact work root. Use the existing pinned
-   per-skill installation/fallback pattern from step 3 with only the optional
-   package name substituted; no new CLI syntax is implied. Verify current
-   host targeting support before any package-manager action. If it cannot
-   constrain writes to the approved host/files, stop or propose the already
-   documented pinned-copy fallback with a newly confirmed file manifest.
+3. Obtain explicit choice of **host / SSOT destination** (`~/.jaiba/skills/`
+   and/or enabled host roots declared in `~/.jaiba/config.yaml`),
+   **project-local or global** scope, exact target root/destination, and
+   **files** to install/change. Local scope requires the chosen project's exact
+   work root. Use the existing pinned per-skill installation/fallback pattern
+   from step 3 with only the optional package name substituted; no new CLI
+   syntax is implied. Verify current host targeting support before any
+   package-manager action. If it cannot constrain writes to the approved
+   host/files, stop or propose the already documented pinned-copy fallback with
+   a newly confirmed file manifest. Recording an approved install in
+   `~/.jaiba/config.yaml` `memory-adapters` is inventory metadata only, never a
+   binding or activation.
 4. Show a pre-install manifest: skill, literal source#ref, host, scope,
    destination files, conformance status, requirements and precedence impact.
    Preview package contents at that ref before authorizing destination writes;

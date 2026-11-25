@@ -1,0 +1,61 @@
+# JAIBA Global SSOT Configuration Template (~/.jaiba/config.yaml)
+# Single Source of Truth for host registrations, paths, and orchestrator settings.
+# Managed and projected by jaiba_ssot.py.
+
+schema_version: 1
+
+# Global native plan client preference ("auto" | "on" | "off")
+# - "auto": integrate with host's native plan client if supported, fallback to JAIBA markdown
+# - "on": require host native plan client integration
+# - "off": enforce JAIBA markdown plan workflow (.ai/work/)
+native-plan-client: "auto"
+
+# Canonical SSOT behavioral contract and shared skills directory
+contract-path: "~/.jaiba/contract/jaiba-contract.md"
+skills-dir: "~/.jaiba/skills"
+
+# Registered host environments (enabled: true triggers projection by jaiba_ssot.py)
+hosts:
+  antigravity:
+    enabled: false
+    config-root: "~/.gemini/config"
+    global-instruction-file: "pointer"
+    # native-plan-client: "auto"
+  claude-code:
+    enabled: false
+    config-root: "~/.claude"
+    global-instruction-file: "CLAUDE.md"
+    # native-plan-client: "auto"
+  opencode:
+    enabled: false
+    config-root: "~/.config/opencode"
+    global-instruction-file: "AGENTS.md"
+    # native-plan-client: "auto"
+  cursor:
+    enabled: false
+    config-root: "~/.cursor"
+    global-instruction-file: "pointer"
+    # native-plan-client: "auto"
+  gemini-cli:
+    enabled: false
+    config-root: "~/.gemini"
+    global-instruction-file: "GEMINI.md"
+    # native-plan-client: "auto"
+  windsurf:
+    enabled: false
+    config-root: "~/.windsurf"
+    global-instruction-file: "pointer"
+    # native-plan-client: "auto"
+  github-copilot:
+    enabled: false
+    config-root: "~/.github/copilot"
+    global-instruction-file: "pointer"
+    # native-plan-client: "auto"
+  agents:
+    enabled: false
+    config-root: "~/.agents"
+    global-instruction-file: "pointer"
+    # native-plan-client: "auto"
+
+# Optional registry of installed memory surface adapters (e.g. jaiba-engram-memory)
+memory-adapters: []

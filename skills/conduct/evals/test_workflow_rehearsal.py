@@ -57,11 +57,24 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
     def test_historical_source_profile_has_only_exact_reviewed_drift(self):
         manifest = json.loads((FIXTURES / 'reviewed-source-drift.json').read_text())
         provenance = {
-            'skills/create-memory/references/filesystem-surface.md': 'T-083',
-            'skills/create-memory/references/resolution.md': 'T-088',
-            'skills/conduct/references/execute-mode.md': 'T-024',
-            'skills/conduct/references/summarize-mode.md': 'T-024',
-            'skills/create-memory/references/memory-surface-contract.md': 'T-083',
+            'skills/create-memory/references/resolution.md': 'T-009',
+            'skills/create-memory/references/filesystem-surface.md': 'ADR-014',
+            'skills/create-memory/references/memory-surface-contract.md': 'ADR-014',
+            'skills/conduct/SKILL.md': 'T-009',
+            'skills/conduct/references/execute-mode.md': 'T-010',
+            'skills/conduct/references/spec-mode.md': 'ADR-015',
+            'skills/conduct/references/subagents.md': 'T-010',
+            'skills/conduct/references/summarize-mode.md': 'ADR-019',
+            'skills/conduct/references/tasks-mode.md': 'T-008',
+            'skills/conduct/references/triage.md': 'ADR-019',
+            'skills/conduct/references/validate-mode.md': 'ADR-014',
+            'skills/conduct/assets/tasks-template.md': 'T-008',
+            'skills/conduct/scripts/archive.sh': 'PR-22',
+            'skills/ask/SKILL.md': 'T-006',
+            'skills/ask/references/handoff.md': 'ADR-017',
+            'skills/ask/references/orientation.md': 'ADR-014',
+            'skills/fast/SKILL.md': 'T-006',
+            'skills/fast/references/plan-adjustment.md': 'ADR-016',
         }
         self.assertIn('predate T-023 and T-024', manifest['review_scope'])
         self.assertNotIn('T-033 is the provenance', manifest['review_scope'])
@@ -98,8 +111,11 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
         self.assertEqual(canonical, (ROOT / 'skills/doctor/assets/jaiba-contract.md').read_bytes())
         text = canonical.decode()
         self.assertNotIn('`conduct`, `ask` and `fast` remain gated', text)
-        self.assertIn('Draft categories are not conforming selectable mutable adapters.', text)
-        self.assertIn('`jaiba-engram-memory` remains `memory-surface-draft`', text)
+        self.assertNotIn('`jaiba-engram-memory` remains `memory-surface-draft`', text)
+        self.assertIn('The `jaiba-memory-surface` **1.1.0** contract', text)
+        self.assertIn('Only `category: memory-surface` is a conforming selectable mutable\nadapter. Draft categories are not.', text)
+        self.assertIn("`~/.jaiba/` is the machine's sole Global Single Source of Truth (SSOT) installation root", text)
+        self.assertIn('`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` → `~/.jaiba/memory/bindings/<sha256(R)>.yaml`', text)
         for skill, last in [('conduct', 23), ('ask', 8), ('fast', 6)]:
             data = json.loads((ROOT / f'skills/{skill}/evals/evals.json').read_text())
             self.assertEqual(data['filesystem_scoped_eval_ids'], list(range(1, last + 1)))
@@ -116,7 +132,8 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
 
     def test_current_migration_source_guard_is_static_not_conformance(self):
         migration = (ROOT / 'skills/jaiba-init/references/surface-migration.md').read_text().lower()
-        for required in ('complete target enumeration', 'full readback', 'new explicit\nhuman approval to activate this verified manifest revision',
+        for required in ('complete target enumeration', 'full readback', 'single cutover gate (`msv-011`)',
+                         'activation decision', 'retirement decision',
                          'source remains authoritative', 'source and staging', 'same transaction',
                          'registry', 'stale-snapshot recovery'):
             self.assertIn(required, migration)
@@ -127,7 +144,7 @@ class HistoricalCapturedRehearsal(unittest.TestCase):
         self.assertIn('never automatic', engram)
         self.assertIn('filesystem by default', engram)
         self.assertNotIn('memory-surface-draft', engram)
-        self.assertRegex(migration, r'adapter files,\s*test fixtures and host memory bookkeeping are not backend evidence')
+        self.assertRegex(migration, r'adapter files,\s*test fixtures and host memory\s+bookkeeping are not backend evidence')
 
     def test_propose_and_refusal_have_zero_artifact_mutations(self):
         for journal in self.journals.values():

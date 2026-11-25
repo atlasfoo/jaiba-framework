@@ -84,6 +84,13 @@ summary and require corrective action before closing.
 - **No versioned executive artifacts:** `git status --short` shows
   nothing under `.ai/work/` (requires `.ai/.gitignore` to exist and
   cover it).
+- **Python stdlib test suites:** run
+  `python3 -m unittest discover skills/doctor/evals`,
+  `python3 -m unittest discover skills/jaiba-configure/evals` and
+  `python3 -m unittest discover skills/conduct/evals` — all must pass
+  (38 tests at the SSOT migration close; see
+  [ADR-020](../decisions/ADR-020.md) and
+  [ADR-021](../decisions/ADR-021.md)).
 
 **Security scan:** none configured — omitted, not `[MISSING]`; this
 repo ships no executable application code for a scanner to analyze.

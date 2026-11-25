@@ -107,8 +107,14 @@
     {
       "step": 5,
       "name": "multi_host_reinstallation",
-      "discover_hosts": ["~/.claude", "~/.config/opencode"],
-      "user_selection": ["~/.claude"],
+      "ssot_root": "~/.jaiba",
+      "discover_hosts": ["~/.jaiba", "~/.claude", "~/.config/opencode"],
+      "disabled_hosts_untouched": ["~/.cursor"],
+      "user_selection": ["~/.jaiba", "~/.claude"],
+      "expected_targets": [
+        "~/.jaiba/skills/mock-kv-adapter",
+        "~/.claude/skills/mock-kv-adapter"
+      ],
       "collision_handling": "move to mock-kv-adapter.bak-20261107T150000",
       "readback": "verified"
     }

@@ -1,10 +1,10 @@
 ---
 name: executor-low
 description: JAIBA low-load task executor. Implements a single task delegated by conduct's execute phase when the task is labeled load:low — mechanical, repetitive, zero-judgment work such as renames, boilerplate, config echoes. Receives the task, scoped minimal context, and phase gate commands; returns a diff summary and report. Never writes executive or constitutive JAIBA memory on any surface; never commits.
-# Model class (declarative): fast/cheap tier — e.g. Haiku/Flash class
-# on Claude Code. No `model:` field by default: absent = inherit the
-# orchestrator's model. jaiba-configure's install-time selection step
-# may pin one for this tier from the models available on the host.
+# Canonical base template destined for ~/.jaiba/agents/base/executor-low.md.
+# Model class (declarative): fast/cheap tier (e.g. Haiku/Flash class).
+# No `model:` field by default: absent = inherit orchestrator model.
+# Mappings are configured in ~/.jaiba/mappings.yaml and projected by jaiba_ssot.py.
 requires:
   - git
 ---

@@ -15,7 +15,7 @@
 # is machine state, gitignored, not project memory.
 #
 # Usage:
-#   check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [<project-root>]
+#   check-tools.sh [<installed-skills-dir>[:<installed-skills-dir>...]|--auto] [<project-root>]
 #
 #   <installed-skills-dir>  where JAIBA skills are installed (e.g.
 #                           .claude/skills, .agents/skills, or a global
@@ -27,6 +27,11 @@
 #                           folder, so subagents (agents/*.md) and hook
 #                           configs (settings*.json) next to each are
 #                           scanned too.
+#                           Pass `--auto` (or omit when ~/.jaiba/config.yaml
+#                           exists) to discover paths from the SSOT config.
+#                           When ~/.jaiba/config.yaml (or $JAIBA_SSOT_ROOT/config.yaml)
+#                           exists, SSOT skills/base-agents and every
+#                           `enabled: true` host are also inventoried.
 #   <project-root>          defaults to the current directory.
 #
 # Exit code is always 0 (the missing count is reported in the output
@@ -34,10 +39,22 @@
 
 set -uo pipefail
 
-SKILLS_DIRS_RAW="${1:?usage: check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [project-root]}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGED_CONTRACT="$SCRIPT_DIR/../assets/jaiba-contract.md"
+SSOT_ROOT="${JAIBA_SSOT_ROOT:-$HOME/.jaiba}"
+CONFIG_YAML="$SSOT_ROOT/config.yaml"
+
+ARG1="${1:-}"
+if [ -z "$ARG1" ] || [ "$ARG1" = "--auto" ]; then
+  if [ ! -f "$CONFIG_YAML" ]; then
+    : "${1:?usage: check-tools.sh <installed-skills-dir>[:<installed-skills-dir>...] [project-root]}"
+  fi
+  SKILLS_DIRS_RAW=""
+else
+  SKILLS_DIRS_RAW="$ARG1"
+fi
 ROOT="${2:-$PWD}"
 OUT="$ROOT/.atl/tool-layout.md"
-IFS=':' read -r -a SKILLS_DIRS <<< "$SKILLS_DIRS_RAW"
 
 # Detect host shell flavor to distinguish git bash from WSL in Windows
 SHELL_FLAVOR="native"
@@ -52,16 +69,49 @@ elif [ -n "${WSL_DISTRO_NAME:-}" ]; then
 fi
 
 # Each skills dir's parent is an agent folder (subagents/hooks live
-# alongside it). De-duplicate in case two skill dirs share a parent.
+# alongside it). De-duplicate both skills dirs and agent dirs so
+# overlapping explicit args and SSOT/config.yaml entries aren't scanned twice.
+declare -A SEEN_SKILLS_DIR
+SKILLS_DIRS=()
 declare -A SEEN_AGENT_DIR
 AGENT_DIRS=()
-for d in "${SKILLS_DIRS[@]}"; do
-  ad="$(dirname "$d")"
-  if [ -z "${SEEN_AGENT_DIR[$ad]:-}" ]; then
-    SEEN_AGENT_DIR[$ad]=1
+
+canon_dir_key() {  # canon_dir_key <dir-path>
+  local d="$1"
+  if [ -d "$d" ]; then
+    (cd -P "$d" 2>/dev/null && pwd -P) || printf '%s\n' "${d%/}"
+  else
+    [ "$d" = "/" ] && printf '/\n' || printf '%s\n' "${d%/}"
+  fi
+}
+
+add_agent_dir() {  # add_agent_dir <agent-dir>
+  local ad="$1" key
+  [ -z "$ad" ] && return 0
+  key="$(canon_dir_key "$ad")"
+  if [ -z "${SEEN_AGENT_DIR[$key]:-}" ]; then
+    SEEN_AGENT_DIR[$key]=1
     AGENT_DIRS+=("$ad")
   fi
-done
+}
+
+add_skills_dir() {  # add_skills_dir <skills-dir>
+  local d="$1" key
+  [ -z "$d" ] && return 0
+  key="$(canon_dir_key "$d")"
+  if [ -z "${SEEN_SKILLS_DIR[$key]:-}" ]; then
+    SEEN_SKILLS_DIR[$key]=1
+    SKILLS_DIRS+=("$d")
+  fi
+  add_agent_dir "$(dirname "$d")"
+}
+
+if [ -n "$SKILLS_DIRS_RAW" ]; then
+  IFS=':' read -r -a _CLI_SKILLS_DIRS <<< "$SKILLS_DIRS_RAW"
+  for d in "${_CLI_SKILLS_DIRS[@]}"; do
+    [ -n "$d" ] && add_skills_dir "$d"
+  done
+fi
 
 # Framework baseline — tools the JAIBA skills assume regardless of any
 # one declaration.
@@ -305,75 +355,347 @@ format_requires() {  # format_requires <source-label>
 
 format_path() {  # format_path <absolute-path>
   local p="$1"
-  if [[ "$p" == "$ROOT"* ]]; then
-    printf './%s' "${p#"$ROOT"/}"
-  elif [[ "$p" == "$HOME"* ]]; then
+  if [ "$p" = "$ROOT" ]; then
+    printf '.'
+  elif [[ "$p" == "$ROOT/"* ]]; then
+    printf './%s' "${p#"$ROOT/"}"
+  elif [ "$p" = "$HOME" ]; then
+    printf '~'
+  elif [[ "$p" == "$HOME/"* ]]; then
     printf '~%s' "${p#"$HOME"}"
   else
     printf '%s' "$p"
   fi
 }
 
+# --- SSOT & multi-host config.yaml discovery (§4.5 / ADR-010) ---------
+HOST_ID_RE='^[A-Za-z0-9._-]{1,64}$'
+SAFE_PATH_RE='^(~\/|\/)[A-Za-z0-9._:+@\/-]{1,256}$'
+
+BATTERY=("executor-high" "executor-medium" "executor-low" "code-analyst" "business-analyst" "verify" "researcher")
+declare -A BATTERY_MAP
+for b in "${BATTERY[@]}"; do BATTERY_MAP["subagent:$b"]=1; done
+
+declare -A BATTERY_REQ
+BATTERY_REQ["subagent:executor-high"]="git"
+BATTERY_REQ["subagent:executor-medium"]="git"
+BATTERY_REQ["subagent:executor-low"]="git"
+BATTERY_REQ["subagent:code-analyst"]="rg"
+BATTERY_REQ["subagent:business-analyst"]="rg"
+BATTERY_REQ["subagent:verify"]="git"
+BATTERY_REQ["subagent:researcher"]="rg"
+
+valid_safe_path() {  # valid_safe_path <path>
+  local p="$1"
+  [[ ! "$p" =~ [[:cntrl:]] ]] || return 1
+  [[ "$p" =~ $SAFE_PATH_RE ]] || return 1
+  [[ "/$p/" != */../* ]] || return 1
+  return 0
+}
+
+expand_ssot_path() {  # expand_ssot_path <raw-path>
+  local p="$1"
+  if [ -n "${JAIBA_SSOT_ROOT:-}" ] && [[ "$p" == "~/.jaiba/"* ]]; then
+    printf '%s/%s\n' "${SSOT_ROOT%/}" "${p#"~/.jaiba/"}"
+  elif [ "$p" = "~" ]; then
+    printf '%s\n' "$HOME"
+  elif [[ "$p" == "~/"* ]]; then
+    printf '%s/%s\n' "$HOME" "${p#"~/"}"
+  else
+    printf '%s\n' "$p"
+  fi
+}
+
+default_host_root() {  # default_host_root <host-id>
+  case "$1" in
+    antigravity)    printf '%s/.gemini/config\n' "$HOME" ;;
+    claude-code)    printf '%s/.claude\n' "$HOME" ;;
+    opencode)       printf '%s/.config/opencode\n' "$HOME" ;;
+    cursor)         printf '%s/.cursor\n' "$HOME" ;;
+    gemini-cli)     printf '%s/.gemini\n' "$HOME" ;;
+    windsurf)       printf '%s/.windsurf\n' "$HOME" ;;
+    github-copilot) printf '%s/.github/copilot\n' "$HOME" ;;
+    agents)         printf '%s/.agents\n' "$HOME" ;;
+    *)              return 1 ;;
+  esac
+}
+
+resolve_canon_file() {  # resolve_canon_file <file-path>
+  local p="$1" d b
+  if command -v readlink >/dev/null 2>&1 && readlink -f "$p" >/dev/null 2>&1; then
+    readlink -f "$p"
+    return 0
+  fi
+  d="$(dirname "$p")"
+  b="$(basename "$p")"
+  if [ -d "$d" ]; then
+    printf '%s/%s\n' "$(cd -P "$d" 2>/dev/null && pwd -P)" "$b"
+  else
+    printf '%s\n' "$p"
+  fi
+}
+
+parse_ssot_config() {  # parse_ssot_config <config.yaml>
+  awk '
+    function ltrim(s) { sub(/^[ \t]+/, "", s); return s }
+    function rtrim(s) { sub(/[ \t]+$/, "", s); return s }
+    function trim(s)  { return rtrim(ltrim(s)) }
+    function strip_comment(s,    i, ch, in_sq, in_dq, out) {
+      in_sq = 0; in_dq = 0; out = ""
+      for (i = 1; i <= length(s); i++) {
+        ch = substr(s, i, 1)
+        if (ch == "\\" && in_dq && i < length(s)) {
+          out = out ch substr(s, i + 1, 1); i++; continue
+        }
+        if (ch == "'"'"'" && !in_dq) {
+          in_sq = !in_sq
+        } else if (ch == "\"" && !in_sq) {
+          in_dq = !in_dq
+        } else if (ch == "#" && !in_sq && !in_dq) {
+          if (i == 1 || substr(s, i - 1, 1) == " " || substr(s, i - 1, 1) == "\t") {
+            break
+          }
+        }
+        out = out ch
+      }
+      return rtrim(out)
+    }
+    function unquote(s) {
+      s = trim(s)
+      if ((substr(s, 1, 1) == "\"" && substr(s, length(s), 1) == "\"") ||
+          (substr(s, 1, 1) == "'"'"'" && substr(s, length(s), 1) == "'"'"'")) {
+        if (length(s) >= 2) s = substr(s, 2, length(s) - 2)
+      }
+      return s
+    }
+    function flush_host() {
+      if (cur_host != "") {
+        print "HOST_BEGIN"
+        print "ID:" cur_host
+        print "ENABLED:" cur_enabled
+        print "ROOT:" cur_root
+        print "HOST_END"
+        cur_host = ""; cur_enabled = ""; cur_root = ""
+      }
+    }
+    BEGIN { in_hosts = 0; host_indent = -1; cur_host = ""; cur_enabled = ""; cur_root = "" }
+    {
+      line = $0
+      sub(/\r$/, "", line)
+      if (line ~ /^[ \t]*$/ || line ~ /^[ \t]*#/) next
+      match(line, /^[ ]*/)
+      indent = RLENGTH
+      if (substr(line, indent + 1, 1) == "\t") {
+        print "CFG_ERR:tab_indent"
+        next
+      }
+      content = substr(line, indent + 1)
+      colon = index(content, ":")
+      if (colon == 0) next
+      raw_key = unquote(substr(content, 1, colon - 1))
+      raw_val = strip_comment(substr(content, colon + 1))
+      val = unquote(raw_val)
+
+      if (indent == 0) {
+        flush_host()
+        in_hosts = 0
+        host_indent = -1
+        if (raw_key == "hosts" && (val == "" || val == "{}")) {
+          if (val == "") in_hosts = 1
+        } else if (raw_key == "contract-path" || raw_key == "contract_path") {
+          print "TOP_CONTRACT:" val
+        } else if (raw_key == "skills-dir" || raw_key == "skills_dir") {
+          print "TOP_SKILLS:" val
+        }
+        next
+      }
+
+      if (!in_hosts) next
+      if (host_indent == -1) host_indent = indent
+
+      if (indent == host_indent) {
+        flush_host()
+        cur_host = raw_key
+        cur_enabled = ""
+        cur_root = ""
+      } else if (indent > host_indent && cur_host != "") {
+        if (raw_key == "enabled") {
+          cur_enabled = val
+        } else if (raw_key == "config-root" || raw_key == "config_root") {
+          cur_root = val
+        }
+      }
+    }
+    END { flush_host() }
+  ' "$1"
+}
+
+CONFIG_YAML_FOUND=0
+SSOT_CONTRACT="$SSOT_ROOT/contract/jaiba-contract.md"
+SSOT_SKILLS_DIR="$SSOT_ROOT/skills"
+declare -a ENABLED_HOST_IDS=()
+declare -A ENABLED_HOST_ROOT
+declare -a DISABLED_HOST_IDS=()
+
+if [ -f "$CONFIG_YAML" ]; then
+  CONFIG_YAML_FOUND=1
+  _cur_h="" _cur_en="" _cur_rt="" _in_h=0
+  while IFS= read -r rec; do
+    case "$rec" in
+      CFG_ERR:*)
+        reject "config:ssot" "invalid yaml indentation"
+        ;;
+      TOP_CONTRACT:*)
+        _v="${rec#TOP_CONTRACT:}"
+        if [ -n "$_v" ]; then
+          if valid_safe_path "$_v"; then
+            SSOT_CONTRACT="$(expand_ssot_path "$_v")"
+          else
+            reject "config:ssot" "invalid contract-path"
+          fi
+        fi
+        ;;
+      TOP_SKILLS:*)
+        _v="${rec#TOP_SKILLS:}"
+        if [ -n "$_v" ]; then
+          if valid_safe_path "$_v"; then
+            SSOT_SKILLS_DIR="$(expand_ssot_path "$_v")"
+          else
+            reject "config:ssot" "invalid skills-dir"
+          fi
+        fi
+        ;;
+      HOST_BEGIN)
+        _in_h=1; _cur_h=""; _cur_en=""; _cur_rt=""
+        ;;
+      ID:*)
+        [ "$_in_h" -eq 1 ] && _cur_h="${rec#ID:}"
+        ;;
+      ENABLED:*)
+        [ "$_in_h" -eq 1 ] && _cur_en="${rec#ENABLED:}"
+        ;;
+      ROOT:*)
+        [ "$_in_h" -eq 1 ] && _cur_rt="${rec#ROOT:}"
+        ;;
+      HOST_END)
+        _in_h=0
+        if [[ ! "$_cur_h" =~ $HOST_ID_RE ]] || [[ "$_cur_h" =~ [[:cntrl:]] ]]; then
+          reject "config:host:<redacted>" "invalid host id"
+          continue
+        fi
+        if [ -n "$_cur_en" ] && [ "$_cur_en" != "true" ] && [ "$_cur_en" != "false" ]; then
+          reject "config:host:$_cur_h" "invalid enabled flag"
+          continue
+        fi
+        if [ "$_cur_en" = "true" ]; then
+          _resolved_rt=""
+          if [ -n "$_cur_rt" ]; then
+            if valid_safe_path "$_cur_rt"; then
+              _resolved_rt="$(expand_ssot_path "$_cur_rt")"
+            else
+              reject "config:host:$_cur_h" "invalid config-root"
+              continue
+            fi
+          else
+            _resolved_rt="$(default_host_root "$_cur_h" 2>/dev/null || true)"
+            if [ -z "$_resolved_rt" ]; then
+              reject "config:host:$_cur_h" "missing config-root"
+              continue
+            fi
+          fi
+          if [ -z "${ENABLED_HOST_ROOT[$_cur_h]:-}" ]; then
+            ENABLED_HOST_IDS+=("$_cur_h")
+            ENABLED_HOST_ROOT[$_cur_h]="${_resolved_rt%/}"
+          fi
+        else
+          DISABLED_HOST_IDS+=("$_cur_h")
+        fi
+        ;;
+    esac
+  done < <(parse_ssot_config "$CONFIG_YAML")
+
+  # Inventory SSOT shared skills and base subagent battery
+  [ -d "$SSOT_SKILLS_DIR" ] && add_skills_dir "$SSOT_SKILLS_DIR"
+  [ -d "$SSOT_ROOT/agents/base" ] && add_agent_dir "$SSOT_ROOT"
+
+  # Inventory enabled hosts only (disabled hosts remain skipped and untouched)
+  if [ "${#ENABLED_HOST_IDS[@]}" -gt 0 ]; then
+    readarray -t _sorted_ehosts < <(printf '%s\n' "${ENABLED_HOST_IDS[@]}" | sort -u)
+    ENABLED_HOST_IDS=("${_sorted_ehosts[@]}")
+    for _eh in "${ENABLED_HOST_IDS[@]}"; do
+      _eroot="${ENABLED_HOST_ROOT[$_eh]}"
+      [ -d "$_eroot/skills" ] && add_skills_dir "$_eroot/skills"
+      add_agent_dir "$_eroot"
+    done
+  fi
+fi
+
 # 1. Skills: <skills-dir>/**/SKILL.md  ->  labelled by skill folder name.
-for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
-  [ -d "$SKILLS_DIR" ] || continue
-  while IFS= read -r -d '' f; do
-    label="skill:$(basename "$(dirname "$f")")"
-    # A skill folder name lands in the report as a table cell and keys
-    # every downstream map, so gate it before anything reads the file.
-    # Skipping here keeps the label out of SKILL_FILE/SKILL_LABELS and
-    # leaves the skill's requires: unread.
-    validate_source_label "$label" || continue
-    register_source "$label"
-    # First location wins when the same skill name exists in two dirs:
-    # its requires merge into one source anyway, so one row is correct.
-    if [ -z "${SKILL_FILE[$label]:-}" ]; then
-      SKILL_FILE[$label]="$f"
-      SKILL_LABELS+=("$label")
-    fi
-    while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-  done < <(find -L "$SKILLS_DIR" -type d -name evals -prune -o -name SKILL.md -print0 2>/dev/null)
-done
+if [ "${#SKILLS_DIRS[@]}" -gt 0 ]; then
+  for SKILLS_DIR in "${SKILLS_DIRS[@]}"; do
+    [ -d "$SKILLS_DIR" ] || continue
+    while IFS= read -r -d '' f; do
+      label="skill:$(basename "$(dirname "$f")")"
+      # A skill folder name lands in the report as a table cell and keys
+      # every downstream map, so gate it before anything reads the file.
+      # Skipping here keeps the label out of SKILL_FILE/SKILL_LABELS and
+      # leaves the skill's requires: unread.
+      validate_source_label "$label" || continue
+      register_source "$label"
+      # First location wins when the same skill name exists in two dirs:
+      # its requires merge into one source anyway, so one row is correct.
+      if [ -z "${SKILL_FILE[$label]:-}" ]; then
+        SKILL_FILE[$label]="$f"
+        SKILL_LABELS+=("$label")
+      fi
+      while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
+    done < <(find -L "$SKILLS_DIR" -type d -name evals -prune -o -name SKILL.md -print0 2>/dev/null)
+  done
+fi
 
 # 2. Subagents: <agent>/agents/*.md with a `requires:` block, for every
-#    agent folder in play (project-local and/or global).
-for AGENT_DIR in "${AGENT_DIRS[@]}"; do
-  if [ -d "$AGENT_DIR/agents" ]; then
-    while IFS= read -r -d '' f; do
-      label="subagent:$(basename "$f" .md)"
-      # Same gate as the skills loop. It has to precede the
-      # SUBAGENT_LABELS append — that array feeds the Agent Layers table
-      # directly, so an unvalidated label must not reach it either.
-      validate_source_label "$label" || continue
-      if [ -z "${SEEN_SOURCE[$label]:-}" ]; then
-        SUBAGENT_LABELS+=("$label")
-        SUBAGENT_FILE[$label]="$f"
-      fi
-      register_source "$label"
-      while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
-    done < <(find -L "$AGENT_DIR/agents" -type d -name evals -prune -o -name '*.md' -print0 2>/dev/null)
-  fi
-done
+#    agent folder in play (project-local, SSOT base, and enabled hosts).
+if [ "${#AGENT_DIRS[@]}" -gt 0 ]; then
+  for AGENT_DIR in "${AGENT_DIRS[@]}"; do
+    if [ -d "$AGENT_DIR/agents" ]; then
+      while IFS= read -r -d '' f; do
+        label="subagent:$(basename "$f" .md)"
+        # Same gate as the skills loop. It has to precede the
+        # SUBAGENT_LABELS append — that array feeds the Agent Layers table
+        # directly, so an unvalidated label must not reach it either.
+        validate_source_label "$label" || continue
+        if [ -z "${SEEN_SOURCE[$label]:-}" ]; then
+          SUBAGENT_LABELS+=("$label")
+          SUBAGENT_FILE[$label]="$f"
+        fi
+        register_source "$label"
+        while IFS= read -r t; do note "$t" "$label"; done < <(requires_of "$f")
+      done < <(find -L "$AGENT_DIR/agents" -type d -name evals -prune -o -name '*.md' -print0 2>/dev/null)
+    fi
+  done
+fi
 
 # 3. Hooks: leading executable of every hook command in settings*.json,
 #    for every agent folder in play.
 #    Best-effort and jq-gated — hooks can run arbitrary shell, so we only
 #    claim the command's first token (the program it invokes).
 if command -v jq >/dev/null 2>&1; then
-  for AGENT_DIR in "${AGENT_DIRS[@]}"; do
-    for cfg in "$AGENT_DIR"/settings.json "$AGENT_DIR"/settings.local.json; do
-      [ -f "$cfg" ] || continue
-      while IFS= read -r cmd; do
-        [ -z "$cmd" ] && continue
-        exe="$(printf '%s\n' "$cmd" | awk '{print $1}')"
-        exe="$(basename "$exe")"
-        # Skip empties and bare shell wrappers (`bash -c "…"`): the wrapper
-        # isn't the dependency, and bash is already in the baseline.
-        case "$exe" in ""|sh|bash|zsh|env) continue ;; esac
-        note "$exe" "hook"
-      done < <(jq -r '.hooks // {} | .. | .command? // empty' "$cfg" 2>/dev/null)
+  if [ "${#AGENT_DIRS[@]}" -gt 0 ]; then
+    for AGENT_DIR in "${AGENT_DIRS[@]}"; do
+      for cfg in "$AGENT_DIR"/settings.json "$AGENT_DIR"/settings.local.json; do
+        [ -f "$cfg" ] || continue
+        while IFS= read -r cmd; do
+          [ -z "$cmd" ] && continue
+          exe="$(printf '%s\n' "$cmd" | awk '{print $1}')"
+          exe="$(basename "$exe")"
+          # Skip empties and bare shell wrappers (`bash -c "…"`): the wrapper
+          # isn't the dependency, and bash is already in the baseline.
+          case "$exe" in ""|sh|bash|zsh|env) continue ;; esac
+          note "$exe" "hook"
+        done < <(jq -r '.hooks // {} | .. | .command? // empty' "$cfg" 2>/dev/null)
+      done
     done
-  done
+  fi
 else
   HOOKS_UNVERIFIED=1
 fi
@@ -513,25 +835,14 @@ fi
 
 # Check if JAIBA framework is in play
 HAS_FRAMEWORK=0
-for s in "${SKILL_LABELS[@]}"; do
-  if [ "$(origin_of "${SKILL_FILE[$s]}")" = "framework" ]; then
-    HAS_FRAMEWORK=1
-    break
-  fi
-done
-
-BATTERY=("executor-high" "executor-medium" "executor-low" "code-analyst" "business-analyst" "verify" "researcher")
-declare -A BATTERY_MAP
-for b in "${BATTERY[@]}"; do BATTERY_MAP["subagent:$b"]=1; done
-
-declare -A BATTERY_REQ
-BATTERY_REQ["subagent:executor-high"]="git"
-BATTERY_REQ["subagent:executor-medium"]="git"
-BATTERY_REQ["subagent:executor-low"]="git"
-BATTERY_REQ["subagent:code-analyst"]="rg"
-BATTERY_REQ["subagent:business-analyst"]="rg"
-BATTERY_REQ["subagent:verify"]="git"
-BATTERY_REQ["subagent:researcher"]="rg"
+if [ "${#SKILL_LABELS[@]}" -gt 0 ]; then
+  for s in "${SKILL_LABELS[@]}"; do
+    if [ "$(origin_of "${SKILL_FILE[$s]}")" = "framework" ]; then
+      HAS_FRAMEWORK=1
+      break
+    fi
+  done
+fi
 
 subagent_rows=""
 subagents_detected=0
@@ -539,9 +850,11 @@ subagents_definition_missing=0
 subagent_notes=""
 
 declare -a ALL_SUBAGENT_LABELS=()
-for label in "${SUBAGENT_LABELS[@]}"; do
-  ALL_SUBAGENT_LABELS+=("$label")
-done
+if [ "${#SUBAGENT_LABELS[@]}" -gt 0 ]; then
+  for label in "${SUBAGENT_LABELS[@]}"; do
+    ALL_SUBAGENT_LABELS+=("$label")
+  done
+fi
 
 if [ "$HAS_FRAMEWORK" -eq 1 ]; then
   for b in "${BATTERY[@]}"; do
@@ -586,6 +899,107 @@ else
     hooks_line="Scanned — no tool needs derived from hook commands."
   else
     hooks_line="Scanned — $hook_count tool need(s) derived from hook commands: $(format_requires hook)."
+  fi
+fi
+
+# Host Projections (multi-host SSOT evaluation — per ADR-006, each enabled
+# host is inspected independently without overwriting another's view).
+ssot_contract_status=""
+ssot_base_battery_status=""
+ssot_skills_status=""
+host_proj_rows=""
+disabled_hosts_line="_None._"
+
+if [ "$CONFIG_YAML_FOUND" -eq 1 ]; then
+  if [ -f "$SSOT_CONTRACT" ]; then
+    if [ -f "$PACKAGED_CONTRACT" ]; then
+      if diff -q --strip-trailing-cr "$SSOT_CONTRACT" "$PACKAGED_CONTRACT" >/dev/null 2>&1; then
+        ssot_contract_status="✅ in sync with packaged contract (\`$(format_path "$SSOT_CONTRACT")\`)"
+      else
+        ssot_contract_status="⚠️ drifted vs packaged contract (\`$(format_path "$SSOT_CONTRACT")\`)"
+      fi
+    else
+      ssot_contract_status="❔ present (packaged reference missing; \`$(format_path "$SSOT_CONTRACT")\`)"
+    fi
+  else
+    ssot_contract_status="❌ missing (\`$(format_path "$SSOT_CONTRACT")\`)"
+  fi
+
+  _base_cnt=0
+  if [ -d "$SSOT_ROOT/agents/base" ]; then
+    for b in "${BATTERY[@]}"; do
+      [ -f "$SSOT_ROOT/agents/base/$b.md" ] && _base_cnt=$((_base_cnt + 1))
+    done
+  fi
+  ssot_base_battery_status="$_base_cnt/${#BATTERY[@]} canonical (\`$(format_path "$SSOT_ROOT/agents/base")\`)"
+
+  if [ -d "$SSOT_SKILLS_DIR" ]; then
+    ssot_skills_status="present (\`$(format_path "$SSOT_SKILLS_DIR")\`)"
+  else
+    ssot_skills_status="absent (\`$(format_path "$SSOT_SKILLS_DIR")\`)"
+  fi
+
+  if [ "${#DISABLED_HOST_IDS[@]}" -gt 0 ]; then
+    readarray -t _sorted_dhosts < <(printf '%s\n' "${DISABLED_HOST_IDS[@]}" | sort -u)
+    _dlist=""
+    for _dh in "${_sorted_dhosts[@]}"; do
+      if [ -z "$_dlist" ]; then _dlist="\`$_dh\`"; else _dlist+=", \`$_dh\`"; fi
+    done
+    disabled_hosts_line="$_dlist"
+  fi
+
+  if [ "${#ENABLED_HOST_IDS[@]}" -gt 0 ]; then
+    _ssot_canon=""
+    [ -f "$SSOT_CONTRACT" ] && _ssot_canon="$(resolve_canon_file "$SSOT_CONTRACT")"
+    for _eh in "${ENABLED_HOST_IDS[@]}"; do
+      _eroot="${ENABLED_HOST_ROOT[$_eh]}"
+      _hcontract="$_eroot/jaiba-contract.md"
+      _c_state=""
+      if [ -L "$_hcontract" ]; then
+        if [ ! -e "$_hcontract" ]; then
+          _c_state="❌ broken symlink"
+        elif [ -n "$_ssot_canon" ] && [ "$(resolve_canon_file "$_hcontract")" = "$_ssot_canon" ]; then
+          _c_state="✅ symlinked (in sync)"
+        elif [ -f "$SSOT_CONTRACT" ] && diff -q --strip-trailing-cr "$_hcontract" "$SSOT_CONTRACT" >/dev/null 2>&1; then
+          _c_state="⚠️ symlinked (target differs, content matches)"
+        else
+          _c_state="⚠️ drifted (symlink target differs)"
+        fi
+      elif [ -f "$_hcontract" ]; then
+        if [ ! -f "$SSOT_CONTRACT" ]; then
+          _c_state="⚠️ copied (SSOT contract missing)"
+        elif diff -q --strip-trailing-cr "$_hcontract" "$SSOT_CONTRACT" >/dev/null 2>&1; then
+          _c_state="✅ copied (in sync)"
+        else
+          _c_state="⚠️ drifted (copy differs from SSOT)"
+        fi
+      else
+        _c_state="❌ missing"
+      fi
+
+      _hbat=0
+      _hthird=0
+      if [ -d "$_eroot/agents" ]; then
+        for b in "${BATTERY[@]}"; do
+          [ -f "$_eroot/agents/$b.md" ] && _hbat=$((_hbat + 1))
+        done
+        while IFS= read -r -d '' _af; do
+          _aname="$(basename "$_af" .md)"
+          if [ -z "${BATTERY_MAP["subagent:$_aname"]:-}" ]; then
+            _hthird=$((_hthird + 1))
+          fi
+        done < <(find -L "$_eroot/agents" -maxdepth 1 -name '*.md' -print0 2>/dev/null)
+      fi
+      _bat_label="$_hbat/${#BATTERY[@]} canonical"
+      if [ "$_hthird" -gt 0 ]; then
+        _bat_label+=" (+$_hthird third-party)"
+      fi
+
+      _hskills="absent"
+      [ -d "$_eroot/skills" ] && _hskills="present"
+
+      host_proj_rows+="| \`$_eh\` | \`$(format_path "$_eroot")\` | $_c_state | $_bat_label | $_hskills |"$'\n'
+    done
   fi
 fi
 
@@ -677,8 +1091,23 @@ fi
   echo
   echo "- **Probed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "- **Shell host:** $SHELL_FLAVOR"
-  echo "- **Skills scanned:** $(printf '`%s` ' "${SKILLS_DIRS[@]}")"
-  echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
+  if [ "${#SKILLS_DIRS[@]}" -gt 0 ]; then
+    echo "- **Skills scanned:** $(printf '`%s` ' "${SKILLS_DIRS[@]}")"
+  else
+    echo "- **Skills scanned:** _none_"
+  fi
+  if [ "${#AGENT_DIRS[@]}" -gt 0 ]; then
+    echo "- **Agent folder(s):** $(printf '`%s` ' "${AGENT_DIRS[@]}")"
+  else
+    echo "- **Agent folder(s):** _none_"
+  fi
+  if [ "$CONFIG_YAML_FOUND" -eq 1 ]; then
+    if [ "${#ENABLED_HOST_IDS[@]}" -gt 0 ]; then
+      echo "- **SSOT enabled hosts:** $(printf '`%s` ' "${ENABLED_HOST_IDS[@]}")"
+    else
+      echo "- **SSOT enabled hosts:** _none_"
+    fi
+  fi
   echo "- **Subagent definitions:** $subagents_detected detected$([ "$subagents_definition_missing" -gt 0 ] && echo ", $subagents_definition_missing missing from scanned folders")"
   echo "- **Missing:** $missing of $total"
   echo "- **Unverified (MCP):** $unverified"
@@ -748,6 +1177,30 @@ fi
   echo "### Hooks"
   echo
   echo "$hooks_line"
+  echo
+  echo "## Host Projections"
+  echo
+  if [ "$CONFIG_YAML_FOUND" -eq 1 ]; then
+    echo "> Multi-host SSOT inventory from \`$(format_path "$CONFIG_YAML")\`. Each \`enabled: true\`"
+    echo "> host is evaluated independently so one host never overwrites another's view"
+    echo "> (ADR-006). Hosts marked \`enabled: false\` are skipped and left untouched."
+    echo
+    echo "- **SSOT root:** \`$(format_path "$SSOT_ROOT")\`"
+    echo "- **SSOT contract:** $ssot_contract_status"
+    echo "- **SSOT base battery:** $ssot_base_battery_status"
+    echo "- **SSOT shared skills:** $ssot_skills_status"
+    echo "- **Disabled hosts (untouched, not scanned):** $disabled_hosts_line"
+    echo
+    if [ -n "$host_proj_rows" ]; then
+      echo "| Host | Config Root | Contract Projection | Subagent Battery | Host Skills |"
+      echo "|---|---|---|---|---|"
+      printf '%s' "$host_proj_rows"
+    else
+      echo "_No hosts marked \`enabled: true\` in config.yaml._"
+    fi
+  else
+    echo "_No \`~/.jaiba/config.yaml\` SSOT configuration found (explicit / single-directory scan)._"
+  fi
   echo
   echo "## Rejected entries"
   echo

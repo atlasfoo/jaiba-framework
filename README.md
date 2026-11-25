@@ -75,10 +75,10 @@ The release-tag suffix pins the install to that git tag — the tag *is* the fra
 
 *Or simply: "configure jaiba on this machine"*
 
-`jaiba-configure` owns three core setup responsibilities; skill destinations may be explicitly global or project-local, and it never changes a project's brain or bindings:
-- Installs the **global JAIBA Behavioral Contract** (`jaiba-contract.md`) into your agent's user-level config
-- Installs the **workflow/meta skillset** (`conduct`, `ask`, `fast`, `jaiba-init`, `create-knowledge`, `create-memory`, `jaiba-doctor` — seven core skills, exactly what `assets/skillset.txt` lists) globally — or project-locally, if you want one project's versions pinned
-- Installs the **subagent battery** (executors + specialists) into your agent's global `agents/` folder
+`jaiba-configure` owns the unified `~/.jaiba/` machine Single Source of Truth (SSOT) and multi-host projection (`N >= 1` enabled hosts, where single-agent setup is `N = 1`); skill destinations may be explicitly global or project-local, and it never changes a project's brain or bindings:
+- Installs the **global JAIBA Behavioral Contract** into the machine SSOT (`~/.jaiba/contract/jaiba-contract.md`) and projects it (symlink, or copy fallback) to each host marked `enabled: true` in `~/.jaiba/config.yaml` (`N >= 1`)
+- Installs the **workflow/meta skillset** (`conduct`, `ask`, `fast`, `jaiba-init`, `create-knowledge`, `create-memory`, `jaiba-doctor` — seven core skills, exactly what `assets/skillset.txt` lists) globally (under `~/.jaiba/skills/` / `~/.agents/skills/`) — or project-locally, if you want one project's versions pinned
+- Installs the 7 canonical base subagent templates in `~/.jaiba/agents/base/` with per-host model/effort mappings in `~/.jaiba/mappings.yaml`, projecting host-native wrappers into `enabled: true` hosts' `agents/` folders via `scripts/jaiba_ssot.py` (leaving `enabled: false` hosts and third-party agent files untouched)
 
 As a separate, explicitly chosen extra — never part of the core install — `jaiba-configure` can also offer the optional first-party `jaiba-engram-memory` adapter (see [Memory surfaces](#pluggable-memory-surfaces-architecture)). Declining it is a successful core-only setup.
 
@@ -130,15 +130,15 @@ Skills are installed globally using `npx skills add` and are available across al
 | Aspect | Global |
 |--------|--------|
 | **Command** | `npx skills add -y atlasfoo/jaiba-framework#v3.6.0 --skill <skill-name>` |
-| **Location** | `~/.agents/skills/` (user home directory) |
+| **Location** | `~/.jaiba/` (machine SSOT) and `~/.agents/skills/` (user home directory) |
 | **Availability** | All projects automatically have access |
 | **Setup per project** | Only instrument the repo with `/jaiba-init` |
 | **Disk footprint** | Minimal — skills are stored once |
 | **Updates** | `npx skills update` applies to all projects |
-| **Recommended for** | Teams, multi-project workflows, clean repositories |
+| **Recommended for** | Teams, multi-project workflows, multi-agent setups, clean repositories |
 
 **How it works:**
-1. Run `/jaiba-configure` once — contract, skillset and subagents land in your agent's global config
+1. Run `/jaiba-configure` once — the `~/.jaiba/` SSOT (`config.yaml`, `mappings.yaml`, `contract/jaiba-contract.md`, `skills/`, `agents/base/`) is configured and projected to every `enabled: true` host (`N >= 1`)
 2. In each project, run `/jaiba-init` to instrument the repo (`AGENTS.md` marker + `.ai/` brain + `.atl/`)
 3. All skills automatically activate in every project you work on
 
@@ -187,7 +187,7 @@ Add `-g` for a global install, or choose *project-local* for one repository. Dec
 
 ### Selection, instrumentation and migration guarantees
 
-- **Step 0 Binding-First discovery and portable binding `v2`:** JAIBA checks `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` before testing for `.ai/` or assuming filesystem. A valid binding `v2` record governs unless `AGENTS.md` carries an explicit `jaiba-memory-surface:` override. When external, identity is $O(1)$ from `project.project-id` and `executive.context-id` without touching `.ai/`.
+- **Step 0 Binding-First discovery and portable binding `v2`:** JAIBA checks `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml` before testing for `.ai/` or assuming filesystem. Every Step 0 `v2` binding write or auto-generation uses an atomic `temp + rename` in the same directory (`<sha256(R)>.yaml.tmp.<pid>` → `<sha256(R)>.yaml`, followed by exact readback verification) so concurrent multi-agent sessions never observe partial files. A valid binding `v2` record governs unless `AGENTS.md` carries an explicit `jaiba-memory-surface:` override. When external, identity is $O(1)$ from `project.project-id` and `executive.context-id` without touching `.ai/`.
 - **Selection precedence:** explicit project `AGENTS.md` data field (`jaiba-memory-surface: filesystem`, or an exact adapter ID) → host-visible installed project-local adapter → host-visible installed global adapter → built-in filesystem. Multiple different candidates at the winning level require an explicit human choice; there is no silent fallback to a lower level, to another project, or to a new empty brain.
 - **The filesystem default is unchanged:** it preserves both supported `.ai/memory/` layouts — concept bundle and legacy flat — exactly as described in [Memory structure](#-memory-structure-the-agents-brain).
 - **Traceless mode (zero files in repo):** On an external memory surface, a valid binding plus a real, complete, readable constitutive catalogue *is* the instrumentation. `AGENTS.md` and `.ai/` are completely omitted — zero files are written to or tracked in the repository. Local toolchain metadata (`.atl/`) is kept out of `git status` by registering `.atl/` in `.git/info/exclude` (via `git rev-parse --git-path info/exclude`), leaving the worktree pristine. JAIBA creates no hidden `.ai/` mirror or cache for external surfaces.
@@ -215,12 +215,13 @@ To remove JAIBA from your machine, undo what `jaiba-configure` installed. Per-re
 
 ### 1. Remove the global behavioral contract
 
-Delete `jaiba-contract.md` from your agent's global config folder:
+Delete the machine SSOT contract and any projected links/copies from enabled hosts' config folders:
 
-- `~/.claude/jaiba-contract.md` (Claude Code)
-- `~/.agents/jaiba-contract.md` (neutral default)
-- `~/.cursor/jaiba-contract.md` (Cursor)
-- Or equivalent for your agent vendor
+- `~/.jaiba/contract/jaiba-contract.md` (machine SSOT — or remove `~/.jaiba/` completely to clear SSOT config, mappings, base agents, and bindings)
+- `~/.claude/jaiba-contract.md` (Claude Code projection)
+- `~/.agents/jaiba-contract.md` (neutral projection)
+- `~/.cursor/jaiba-contract.md` (Cursor projection)
+- Or equivalent for your enabled host vendor(s)
 
 ### 2. Uninstall the workflow/meta skillset
 
@@ -246,7 +247,7 @@ Or delete the skill folders directly from your agent's global config (e.g. `~/.c
 
 ### 3. Remove the subagent battery
 
-Delete the following files from your agent's global `agents/` folder:
+Delete the canonical templates under `~/.jaiba/agents/base/` and the following projected files from each enabled host's global `agents/` folder (leaving third-party agent files untouched):
 
 - `executor-high.md`
 - `executor-medium.md`
@@ -254,6 +255,7 @@ Delete the following files from your agent's global `agents/` folder:
 - `code-analyst.md`
 - `business-analyst.md`
 - `verify.md`
+- `researcher.md`
 
 For example, if using Claude Code, delete these files from `~/.claude/agents/`.
 
@@ -301,11 +303,20 @@ JAIBA starts from a simple premise: **the code is the context**, and the agent m
 JAIBA organizes its operation in three layers: the **memory structure** (the agent's brain), the **skills library** (the executable workflows), and the **subagent battery** (delegated execution).
 
 ```
-~/.claude/  (or your agent's global config)
-├── jaiba-contract.md                   ← Global behavioral contract (one per machine)
-├── skills/                             ← JAIBA skills, installed globally
-└── agents/                             ← Subagent battery: executor-high/-medium/-low,
-                                          code-analyst, business-analyst, verify
+~/.jaiba/                               ← Machine SSOT (sole global installation root)
+├── config.yaml                         ← Host registry (enabled: true/false) & SSOT paths
+├── mappings.yaml                       ← Per-host/tier model & effort mappings
+├── contract/
+│   └── jaiba-contract.md               ← Canonical behavioral contract (one per machine)
+├── skills/                             ← Canonical JAIBA skillset
+├── agents/base/                        ← 7 base subagent templates
+└── memory/bindings/                    ← Atomic Step 0 v2 routing bindings (<sha256(R)>.yaml)
+
+<host-config-root>/  (e.g. ~/.claude/, ~/.cursor/, ~/.config/opencode/ — enabled: true hosts)
+├── jaiba-contract.md                   ← Projected symlink (or copy fallback) to SSOT contract
+├── skills/                             ← Host-visible JAIBA skills (or ~/.agents/skills/)
+└── agents/                             ← Projected host-native wrappers: executor-high/-medium/-low,
+                                          code-analyst, business-analyst, verify, researcher
 
 project/
 ├── AGENTS.md                           ← Minimal marker: points at the global contract
@@ -357,7 +368,7 @@ The `.ai/` folder is the core of JAIBA. Memory collapses into **two categories**
 
 ### The behavioral contract: global + repo marker
 
-Behavior does not live per-repo anymore. `jaiba-configure` installs the **JAIBA Behavioral Contract** (`jaiba-contract.md`) once per machine into the agent's global config: the brain map, the numbered behavioral rules, the routing rule, security and toolchain discipline. Each repo keeps only a **minimal `AGENTS.md` marker** — dropped by `jaiba-init` — that confirms instrumentation and defers to the global contract for behavior and to the constitution for project facts. The split is the same one that separates the two setup skills: `jaiba-configure` owns the machine half, `jaiba-init` the repo half.
+Behavior does not live per-repo anymore. `jaiba-configure` installs the **JAIBA Behavioral Contract** once per machine into the `~/.jaiba/` SSOT (`~/.jaiba/contract/jaiba-contract.md`) and projects it (symlink or copy fallback) to each `enabled: true` host's global config (`N >= 1`): the brain map, multi-host projection rules, atomic Step 0 `v2` binding rules, the numbered behavioral rules, the routing rule, security and toolchain discipline. Each repo keeps only a **minimal `AGENTS.md` marker** — dropped by `jaiba-init` — that confirms instrumentation and defers to the global contract for behavior and to the constitution for project facts. The split is the same one that separates the two setup skills: `jaiba-configure` owns the machine half, `jaiba-init` the repo half.
 
 `jaiba-doctor` checks the contract's presence and drift against the packaged version on every health check.
 
@@ -382,8 +393,9 @@ instrumented project into **3 memory levels** (`jaiba-contract.md` §1):
 - **Level 3 (v3 — Bound surface or `filesystem` with pin + `v2` binding):**
   `index.md` + `jaiba-memory-surface: filesystem` in `AGENTS.md` + `v2`
   binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` (auto-generated
-  silently on Step 0 if `AGENTS.md` already has the `filesystem` pin over
-  OKF), or a valid external surface `v2` binding.
+  silently via atomic `temp + rename` `<sha256(R)>.yaml.tmp.<pid>` →
+  `<sha256(R)>.yaml` + exact readback on Step 0 if `AGENTS.md` already has
+  the `filesystem` pin over OKF), or a valid external surface `v2` binding.
 
 > **Unorchestrated projects:** On the **first message of a session** in an
 > authoritatively unorchestrated repository (no `.ai/memory/`, no
@@ -497,7 +509,7 @@ Pure query mode, triggered by interrogative messages (including a side question 
 
 ### 🧰 `jaiba-configure` — machine setup
 
-The **machine** half of setup, and nothing else: the global behavioral contract, the workflow/meta skillset, the subagent battery. It never touches a repository — no `.ai/`, no `.atl/`, no `AGENTS.md` — and carries no brain templates at all. Run from anywhere, once per machine, and **safe to re-run** as the upgrade path: every divergence from the packaged version is a question, never a silent overwrite. It names `jaiba-init` as the next step for a specific project, but never invokes it.
+The **machine** half of setup, and nothing else: manages the unified `~/.jaiba/` SSOT (`config.yaml`, `mappings.yaml`, `contract/jaiba-contract.md`, `skills/`, `agents/base/*.md`) and projects the contract and host-native subagent wrappers (via `scripts/jaiba_ssot.py`) exclusively to `enabled: true` hosts (`N >= 1`, leaving `enabled: false` hosts and third-party agent files untouched). It never touches a repository — no `.ai/`, no `.atl/`, no `AGENTS.md` — and carries no brain templates at all. Run from anywhere, once per machine (including `harvest-legacy` consolidation from pre-SSOT per-agent setups), and **safe to re-run** as the upgrade path: every divergence from the packaged version is a question, never a silent overwrite. It names `jaiba-init` as the next step for a specific project, but never invokes it.
 
 ### 🏗️ `jaiba-init` — repo bootstrap and brain maintenance
 
@@ -530,7 +542,7 @@ The first-party memory-surface adapter for the Engram MCP — developed in the s
 
 ## 🤖 The subagent battery
 
-`jaiba-configure` installs seven native subagent definitions into the agent's global `agents/` folder. Conduct, `ask`, and `fast` **must dispatch applicable roles** when the host permits it, the roles are runtime-callable, and prerequisites are verified. The invocation contract (`conduct/references/subagents.md`) governs runtime and toolchain checks, concurrency, and fallback accounting. An exposed role is runtime evidence; doctor's detected files alone do not prove invocation support. Authorized first-party role calls need no separate approval.
+`jaiba-configure` stores seven canonical base subagent templates in `~/.jaiba/agents/base/` and projects host-native wrappers into each `enabled: true` host's `agents/` folder using `~/.jaiba/mappings.yaml` and `scripts/jaiba_ssot.py`. Conduct, `ask`, and `fast` **must dispatch applicable roles** when the host permits it, the roles are runtime-callable, and prerequisites are verified. The invocation contract (`conduct/references/subagents.md`) governs runtime and toolchain checks, concurrency, and fallback accounting. An exposed role is runtime evidence; doctor's detected files alone do not prove invocation support. Authorized first-party role calls need no separate approval.
 
 | Subagent | Role | Used in phase / lane |
 |---|---|---|
@@ -698,7 +710,7 @@ Projects instrumented before the conduct unification use `planning`/`specificati
 | **Concept bundle** | The current-default `.ai/memory/` layout: one file per constitutive concept, closed `type:` vocabulary, all reachable from `index.md` |
 | **Legacy flat layout** | The pre-bundle `.ai/memory/` layout — three files (`constitution.md`, `adr-log.md`, `reference-index.md`) plus `log/` (Level 1). Readable losslessly; emits Notice 1 routing to `jaiba-init:update-brain:migrate` → Level v3 |
 | **Executive memory** | `.ai/work/`: PRD (if any), plan, tasks, walkthrough — what is being done right now (gitignored) |
-| **Behavioral contract** | `jaiba-contract.md`, installed once per machine in the agent's global config; each repo keeps a minimal `AGENTS.md` marker pointing at it |
+| **Behavioral contract** | `~/.jaiba/contract/jaiba-contract.md`, installed once per machine in the `~/.jaiba/` SSOT and projected to `enabled: true` hosts' global config; each repo keeps a minimal `AGENTS.md` marker pointing at it |
 | **Triage** | The shared blast-radius → depth mapping (`inline → design → spec`) that decides how deep a change enters the chain |
 | **Chain** | Conduct's SDD phases: `propose → spec → tasks → execute → validate → summarize` |
 | **Lane** | An implicit, routing-triggered skill: `ask` (read-only) or `fast` (inline execution) |

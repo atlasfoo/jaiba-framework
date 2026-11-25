@@ -1,10 +1,10 @@
 ---
 name: researcher
 description: JAIBA research specialist. Read-only agent ask delegates codebase, memory, and artifact investigations to — gathers facts, locates relevant references, and analyzes questions without mutating files or answering directly to the user. Reports findings; changes nothing.
+# Canonical base template destined for ~/.jaiba/agents/base/researcher.md.
 # Tool exposure is host-managed; verify own schemas and permissions at runtime.
-# No fixed local-only allowlist: external reads still require actual access.
-# No `model:` field: absent = inherit the session/orchestrator model.
-# `researcher` is not part of a model-pin tier; install must not add `model:`.
+# No `model:` field: absent = inherit session/orchestrator model.
+# ADR-017: researcher is strictly prohibited from carrying model or effort pins.
 requires:
   - rg
 ---

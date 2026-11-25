@@ -5,10 +5,21 @@ gate does not move (`references/spec-mode.md` § The approval gate).
 
 ## Setting
 
-`native-plan-client` is `auto` (default), `on`, or `off`.
-`jaiba-configure` owns where the machine setting is stored. Do not
-invent a path, filename, or schema. Do not store it in `.ai/memory/`.
-If the setting is absent or unreadable, treat it as `auto`.
+`native-plan-client` is `"auto"` (default), `"on"`, or `"off"` (stored
+as quoted YAML strings so YAML 1.1 parsers do not coerce `on`/`off` to
+booleans). `jaiba-configure` owns the machine SSOT setting in
+`~/.jaiba/config.yaml`:
+
+1. Check the optional per-host override `hosts.<id>.native-plan-client`
+   for the active host in `~/.jaiba/config.yaml`.
+2. If unset, read the global top-level `native-plan-client` key in
+   `~/.jaiba/config.yaml`.
+3. If `~/.jaiba/config.yaml` is absent, fall back to legacy
+   `<host>/jaiba-configure.yaml` if present; if neither exists or the
+   setting is absent or unreadable, treat it as `"auto"`.
+
+Do not invent another path, filename, or schema. Do not store this
+setting in `.ai/memory/` or in `~/.jaiba/memory/bindings/`.
 
 `auto` and `on` run this client only when the host exposes plan mode
 or a plan subagent. If the host exposes neither, or the setting is
