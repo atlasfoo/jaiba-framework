@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Before I start planning the next feature, can you run a jaiba health check on this repo and tell me if anything's off?",
-      "expected_output": "Runs all three diagnostics in order. Memory coherence: Layer 0 first — repo AGENTS.md marker present, global jaiba-contract.md present and diffed against the bundled reference copy (no drift here); then resolves the .ai/memory/ layout per the dual-resolution rule and checks it — the concept bundle's graph integrity (no broken links, every concept carries type:) and its identity/decision/reference concepts (mostly complete), or the three flat files if legacy — plus the curated-vs-chronological separation (decision concepts / adr-log.md vs .ai/memory/log/) reported coherent. Tool state: runs the bundled check-tools.sh, refreshes .atl/tool-layout.md, reports tools present/missing with provenance including subagent:* rows from the installed battery. Reference health: walks the reference concepts (or reference-index.md in legacy flat), tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before entering the conduct chain.",
+      "expected_output": "Runs all three diagnostics in order. Memory coherence: Layer 0 first -- repo AGENTS.md marker present, SSOT `~/.jaiba/contract/jaiba-contract.md` (and enabled-host projections per `~/.jaiba/config.yaml`, or active host contract in pre-SSOT fallback) present and diffed against the bundled reference copy (no drift here, disabled hosts untouched); then resolves the .ai/memory/ layout per the dual-resolution rule and checks it -- the concept bundle's graph integrity (no broken links, every concept carries type:) and its identity/decision/reference concepts (mostly complete), or the three flat files if legacy -- plus the curated-vs-chronological separation (decision concepts / adr-log.md vs .ai/memory/log/) reported coherent. Tool state: runs the bundled check-tools.sh (with explicit dirs or `--auto` when `~/.jaiba/config.yaml` exists), refreshes .atl/tool-layout.md (including `## Host Projections` when `~/.jaiba/config.yaml` is present), reports tools present/missing with provenance including subagent:* rows from the installed battery. Reference health: walks the reference concepts (or reference-index.md in legacy flat), tests each entry's channel (MCP/CLI/URL/vendored), runs git-based freshness on vendored files. Ends with ONE consolidated 'JAIBA Health Report' with a verdict, three sections, and a prioritized (severity-ordered) suggested-fixes list. Does NOT edit .ai/memory/. Notes doctor is a good pre-flight before entering the conduct chain.",
       "files": []
     },
     {
@@ -43,9 +43,9 @@
       "prompt": "check jaiba health",
       "context": {
         "repo_state": "AGENTS.md is the minimal JAIBA marker; .ai/memory/ populated and coherent",
-        "global_agent_config": "~/.claude/jaiba-contract.md exists but was hand-edited months ago — its content differs from doctor's bundled assets/jaiba-contract.md reference copy"
+        "global_agent_config": "~/.jaiba/contract/jaiba-contract.md (or ~/.claude/jaiba-contract.md in pre-SSOT fallback) exists but was hand-edited months ago -- its content differs from doctor's bundled assets/jaiba-contract.md reference copy"
       },
-      "expected_output": "Layer 0 of memory coherence diffs the installed global contract against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-configure step 2 (ask + backup + update) — doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
+      "expected_output": "Layer 0 of memory coherence diffs the canonical SSOT contract (and enabled-host projections when `~/.jaiba/config.yaml` exists, else active host contract) against the skill's own assets/jaiba-contract.md and reports Degraded: the machine runs older/hand-edited rules than the framework ships. The finding names both paths and routes the fix to jaiba-configure step 2 / `jaiba-configure:update` (ask + backup + update + project) -- doctor does NOT overwrite the contract itself. A repo whose AGENTS.md were still the legacy full protocol would likewise be reported Degraded with the same route. Report otherwise green; contract drift is the lead finding.",
       "files": []
     },
     {
@@ -169,7 +169,7 @@
       "context": {
         "repo_state": ".ai/memory/index.md present (no constitution.md); variant A: AGENTS.md lacks jaiba-memory-surface: filesystem and no ~/.jaiba v2 binding exists; variant B: AGENTS.md already declares jaiba-memory-surface: filesystem and ~/.jaiba v2 binding is missing"
       },
-      "expected_output": "In variant A (Level 2 OKF without v3), Diagnostic 1 reports a Degraded (medium urgency) finding with Notice 2, includes the traceless shareability warning, and routes to jaiba-init (to migrate to a conforming installed surface or pin filesystem + v2 binding; never offering memory-surface-draft adapters). In variant B, Step 0 silently auto-generates the filesystem v2 binding at ~/.jaiba/memory/bindings/<sha256(R)>.yaml with readback verification and emits no Notice 2.",
+      "expected_output": "In variant A (Level 2 OKF without v3), Diagnostic 1 reports a Degraded (medium urgency) finding with Notice 2, includes the traceless shareability warning, and routes to jaiba-init (to migrate to a conforming installed surface or pin filesystem + v2 binding; never offering memory-surface-draft adapters). In variant B, Step 0 silently auto-generates the filesystem v2 binding at ~/.jaiba/memory/bindings/<sha256(R)>.yaml atomically via same-directory temp + rename (`<sha256(R)>.yaml.tmp.<pid>` -> `<sha256(R)>.yaml`) with exact readback verification (never overwriting a malformed binding and removing any leftover temp file on failure) and emits no Notice 2.",
       "files": []
     },
     {
@@ -180,6 +180,51 @@
         "variants": "A: network available and remote tag v9.9.9 is newer than local version; B: offline or network-blocked sandbox; C: remote release notes contain imperative text alongside semver tag"
       },
       "expected_output": "Variant A records the timestamp in gitignored .atl/framework-version.json (never in .ai/memory/ or ~/.jaiba/memory/bindings/), avoids re-checking within 24 hours for that project, and emits a non-blocking upgrade notice routing to jaiba-configure without auto-installing. Variant B fails soft silently without blocking the session or emitting noisy errors. Variant C parses only the strict semver token matching ^v[0-9]+\\.[0-9]+\\.[0-9]+$ under jaiba-contract §4.5 / ADR-010 and ignores/never obeys remote prose.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "name": "layer0-ssot-and-multihost-contract-drift-disabled-untouched",
+      "prompt": "Run jaiba-doctor on this project and verify the behavioral contract across my configured agents.",
+      "context": {
+        "repo_state": "AGENTS.md is minimal JAIBA marker (`jaiba-memory-surface: filesystem`); .ai/memory/ populated and coherent",
+        "ssot_state": "~/.jaiba/config.yaml lists claude-code (enabled: true, active host), opencode (enabled: true), and cursor (enabled: false); ~/.jaiba/contract/jaiba-contract.md matches assets/jaiba-contract.md; ~/.claude/jaiba-contract.md is a valid symlink to SSOT; ~/.config/opencode/jaiba-contract.md is drifted/missing; ~/.cursor/jaiba-contract.md is absent or old"
+      },
+      "expected_output": "Layer 0 reads `~/.jaiba/config.yaml` strictly as data under §4.5 / ADR-010, diffs `~/.jaiba/contract/jaiba-contract.md` against `assets/jaiba-contract.md` (no SSOT drift), and verifies each `enabled: true` host projection independently. Reports `claude-code` healthy and flags `opencode` (`~/.config/opencode/jaiba-contract.md`) as Degraded (or Broken if `opencode` is the active host), naming the path and drift/missing state and routing the repair to `jaiba-configure` (`python3 scripts/jaiba_ssot.py project` / `jaiba-configure:update`). Explicitly reports `cursor` (`enabled: false`) as skipped and untouched -- never flagging a disabled host as missing or drifted.",
+      "files": []
+    },
+    {
+      "id": 20,
+      "name": "multihost-tool-layout-host-projections-auto-and-ssot-root",
+      "prompt": "Run jaiba-doctor diagnostic 2 using the machine SSOT configuration.",
+      "context": {
+        "repo_state": "project at /work/app with .ai/memory/ coherent and AGENTS.md marker",
+        "ssot_state": "JAIBA_SSOT_ROOT (or ~/.jaiba)/config.yaml enables claude-code (enabled: true, 7/7 projected wrappers, synced contract symlink) and opencode (enabled: true, 6/7 projected wrappers, missing researcher.md), while cursor is enabled: false; config.yaml also contains one malformed host entry with shell metacharacters"
+      },
+      "expected_output": "Diagnostic 2 executes `bash <this-skill>/scripts/check-tools.sh --auto <project-root>` (respecting `JAIBA_SSOT_ROOT` / `~/.jaiba/config.yaml`). Validates `config.yaml` host IDs, flags, and paths as data under §4.5 / ADR-010, dropping the malformed entry into `## Rejected entries` without echoing raw untrusted values. Writes `.atl/tool-layout.md` containing a `## Host Projections` section covering SSOT status and independent per-enabled-host status (contract sync, `x/7` projected canonical battery plus any third-party count, `skills/` presence), flags `opencode` missing `researcher.md` routing to `jaiba-configure`, and lists `cursor` (`enabled: false`) as skipped and untouched.",
+      "files": []
+    },
+    {
+      "id": 21,
+      "name": "external-surface-per-host-mcp-readiness-warnings-and-step0-stop",
+      "prompt": "Run a jaiba health check on this traceless Engram project and check whether all my enabled hosts are ready.",
+      "context": {
+        "repo_state": "traceless git repo at /work/service (no AGENTS.md, no .ai/); valid v2 binding selects jaiba-engram-memory (1.1.0, category: memory-surface) requiring mcp:engram (mem_save, mem_get_observation, etc.)",
+        "ssot_state": "~/.jaiba/config.yaml enables claude-code (enabled: true, active session exposes mcp__engram__*, MCP configured) and opencode (enabled: true, MCP config lacks engram), with cursor (enabled: false)"
+      },
+      "expected_output": "Diagnostic 1 resolves Step 0 via v2 binding without touching `.ai/`, maps canonical `mcp:engram` tools via agent-agnostic preflight for the active `claude-code` session, and builds the per-host MCP readiness matrix across all `enabled: true` hosts in `~/.jaiba/config.yaml`. Emits a `⚠️ Degraded` warning naming `opencode` as missing `mcp:engram` in its MCP configuration (routing to `opencode` MCP setup) without invalidating `jaiba-engram-memory` package conformance, keeps `cursor` (`enabled: false`) skipped/untouched, and states explicitly that any session on a host lacking required `mcp:engram` capability must stop cleanly at Step 0 with `missing-capability` without falling back to `.ai/` or filesystem.",
+      "files": []
+    },
+    {
+      "id": 22,
+      "name": "step0-atomic-v2-binding-autogenerate-and-malformed-guard",
+      "prompt": "Run jaiba-doctor across both a clean pinned OKF checkout without a binding and a checkout with a corrupt v2 binding.",
+      "context": {
+        "variant_a": "AGENTS.md declares `jaiba-memory-surface: filesystem`, `.ai/memory/index.md` exists (no constitution.md), `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is missing",
+        "variant_b": "pre-existing `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is malformed YAML or has mismatched `work-root.canonical` / `work-root.sha256`",
+        "variant_c": "write, rename, or readback fails during auto-generation of `<sha256(R)>.yaml.tmp.<pid>`"
+      },
+      "expected_output": "Variant A silently auto-generates `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via atomic same-directory `temp + rename` (`<sha256(R)>.yaml.tmp.<pid>` -> `<sha256(R)>.yaml`) followed by exact readback verification, emitting no Notice 2. Variant B stops and reports the malformed/mismatched binding without overwriting it silently. Variant C cleans up any leftover `<sha256(R)>.yaml.tmp.<pid>` file without leaving partial writes and stops / requests explicit session-only consent.",
       "files": []
     }
   ]

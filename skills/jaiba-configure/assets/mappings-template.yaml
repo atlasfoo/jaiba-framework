@@ -1,0 +1,80 @@
+# JAIBA Global SSOT Model & Effort Mappings Template (~/.jaiba/mappings.yaml)
+# Defines model tiers, role overrides, tier affinity, and cross-agent bridges.
+# Managed and validated by jaiba_ssot.py.
+
+schema_version: 1
+
+# Host model & effort configuration
+# Each enabled host in config.yaml can configure models and effort controls via tiers or roles.
+#
+# Constraints & Invariants:
+# - ADR-017: 'researcher' MUST NEVER carry a 'model:' or 'effort:' pin on any host.
+# - Effort controls are only supported where explicitly documented by host caveats
+#   (e.g. claude-code: low|medium|high|max; cursor: inline effort).
+# - Tiers define defaults: 'high' (executor-high), 'medium' (executor-medium,
+#   code-analyst, business-analyst, verify), 'low' (executor-low).
+#
+# Example host mapping structure:
+# hosts:
+#   claude-code:
+#     tiers:
+#       high:
+#         model: "claude-3-7-sonnet-20250219"
+#         effort: "high"
+#         provenance: "user"
+#       medium:
+#         model: "claude-3-7-sonnet-20250219"
+#         effort: "medium"
+#         provenance: "user"
+#       low:
+#         model: "claude-3-5-haiku-20241022"
+#         effort: "low"
+#         provenance: "user"
+#     roles:
+#       executor-high:
+#         model: "claude-3-7-sonnet-20250219"
+#         effort: "high"
+#         provenance: "user"
+#       # ADR-017: researcher is omitted to inherit orchestrator model without pins
+#   opencode:
+#     tiers:
+#       high:
+#         model: "anthropic/claude-3-7-sonnet"
+#         provenance: "user"
+#       medium:
+#         model: "anthropic/claude-3-7-sonnet"
+#         provenance: "user"
+#       low:
+#         model: "anthropic/claude-3-5-haiku"
+#         provenance: "user"
+#   antigravity:
+#     tiers:
+#       high:
+#         model: "inherit"
+#         provenance: "default"
+#       medium:
+#         model: "inherit"
+#         provenance: "default"
+#       low:
+#         model: "flash"
+#         provenance: "user"
+hosts: {}
+
+# Pattern 1: Tier affinity for multi-agent environments (N > 1)
+# Directs task execution to preferred hosts per tier in tasks.md when multiple agents are active.
+# Example:
+# tier-affinity:
+#   high: claude-code
+#   medium: opencode
+#   low: antigravity
+tier-affinity: {}
+
+# Pattern 3: Cross-agent dispatch bridge via CLI or ACP
+# Enables orchestrator to dispatch executor subagents to secondary host agents.
+# Example:
+# cross-agent-bridge:
+#   bridge: cli
+#   host: claude-code
+#   command: "claude"
+#   timeout: 300
+cross-agent-bridge: {}

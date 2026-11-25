@@ -210,26 +210,33 @@ developer means rather than guessing.
    contexts. Creating an empty context registry identity is allowed when
    authorized; writing PRD, plan, tasks or walkthrough is not. Switching
    retains old work. Filesystem keeps `.ai/work/` per checkout unchanged.
-6. Persist the routing-only binding `v2` at
-   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
-   (`binding-format-version: "2"`). The only key is that canonical-work-root
-   digest from `resolution.md` §2 and §4. `host-agent-id` is not a directory,
-   a file name, or a lookup key. Do not write a new record under
-   `~/.jaiba/memory/<host-agent-id>/`. Store sanitized IDs, versions, and
-   locators only — no payloads, credentials, summaries, journal bodies, or
-   receipts that contain payloads, and no `.ai/` cache. Do not create the
-   file merely to test the path, and do not hash a URI, a trailing slash,
-   or a relative path. Reuse a valid v2 record for this canonical root
-   without asking, including when `last-verified-by` names another agent.
-   A malformed v2 record stops; do not repair it from legacy or from memory.
-   If v2 is absent, consolidate agreeing legacy records into v2 per
+6. Persist the routing-only binding `v2` (and any Step 0 silent
+   `filesystem` auto-generation or legacy consolidation into `v2`)
+   atomically via same-directory temp-file write + rename: write the
+   YAML payload to `~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>`,
+   atomically replace `~/.jaiba/memory/bindings/<sha256(R)>.yaml`
+   (`mv -f` / `os.replace`), and perform exact readback verification
+   (`binding-format-version: "2"`) so concurrent multi-agent sessions
+   never observe partial or truncated files. The only key is that
+   canonical-work-root digest from `resolution.md` §2 and §4. `host-agent-id`
+   is not a directory, a file name, or a lookup key. Do not write a new
+   record under `~/.jaiba/memory/<host-agent-id>/`. Store sanitized IDs,
+   versions, and locators only — no payloads, credentials, summaries,
+   journal bodies, or receipts that contain payloads, and no `.ai/` cache.
+   Do not create the file merely to test the path, and do not hash a URI,
+   a trailing slash, or a relative path. Reuse a valid v2 record for this
+   canonical root without asking, including when `last-verified-by` names
+   another agent. A malformed or mismatched v2 record stops; do not
+   repair or overwrite it silently from legacy or from memory. If v2 is
+   absent, consolidate agreeing legacy records atomically into v2 per
    `resolution.md` §4 and leave the originals byte for byte. Validate
    existing root/origin, precedence, and registry ownership before reuse.
-   Read back saved routing fields before claiming persistence; preserve
-   conflicts for reconciliation. If persistence is unavailable, report it
-   and obtain explicit **session-only** consent (same identity checks, no
-   durable claim), or stop. A session-only selection is not the v2 file.
-   Never mint a new context silently on every session.
+   Exact readback of saved routing fields must succeed before claiming
+   persistence; preserve conflicts for reconciliation. If write, rename,
+   or readback fails, remove any leftover temporary file, report the
+   failure, and obtain explicit **session-only** consent (same identity
+   checks, no durable claim), or stop. A session-only selection is not the
+   v2 file. Never mint a new context silently on every session.
    During migration these are proposed target fields only: do not persist
    them as effective authority before verified, human-approved activation.
    In traceless mode this binding is the only JAIBA record saved. When Git

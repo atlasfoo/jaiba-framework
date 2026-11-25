@@ -1,7 +1,7 @@
 ---
 name: conduct
 description: >-
-  Unified Spec-Driven-Development chain of JAIBA: propose → spec (PRD when depth demands it + design, human approval) → tasks → execute (phase by phase) → validate → summarize. Trigger when the developer describes work to shape or build, requests a PRD/design, or sends a continuation cue ("continue", "next", "go") with an active plan in the resolved executive context. Resolve logical constitutive/executive memory through the selected memory surface; filesystem retains .ai/memory/ and .ai/work/. Explicit override: /conduct [phase]. Not the host agent's native read-only plan mode: this workflow must persist full executive artifacts and approval before execution.
+  Unified Spec-Driven-Development chain of JAIBA: propose → spec (PRD when depth demands it + design, human approval) → tasks → execute (phase by phase) → validate → summarize. Trigger when the developer describes work to shape or build, requests a PRD/design, or sends a continuation cue ("continue", "next", "go") with an active plan in the resolved executive context. Resolve logical constitutive/executive memory through the selected memory surface; filesystem retains .ai/memory/ and .ai/work/. Explicit override: /conduct [phase] or /conduct execute T-NNN (bounded worker). Not the host agent's native read-only plan mode: this workflow must persist full executive artifacts and approval before execution.
 version: 3.6.0
 author: atlasfoo<iscomejia15@outlook.com>
 requires:
@@ -70,6 +70,14 @@ The full procedure is `references/native-plan-client.md`.
   phase out of turn (`/conduct summarize`, `/conduct
   propose`). With no phase argument, run phase selection as if the
   message were implicit.
+- **Explicit bounded worker — `/conduct execute T-NNN` (or
+  `executive.role: worker`).** Pattern 2 worktree worker invocation
+  (`references/execute-mode.md § Bounded Worker Flow`): resolves the
+  Coordinator's executive context strictly read-only, executes `T-NNN`
+  within its declared file footprint, runs the Phase gate in the worker
+  worktree, checks `git status` / `git diff` for scope violations, and
+  returns the 4-part Executor Report without writing any executive or
+  constitutive artifact.
 
 ## Routing rule (when work is active)
 
@@ -127,7 +135,10 @@ Resolve the selected adapter, namespace, stable project ID and executive
 context ID before phase selection. Follow Step 0, then installed-skill
 precedence only on the no-binding miss path, plus callable-tool probes
 and authority checks. Never pick a latest plan, branch-named context or
-another checkout's work. A changed binding is not migration permission.
+another checkout's work — except an explicit Worktree Worker Link
+(`executive.role: worker` per `resolution.md §3`) or `/conduct execute
+T-NNN`, which binds the Coordinator's context strictly **read-only** for
+executive artifacts. A changed binding is not migration permission.
 No silent fallback, dual-write or local memory cache.
 
 **Portable binding v2.** The machine routing record is
@@ -283,9 +294,14 @@ Only in the filesystem branch do `PRD.md`, `plan.md`, `tasks.md` and
 through the selected catalogue (through the index/legacy mapping on
 filesystem). No backend record ID or guessed URI substitutes for an address.
 
-Conduct is the single executive writer per context. Analysts/executors
-receive exact scope, addresses, full necessary content and revision
-provenance, and return reports; they do not write executive memory.
+Conduct's Coordinator session is the single executive writer per context
+(ADR-005, ADR-014). Analysts, subagent executors, and bounded worktree
+workers (`executive.role: worker` or `/conduct execute T-NNN`) receive
+exact scope, addresses, full necessary content and revision provenance,
+and return reports; they must NEVER write constitutive memory or write
+or emit `patch`, `check`, `uncheck`, `append-entry`, `create`, `update`,
+or `compact` against `tasks.md`, `walkthrough.md`, `plan.md`, `PRD.md`,
+or an external executive journal.
 Establish serialized access before writes. For every `create`, `update`,
 and `patch`, check authoritative absence or the current full revision and
 `expected-head`, preserve unknown metadata and relations, retain the
@@ -329,6 +345,7 @@ ambiguous, ask the developer instead of guessing.
 | The context's plan is still draft, or approval was not persisted/verified | `spec` (approval/reconciliation) | `references/spec-mode.md` |
 | `plan.md` exists and is approved, but `tasks.md` doesn't exist yet | `tasks` | `references/tasks-mode.md` |
 | `plan.md` + `tasks.md` exist with unchecked tasks; message is a continuation cue | `execute` *(implicit)* | `references/execute-mode.md` |
+| `/conduct execute T-NNN` or resolved `executive.role: worker` | `execute` *(Bounded Worker Flow)* | `references/execute-mode.md` |
 | All tasks checked; acceptance criteria not yet verified (or developer asks to validate) | `validate` | `references/validate-mode.md` |
 | `validate` passed; developer asks to close/wrap up — or validate just passed and they confirm closing | `summarize` | `references/summarize-mode.md` |
 | Anything else — including a message unrelated to the active work | **Route or ask.** See the routing rule. | — |
@@ -502,3 +519,10 @@ JAIBA does not prescribe a versioning strategy. Within this skill:
 - **Removing or rewriting a criterion after `status` leaves `draft`.**
   That patch fails `conflict`. Do not set `status` back to `draft` to
   force it through.
+- **Letting a bounded worktree worker (`executive.role: worker` or
+  `/conduct execute T-NNN`) write executive artifacts or exceed `T-NNN`'s
+  footprint.** Workers resolve the Coordinator's context read-only,
+  validate `git status` / `git diff` against `T-NNN`'s declared footprint,
+  and return the 4-part Executor Report; only the Coordinator integrates,
+  re-verifies the gate, and `patch`es (`append-entry` + `check`) with
+  `expected-head`.

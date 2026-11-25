@@ -127,11 +127,18 @@ unbound).
      already declares `jaiba-memory-surface: filesystem`, and
      `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent (with no
      malformed v2 file or disagreeing legacy record), silently
-     auto-generate that `filesystem` `v2` binding (verified by readback)
-     and do **not** emit Notice 2. This is an explicit **local
-     routing-sync exception** permitted for **all lanes**, including
-     read-only consumers (`ask`, `jaiba-doctor`): it writes only the
-     machine-local `filesystem` routing record (unlike external registry
+     auto-generate that `filesystem` `v2` binding atomically via
+     same-directory temp-file write + rename
+     (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+     `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`,
+     followed by exact readback verification) and do **not** emit Notice 2.
+     If persistence or readback fails, remove any leftover temporary file
+     and stop / request explicit session-only consent; if a pre-existing
+     binding is malformed or has a mismatched canonical root / sha256,
+     stop and report it without overwriting it silently. This is an
+     explicit **local routing-sync exception** permitted for **all lanes**,
+     including read-only consumers (`ask`, `jaiba-doctor`): it writes only
+     the machine-local `filesystem` routing record (unlike external registry
      links in step 3, and without mutating JAIBA constitutive or
      executive memory).
    - **Boundary on cancelled `migrate-surface`:** when a
@@ -339,7 +346,7 @@ pending journal or unknown mutation blocks writes (§4).
 | Valid v2 binding; no `jaiba-memory-surface:` field, or no `AGENTS.md` | Binding governs. O(1) `project-id` and `context-id`. Do not read `.ai/`. Do not fall through to filesystem. |
 | Valid v2 external binding; explicit override `filesystem` | Override selects filesystem. Not migration approval. Do not treat the override as a silent switch of populated stores. |
 | Valid v2 binding for `alpha`; local skill `beta` newly visible | `alpha` still governs. A new local skill does not displace Step 0. |
-| Override `filesystem`; local adapter `team-store`; no binding | Short-circuit directly to step 5 (`filesystem` branch); skip step 2's external registry lookup. No automatic export/import. If OKF `index.md` exists, silently auto-generate the local `filesystem` `v2` binding (local routing-sync exception permitted in all lanes including `ask` and `jaiba-doctor`). |
+| Override `filesystem`; local adapter `team-store`; no binding | Short-circuit directly to step 5 (`filesystem` branch); skip step 2's external registry lookup. No automatic export/import. If OKF `index.md` exists, silently auto-generate the local `filesystem` `v2` binding atomically (`temp + rename` in the same directory with exact readback verification; local routing-sync exception permitted in all lanes including `ask` and `jaiba-doctor`). |
 | Override `team-store`; only its global skill visible | Global `team-store`, after real tool validation. |
 | Override `team-store`; skill or required tool missing | Stop with selected-adapter failure; no fallback. |
 | No binding; local `team-store` v1; global same ID v2 | Local v1 is the surface to query. Incompatible contract blocks use, not fallback to v2. |
@@ -557,6 +564,45 @@ another machine does not magically expose its local files; that needs an
 explicit supported transfer, not a path rewrite. See the effective
 `create-memory` filesystem reference for its physical mapping.
 
+### Worktree Worker Link (Pattern 2)
+
+Independent executive contexts per canonical work root remain the **default**
+for every new clone and Git worktree. Do not share or borrow another root's
+`context-id` automatically.
+
+When a secondary Git worktree is explicitly linked to an active Coordinator
+session — or invoked in bounded worker mode (`/conduct execute T-NNN`) —
+use an explicit **Worktree Worker Link**:
+
+- **Binding fields (`v2` or explicit session-only worker link).** Keep the
+  secondary worktree's own canonical work root `R_worker` and its own `v2`
+  binding path `~/.jaiba/memory/bindings/<sha256(R_worker)>.yaml` (or an
+  explicit session-only worker link when persistence is declined, unavailable,
+  or scoped to one invocation). Set:
+  - `executive.role: worker` (omitted or `coordinator` on the primary
+    Coordinator root; never inferred from branch names, folder names, or
+    search hits).
+  - `executive.context-id`: the Coordinator's resolved `context-id`.
+  - `executive.context-locator`: on `filesystem`, the Coordinator primary
+    worktree's canonical `.ai/work` path; on external surfaces, the
+    Coordinator's `context-id` + `project-id` (and sanitized context locator).
+- **Strict read-only executive access.** A linked worker binding
+  (`executive.role: worker`) resolves the Coordinator's executive context
+  strictly in **read-only** mode for all executive artifacts (`prd`, `plan`,
+  `tasks`, `walkthrough`, `context-head`, and executive journal). A worker
+  link never grants executive write authority (`patch`, `check`, `uncheck`,
+  `append-entry`, `create`, `update`, `compact`, `clear-work`) or constitutive
+  write authority, even if filesystem paths or backend credentials allow
+  mutation. The Coordinator remains the single executive writer per context
+  (ADR-005, ADR-014).
+- **Persistence and unlinking.** Persisting or updating a worker-linked `v2`
+  binding for `R_worker` must use §4's atomic same-directory `temp + rename`
+  + exact readback protocol and must never modify the Coordinator's `v2`
+  binding or create a local `.ai/` mirror in the worker worktree. Switching
+  the secondary worktree back to independent work requires an explicit
+  binding update (atomic `temp + rename` + readback) to a fresh per-root
+  `context-id` with `executive.role` cleared.
+
 ## 4. Machine binding persistence
 
 Store the machine routing record at:
@@ -576,6 +622,18 @@ different encoding for v2: the path above is the standard path. Exact
 comparison uses the canonical string and the lowercase digest, not a
 display path.
 
+Write or auto-generate every Step 0 `v2` binding (initial creation, silent
+`filesystem` auto-generation, legacy consolidation, and provenance updates)
+atomically via same-directory temp-file write + rename: write the full
+YAML payload to `~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` (in
+the same `bindings/` directory), atomically replace
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` (`mv -f` / `os.replace`), and
+perform exact readback verification before claiming persistence so
+concurrent multi-agent sessions never observe partial or truncated files.
+If write, rename, or readback fails, remove any leftover temporary file
+and obtain explicit session-only consent or stop; never overwrite a
+malformed or mismatched pre-existing binding silently.
+
 A binding records only identifiers, sanitized locators, versions, and
 routing provenance:
 
@@ -590,7 +648,9 @@ routing provenance:
   fallback
 - surface selection: adapter id, adapter version, contract version,
   category `memory-surface`
-- namespace, stable `project-id`, executive `context-id`
+- namespace, stable `project-id`, executive `context-id`, and optional
+  `executive.role` (`worker` only on an explicit §3 Worktree Worker Link;
+  omitted or `coordinator` otherwise)
 - sanitized registry and context locators, confirmed candidate ids, and
   an optional confirmed alias id
 - consolidation provenance: legacy locators read, and which record was
@@ -624,7 +684,10 @@ deterministically as:
   `fs-<first-16-hex-of-sha256(R)>` on local-only fallback.
 - `executive.context-id`: `ctx-<first-16-hex-of-sha256(R)>` (unless an
   agreed legacy record already supplies one) with
-  `executive.context-locator: ".ai/work"`.
+  `executive.context-locator: ".ai/work"`. On an explicit Worktree
+  Worker Link (`executive.role: worker`), `executive.context-id` and
+  `executive.context-locator` instead point to the Coordinator primary
+  worktree's `context-id` and canonical `.ai/work` path in read-only mode.
 
 ### Read and reuse
 
@@ -672,8 +735,11 @@ and digest are exact strings.
 
 After a successful readiness preflight, this host may update
 `last-verified-by`, `last-verified-at`, and the adapter version it
-actually read, without asking. That update is routing provenance. It
-must itself be read back. It must not change `project-id`, `context-id`,
+actually read, without asking. That update is routing provenance; write
+it via the same-directory `temp + rename` protocol
+(`<sha256(R)>.yaml.tmp.<pid>` → `<sha256(R)>.yaml` via `mv -f` /
+`os.replace`) and verify it by exact readback, cleaning up any temporary
+file on failure. It must not change `project-id`, `context-id`,
 adapter id, namespace, or the identity candidate. Those changes require
 the human decisions this reference already requires. Do not update them
 because this host is new.
@@ -712,15 +778,18 @@ If one or more legacy records match and they agree on every blocking
 field below, consolidate once:
 
 - Write a v2 record at the standard path from those agreed routing
-  fields.
+  fields atomically via same-directory temp-file write + rename
+  (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+  `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`).
 - `last-verified-by` is the host performing consolidation, and only
   after readback succeeds.
 - List every legacy locator in consolidation provenance. Locators are
   sanitized paths under `~/.jaiba/memory/`, not file bodies.
 - Read the v2 file back. Every persisted routing field, the canonical
-  path, and the digest must match the intended record. If readback
-  fails, do not claim consolidation, do not delete or rewrite legacy
-  files, and stop.
+  path, and the digest must match the intended record. If write, rename,
+  or exact readback fails, remove any leftover temporary file, do not
+  claim consolidation, do not delete or rewrite legacy files, and stop
+  (or request explicit session-only consent if unwritable).
 - Preserve each original legacy file byte for byte as backup and as
   the fallback used only when the v2 file is absent. Do not rewrite
   legacy files in place, rename them over v2, or delete them after
@@ -778,10 +847,11 @@ reads v2 and does not ask again.
 |---|---|
 | Valid v2 file for this canonical root | Same file, same `project-id` and `context-id`, any agent. O(1). Do not ask. Do not search. Do not read `.ai/` when the active surface is external. |
 | v2 absent; no matching legacy; `origin` matches one registry project | Link. Write v2. No search. No questionnaire. |
-| v2 absent; one legacy file, or several that agree | Consolidate to the v2 path with readback. Leave every legacy file in place. |
+| v2 absent; one legacy file, or several that agree | Consolidate atomically (`temp + rename` in the same directory) to the v2 path with exact readback. Leave every legacy file in place. |
 | v2 absent; legacy files disagree on a blocking field (`project-id`, `context-id`, adapter, namespace, identity, or contract major) | Stop. Human choice. Do not pick by host order. |
 | v2 valid, and a disagreeing legacy file also exists | v2 wins. Do not re-consolidate. |
 | v2 present but digest or canonical path disagrees | Stop. Do not repair from legacy. |
+| Secondary worktree with explicit Worktree Worker Link (`executive.role: worker`) | Persist via atomic `temp + rename` + readback (or session-only worker link). Resolves Coordinator's `context-id`/`context-locator` read-only for executive artifacts; zero executive write rights. |
 | Pending journal or unknown mutation on the bound context | Block dependent writes. Do not change conformance or mint a context. |
 
 ### Pending journal and unknown mutation

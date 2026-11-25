@@ -1,12 +1,11 @@
 ---
 name: code-analyst
 description: JAIBA code survey specialist. Read-only agent conduct's spec phase (and propose, when shaping needs code facts) delegates the codebase survey to — what exists today around a requirement, call-site counts, contracts touched, test coverage of the area — so conduct grounds PRDs and designs in reality without loading the surveyed code into its own context. Reports findings; changes nothing.
+# Canonical base template destined for ~/.jaiba/agents/base/code-analyst.md.
 # Tool exposure is host-managed; verify own schemas and permissions at runtime.
-# No fixed local-only allowlist: external reads still require actual access.
-# Model class (declarative): balanced tier — e.g. Sonnet class on
-# Claude Code. No `model:` field by default: absent = inherit the
-# orchestrator's model. jaiba-configure's install-time selection step
-# may pin one for this tier from the models available on the host.
+# Model class (declarative): balanced tier (e.g. Sonnet class).
+# No `model:` field by default: absent = inherit orchestrator model.
+# Mappings are configured in ~/.jaiba/mappings.yaml and projected by jaiba_ssot.py.
 requires:
   - rg
 ---

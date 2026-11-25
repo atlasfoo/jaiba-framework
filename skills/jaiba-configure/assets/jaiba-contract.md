@@ -1,5 +1,6 @@
 <!-- jaiba-contract v3 — global behavioral contract. Installed once per
-     machine by jaiba-configure into the agent's global config folder.
+     machine by jaiba-configure into ~/.jaiba/contract/jaiba-contract.md
+     (machine SSOT) and projected to enabled host config folders.
      Canonical copy: skills/jaiba-configure/assets/jaiba-contract.md;
      doctor carries a lockstep reference copy for drift detection.
      Section numbering §1–§6 is preserved from the pre-split per-repo
@@ -47,6 +48,13 @@ storage requirements; external surfaces address the same concepts logically.
 | `.ai/memory/` | long-term | The constitutive brain: project identity, architecture, scope, quality gate and conventions; the architectural decisions in force (the *why*); the external dependencies, APIs, services and internal contracts the project relies on; and `log/`, the append-only dated record of closed work and brain changes. **Authoritative on project specifics; overrides this file on conflict over project facts.** |
 | `.ai/work/` | short-term | Executive memory (gitignored): `PRD.md` (when depth demands one), `plan.md`, `tasks.md`, `walkthrough.md`. |
 | `.atl/tool-layout.md` | environment | Local toolchain probe written by `jaiba-doctor` (gitignored — machine state, not project memory). Full inventory of installed skills, subagents, and hooks, with their declared tools marked present, missing, or `[UNVERIFIED]` (e.g. an `mcp:` dependency — indexed here, verified by diagnostic 3). |
+
+### Machine SSOT and multi-host projection
+
+`~/.jaiba/` is the machine's sole Global Single Source of Truth (SSOT) installation root (`config.yaml`, `mappings.yaml`, `contract/jaiba-contract.md`, `skills/`, and `agents/base/*.md`). This contract lives canonically at `~/.jaiba/contract/jaiba-contract.md`.
+
+- **Multi-host projection (`N >= 1`):** `jaiba-configure` (`scripts/jaiba_ssot.py`) registers host environments in `~/.jaiba/config.yaml` and projects `<host-config-root>/jaiba-contract.md` (symlink to `~/.jaiba/contract/jaiba-contract.md`, with copy fallback only when symlinks are unsupported) plus host-native `<host-config-root>/agents/<role>.md` wrappers exclusively to hosts marked `enabled: true` (`N >= 1`; single-agent setup is `N = 1`).
+- **Disabled & third-party isolation:** Hosts marked `enabled: false` in `~/.jaiba/config.yaml` remain untouched, and third-party non-JAIBA agent files under `<host-config-root>/agents/` are never overwritten or removed.
 
 ### Surface resolution and identity
 
@@ -111,11 +119,15 @@ resembles it.
 Bindings are routing-only, shared by this user's agents for one canonical root: sanitized IDs
 and locators, never payloads, credentials or an `.ai/` mirror. No `host-agent-id` key. Legacy
 `~/.jaiba/memory/<host-agent-id>/` records consolidate into v2 with readback when blocking
-fields agree; keep the originals. Disagreement needs a human choice, not host order. Read back
-saved routing; if persistence fails, get explicit session-only consent or stop. A pending
-journal or unknown mutation blocks dependent writes. Context ID persists per root, independent
-of branch, session or model; clones/worktrees default independent. Resuming elsewhere needs
-exact owned lookup plus a single-writer handoff. Filesystem keeps `.ai/work/` per checkout.
+fields agree; keep the originals. Disagreement needs a human choice, not host order. Write or
+auto-generate every Step 0 `v2` binding atomically via `temp + rename` in the same directory
+(`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` → `~/.jaiba/memory/bindings/<sha256(R)>.yaml`,
+followed by exact readback verification) so concurrent multi-agent sessions never observe
+partial files; if persistence fails, remove any temporary file and get explicit session-only
+consent or stop. A pending journal or unknown mutation blocks dependent writes. Context ID
+persists per root, independent of branch, session or model; clones/worktrees default independent.
+Resuming elsewhere needs exact owned lookup plus a single-writer handoff. Filesystem keeps
+`.ai/work/` per checkout.
 
 ### Catalogue, verification and authority
 
@@ -199,7 +211,7 @@ older flat layout; both remain readable losslessly. Determine which *before* rea
 - **Level 1 (v1 — Legacy flat on `filesystem`):** `.ai/memory/constitution.md` without `index.md`. Non-blocking, but on **every response** (in any JAIBA skill or freeform prompt) emit **Notice 1 (very high urgency)**: state that project memory is on **Version 1 (flat)** and must be upgraded to **OKF (Version 2)** and configured for **Version 3 (surface/binding)** via `jaiba-init` (`jaiba-init:update-brain:migrate`), which will also offer migrating to a conforming installed surface (`category: memory-surface`, traceless mode) if available or staying on `filesystem` by writing the `v2` binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` and the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (include the **traceless shareability warning** below).
 - **Level 2 (v2 — OKF on `filesystem` without v3):** `.ai/memory/index.md` without `constitution.md`, lacking the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (and without an active external surface). Non-blocking, but on **every response** (in any JAIBA skill or freeform prompt) emit **Notice 2 (medium urgency)**: state that memory is on **OKF (Version 2)** and still needs **Version 3**, inviting the developer to run `jaiba-init` to migrate to a conforming installed surface in **traceless mode** (never offer `memory-surface-draft` adapters) or stay on `filesystem` by creating the `v2` binding in `~/.jaiba/memory/bindings/<sha256(R)>.yaml` and the `jaiba-memory-surface: filesystem` pin in `AGENTS.md` (include the **traceless shareability warning** below).
 - **Level 3 (v3 — Bound external surface, or `filesystem` with pin + `v2` binding):** External surface with a valid `v2` binding, or `filesystem` with `index.md` + `jaiba-memory-surface: filesystem` in `AGENTS.md` + valid `~/.jaiba/memory/bindings/<sha256(R)>.yaml`. No migration notice is emitted.
-- **Silent `v2` binding auto-generation (local routing-sync exception):** When `AGENTS.md` already declares `jaiba-memory-surface: filesystem` and `.ai/memory/index.md` exists (OKF v2), but `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent, silently auto-generate that `v2` binding (with readback verification) and do **not** emit Notice 2. Because `AGENTS.md` and `index.md` already establish the `filesystem` surface, this local routing sync is an explicit exception permitted even in read-only lanes (`ask`, `jaiba-doctor`) — mirroring `.atl/` in `jaiba-doctor` — without mutating JAIBA memory or persisting external registry links. If a pre-existing binding at that path is malformed or has a mismatched canonical root / sha256, stop and report it without overwriting it silently.
+- **Silent `v2` binding auto-generation (local routing-sync exception):** When `AGENTS.md` already declares `jaiba-memory-surface: filesystem` and `.ai/memory/index.md` exists (OKF v2), but `~/.jaiba/memory/bindings/<sha256(R)>.yaml` is absent, silently auto-generate that `v2` binding via atomic `temp + rename` (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` → `~/.jaiba/memory/bindings/<sha256(R)>.yaml` in the same directory, with exact readback verification) and do **not** emit Notice 2. Because `AGENTS.md` and `index.md` already establish the `filesystem` surface, this local routing sync is an explicit exception permitted even in read-only lanes (`ask`, `jaiba-doctor`) — mirroring `.atl/` in `jaiba-doctor` — without mutating JAIBA memory or persisting external registry links. If a pre-existing binding at that path is malformed or has a mismatched canonical root / sha256, stop and report it without overwriting it silently.
 - **Traceless shareability warning:** Whenever traceless mode or migrating to an external surface is offered or explained, explicitly warn that if a project switches to a memory surface with **traceless mode** enabled (omitting `.ai/` and `AGENTS.md` from the repository), JAIBA cannot guarantee the brain is shareable across developers, machines, or clones, as shareability depends exclusively on the surface backend's own operation and synchronization.
 
 If a needed concept is absent or empty in the resolved layout, say so before

@@ -253,14 +253,14 @@
     },
     {
       "id": 19,
-      "prompt": "Evaluate the multi-host installation procedure using the multihost fixture. Show which candidate host roots qualify as JAIBA-configured, how destination selection operates, what collision backup naming rule applies, and how readback failures are handled.",
-      "expected_output": "Discovery checks known agent roots (~/.agents, ~/.claude, ~/.codex, ~/.config/opencode); a root qualifies only if it contains jaiba-contract.md or existing JAIBA skills in skills/. The user may select any subset, including multiple global hosts simultaneously; it does not install to all by default. On collision, user confirms replacement and the existing install is moved to a timestamped backup <path>.bak-<timestamp> (local YYYYMMDDTHHMMSS, no colons). Readback verifies each destination independently; failure at one destination is reported individually without silent rollback of successful ones.",
+      "prompt": "Evaluate the multi-host installation procedure using the multihost fixture. Show which candidate roots (including the ~/.jaiba SSOT root and enabled vs disabled hosts) qualify as JAIBA-configured, how destination selection operates, what collision backup naming rule applies, and how readback failures are handled.",
+      "expected_output": "Discovery checks the `~/.jaiba` SSOT root (qualifying when `~/.jaiba/config.yaml` or `~/.jaiba/contract/jaiba-contract.md` exists, plus any `enabled: true` host `config-root` entries declared in `~/.jaiba/config.yaml`) and known agent roots (`~/.agents`, `~/.claude`, `~/.codex`, `~/.config/opencode`); a host root qualifies only if it contains `jaiba-contract.md` or existing JAIBA skills in `skills/` (and is not `enabled: false` in `~/.jaiba/config.yaml`). The user may select any subset, including `~/.jaiba` and multiple enabled global hosts simultaneously; it does not install to all by default and never touches disabled (`enabled: false`) or unconfigured roots. On collision, user confirms replacement and the existing install is moved to a timestamped backup `<path>.bak-<timestamp>` (local YYYYMMDDTHHMMSS, no colons). Readback verifies each destination independently; failure at one destination is reported individually without silent rollback of successful ones.",
       "files": [
         "evals/fixtures/multihost-installation-cases.json"
       ],
       "assertions": [
-        "Host roots qualify only with jaiba-contract.md or existing JAIBA skills; unconfigured directories are rejected.",
-        "Multiple host destinations can be selected and confirmed in a single operation, without installing to all by default.",
+        "The ~/.jaiba SSOT root qualifies when config.yaml or contract/jaiba-contract.md exists, and enabled: true hosts in config.yaml are included while enabled: false or unconfigured directories are excluded.",
+        "Multiple host destinations (including ~/.jaiba and enabled hosts) can be selected and confirmed in a single operation, without installing to all by default.",
         "Collisions require replacement confirmation and create a timestamped backup .bak-YYYYMMDDTHHMMSS with no colons.",
         "Readback is verified per destination; single-destination failure is reported without rolling back successful installs."
       ]
@@ -309,8 +309,8 @@
     },
     {
       "id": 23,
-      "prompt": "Trace the upgrade/repair workflow for a 1.0.x adapter using the upgrade-repair fixture. How are alien packages rejected, when can a contrasted profile be preserved without repeating native experiments, how are host locks dropped, what incremental conformance checks run, and how is multi-host reinstall offered?",
-      "expected_output": "Audit verifies category memory-surface and contract-id jaiba-memory-surface; alien packages are terminally rejected without mutation or backup. A contrasted profile is preserved without re-running native experiments if backend, tool versions, and limits are unchanged with no unknown/discrepant necessary guarantees. Host locks (active-procedure-reference, absolute install paths) are deleted, retaining procedure-provenance as history, and host exposures are replaced with canonical mcp:<server> tokens. Incremental conformance tests patch atomic semantics, determinism, and the Efficiency Gate. Reinstallation offers discovery of configured hosts, multi-selection, collision backups (.bak-<timestamp>), and independent readback.",
+      "prompt": "Trace the upgrade/repair workflow for a 1.0.x adapter using the upgrade-repair fixture. How are alien packages rejected, when can a contrasted profile be preserved without repeating native experiments, how are host locks dropped, what incremental conformance checks run, and how is SSOT/multi-host reinstall offered?",
+      "expected_output": "Audit verifies category memory-surface and contract-id jaiba-memory-surface; alien packages are terminally rejected without mutation or backup. A contrasted profile is preserved without re-running native experiments if backend, tool versions, and limits are unchanged with no unknown/discrepant necessary guarantees. Host locks (active-procedure-reference, absolute install paths) are deleted, retaining procedure-provenance as history, and host exposures are replaced with canonical mcp:<server> tokens. Incremental conformance tests patch atomic semantics, determinism, and the Efficiency Gate. Reinstallation discovers ~/.jaiba (when config.yaml or contract/jaiba-contract.md exists) plus enabled: true hosts in config.yaml and known JAIBA-configured host roots (leaving enabled: false hosts untouched), supports multi-selection, collision backups (.bak-<timestamp>), and independent readback.",
       "files": [
         "evals/fixtures/upgrade-repair-cases.json"
       ],
@@ -318,22 +318,37 @@
         "Alien packages lacking valid category or contract-id are terminally rejected without mutation.",
         "Contrasted profiles are preserved without re-running native experiments when backend, tools, and limits are unchanged.",
         "Host locks (active-procedure-reference, absolute paths) are dropped, keeping procedure-provenance as history.",
-        "Incremental conformance validates patch semantics, determinism, and the Efficiency Gate before multi-host reinstall."
+        "Incremental conformance validates patch semantics, determinism, and the Efficiency Gate before SSOT/multi-host reinstall excluding disabled hosts."
       ]
     },
     {
       "id": 24,
-      "prompt": "Verify the built-in filesystem v2 binding schema, Step 0 silent auto-generation over OKF + AGENTS.md pin, malformed binding guard, and traceless shareability warning.",
-      "expected_output": "Built-in filesystem v2 bindings use adapter-id 'filesystem', adapter-version 'built-in', namespace 'filesystem', registry-locator '.ai/memory/index.md', deterministic project-id and context-id, and context-locator '.ai/work'. When .ai/memory/index.md exists and AGENTS.md already declares jaiba-memory-surface: filesystem, Step 0 silently auto-generates the missing v2 binding with readback without firing Notice 2 (though an AGENTS.md pin never suppresses Notice 1 on flat constitution.md). A malformed or mismatched pre-existing v2 binding stops without silent overwrite. Cancelled migrate-surface on filesystem-unbound still writes no filesystem binding. Traceless external options always include the shareability warning.",
+      "prompt": "Verify the built-in filesystem v2 binding schema, Step 0 silent atomic auto-generation over OKF + AGENTS.md pin, malformed binding guard, and traceless shareability warning.",
+      "expected_output": "Built-in filesystem v2 bindings use adapter-id 'filesystem', adapter-version 'built-in', namespace 'filesystem', registry-locator '.ai/memory/index.md', deterministic project-id and context-id, and context-locator '.ai/work'. When .ai/memory/index.md exists and AGENTS.md already declares jaiba-memory-surface: filesystem, Step 0 silently auto-generates the missing v2 binding atomically via same-directory temp + rename (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` -> `~/.jaiba/memory/bindings/<sha256(R)>.yaml`) with exact readback verification (removing any leftover temp file on failure) and emits no Notice 2 (though an AGENTS.md pin never suppresses Notice 1 on flat constitution.md). A malformed or mismatched pre-existing v2 binding stops without silent overwrite. Cancelled migrate-surface on filesystem-unbound still writes no filesystem binding. Traceless external options always include the shareability warning.",
       "files": [
         "evals/fixtures/layout-legacy.json",
         "evals/fixtures/binding-v2-cases.json"
       ],
       "assertions": [
         "Filesystem v2 binding uses deterministic namespace 'filesystem', registry-locator '.ai/memory/index.md', and context-locator '.ai/work'.",
-        "Step 0 silently auto-generates missing v2 binding with readback when OKF + AGENTS.md filesystem pin are present, without suppressing Notice 1 on flat layout.",
-        "Malformed or mismatched pre-existing v2 binding stops and reports without overwriting.",
+        "Step 0 silently auto-generates missing v2 binding atomically via same-directory temp + rename (<sha256(R)>.yaml.tmp.<pid> -> <sha256(R)>.yaml) with exact readback when OKF + AGENTS.md filesystem pin are present, without suppressing Notice 1 on flat layout.",
+        "Malformed or mismatched pre-existing v2 binding stops and reports without overwriting, and failed writes clean up leftover temp files.",
         "Cancelled migrate-surface on filesystem-unbound writes no filesystem binding, and traceless explanations include the shareability warning."
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "Verify Step 0 atomic v2 binding persistence protocol (initial creation, legacy consolidation, and temp cleanup) alongside SSOT ~/.jaiba/ multi-host destination rules excluding disabled hosts.",
+      "expected_output": "Every Step 0 v2 binding write (initial creation, silent filesystem routing-sync, legacy consolidation, and provenance update) writes the full YAML payload to `~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` in the same `bindings/` directory, atomically renames (`mv -f` / `os.replace`) to `<sha256(R)>.yaml`, and performs exact readback verification before claiming persistence; on write/rename/readback failure, leftover `.tmp.<pid>` is removed without leaving partial files. During adapter installation/reinstallation, `~/.jaiba` with `config.yaml` or `contract/jaiba-contract.md` and `enabled: true` hosts qualify as destinations while `enabled: false` hosts in `config.yaml` remain excluded and untouched, and `~/.jaiba/memory/bindings/` is never modified by skill installation.",
+      "files": [
+        "evals/fixtures/binding-v2-cases.json",
+        "evals/fixtures/multihost-installation-cases.json"
+      ],
+      "assertions": [
+        "All Step 0 v2 binding writes use same-directory temp + rename (<sha256(R)>.yaml.tmp.<pid> -> <sha256(R)>.yaml) plus exact readback verification.",
+        "Failed write, rename, or readback removes leftover temporary files and never leaves partial bindings or overwrites malformed records.",
+        "SSOT destination discovery includes ~/.jaiba and enabled: true hosts from config.yaml while keeping enabled: false hosts untouched.",
+        "Adapter installation never mutates ~/.jaiba/memory/bindings/."
       ]
     }
   ]

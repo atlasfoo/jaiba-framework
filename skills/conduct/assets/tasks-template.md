@@ -38,6 +38,16 @@ created: <YYYY-MM-DD>
 > - `covers` maps the task to acceptance criteria IDs from the PRD
 >   schema (`—` at design depth). Every criterion must be covered by
 >   at least one task.
+> - `affinity` *(optional, Pattern 1)* — `<host>` or `<host>/<model>`,
+>   projected only when `~/.jaiba/config.yaml` has multiple enabled
+>   hosts (`N > 1`) and `~/.jaiba/mappings.yaml` configures
+>   `tier-affinity` for that `load` tier (plus optional non-`inherit`
+>   `roles.executor-<load>.model` or `tiers.<load>.model` pin). Omit
+>   cleanly when `N = 1`, SSOT files are absent, or unconfigured.
+>   Because `~/.jaiba/memory/bindings/` and `~/.jaiba/config.yaml` are
+>   shared across enabled hosts, any enabled host can resume at a phase
+>   or wave boundary using these hints without re-configuring or
+>   migrating memory.
 > - Phases are **multisession checkpoints**: architectural cohesion,
 >   reversible/buildable at close, gate green, safe `chore(wip)`
 >   commit point. A phase cannot start until `depends on:` phases are
@@ -54,7 +64,7 @@ created: <YYYY-MM-DD>
 - **Suggested commit:** `chore(wip): <short phase summary>`
 
 - [ ] **T-001** — <task, concrete and imperative>
-  `load: <high|medium|low>` · `depends-on: none` · `covers: <PREFIX>-NNN`
+  `load: <high|medium|low>` · `depends-on: none` · `covers: <PREFIX>-NNN` · `affinity: <host[/model]>` *(omit when N = 1 or unconfigured)*
 - [ ] **T-002** — <task>
   `load: <high|medium|low>` · `depends-on: [T-001]` · `covers: <PREFIX>-NNN`
 
@@ -93,4 +103,5 @@ TDD-enabled worked example (delete when filling the template):
   `load: high` · `depends-on: [T-002, T-004]` · `covers: ITIN-002, ITIN-003`
 
 T-001/T-004 share no edge and no files → parallelizable wave.
+With Pattern 1 multi-host tier-affinity (N > 1), metadata lines append e.g. `· affinity: <host>` or `· affinity: <host>/<model>`.
 -->

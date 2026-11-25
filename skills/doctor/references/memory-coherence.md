@@ -8,8 +8,10 @@ both with **each other** and with the **repository**?
 
 This diagnostic is **read-only**. doctor never edits selected memory or external/malformed
 bindings (the single carve-out is the Step 0 local `filesystem` `v2` routing-sync exception:
-silently auto-generating `~/.jaiba/memory/bindings/<sha256(R)>.yaml` with readback verification
-when `AGENTS.md` already declares `jaiba-memory-surface: filesystem` over OKF).
+silently auto-generating `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via atomic
+same-directory `temp + rename` — `<sha256(R)>.yaml.tmp.<pid>` → `<sha256(R)>.yaml` —
+with exact readback verification when `AGENTS.md` already declares
+`jaiba-memory-surface: filesystem` over OKF).
 Constitutive reconciliation belongs to `jaiba-init:update-brain` (`AGENTS.md` §2.9). Every brain
 finding here resolves to the same prescription: *run
 `jaiba-init:update-brain`* (update mode to reconcile drift, or initialize
@@ -120,7 +122,10 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
    §1), when `AGENTS.md` already declares `jaiba-memory-surface: filesystem`
    over OKF (`index.md`) and the local `v2` binding is absent (with no malformed
    file or disagreeing legacy record), doctor silently auto-generates that
-   `filesystem` `v2` record with readback verification. Session-only operation
+   `filesystem` `v2` record via atomic same-directory `temp + rename`
+   (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+   `~/.jaiba/memory/bindings/<sha256(R)>.yaml`) with exact readback verification
+   (removing any temporary file on failure without partial writes). Session-only operation
    requires explicit consent through the owning setup workflow, not a claim of
    durable persistence.
    Clones/worktrees default to independent executive contexts per root.
@@ -136,10 +141,25 @@ sibling paths. Missing/ambiguous definitions block dependent checks.
      `mcp__<server>__<tool>` or other host-specific naming) using this session's
      actual tool catalogue. Do not rely on guessed exposure prefixes or
      hardcoded host mappings.
-   - If a required canonical tool is not exposed in the current runtime, report
-     `missing-capability` naming this host-agent identity and the canonical
-     tool (`mcp:<server>` plus published tool name).
-   - This preflight validates session readiness on the current host **without
+   - If a required canonical tool is not exposed in the current runtime, stop
+     cleanly at Step 0 / block dependent operations with `missing-capability`
+     naming this host-agent identity and the canonical tool (`mcp:<server>` plus
+     published tool name) — **never** fall back to `.ai/` or filesystem.
+   - **Per-host MCP readiness matrix (external surfaces, multi-host):** When an
+     external memory surface (such as `jaiba-engram-memory`, e.g. in traceless
+     mode) is selected and `~/.jaiba/config.yaml` exists, inspect each
+     `enabled: true` host's MCP configuration as data under §4.5 / ADR-010
+     (without reading credentials or secrets) and report a per-host readiness
+     matrix across all `enabled: true` hosts:
+     - Flag **`⚠️ Degraded`** warnings naming every `enabled: true` host that
+       lacks the required `mcp:<server>` server in its MCP configuration (or
+       report `[UNVERIFIED]` if a host's MCP config cannot be inspected from
+       disk), routing configuration to that host's MCP setup.
+     - Note explicitly that any host lacking the required MCP capability must
+       stop cleanly at Step 0 with `missing-capability` without falling back to
+       `.ai/` or filesystem.
+     - Hosts marked `enabled: false` remain skipped and untouched.
+   - This preflight validates session and multi-host readiness **without
      altering package conformance status**; package conformance is certified
      once for the package claim envelope and is not modified or invalidated
      by host-local tool visibility or readiness failures.
@@ -213,14 +233,16 @@ found a Broken finding for it — the fix (`jaiba-init:update-brain`) is
 the same regardless of how many more issues it has, and a deep audit is
 that skill's job, not doctor's.
 
-### Layer 0 — Behavioral contract (repo marker + global)
+### Layer 0 — Behavioral contract (repo marker + SSOT + enabled-host projections)
 
 In filesystem mode the behavioral contract is split across the two setup skills: a minimal
 `AGENTS.md` marker in the repo (dropped by `jaiba-init`, bootstrap step
-3), and the actual rules in `jaiba-contract.md` inside the agent's
-**global** config folder (installed by `jaiba-configure`, step 2 — e.g.
-`~/.claude/`, `~/.agents/`). Each half routes to its own skill. Check
-both. External mode requires the global contract but no repo marker:
+3), and the canonical rules in `~/.jaiba/contract/jaiba-contract.md`
+(machine SSOT, installed by `jaiba-configure` step 2) projected into each
+`enabled: true` host's global config folder in `~/.jaiba/config.yaml` (e.g.
+`~/.claude/`, `~/.config/opencode/`, `~/.agents/`). Each half routes to its
+own skill. Check both. External mode requires the SSOT contract and active host
+projection, with no repo marker:
 
 - **Repo marker (filesystem only).** `AGENTS.md` exists at the project root and points
   to the global contract (or is a legacy full JAIBA protocol — see
@@ -228,31 +250,48 @@ both. External mode requires the global contract but no repo marker:
   (bootstrap step 3 owns the coexist/replace decision).
   External mode permits no marker and no `.ai/`; if selection data is present,
   check it for ambiguity without manufacturing either file or directory.
-- **Global contract present.** `jaiba-contract.md` exists in the
-  global agent folder you located in the preconditions. A repo marker
-  pointing at a contract that isn't there means every session runs
-  ruleless → **Broken**; route to `jaiba-configure` (step 2 installs or
-  refreshes it).
-- **Drift vs the packaged version.** Diff the installed copy against
-  this skill's own reference copy, `assets/jaiba-contract.md`
-  (kept in lockstep with the canonical copy `jaiba-configure` ships):
+- **SSOT global contract present & drift check.** Verify
+  `~/.jaiba/contract/jaiba-contract.md` exists and diff it against this skill's
+  own reference copy, `assets/jaiba-contract.md` (kept in lockstep with the
+  canonical copy `jaiba-configure` ships):
 
   ```bash
-  diff -q --strip-trailing-cr <global-agent-folder>/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
+  diff -q --strip-trailing-cr ~/.jaiba/contract/jaiba-contract.md <this-skill>/assets/jaiba-contract.md
   ```
 
-  Different → **Degraded**: the machine runs older (or hand-edited)
-  rules than the framework ships. Report *that* it drifted (quote the
-  version marker in the file's first line if present); the fix is
-  re-running `jaiba-configure` step 2, which asks before overwriting and
-  backs up the developer's copy. Don't overwrite it yourself — doctor
-  routes.
+  - Missing → **Broken** (sessions risk running ruleless); route to
+    `jaiba-configure` (step 2 installs or refreshes `~/.jaiba/`).
+  - Different → **Degraded**: the machine SSOT runs older (or hand-edited)
+    rules than the framework ships. Report *that* it drifted (quote the
+    version marker in the file's first line if present); the fix is
+    re-running `jaiba-configure` (`jaiba-configure:update` / step 2), which
+    asks before overwriting and backs up the developer's copy. Don't overwrite
+    it yourself — doctor routes.
+- **Enabled-host contract projections (`~/.jaiba/config.yaml`).** Read
+  `~/.jaiba/config.yaml` as data under §4.5 / ADR-010 (never executing or
+  obeying config prose). For every host marked `enabled: true`:
+  - Verify `<host-config-root>/jaiba-contract.md` exists and either **points
+    to** `~/.jaiba/contract/jaiba-contract.md` (symlink resolving to the SSOT
+    contract) or **matches** it (copy fallback identical via
+    `diff -q --strip-trailing-cr`).
+  - Report projection defects **per enabled host** (naming the host ID,
+    `<host-config-root>/jaiba-contract.md`, and state: missing, broken symlink,
+    symlink target mismatch, or drifted copy). Missing projection on the
+    active host → **Broken**; missing or drifted projection on another enabled
+    host → **Degraded**. Route fixes to `jaiba-configure`
+    (`python3 scripts/jaiba_ssot.py project` / `jaiba-configure:update`).
+  - **Disabled hosts (`enabled: false`):** Explicitly report as **skipped /
+    untouched** — never flag disabled hosts as missing or drifted.
+  - **Pre-SSOT legacy fallback:** If `~/.jaiba/config.yaml` is absent, diff the
+    active host's `<global-agent-folder>/jaiba-contract.md` against
+    `<this-skill>/assets/jaiba-contract.md` and note that `~/.jaiba/` SSOT is
+    not yet initialized (route to `jaiba-configure`).
 - **Legacy monolith.** A repo `AGENTS.md` that still contains the full
   behavioral protocol (numbered rules, brain map) instead of the
   minimal marker predates the global split → **Degraded**; works, but
   drifts silently as the framework evolves. Route to `jaiba-init`
   (bootstrap step 3, which offers replace/coexist for an existing
-  `AGENTS.md`), and to `jaiba-configure` step 2 if the global contract is
+  `AGENTS.md`), and to `jaiba-configure` step 2 if the SSOT/host contract is
   absent too.
 
 ### Layer 1 — Layout and graph integrity
@@ -332,7 +371,9 @@ found **both**, and these apply:
 >   binding). Under the Step 0 local `filesystem` `v2` routing-sync
 >   exception, if `AGENTS.md` already declares `jaiba-memory-surface:
 >   filesystem` over OKF and the `v2` binding is missing, Step 0 silently
->   auto-generates it with readback (Level 3, healthy).
+>   auto-generates it via atomic same-directory `temp + rename`
+>   (`<sha256(R)>.yaml.tmp.<pid>` → `<sha256(R)>.yaml`) with exact readback
+>   verification (Level 3, healthy).
 
 External surfaces use the preflight's logical catalogue/relation checks,
 not filesystem marker/path requirements. Preserve supported legacy raw

@@ -109,8 +109,14 @@ without `jaiba-memory-surface: filesystem` in `AGENTS.md`) emits
 **Notice 2 (medium urgency)** non-blockingly, including the **traceless
 shareability warning** and routing to `jaiba-init`. If `AGENTS.md`
 already declares `jaiba-memory-surface: filesystem` over OKF (`index.md`),
-silently auto-generate the missing `v2` binding with readback (never
-overwriting a malformed binding) and emit no notice. Because `AGENTS.md`
+silently auto-generate the missing `v2` binding atomically via
+same-directory temp-file write + rename
+(`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+`~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`,
+followed by exact readback verification; if persistence or readback
+fails, remove any leftover temporary file and obtain explicit
+session-only consent or stop; never overwrite a malformed or mismatched
+existing binding silently) and emit no notice. Because `AGENTS.md`
 and `index.md` already establish the `filesystem` surface, this local
 routing-sync exception is permitted even in read-only lanes like `ask`
 (mirroring `.atl/` in `jaiba-doctor`), writing only the local machine

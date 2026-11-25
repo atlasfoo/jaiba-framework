@@ -107,7 +107,13 @@ ask the developer; don't silently over- or under-scope
 > traceless shareability warning and `jaiba-init` routing) non-blockingly
 > in every response, and silently auto-generate a missing `v2` binding
 > when `AGENTS.md` already declares `jaiba-memory-surface: filesystem`
-> over OKF.
+> over OKF, writing atomically via same-directory temp-file write + rename
+> (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+> `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`,
+> followed by exact readback verification; removing any leftover temporary
+> file and obtaining explicit session-only consent or stopping on failure,
+> and never overwriting a malformed or mismatched existing binding
+> silently).
 
 Context loaded depends on execution context — detect which applies (see
 "Two contexts" below) before reading.

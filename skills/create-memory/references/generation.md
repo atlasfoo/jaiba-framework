@@ -565,20 +565,24 @@ adapter. Conformance is not install authorization.
    requested. Do not assume one directory. Do not invent an installer.
    Ask when visibility is uncertain.
 
-   Global candidates are the known agent roots. Do not scan the whole
-   home directory:
+   Global candidates are the SSOT root and known agent roots. Do not scan the
+   whole home directory:
 
+   - `~/.jaiba` (SSOT root — when `~/.jaiba/config.yaml` or
+     `~/.jaiba/contract/jaiba-contract.md` exists, plus any `enabled: true`
+     host `config-root` entries declared in `~/.jaiba/config.yaml`)
    - `~/.agents`
    - `~/.claude`
    - `~/.codex`
    - `~/.config/opencode`
 
    Also include a root the user names. A root counts as JAIBA-configured
-   only when it contains `jaiba-contract.md`, or a `skills/` directory
-   that already holds a JAIBA skill (for example `create-memory` or
-   `conduct`). A vendor directory with neither marker is not a
-   destination. Do not create a root in order to have somewhere to
-   install. Skill packages land in `<root>/skills/<adapter-name>/`.
+   only when it is `~/.jaiba` with `config.yaml` or `contract/jaiba-contract.md`,
+   or a host root that contains `jaiba-contract.md` (file or symlink) or a
+   `skills/` directory that already holds a JAIBA skill (for example
+   `create-memory` or `conduct`). A vendor directory with neither marker is not
+   a destination. Do not create a root in order to have somewhere to install.
+   Skill packages land in `<root>/skills/<adapter-name>/`.
 
 2. **Select destinations.** Offer draft-only, project-local, or one or
    more detected global hosts. Present every detected root and let the

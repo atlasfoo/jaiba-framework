@@ -17,10 +17,10 @@ filesystem pin: `jaiba-init`'s marker template
 filesystem projects copy it along with the rest of the marker.
 
 1. **Behavior** — follow the **JAIBA Behavioral Contract** installed
-   globally in your agent configuration (file `jaiba-contract.md` in
-   the agent's global config folder, e.g. `~/.claude/` or `~/.agents/`;
-   installed once per machine by `jaiba-configure`). It defines the
-   brain map, the routing rule (continuation → `conduct:execute` ·
+   once per machine by `jaiba-configure` at `~/.jaiba/contract/jaiba-contract.md`
+   (the machine SSOT, projected to enabled host config folders such as
+   `~/.claude/jaiba-contract.md` or `~/.agents/jaiba-contract.md`). It
+   defines the brain map, the routing rule (continuation → `conduct:execute` ·
    question → `ask` · small change → `fast`), and the numbered
    behavioral rules.
 

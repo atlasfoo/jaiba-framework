@@ -58,6 +58,19 @@ not "work on the collaborator model". Each task carries:
   criterion in the PRD schema must be covered by at least one task —
   an uncovered criterion is undeliverable by construction; surface it
   and fix the decomposition before asking for anything else.
+- **`affinity`** *(optional, Pattern 1)* — `<host>` or `<host>/<model>`,
+  projected onto the task metadata line (`load: <tier> · depends-on: [...] · covers: [...] · affinity: <host>` or `<host>/<model>`)
+  only when `~/.jaiba/config.yaml` has multiple hosts marked
+  `enabled: true` (`N > 1`) and `~/.jaiba/mappings.yaml` configures
+  `tier-affinity.<load>` for that task's `load` tier (with `<host>`
+  enabled). If the target host also pins a concrete model in
+  `~/.jaiba/mappings.yaml` under `hosts.<host>.roles.executor-<load>.model`
+  (precedence) or `hosts.<host>.tiers.<load>.model` (excluding
+  `"inherit"` or unset), format as `<host>/<model>`; otherwise format as
+  `<host>`. When `N = 1` (single enabled host), `~/.jaiba/config.yaml`
+  or `~/.jaiba/mappings.yaml` is absent/unreadable, or `tier-affinity` /
+  host affinity for that tier is unconfigured, **omit** the `affinity:`
+  token cleanly without blocking task decomposition.
 
 ## Phases: multisession checkpoints
 
@@ -70,6 +83,12 @@ chronology. Each phase:
 - Is the unit of human review and the unit of session recovery:
   the selected executive context is durable and multisession, so a fresh session
   resumes from the first phase with unchecked tasks.
+- Supports **Pattern 1 phase-boundary handoff** across enabled hosts:
+  because `v2` bindings in `~/.jaiba/memory/bindings/<sha256(R)>.yaml`
+  and `~/.jaiba/config.yaml` are shared across all enabled hosts on the
+  machine, any enabled host agent can resume the next phase or wave
+  using the `affinity:` hints in `tasks.md` without re-configuring
+  JAIBA or migrating constitutive/executive memory.
 - Ends with the **Phase gate** (commands in `tasks.md § Gate
   Commands`).
 
@@ -91,7 +110,16 @@ chronology. Each phase:
    `disabled` ⇒ tests scheduled at the team's discretion; criteria
    still define "done".
 4. **Wire the graph.** Assign IDs in reading order, declare only real
-   `depends-on` edges, label `load`, map `covers`. Identify each task's
+   `depends-on` edges, label `load`, map `covers`, and project optional
+   Pattern 1 `affinity` metadata when configured. Inspect
+   `~/.jaiba/config.yaml` and `~/.jaiba/mappings.yaml`: only when multiple
+   hosts are marked `enabled: true` (`N > 1`) and `tier-affinity.<load>`
+   names an enabled host, append `· affinity: <host>` (or
+   `· affinity: <host>/<model>` when `hosts.<host>.roles.executor-<load>.model`
+   or `hosts.<host>.tiers.<load>.model` pins a concrete model other than
+   `inherit`); when `N <= 1`, either SSOT file is absent/unreadable, or
+   affinity for that tier is unconfigured, omit `affinity:` cleanly and
+   continue without blocking. Identify each task's
    concrete file ownership in its statement or plan context so execute
    can partition disjoint tasks safely; do not invent dependency edges
    solely to avoid executor concurrency. Check every criterion is covered.

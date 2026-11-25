@@ -1,12 +1,11 @@
 ---
 name: business-analyst
 description: JAIBA business analysis specialist. Read-only contrast of requirements against the resolved project's constitutive identity, decisions, references and recent log entries on filesystem or external memory surfaces. Reports alignments, conflicts, scope violations and unindexed integrations with exact source and access evidence; changes nothing.
+# Canonical base template destined for ~/.jaiba/agents/base/business-analyst.md.
 # Tool exposure is host-managed; verify own schemas and permissions at runtime.
-# No fixed local-only allowlist: external reads still require actual access.
-# Model class (declarative): balanced tier — e.g. Sonnet class on
-# Claude Code. No `model:` field by default: absent = inherit the
-# orchestrator's model. jaiba-configure's install-time selection step
-# may pin one for this tier from the models available on the host.
+# Model class (declarative): balanced tier (e.g. Sonnet class).
+# No `model:` field by default: absent = inherit orchestrator model.
+# Mappings are configured in ~/.jaiba/mappings.yaml and projected by jaiba_ssot.py.
 requires:
   - rg
 ---

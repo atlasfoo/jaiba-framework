@@ -3,58 +3,123 @@
   "purpose": "reviewed source drift for immutable Phase4 T-021 historical rehearsal recordings",
   "source_hash_algorithm": "SHA-256 of canonical compact JSON encoding of decoded UTF-8 source text (surface_rehearsal.digest); no source normalization",
   "recording_policy": "Recorded journals and index are immutable; replay validates historical protocol evidence, not current-source execution. No recapture or fresh model run is claimed.",
-  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. Reviewed post-recording source paths: filesystem-surface.md under T-023 plus the later T-083 factory clarification; resolution.md under T-024 plus the later T-088 removal of the stale Engram draft parenthetical; execute-mode.md and summarize-mode.md under T-024; memory-surface-contract.md under T-083. T-033 is not the provenance of any listed change.",
+  "review_scope": "The Phase4 T-021 recordings predate T-023 and T-024. Reviewed post-recording source paths cover ADR-014 (jaiba-memory-surface 1.1.0), ADR-015/ADR-016/ADR-017 (native-plan-client, lane routing, researcher model policy), ADR-019/PR-22 (3-level memory notices, local routing-sync, 1.1.0 archive receipts), and ADE Phases 2-3 (T-006 atomic v2 bindings, T-008 Pattern 1 affinity/SSOT config, T-009 Pattern 2 Worktree Worker Link, T-010 Pattern 3 cross-agent bridge). T-033 is not the provenance of any listed change.",
   "changed_sources": {
     "skills/create-memory/references/resolution.md": {
       "recorded_source_sha256": "2875ae3fa180b27058ae47485199b0fa53950d37b2a142bfad03d7df15922c2e",
-      "current_source_sha256": "35baa7d28a8fbec4dd80e76b67004b0785f9c080d1474b46e852c4c2b2862b49",
-      "classification": "known post-recording T-088 source change",
-      "reason": "T-088: current bytes keep the T-024 unavailable-surface retry/stop and snapshot-recovery policy, and drop the parenthetical that named jaiba-engram-memory as a still-unselectable draft."
+      "current_source_sha256": "6e894c9c6173cc717b5e21ba7dac45eb5b4a293905b87d0fa24803ec1764716f",
+      "classification": "known post-recording T-009 source change",
+      "reason": "T-009: incorporates jaiba-memory-surface 1.1.0 Step 0 binding-first, T-006 atomic temp+rename v2 persistence, and Pattern 2 Worktree Worker Link (executive.role: worker) read-only rules."
     },
     "skills/create-memory/references/filesystem-surface.md": {
       "recorded_source_sha256": "a14dbc4e48f9b1a04b922b60d7da6000ae83f897f207d6277ce2a27567e62951",
-      "current_source_sha256": "df57e01e789528d1617f39c4d4713a041a72efb5c95affa26ed28b80f578e066",
-      "classification": "known post-recording T-083 source change",
-      "reason": "T-083: current bytes keep the T-023 filesystem mapping reconciliation and add the factory rule that one file is the payload unit, with no per-file journals, chunks, or manifests unless a characterized native limit or verification gap requires them; filesystem atomicity stays unasserted."
-    },
-    "skills/conduct/references/execute-mode.md": {
-      "recorded_source_sha256": "0a0c2428b7bbe10a3e46c7ecbb356ffb029f0d78ea6ec566128c2bfde29aa7a2",
-      "current_source_sha256": "61382f80c8dec766b8ebabeb30107f36de28a9a00205f92f983ff227c08c93fa",
-      "classification": "known post-recording T-024 source change",
-      "reason": "T-024: added execute outage/recovery rules for pending tasks, lost acknowledgements, child effects and verified task/walkthrough progress."
-    },
-    "skills/conduct/references/summarize-mode.md": {
-      "recorded_source_sha256": "327deca81a3b1b0128049ee101517b42e9de92b6b2170b8665884606ec65da48",
-      "current_source_sha256": "03178f9387e7d68851e8dd9310974878be0ca1aaaff6e6e33e03777ac124ee13",
-      "classification": "known post-recording T-024 source change",
-      "reason": "T-024: added close-ID recovery rules for uncertain append/clear, frozen inventory, immutable archive verification and context isolation."
+      "current_source_sha256": "d71dd30e270454d5e534f79b1d1425c0802707faf170d7514bc5495396368fb5",
+      "classification": "known post-recording ADR-014 source change",
+      "reason": "ADR-014: updated filesystem surface mapping for jaiba-memory-surface 1.1.0, document-tree executive-journal realization, and 3-level layout rules."
     },
     "skills/create-memory/references/memory-surface-contract.md": {
       "recorded_source_sha256": "0316302534d1e76558458ec449f64f35743acf56d37e03a6b6d7f2947b60357b",
-      "current_source_sha256": "4da3eb77fe5958844922a9abdfc0adf3be014ae283b1177ea41200525d425a93",
-      "classification": "known post-recording T-083 source change",
-      "reason": "T-083: factory contract records the 80% operating threshold as a derivation choice, conditional lossless chunking above it, and absent backend guarantees as not-assumed without weakening contract 1.0.0."
+      "current_source_sha256": "f89eea52eb2ad3b55af89a71c0e3b6382662da17625eb39171a9840ee9cd4e9f",
+      "classification": "known post-recording ADR-014 source change",
+      "reason": "ADR-014: evolved jaiba-memory-surface from 1.0.0 to 1.1.0 with document-tree/record-store archetypes, executive-journal patch/compact, and binding v2 portability."
+    },
+    "skills/conduct/SKILL.md": {
+      "recorded_source_sha256": "7f461749b3ec9bbdf06033c9d16fab24a23200c54ebb2a913fbbc5ef81f4fe22",
+      "current_source_sha256": "ce6e7b6b938be67fa1d34eee77a31d156fee7691662e3411a8e7edbdb8989561",
+      "classification": "known post-recording T-009 source change",
+      "reason": "T-009: added 1.1.0 consumer discovery, native-plan-client/3-level memory notices, and Pattern 2 /conduct execute T-NNN + Worktree Worker Link routing."
+    },
+    "skills/conduct/references/execute-mode.md": {
+      "recorded_source_sha256": "0a0c2428b7bbe10a3e46c7ecbb356ffb029f0d78ea6ec566128c2bfde29aa7a2",
+      "current_source_sha256": "43fc42b710c9b3a9625d220efa2947ab492ba324965bcda228487b147f30da03",
+      "classification": "known post-recording T-010 source change",
+      "reason": "T-010: combines 1.1.0 patch recovery, T-009 Pattern 2 Bounded Worker Flow & Coordinator Integration, and Pattern 3 cross-agent bridge wave/fallback hooks."
+    },
+    "skills/conduct/references/spec-mode.md": {
+      "recorded_source_sha256": "36c00cf108dab0bcae2711e538040788ab193f8419267d6b5eb88892d6ce50a4",
+      "current_source_sha256": "f48c0f07ec8fd415e64a82b8f42f0d71e8937d9f68735b63318a30d5006b35c6",
+      "classification": "known post-recording ADR-015 source change",
+      "reason": "ADR-015: integrated 1.1.0 O(delta) patch/render drafting, native-plan-client conversion, and ADR-018 local-evidence ticket linking."
+    },
+    "skills/conduct/references/subagents.md": {
+      "recorded_source_sha256": "2762d55ce7ab1c233e012d56442d79bd596093ef84e6f9e445f08712d22b7cdd",
+      "current_source_sha256": "a7d7d4ce4587cc3476414639f520c1b86aee796799f2599debe5841ec870aa06",
+      "classification": "known post-recording T-010 source change",
+      "reason": "T-010: added 1.1.0 memory scope/role access rules and Pattern 3 optional cross-agent CLI/ACP bridge verification, §4.5 boundary, and 3-step audit/fallback."
+    },
+    "skills/conduct/references/summarize-mode.md": {
+      "recorded_source_sha256": "327deca81a3b1b0128049ee101517b42e9de92b6b2170b8665884606ec65da48",
+      "current_source_sha256": "6e6aef73bbc13bb928360962694a717979c5974a4dec8ba8ae1ca474c90a4724",
+      "classification": "known post-recording ADR-019 source change",
+      "reason": "ADR-019: added 1.1.0 compact + render close flow and Level 1/Level 2 proactive migration notices."
+    },
+    "skills/conduct/references/tasks-mode.md": {
+      "recorded_source_sha256": "d6b4e9697974968853a6534421f332048ff3bfdda95ad187581da1ab6b9b2fb7",
+      "current_source_sha256": "ef525eca21199282ac103abbb915d1cd87a4e04ef11e9b375df5f06d867fdadf",
+      "classification": "known post-recording T-008 source change",
+      "reason": "T-008: added 1.1.0 patch/render preconditions and Pattern 1 optional affinity:<host[/model]> projection from ~/.jaiba/config.yaml and ~/.jaiba/mappings.yaml."
+    },
+    "skills/conduct/references/triage.md": {
+      "recorded_source_sha256": "88edcba52c690804b4d5c542c8b25f5f45c23910b28ce2b1b45902a9381420e9",
+      "current_source_sha256": "4e7df5a54ff4101b8fb88af3e83868edaeac88e14a476ccac27ac299a58a5cc8",
+      "classification": "known post-recording ADR-019 source change",
+      "reason": "ADR-019: enforces Step 0 resolution and Level 1/Level 2 migration notices at triage entry."
+    },
+    "skills/conduct/references/validate-mode.md": {
+      "recorded_source_sha256": "28c8836a66c06b509bc04b7a9341f89b266a608dea14d5e7edc683226b97fd68",
+      "current_source_sha256": "32544198f01ab31f277738f65a6b6056a9aa796a6f4d45a708972bf9cc834a69",
+      "classification": "known post-recording ADR-014 source change",
+      "reason": "ADR-014: updated validation reads to deterministic render and criterion outcome updates to set-criterion-status patch operations."
+    },
+    "skills/conduct/assets/tasks-template.md": {
+      "recorded_source_sha256": "080dbb499fd599732e8547ed85c208daad8791aad05f2c210e51724663889439",
+      "current_source_sha256": "a67644c143410f1389560d2366f27860cf15c37dfdc96c571d909a43ecf11a0d",
+      "classification": "known post-recording T-008 source change",
+      "reason": "T-008: documented optional Pattern 1 affinity:<host[/model]> task metadata line when N > 1 enabled hosts configure tier-affinity."
+    },
+    "skills/conduct/scripts/archive.sh": {
+      "recorded_source_sha256": "b8252ffa0a101c5535f9996228e113ccc1abf83b412f1a529a35b755d3af8c97",
+      "current_source_sha256": "577754c88cb1a101007c83dd8796fd6be0f1fb87b549efed20f9c25cf53f3d60",
+      "classification": "known post-recording PR-22 source change",
+      "reason": "PR-22: updated archive close receipt stamping for jaiba-memory-surface 1.1.0/1.0.0 compatibility."
+    },
+    "skills/ask/SKILL.md": {
+      "recorded_source_sha256": "5f881d2e0707ba00488ca98b6d6e6f2dc97b2623d089864a931adf9c3ed13fa8",
+      "current_source_sha256": "4d3f15af382a49ed5aff5426151b679deb15487034a2a040b525e551670653b6",
+      "classification": "known post-recording T-006 source change",
+      "reason": "T-006: aligns ask lane with 1.1.0 Step 0, ADR-016 side-question routing, ADR-019 local routing-sync exception, and atomic temp+rename v2 binding auto-generation."
+    },
+    "skills/ask/references/handoff.md": {
+      "recorded_source_sha256": "d6c2669896d94bea3d2bc6335614e9f68f2804f61e7d01c5c6784a692307f21c",
+      "current_source_sha256": "ed7d1702751b0ea7e0f48c4ea4bb5abc323f2d3b2fdc8748a00f2f8c6f66fa94",
+      "classification": "known post-recording ADR-017 source change",
+      "reason": "ADR-017: documents read-only researcher dispatch without model: pin and 1.1.0 render bounds."
+    },
+    "skills/ask/references/orientation.md": {
+      "recorded_source_sha256": "a14d558ae6bc2c89a18fc4d814320068b447392e58cbebc9c9d16538626e8d60",
+      "current_source_sha256": "93b6dafdfbeb5030cf40777c9d5f87fc5940facd010bd5928580623ea0da0145",
+      "classification": "known post-recording ADR-014 source change",
+      "reason": "ADR-014: enforces MSV-008 deterministic binding -> catalogue -> exact ID -> render path without mem_search."
+    },
+    "skills/fast/SKILL.md": {
+      "recorded_source_sha256": "3f869eed2d7d46cadf4d6583e276f7a1258098acd4f51009df053da32ee89501",
+      "current_source_sha256": "9ec44f5563c57f236bfd7efb07b6cbe0a48d8ee80ef17a18270bee7848c06677",
+      "classification": "known post-recording T-006 source change",
+      "reason": "T-006: aligns fast lane with 1.1.0 Step 0, ADR-016 out-of-plan routing, ADR-019 notices, and atomic temp+rename v2 binding auto-generation."
+    },
+    "skills/fast/references/plan-adjustment.md": {
+      "recorded_source_sha256": "52c46db24dc32088ab2c4a19f4c85141b57061c91c4293f908a8ff9d0dbb2dd8",
+      "current_source_sha256": "9baa9dbb8649bd085e4713069140013595f72fc03eba10accb10e61f8f6fbbeb",
+      "classification": "known post-recording ADR-016 source change",
+      "reason": "ADR-016: updated out-of-plan routing and 1.1.0 executive-journal reconciliation rules."
     }
   },
   "unchanged_source_paths": [
-    "skills/ask/SKILL.md",
-    "skills/ask/references/handoff.md",
-    "skills/ask/references/orientation.md",
-    "skills/conduct/SKILL.md",
     "skills/conduct/assets/plan-summary-template.md",
     "skills/conduct/assets/plan-template.md",
     "skills/conduct/assets/prd-template.md",
-    "skills/conduct/assets/tasks-template.md",
     "skills/conduct/assets/walkthrough-template.md",
-    "skills/conduct/references/propose-mode.md",
-    "skills/conduct/references/spec-mode.md",
-    "skills/conduct/references/subagents.md",
-    "skills/conduct/references/tasks-mode.md",
-    "skills/conduct/references/triage.md",
-    "skills/conduct/references/validate-mode.md",
-    "skills/conduct/scripts/archive.sh",
-    "skills/fast/SKILL.md",
-    "skills/fast/references/plan-adjustment.md"
+    "skills/conduct/references/propose-mode.md"
   ],
   "immutable_recordings_sha256_raw_bytes": {
     "index.json": "8ed1337444cc66a3ac71067540932fbe208a976c753987e270cb9287fc4cfeb7",

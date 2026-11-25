@@ -151,16 +151,20 @@ filesystem-mode mechanism only. It is not used here.
    stays empty: no PRD, plan, tasks, or walkthrough. Verify each registry
    write with a pre-read revision, full readback, and receipt before the
    next write.
-8. Persist binding `v2` at
-   `~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
-   (`binding-format-version: "2"`) per `resolution.md` §4, and read the
-   routing fields back before claiming it saved. Do not create the file
-   merely to test the path. Do not hash a URI, a trailing slash, or a
-   relative path. Do not write `~/.jaiba/memory/<host-agent-id>/`.
-   `host-agent-id` is provenance (`last-verified-by`), not a key. If
-   persistence is unavailable, obtain explicit session-only consent or
-   stop. A session-only selection is not the v2 file. Never mint a new
-   context silently on every session.
+8. Persist binding `v2` atomically via same-directory temp-file write +
+   rename (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>` →
+   `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`,
+   `binding-format-version: "2"`) per `resolution.md` §4, and perform exact
+   readback verification of the routing fields before claiming it saved.
+   Do not create the file merely to test the path. Do not hash a URI, a
+   trailing slash, or a relative path. Do not write
+   `~/.jaiba/memory/<host-agent-id>/`. `host-agent-id` is provenance
+   (`last-verified-by`), not a key. Never overwrite a malformed or
+   mismatched pre-existing binding silently. If write, rename, or readback
+   fails (or persistence is unavailable), remove any leftover temporary
+   file and obtain explicit session-only consent or stop. A session-only
+   selection is not the v2 file. Never mint a new context silently on every
+   session.
 9. **Create, then depth.** A new project needs an authoritatively empty
    scope. Empty catalogue alone is not instrumentation.
    - **minimal** — registry project, empty context identity, and binding
@@ -289,7 +293,7 @@ would clobber real work. Read the state first, then pick the row.
 | The repo already has… | Meaning | Do this |
 |---|---|---|
 | `.ai/memory/index.md` (bundle) or flat `constitution.md` (legacy), either with **real content** | Fully instrumented | Don't bootstrap. Route to `jaiba-init:update-brain` (drift/update), `conduct`, or `ask` |
-| `.ai/` skeleton but `memory/` holds neither `index.md` nor `constitution.md` — or only bare, untouched templates | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–2 (skeleton) while **verifying/completing step 3** (`AGENTS.md` `jaiba-memory-surface: filesystem` pin — checking existing `AGENTS.md` non-destructively if unpinned/pre-existing — and persisting/readback-verifying the `filesystem` `v2` binding) **before** entering **step 4** (`update-brain:initialize`) and step 5 (`jaiba-doctor`), so the completed bootstrap lands directly at Level 3 (`v3`) rather than `⚠️ Degraded (Level 2)` |
+| `.ai/` skeleton but `memory/` holds neither `index.md` nor `constitution.md` — or only bare, untouched templates | Half-bootstrapped (a prior run stopped before the brain was built) | Resume: skip steps 1–2 (skeleton) while **verifying/completing step 3** (`AGENTS.md` `jaiba-memory-surface: filesystem` pin — checking existing `AGENTS.md` non-destructively if unpinned/pre-existing — and atomically persisting via same-directory `temp + rename` (`<sha256(R)>.yaml.tmp.<pid>` → `<sha256(R)>.yaml`) with exact readback verification the `filesystem` `v2` binding) **before** entering **step 4** (`update-brain:initialize`) and step 5 (`jaiba-doctor`), so the completed bootstrap lands directly at Level 3 (`v3`) rather than `⚠️ Degraded (Level 2)` |
 | Nothing JAIBA under `.ai/` | Greenfield or legacy, not yet adopted | Continue with the full sequence below |
 
 If you're unsure which case you're in, check `.ai/memory/` for
@@ -378,15 +382,19 @@ in its frontmatter by default) to the repo root. It is the minimal per-repo
 marker: it only confirms instrumentation, pins `filesystem`, points behavior
 at the global contract, and defers project facts to the constitution.
 
-Also persist and readback-verify the `filesystem` `v2` binding at
-`~/.jaiba/memory/bindings/<sha256(canonical-work-root)>.yaml`
-(`binding-format-version: "2"`, `surface.adapter-id: "filesystem"`,
-`surface.namespace: "filesystem"`, `surface.registry-locator: ".ai/memory/index.md"`,
-deterministic `project.project-id` and `executive.context-id`,
+Also persist the `filesystem` `v2` binding atomically via same-directory
+temp-file write + rename (`~/.jaiba/memory/bindings/<sha256(R)>.yaml.tmp.<pid>`
+→ `~/.jaiba/memory/bindings/<sha256(R)>.yaml` via `mv -f` / `os.replace`,
+followed by exact readback verification) (`binding-format-version: "2"`,
+`surface.adapter-id: "filesystem"`, `surface.namespace: "filesystem"`,
+`surface.registry-locator: ".ai/memory/index.md"`, deterministic
+`project.project-id` and `executive.context-id`,
 `executive.context-locator: ".ai/work"`) per `create-memory/references/resolution.md`
-so the project reaches **Level 3 (v3)** directly from bootstrap. If
-machine persistence is unavailable, obtain explicit session-only consent
-or stop.
+so the project reaches **Level 3 (v3)** directly from bootstrap. Never
+overwrite a malformed or mismatched existing binding silently. If write,
+rename, or readback fails (or machine persistence is unavailable), remove
+any leftover temporary file and obtain explicit session-only consent or
+stop.
 
 **Edge case — the repo already has an `AGENTS.md`.** Do not overwrite it;
 that's likely the developer's own contract. Stop and ask, offering two

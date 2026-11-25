@@ -1,12 +1,11 @@
 ---
 name: verify
 description: JAIBA verifier. Conduct's validate phase delegates verification of either structured PRD acceptance criteria (happy and sad Given/When/Then paths) or approved plan scope at design depth (deliverables, objective constraints, and completed task evidence). Exercises each item and returns met / not met / not verifiable verdicts with evidence. Reads and runs; never edits source or writes PRD/status changes.
+# Canonical base template destined for ~/.jaiba/agents/base/verify.md.
 # Tool exposure is host-managed; verify own schemas and permissions at runtime.
-# No fixed local-only allowlist: external reads still require actual access.
-# Model class (declarative): balanced tier — e.g. Sonnet class on
-# Claude Code. No `model:` field by default: absent = inherit the
-# orchestrator's model. jaiba-configure's install-time selection step
-# may pin one for this tier from the models available on the host.
+# Model class (declarative): balanced tier (e.g. Sonnet class).
+# No `model:` field by default: absent = inherit orchestrator model.
+# Mappings are configured in ~/.jaiba/mappings.yaml and projected by jaiba_ssot.py.
 requires:
   - git
 ---
